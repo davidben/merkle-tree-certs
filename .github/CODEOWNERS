@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-davidben-tls-merkle-tree-certs.md davidben@google.com
