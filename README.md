@@ -1,6 +1,6 @@
-# TODO - Your title
+# Merkle Tree Certificates for TLS
 
-This is the working area for the individual Internet-Draft, "TODO - Your title".
+This is the working area for the individual Internet-Draft, "Merkle Tree Certificates for TLS".
 
 * [Editor's Copy](https://davidben.github.io/merkle-tree-certs/#go.draft-davidben-tls-merkle-tree-certs.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs)
