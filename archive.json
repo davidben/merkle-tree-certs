@@ -1,0 +1,71 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2023-03-12T01:50:55.644602+00:00",
+  "repo": "davidben/merkle-tree-certs",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOJIBkVc5gi33k",
+      "title": "Time math is ambiguously-specified",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/1",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Leap seconds, UTC, TAI, etc., are all the worst. While we never actually write the timestamps on the wire, it is important that everyone agree, for a given batch number, what times they refer to.\r\n\r\nThe intent was that you just do math in POSIX time, since that's what every programming language gives you. But if there's ever another leap second, it gets a little tricky. It might be that we have to literally cite POSIX here? Something like: all of these are just measured in seconds, do the math in seconds to get a POSIX timestamp, convert the current time to POSIX time, and then compare in that space?\r\nhttps://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_16\r\n\r\nOtherwise you have to answer ridiculous questions like what happens at one of the POSIX timestamps that correspond to multiple times of day.\r\n\r\nNot that anything at this granularity matters _at all_ for a PKI.",
+      "createdAt": "2023-03-10T23:32:00Z",
+      "updatedAt": "2023-03-10T23:33:12Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": []
+}
