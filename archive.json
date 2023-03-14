@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-03-12T01:50:55.644602+00:00",
+  "timestamp": "2023-03-14T01:25:17.698472+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -63,6 +63,22 @@
       "body": "Leap seconds, UTC, TAI, etc., are all the worst. While we never actually write the timestamps on the wire, it is important that everyone agree, for a given batch number, what times they refer to.\r\n\r\nThe intent was that you just do math in POSIX time, since that's what every programming language gives you. But if there's ever another leap second, it gets a little tricky. It might be that we have to literally cite POSIX here? Something like: all of these are just measured in seconds, do the math in seconds to get a POSIX timestamp, convert the current time to POSIX time, and then compare in that space?\r\nhttps://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_16\r\n\r\nOtherwise you have to answer ridiculous questions like what happens at one of the POSIX timestamps that correspond to multiple times of day.\r\n\r\nNot that anything at this granularity matters _at all_ for a PKI.",
       "createdAt": "2023-03-10T23:32:00Z",
       "updatedAt": "2023-03-10T23:33:12Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOJIBkVc5gql1x",
+      "title": "How long must long-expired batches be served",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/2",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As currently written, neither CAs nor the transparency service are allowed to stop serving long-outdated batches. Should we relax this? Some nuisances:\r\n\r\n* Storage windows should be much larger than validity windows, to allow for RP clock skew\r\n* If the CA's storage window is smaller than the TS's storage window, it is possible that a transparency service will fail to log something if it's really, _really_ behind. That said, it would need to be behind by more than the CA's storage window and if that's, say, a year, that's probably fine.\r\n* A bigger issue is that if the TS spins up after the CA does, it can't bootstrap itself with data before the CA's storage window (unless it pulls it from another mirror)",
+      "createdAt": "2023-03-13T15:55:05Z",
+      "updatedAt": "2023-03-13T15:55:05Z",
       "closedAt": null,
       "comments": []
     }
