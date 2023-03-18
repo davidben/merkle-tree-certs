@@ -42,12 +42,14 @@ normative:
   RFC1123:
 
   X.690:
-       title: "Information technology - ASN.1 encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)"
-       date: February 2021
-       author:
-         org: ITU-T
-       seriesinfo:
-         ISO/IEC 8824-1:2021
+    title: "Information technology - ASN.1 encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)"
+    date: February 2021
+    author:
+      org: ITU-T
+    seriesinfo:
+      ISO/IEC 8824-1:2021
+
+  POSIX: DOI.10.1109/IEEESTD.2018.8277153
 
 informative:
   CHROME-CT:
@@ -225,7 +227,13 @@ when, and only when, they appear in all capitals, as shown here.
 
 This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}.
 
-# Overview
+## Time {#time}
+
+All time computations in this document are represented by POSIX timestamps, defined in this document to be integers containing a number of seconds since the Epoch, defined in Section 4.16 of {{POSIX}}. That is, the number of seconds after 1970-01-01 00:00:00 UTC, excluding leap seconds. A UTC time is converted to a POSIX timestamp as described in {{POSIX}}.
+
+Durations of time are integers, representing a number of seconds not including leap seconds. They can be added to POSIX timestamps to produce other POSIX timestamps.
+
+The current time is a POSIX timestamp determined by converting the current UTC time to seconds since the Epoch. One POSIX timestamp is said to be before (respectively, after) another POSIX timestamp if it is less than (respectively, greater than) the other value.
 
 ## Terminology and Roles
 
@@ -266,7 +274,7 @@ Inclusion proof:
 Window:
 : A range of consecutive batch tree heads. A relying party maintains a copy of the CA's latest window. At any time, it will accept only assertions contained in tree heads contained in the current window.
 
-## Certificate Lifecycle
+# Overview
 
 The process of issuing and using a certificate is as follows:
 
@@ -418,13 +426,13 @@ A Merkle Tree certification authority is defined by the following values:
 : The public half of a signing keypair. The corresponding private key, `private_key`, is known only to the CA.
 
 `start_time`:
-: The issuance time of the first batch of certificates
+: The issuance time of the first batch of certificates, represented as a POSIX timestamp (see {{time}}).
 
 `lifetime`:
-: A duration of time which determines the lifetime of certificates issued by this CA.
+: A number of seconds which determines the lifetime of certificates issued by this CA.
 
 `batch_duration`:
-: A duration of time which determines how frequently the CA issues certificates. See details below.
+: A number of seconds which determines how frequently the CA issues certificates. See details below.
 
 `window_size`:
 : An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `floor(lifetime / batch_duration) + 1`.
@@ -436,8 +444,6 @@ These values are public and known by the relying party and the CA. They may not 
 Certificates are issued in batches. Batches are numbered consecutively, starting from zero. All certificates in a batch have the same issuance time, determined by `start_time + batch_duration * batch_number`. This is known as the batch's issuance time. That is, batch 0 has an issuance time of `start_time`, and issuance times increment by `batch_duration`. A CA can issue no more frequently than `batch_duration`. `batch_duration` determines how long it takes for the CA to return a certificate to the subscriber.
 
 All certificates in a batch have the same expiration time, computed as `lifetime` past the issuance time. After this time, the certificates in a batch are no longer valid. Merkle Tree certificates uses a short-lived certificates model, such that certificate expiration replaces an external revocation signal like CRLs {{RFC5280}} or OCSP {{?RFC6960}}. `lifetime` SHOULD be set accordingly. For instance, a deployment with a corresponding maximum OCSP {{?RFC6960}} response lifetime of 14 days SHOULD use a value no higher than 14 days. See {{revocation}} for details.
-
-The `window_size` parameter, computed from `lifetime` and `batch_duration`, determines relying party resource requirements, as described in {{relying-parties}}. A relying party must maintain `window_size` hashes at a time. Parameters SHOULD be tuned to balance relying party resource requirements and issuance delay.
 
 CAs are RECOMMENDED to use a `batch_duration` of one hour, and a `lifetime` of 14 days. This results in a `window_size` of 336, for a total of 10,752 bytes in SHA-256 hashes.
 
@@ -451,7 +457,7 @@ pending:
 : The current time is before the batch's issuance time
 
 ready:
-: The current time is at or after the batch's issuance time, but the batch has not yet been issued
+: The current time is not before the batch's issuance time, but the batch has not yet been issued
 
 issued:
 : Certificates have been issued for this batch
@@ -769,7 +775,7 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
 3. If `new_latest_batch` is less than `old_latest_batch`, abort this procedure with an error.
 
-4. If the issuance date for batch `new_latest_batch` is in the future (see {{parameters}}), abort this procedure with an error.
+4. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
 
 5. For all `i` such that `old_latest_batch < i <= new_latest_batch`:
 
@@ -799,7 +805,7 @@ The update server maintains the latest window validated to appear in all mirrors
 
 4. If `new_latest_batch` is less than `old_latest_batch`, abort this procedure with an error.
 
-5. If the issuance date for batch `new_latest_batch` is in the future (see {{parameters}}), abort this procedure with an error.
+5. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
 
 6. Fetch the window with `new_latest_batch` from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.
 
