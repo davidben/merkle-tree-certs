@@ -214,7 +214,7 @@ This document introduces Merkle Tree Certificates, an optimization that authenti
 
 * Certificates are issued after a significant processing delay of, in the recommended parameters ({{parameters}}), about an hour. Subscribers that need a certificate issued quickly are expected to use a different mechanism.
 
-* To mitigate the above, this document describes a certificate negotiation mechanism. This allows subscribers to send these more efficient certificates when available, while falling back to other mechanisms otherwise.
+To support the reduced scope, this document also describes a certificate negotiation mechanism. Subscribers send these more efficient certificates when available, and otherwise fall back to other mechanisms.
 
 Merkle Tree Certificates are not intended to replace existing Public Key Infrastructure (PKI) mechanisms but, in applications where a significant portion of authentications meet the above requirements, complement them as an optional optimization. In particular, it is expected that, even within applications that implement it, this mechanism will not be usable for all TLS connections.
 
