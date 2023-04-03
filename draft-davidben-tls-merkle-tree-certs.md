@@ -920,19 +920,20 @@ This section defines the `Bikeshed` TLS certificate type, which may be negotiate
 
 [[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in {{cert-type-problems}}. We may need to define a third one.]]
 
-When negotiated, the CertificateEntry structure in the Certificate message is updated as follows:
+When negotiated, the Certificate message MUST contain a single CertificateEntry structure.
+CertificateEntry is updated as follows:
 
 ~~~
 enum { Bikeshed(TBD), (255) } CertificateType;
 
 struct {
     select (certificate_type) {
-        // certificate type defined in this document.
+        /* Certificate type defined in this document */
         case Bikeshed:
             BikeshedCertificate certificate;
 
+        /* From RFC 7250 */
         case RawPublicKey:
-            /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
             opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
 
         case X509:
