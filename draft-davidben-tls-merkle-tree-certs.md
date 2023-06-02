@@ -31,7 +31,7 @@ author:
     email: asymmetric@google.com
 
  -
-    ins: "B. Westerbaan"
+    ins: "B.E. Westerbaan"
     name: "Bas Westerbaan"
     organization: "Cloudflare"
     email: bas@cloudflare.com
