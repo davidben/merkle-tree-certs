@@ -344,13 +344,13 @@ enum {
 
 struct {
     ClaimType claim_type;
-    opaque claim_info<0..2^24-1>;
+    opaque claim_info<0..2^16-1>;
 } Claim;
 
 struct {
     SubjectType subject_type;
-    opaque subject_info<0..2^24-1>;
-    Claim claims<0..2^24-1>;
+    opaque subject_info<0..2^16-1>;
+    Claim claims<0..2^16-1>;
 } Assertion;
 ~~~
 
@@ -359,7 +359,7 @@ An Assertion is roughly analogous to an X.509 TBSCertificate ({{Section 4.1.2 of
 ~~~
 struct {
     SignatureScheme signature;
-    opaque public_key<1..2^24-1>;
+    opaque public_key<1..2^16-1>;
 } TLSSubjectInfo;
 ~~~
 
@@ -890,7 +890,7 @@ enum { tls(0), (2^16-1) } SubjectType;
 
 struct {
     SignatureScheme signature;
-    opaque public_key<1..2^24-1>;
+    opaque public_key<1..2^16-1>;
     /* TODO: Should there be an extension list? */
 } TLSSubjectInfo;
 ~~~
