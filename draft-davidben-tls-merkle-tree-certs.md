@@ -499,37 +499,57 @@ First, the CA then builds a Merkle Tree from the list as follows:
 Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is `ceil(log_2(n)) + 1`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
 
 ~~~~
-    HashEmpty() = hash(0x00)
+    HashEmpty(level, index) = hash(HashEmptyInput)
     HashNode(left, right, level, index) = hash(HashNodeInput)
-    HashAssertion(assertion) = hash(0x02 || assertion)
+    HashAssertion(assertion, index) = hash(HashAssertionInput)
 ~~~~
 
-`0x00` and `0x02` denote byte strings containing a single byte with value zero and two, respectively. `||` denotes concatenation. `HashNodeInput` is computed by encoding the structure defined below:
+`0x00` and `0x02` denote byte strings containing a single byte with value zero and two, respectively. `||` denotes concatenation.
+
+`HashEmpyInput`, `HashNodeInput` and `HashAssertionInput` are computed by encoding the structures defined below:
 
 ~~~
+struct {
+    uint8 distinguisher = 0;
+    opaque issuer_id<1..32>;
+    uint32 batch_number;
+    opaque pad[N];
+    uint64 index;
+    uint8 level;
+} HashEmptyInput;
+
 struct {
     uint8 distinguisher = 1;
     opaque issuer_id<1..32>;
     uint32 batch_number;
     opaque pad[N];
+    uint64 index;
+    uint8 level;
     opaque left[hash.length];
     opaque right[hash.length];
-    uint8 level;
-    uint64 index;
 } HashNodeInput;
+
+struct {
+    uint8 distinguisher = 2;
+    opaque issuer_id<1..32>;
+    uint32 batch_number;
+    opaque pad[N];
+    uint64 index;
+    Assertion assertion;
+} HashAssertionInput;
 ~~~
 
 `issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `pad` is an array of zeros to pad up to the hash function's block size. For SHA-256, the block size is 64 bytes. The remaining fields are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
-1. Initialize level 0 with n elements. For `i` between `0` and `n-1`, inclusive,
-   set element `i` to the output of `HashAssertion(assertion[i])`.
+1. Initialize level 0 with n elements. For `j` between `0` and `n-1`, inclusive,
+   set element `j` to the output of `HashAssertion(assertion[j], j)`.
 
 2. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
    follows:
 
-   - If level `i-1` has an odd number of elements, append `HashEmpty()` to the level.
+   - If level `i-1` has an odd number of elements `j`, append `HashEmpty(i, j)` to the level.
 
    - Initialize level `i` with half as many elements as level `i-1`. For all `j`,
      set element `j` to the output of `HashNode(left, right, i, j)` where `left` is
@@ -551,13 +571,9 @@ At the end of this process, level `l-1` will have exactly one root element. This
 ~~~~
 {: #fig-example-tree title="An example Merkle Tree for three assertions"}
 
-If `n` is zero, the CA does not build a tree and the tree head is `HashEmpty()`. This value is constant for a given hash function. The value of `HashEmpty()` for SHA-256 is:
+If `n` is zero, the CA does not build a tree and the tree head is `HashEmpty(0, 0)`.
 
-~~~
-    6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d
-~~~
-
-If `n` is one, the tree contains a single level, level 0, and has a tree head of `HashAssertion(assertion)`.
+If `n` is one, the tree contains a single level, level 0, and has a tree head of `HashAssertion(assertion, 0)`.
 
 ### Signing a Window {#signing}
 
@@ -576,7 +592,7 @@ struct {
 
 `batch_number` is the batch number of the highest batch in the window.
 
-`tree_heads` value contains the last `window_size` tree heads, starting from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty()`.
+`tree_heads` value contains the last `window_size` tree heads, starting from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty(0, 0)`.
 
 After the CA builds the Merkle Tree for a batch, it constructs the Window structure whose `batch_number` is the number of the batch being issued. It then computes a signature over the following structure:
 
@@ -698,7 +714,7 @@ When a subscriber presents a BikeshedCertificate whose `proof_type` field is `me
 
 3. Compute the expiration time of the certificate's `batch_number`, as described in {{parameters}}. If this value is before the current time, abort this procedure with a `certificate_expired` error.
 
-4. Set `hash` to the output of `HashAssertion(assertion)`. Set `remaining` to the certificate's `index` value.
+4. Set `hash` to the output of `HashAssertion(assertion, index)`. Set `remaining` to the certificate's `index` value.
 
 5. For each element `v` at zero-based index `i` of the certificate's `path` field, in order:
 
@@ -1192,3 +1208,20 @@ IANA is requested to create the following entry in the TLS Certificate Types reg
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.
 
 The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document.
+
+# Change log
+{:numbered="false"}
+
+> **RFC Editor's Note:** Please remove this section prior to publication of a
+> final version of this document.
+
+## Since draft-davidben-tls-merkle-tree-certs-00
+{:numbered="false"}
+
+- Add proper context to every node in the Merkle tree. #32
+
+- Clarify we use a single `CertificateEntry`. #11
+
+- Clarify we use POSIX time. #1
+
+- Miscellaneous changes.
