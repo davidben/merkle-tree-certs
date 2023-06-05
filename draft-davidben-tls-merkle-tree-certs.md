@@ -31,7 +31,7 @@ author:
     email: asymmetric@google.com
 
  -
-    ins: "B. Westerbaan"
+    ins: "B.E. Westerbaan"
     name: "Bas Westerbaan"
     organization: "Cloudflare"
     email: bas@cloudflare.com
@@ -373,7 +373,7 @@ When a relying party interprets an Assertion certified by the CA, it MUST ignore
 
 This document defines claim types for DNS names and IP addresses, but others can be defined.
 
-[[TODO: For now, the claims below just transcribe the X.509 GeneralName structure. Should these be origins instead? For HTTPS, it's a pity to not capture the scheme and port. We do mandate ALPN in {{tls-certificate-type}}, so cross-protocol attacks are mitigated, but it's unfortunate that subscribers cannot properly separate their HTTPS vs FTPS keys, or their port 443 vs port 444 keys. One option here is to have HTTPS claims instead, and then other protocols can have FTPS claims, etc.]]
+[[TODO: For now, the claims below just transcribe the X.509 GeneralName structure. Should these be origins instead? For HTTPS, it's a pity to not capture the scheme and port. We do mandate ALPN in {{tls-certificate-type}}, so cross-protocol attacks are mitigated, but it's unfortunate that subscribers cannot properly separate their HTTPS vs FTPS keys, or their port 443 vs port 444 keys. One option here is to have HTTPS claims instead, and then other protocols can have FTPS claims, etc. #35 ]]
 
 ## DNS Claims
 
@@ -439,7 +439,7 @@ A Merkle Tree certification authority is defined by the following values:
 
 These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.
 
-[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -> Subscriber -> RP flow does not depend on the signature, only the CA -> Transparency Service -> RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly.]]
+[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -> Subscriber -> RP flow does not depend on the signature, only the CA -> Transparency Service -> RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]
 
 Certificates are issued in batches. Batches are numbered consecutively, starting from zero. All certificates in a batch have the same issuance time, determined by `start_time + batch_duration * batch_number`. This is known as the batch's issuance time. That is, batch 0 has an issuance time of `start_time`, and issuance times increment by `batch_duration`. A CA can issue no more frequently than `batch_duration`. `batch_duration` determines how long it takes for the CA to return a certificate to the subscriber.
 
@@ -594,7 +594,7 @@ The CA saves this signature as the batch's window signature. It then updates the
 
 ### Certificate Format {#proofs}
 
-[[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one.]]
+[[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one. #15 ]]
 
 For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
@@ -787,7 +787,7 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
    4. Set the mirrored latest batch number to `i` and save the fetched batch state.
 
-[[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest window and skip the intervening batches? The intervening batches are guaranteed to have been expired]]
+[[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]
 
 ## Single Update Service with Multiple Mirrors {#single-update-multiple-mirrors}
 
@@ -833,7 +833,7 @@ It does so by following the procedure in {{single-trusted-service}}, fetching fr
 
 # HTTP Interface {#publishing}
 
-[[TODO: This section hasn't been written yet. For now, this is just an informal sketch. The real text will need to define request/response formats more precisely, with MIME types, etc.]]
+[[TODO: This section hasn't been written yet. For now, this is just an informal sketch. The real text will need to define request/response formats more precisely, with MIME types, etc. #12 ]]
 
 CAs and transparency services publish state over an HTTP {{!RFC9110}} interface described below.
 
@@ -859,13 +859,13 @@ Individual servers in a service MAY return different latest batch numbers. Indiv
 
 {{ts-and-ca-availability}} discusses service availability requirements.
 
-[[TODO: Once a batch has expired, do we allow a CA to stop publishing it? The transparency service can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system.]]
+[[TODO: Once a batch has expired, do we allow a CA to stop publishing it? The transparency service can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system. #2 ]]
 
-[[TODO: If we have the window endpoint, do we still need to separate "info" and "assertions"?]]
+[[TODO: If we have the window endpoint, do we still need to separate "info" and "assertions"? #12 ]]
 
 # ACME Extensions {#acme-extensions}
 
-[[TODO: This section hasn't been written yet. Instead, what follows is an informal sketch and design discussion.]]
+[[TODO: This section hasn't been written yet. Instead, what follows is an informal sketch and design discussion. #13 ]]
 
 See {{agility}} for the overall model this should target.
 
@@ -891,7 +891,7 @@ enum { tls(0), (2^16-1) } SubjectType;
 struct {
     SignatureScheme signature;
     opaque public_key<1..2^24-1>;
-    /* TODO: Should there be an extension list? */
+    /* TODO: Should there be an extension list? #38 */
 } TLSSubjectInfo;
 ~~~
 
@@ -910,15 +910,15 @@ EdDSA algorithms:
 
 This document does not define the public key format for other algorithms. In order for a SignatureScheme to be usable with TLSSubjectInfo, this format must be defined in a corresponding document.
 
-[[TODO: If other schemes get defined before this document is done, add them here. After that, it's on the other schemes to do it.]]
+[[TODO: If other schemes get defined before this document is done, add them here. After that, it's on the other schemes to do it. #39 ]]
 
 ## The Bikeshed Certificate Type {#tls-certificate-type}
 
-[[TODO: Bikeshed is a placeholder name until someone comes up with a better one.]]
+[[TODO: Bikeshed is a placeholder name until someone comes up with a better one. #15]]
 
 This section defines the `Bikeshed` TLS certificate type, which may be negotiated with the `client_certificate_type`, `server_certificate_type` {{!RFC7250}}, or `cert_type` {{!RFC6091}} extensions. It can only be negotiated with TLS 1.3 or later. Servers MUST NOT negotiate it in TLS 1.2 or below. If the client receives a ServerHello that negotiates it in TLS 1.2 or below, it MUST abort the connection with an `illegal_parameter` alert.
 
-[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in {{cert-type-problems}}. We may need to define a third one.]]
+[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in {{cert-type-problems}}. We may need to define a third one. #18]]
 
 When negotiated, the Certificate message MUST contain a single CertificateEntry structure.
 CertificateEntry is updated as follows:
@@ -956,7 +956,7 @@ The second modification differs from {{RFC8446}}. Where {{RFC8446}} allowed an i
 
 If this certificate type is used for either the client or server certificate, the ALPN {{!RFC7301}} extension MUST be negotiated. If no application protocol is selected, endpoints MUST close the connection with a `no_application_protocol` alert.
 
-[[TODO: Suppose we wanted to introduce a second SubjectType for TLS, either to add new fields or capture a new kind of key. That would need to be negotiated. We could use another extension, but defining a new certificate type seems most natural. That suggests this certificate type isn't about negotiating BikeshedCertificate in general, but specifically SubjectType.tls and TLSSubjectInfo. So perhaps the certificate type should be TLSSubjectInfo or BikeshedTLS.]]
+[[TODO: Suppose we wanted to introduce a second SubjectType for TLS, either to add new fields or capture a new kind of key. That would need to be negotiated. We could use another extension, but defining a new certificate type seems most natural. That suggests this certificate type isn't about negotiating BikeshedCertificate in general, but specifically SubjectType.tls and TLSSubjectInfo. So perhaps the certificate type should be TLSSubjectInfo or BikeshedTLS. #7 ]]
 
 ## The Trust Anchors Extension {#tls-trust-anchors-extension}
 
@@ -976,7 +976,7 @@ When the subscriber receives this extension, selects a certificate from its cert
 
 ## Certificate Type Negotiation {#cert-type-problems}
 
-[[TODO: We may need a new certificate types extension, either in this document or a separate one. For now, this section just informally describes the problem.]]
+[[TODO: We may need a new certificate types extension, either in this document or a separate one. For now, this section just informally describes the problem. #18 ]]
 
 The server certificate type is negotiated as follows:
 
@@ -1126,7 +1126,7 @@ Merkle Tree certificates avoid sending an additional signature for OCSP response
 
 Relying parties with additional sources of revocation such as {{CRLite}} or {{CRLSets}} SHOULD provide a mechanism to express revoked assertions in such systems, in order to opportunistically revoke assertions in up-to-date relying parties sooner. It is expected that, in most deployments, relying parties can fetch this revocation data and Merkle Tree CA windows from the same service.
 
-[[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]]
+[[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document. #41]]
 
 ## Transparency
 
@@ -1176,7 +1176,7 @@ IANA is requested to create the following entry in the TLS Certificate Types reg
 | TBD   | `Bikeshed` | TBD         |
 {: title="Additions to the TLS Certificate Types Registry"}
 
-TODO: Define registries for the enums introduced in this document:
+[[ TODO: Define registries for the enums introduced in this document. #42]]
 
 * SubjectType
 
