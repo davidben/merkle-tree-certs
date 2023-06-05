@@ -349,12 +349,12 @@ struct {
 
 struct {
     SubjectType subject_type;
-    opaque subject_info<0..2^16-1>;
+    opaque subject_info_hash[hash.length];
     Claim claims<0..2^16-1>;
 } Assertion;
 ~~~
 
-An Assertion is roughly analogous to an X.509 TBSCertificate ({{Section 4.1.2 of RFC5280}}). It describes a series of claims about some subject. The `subject_info` field is interpreted according to the `subject_type` value. For TLS, the `subject_type` is `tls`, and the `subject_info` is a TLSSubjectInfo structure. TLSSubjectInfo is defined in full in {{tls-subject-info}} below, but as an illustrative example, it is reproduced below:
+An Assertion is roughly analogous to an X.509 TBSCertificate ({{Section 4.1.2 of RFC5280}}). It describes a series of claims about some subject. The `subject_info_hash` field is set to the *hash* of the `subject_info` field of a BikeshedCertificate, defined later in {{proofs}}. The `subject_info` field is interpreted according to the `subject_type` value. For TLS, the `subject_type` is `tls`, and the `subject_info` is the a TLSSubjectInfo structure. TLSSubjectInfo is defined in full in {{tls-subject-info}} below, but as an illustrative example, it is reproduced below:
 
 ~~~
 struct {
@@ -363,7 +363,7 @@ struct {
 } TLSSubjectInfo;
 ~~~
 
-This structure represents the public half of a TLS signing key. The semantics are thus that each claim in `claims` applies to the TLS client or server. This is analogous to X.509's SubjectPublicKeyInfo structure ({{Section 4.1.2.7 of RFC5280}}) but additionally incorporates the protocol. Protocols consuming an Assertion MUST check the `subject_type` is a supported value before processing `subject_info`. If unrecognized, the structure MUST be rejected.
+This structure represents the public half of a TLS signing key. The semantics are thus that each claim in `claims` applies to the TLS client or server. This is analogous to X.509's SubjectPublicKeyInfo structure ({{Section 4.1.2.7 of RFC5280}}) but additionally incorporates the protocol. Protocols consuming an Assertion MUST check the `subject_type` is a supported value before processing `subject_info_hash`. If unrecognized, the structure MUST be rejected.
 
 Other protocols aiming to integrate with this structure allocate a SubjectType codepoint and describe how it is interpreted.
 
@@ -596,7 +596,9 @@ The CA saves this signature as the batch's window signature. It then updates the
 
 [[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one. #15 ]]
 
-For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
+For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion, the `subject_info` matching `assertion.subject_info_hash`, and a proof. (In the case of tls, `subject_info` is a typed public key.)
+
+A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
 ~~~
 enum { merkle_tree_sha256(0), (2^16-1) } ProofType;
@@ -614,8 +616,10 @@ struct {
 struct {
     Assertion assertion;
     Proof proof;
+    opaque subject_info<0..2^24-1>;
 } BikeshedCertificate;
 ~~~
+[[TODO: We could leave out the `assertion.subject_info_hash` field, as that can be recomputed from `subject_info`. That prevents one possible implementation mistake: not checking whether `subject_info` matches with `subject_info_hash`. This does complicate the description of `BikeshedCertificate`. #6 ]]
 
 The `proof_type` identifies a type of proof. It determines the format of the `trust_anchor_data` and `proof_data` values. The mechanism defined in this document is `merkle_tree_sha256`, which uses `trust_anchor_data` and `proof_data` formats of MerkleTreeTrustAnchor and MerkleTreeProofSHA256, respectively:
 
@@ -698,22 +702,24 @@ When a subscriber presents a BikeshedCertificate whose `proof_type` field is `me
 
 3. Compute the expiration time of the certificate's `batch_number`, as described in {{parameters}}. If this value is before the current time, abort this procedure with a `certificate_expired` error.
 
-4. Set `hash` to the output of `HashAssertion(assertion)`. Set `remaining` to the certificate's `index` value.
+4. Check whether `hash(subject_info)` matches `assertion.subject_info_hash`. If not, abort this proedure with a `bad_certificate` error.
 
-5. For each element `v` at zero-based index `i` of the certificate's `path` field, in order:
+5. Set `hash` to the output of `HashAssertion(assertion)`. Set `remaining` to the certificate's `index` value.
+
+6. For each element `v` at zero-based index `i` of the certificate's `path` field, in order:
 
    - If `remaining` is odd, set `hash` to the output of `HashNode(v, hash, i + 1, remaining >> 1)`.
      Otherwise, set `hash` to the output of `HashNode(hash, v, i + 1, remaining >> 1)`
 
    - Set `remaining` to `remaining >> 1`.
 
-5. If `remaining` is non-zero, abort this procedure with an error.
+7. If `remaining` is non-zero, abort this procedure with an error.
 
-6. If `hash` is not equal to the corresponding tree head in the saved window, abort this procedure with a `bad_certificate` error.
+8. If `hash` is not equal to the corresponding tree head in the saved window, abort this procedure with a `bad_certificate` error.
 
-7. Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.
+9. Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.
 
-8. If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.
+10. If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.
 
 ## Certificate Negotiation {#trust-anchor-negotiation}
 
@@ -1192,3 +1198,17 @@ IANA is requested to create the following entry in the TLS Certificate Types reg
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.
 
 The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document.
+
+# Change log
+{:numbered="false"}
+
+> **RFC Editor's Note:** Please remove this section prior to publication of a
+> final version of this document.
+
+## Since draft-davidben-tls-merkle-tree-certs-00
+{:numbered="false"}
+
+- Move `subject_info` from Assertion to BikeshedCertificate, and instead
+  bind it in the Assertion with`subject_info_hash`. This significantly
+  reduces the data that needs to be served by the CA, expecting
+  large post-quantum public keys. #6
