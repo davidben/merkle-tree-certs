@@ -271,8 +271,8 @@ Batch tree head:
 Inclusion proof:
 : A structure which proves that some assertion is contained in some tree head. See {{proofs}}.
 
-Window:
-: A range of consecutive batch tree heads. A relying party maintains a copy of the CA's latest window. At any time, it will accept only assertions contained in tree heads contained in the current window.
+Validity window:
+: A range of consecutive batch tree heads. A relying party maintains a copy of the CA's latest validity window. At any time, it will accept only assertions contained in tree heads contained in the current validity window.
 
 # Overview
 
@@ -280,17 +280,17 @@ The process of issuing and using a certificate is as follows:
 
 1. The subscriber requests a certificate from the CA. {{acme-extensions}} describes ACME {{?RFC8555}} extensions for this.
 
-2. The CA collects certificate requests into a batch (see {{parameters}}) and builds the Merkle Tree and computes the tree head (see {{building-tree}}). It then signs the window ending at this tree head (see {{signing}}) and publishes (see {{publishing}}) the result.
+2. The CA collects certificate requests into a batch (see {{parameters}}) and builds the Merkle Tree and computes the tree head (see {{building-tree}}). It then signs the validity window ending at this tree head (see {{signing}}) and publishes (see {{publishing}}) the result.
 
 3. The CA constructs a certificate using the inclusion proof. It sends this certificate to the subscriber. See {{proofs}}.
 
 4. The transparency service downloads the Merkle Tree, validates the hashes, and mirrors it for monitors to observe. See {{transparency-service}}.
 
-5. The relying party fetches the latest window from the transparency service. This window will contain the new tree head.
+5. The relying party fetches the latest validity window from the transparency service. This validity window will contain the new tree head.
 
-6. In an application protocol such as TLS, the relying party communicates its window state to the subscriber.
+6. In an application protocol such as TLS, the relying party communicates its currently saved validity window to the subscriber.
 
-7. If the relying party’s window contains the subscriber’s certificate, the subscriber negotiates this protocol and sends the Merkle Tree certificate. See {{trust-anchor-negotiation}} for details. If there is no match, the subscriber proceeds as if this protocol were not in use (e.g., by sending a traditional X.509 certificate chain).
+7. If the relying party’s validity window contains the subscriber’s certificate, the subscriber negotiates this protocol and sends the Merkle Tree certificate. See {{trust-anchor-negotiation}} for details. If there is no match, the subscriber proceeds as if this protocol were not in use (e.g., by sending a traditional X.509 certificate chain).
 
 {{fig-deployment}} below shows this process.
 
@@ -434,7 +434,7 @@ A Merkle Tree certification authority is defined by the following values:
 `batch_duration`:
 : A number of seconds which determines how frequently the CA issues certificates. See details below.
 
-`window_size`:
+`validity_window_size`:
 : An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `floor(lifetime / batch_duration) + 1`.
 
 These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.
@@ -445,7 +445,7 @@ Certificates are issued in batches. Batches are numbered consecutively, starting
 
 All certificates in a batch have the same expiration time, computed as `lifetime` past the issuance time. After this time, the certificates in a batch are no longer valid. Merkle Tree certificates uses a short-lived certificates model, such that certificate expiration replaces an external revocation signal like CRLs {{RFC5280}} or OCSP {{?RFC6960}}. `lifetime` SHOULD be set accordingly. For instance, a deployment with a corresponding maximum OCSP {{?RFC6960}} response lifetime of 14 days SHOULD use a value no higher than 14 days. See {{revocation}} for details.
 
-CAs are RECOMMENDED to use a `batch_duration` of one hour, and a `lifetime` of 14 days. This results in a `window_size` of 336, for a total of 10,752 bytes in SHA-256 hashes.
+CAs are RECOMMENDED to use a `batch_duration` of one hour, and a `lifetime` of 14 days. This results in a `validity_window_size` of 336, for a total of 10,752 bytes in SHA-256 hashes.
 
 To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be unique to that Merkle Tree CA. It MUST NOT be used in another Merkle Tree CA, or for another protocol, such as X.509 certificates.
 
@@ -470,7 +470,7 @@ For each batch in the "issued" state, the CA maintains the following batch state
 
 * The tree head, a hash computed over this list, described in {{building-tree}}.
 
-* A window signature computed as described in {{signing}}.
+* A validity window signature computed as described in {{signing}}.
 
 The CA exposes all of this information in an HTTP {{!RFC9110}} interface described in {{publishing}}.
 
@@ -575,38 +575,38 @@ If `n` is zero, the CA does not build a tree and the tree head is `HashEmpty(0, 
 
 If `n` is one, the tree contains a single level, level 0, and has a tree head of `HashAssertion(assertion, 0)`.
 
-### Signing a Window {#signing}
+### Signing a ValidityWindow {#signing}
 
-Batches are grouped into consecutive ranges of `window_size` batches, called windows. As `window_size` is computed to cover the full certificate lifetime, a window that ends at the latest batch number covers all certificates that may still be valid from a CA.
+Batches are grouped into consecutive ranges of `validity_window_size` batches, called validity windows. As `validity_window_size` is computed to cover the full certificate lifetime, a validity window that ends at the latest batch number covers all certificates that may still be valid from a CA.
 
-Windows are serialized into the following structure:
+Validity Windows are serialized into the following structure:
 
 ~~~
 opaque TreeHead[hash.length];
 
 struct {
     uint32 batch_number;
-    TreeHead tree_heads[window_size];
-} Window;
+    TreeHead tree_heads[validity_window_size];
+} ValidityWindow;
 ~~~
 
-`batch_number` is the batch number of the highest batch in the window.
+`batch_number` is the batch number of the highest batch in the validity window.
 
-`tree_heads` value contains the last `window_size` tree heads, starting from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty(0, 0)`.
+`tree_heads` value contains the last `validity_window_size` tree heads, starting from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < validity_window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty(0, 0)`.
 
-After the CA builds the Merkle Tree for a batch, it constructs the Window structure whose `batch_number` is the number of the batch being issued. It then computes a signature over the following structure:
+After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose `batch_number` is the number of the batch being issued. It then computes a signature over the following structure:
 
 ~~~
 struct {
-    uint8 label[31] = "Merkle Tree Certificate Window\0";
+    uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
     opaque issuer_id<1..32>;
-    Window window;
-} LabeledWindow;
+    ValidityWindow window;
+} LabeledValidityWindow;
 ~~~
 
 The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `issuer_id` field is the CA's `issuer_id`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
 
-The CA saves this signature as the batch's window signature. It then updates the latest batch to point to `batch_number`. If the CA's private key signs an input that can be interpreted as a LabeledWindow structure, the CA is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
+The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to `batch_number`. If the CA's private key signs an input that can be interpreted as a LabeledValidityWindow structure, the CA is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
 
 ### Certificate Format {#proofs}
 
@@ -686,7 +686,7 @@ This certificate can be presented to supporting relying parties as described in 
 
 ## Size Estimates {#sizes}
 
-Merkle Tree proofs scale logarithmically in the batch size. {{rolling-renewal}} recommends subscribers renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be `subscriber_count * 2 / window_size`, where `subscriber_count` is a CA's active subscriber count. The recommended parameters in {{parameters}} give an average of `subscriber_count / 168`.
+Merkle Tree proofs scale logarithmically in the batch size. {{rolling-renewal}} recommends subscribers renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be `subscriber_count * 2 / validity_window_size`, where `subscriber_count` is a CA's active subscriber count. The recommended parameters in {{parameters}} give an average of `subscriber_count / 168`.
 
 Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, {{LetsEncrypt}} reported around 330,000,000 active subscribers for a single CA. {{MerkleTown}} reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from {{MerkleTown}} represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.
 
@@ -700,7 +700,7 @@ This section describes how subscribers present and relying parties verify Merkle
 
 ## Relying Party State {#relying-parties}
 
-For each Merkle Tree CA it trusts, a relying party maintains a copy of the most recent window from the CA. This structure determines which certificates the relying party will accept. It is regularly updated from the transparency service, as described in {{transparency-service}}.
+For each Merkle Tree CA it trusts, a relying party maintains a copy of the most recent validity window from the CA. This structure determines which certificates the relying party will accept. It is regularly updated from the transparency service, as described in {{transparency-service}}.
 
 ## Certificate Verification {#verifying}
 
@@ -708,9 +708,9 @@ When a subscriber presents a BikeshedCertificate whose `proof_type` field is `me
 
 1. Decode the `trust_anchor_data` and `proof_data` fields as MerkleTreeTrustAnchor and MerkleTreeProofSHA256 structures, respectively. If they cannot be decoded, abort this procedure with a `bad_certificate` error.
 
-1. Check if the certificate's `issuer_id` corresponds to a trusted Merkle Tree CA with a saved window. If not, abort this procedure with an `unknown_ca` error.
+1. Check if the certificate's `issuer_id` corresponds to a trusted Merkle Tree CA with a saved validity window. If not, abort this procedure with an `unknown_ca` error.
 
-2. Check if the certificate's `batch_number` is contained in the saved window. If not, abort this procedure with a `unknown_ca` error.
+2. Check if the certificate's `batch_number` is contained in the saved validity window. If not, abort this procedure with a `unknown_ca` error.
 
 3. Compute the expiration time of the certificate's `batch_number`, as described in {{parameters}}. If this value is before the current time, abort this procedure with a `certificate_expired` error.
 
@@ -725,7 +725,7 @@ When a subscriber presents a BikeshedCertificate whose `proof_type` field is `me
 
 5. If `remaining` is non-zero, abort this procedure with an error.
 
-6. If `hash` is not equal to the corresponding tree head in the saved window, abort this procedure with a `bad_certificate` error.
+6. If `hash` is not equal to the corresponding tree head in the saved validity window, abort this procedure with a `bad_certificate` error.
 
 7. Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.
 
@@ -743,9 +743,9 @@ Subscribers maintain a certificate set of available BikeshedCertificates. The Tr
 
 These values can be computed from the BikeshedCertificate, given knowledge of the ProofType value and the CA's parameters. However, CAs are RECOMMENDED to send this information to subscribers in a ProofType-independent form. See {{acme-extensions}} for how this is represented in ACME. This simplifies subscriber deployment and improves ecosystem agility, by allowing subscribers to use certificates without precise knowledge of their parameters.
 
-For Merkle Tree certificates, the expiration time is computed as described in {{parameters}}. There are `window_size - 1` additional TrustAnchor values: for each `i` from 1 to `window_size - 1`, make a copy of the primary TrustAnchor with the `batch_number` value replaced with `batch_number + i`.
+For Merkle Tree certificates, the expiration time is computed as described in {{parameters}}. There are `validity_window_size - 1` additional TrustAnchor values: for each `i` from 1 to `validity_window_size - 1`, make a copy of the primary TrustAnchor with the `batch_number` value replaced with `batch_number + i`.
 
-Each relying party maintains a set of TrustAnchor values, which describe the certificates it accepts. This set is sent to the subscriber to aid in certificate selection.  The ProofType code point defines how the relying party determines the TrustAnchor values.  For Merkle Tree certificates, the `proof_type` is `merkle_tree_sha256`, the `issuer_id` is the CA's `issuer_id`, and the `batch_number` is the `batch_number` of the relying party's window.
+Each relying party maintains a set of TrustAnchor values, which describe the certificates it accepts. This set is sent to the subscriber to aid in certificate selection.  The ProofType code point defines how the relying party determines the TrustAnchor values.  For Merkle Tree certificates, the `proof_type` is `merkle_tree_sha256`, the `issuer_id` is the CA's `issuer_id`, and the `batch_number` is the `batch_number` of the relying party's validity window.
 
 The subscriber compares this set with its certificate set. A certificate is eligible if all of the following are true:
 
@@ -763,19 +763,19 @@ This section describes the role of the transparency service. The transparency se
 
 * Mirror all assertions certified by the CA and present them to monitors
 
-* Validate all tree heads and windows produced by the CA
+* Validate all tree heads and validity windows produced by the CA
 
-* Provide the latest valid window to relying parties
+* Provide the latest valid validity window to relying parties
 
 In doing so, the transparency service MUST satisfy the following requirements:
 
 * The mirrored CA state is append-only. That is, the hashes, signatures, and assertions for a given batch number MUST NOT change.
 
-* All windows sent to relying parties MUST be reflected in the mirrored CA state. That is, each tree hash in a window MUST correspond to a mirrored tree hash, consistent with the corresponding mirrored assertions.
+* All tree hashes sent to relying parties MUST be reflected in the mirrored CA state.
 
 The transparency service publishes the mirrored CA state using the same interface as {{publishing}}. The protocol between the relying party and transparency service is out of scope of this document. The relying party MAY use the interface defined here, or an existing application-specific authenticated channel.
 
-As discussed in {{authenticity}}, relying parties MUST ensure that any windows obtained were asserted by the CA. This SHOULD be done by having the transparency service forward the CA's signature, with the relying party verifying it. However, if the transparency service already maintains a trusted, authenticated channel to the relying parties (e.g. a software or root store update channel), relying parties MAY rely on the transparency service to validate the CA windows on their behalf, only sending valid windows over this channel.
+As discussed in {{authenticity}}, relying parties MUST ensure that any validity windows obtained were asserted by the CA. This SHOULD be done by having the transparency service forward the CA's signature, with the relying party verifying it. However, if the transparency service already maintains a trusted, authenticated channel to the relying parties (e.g. a software or root store update channel), relying parties MAY rely on the transparency service to validate the signature on their behalf, rather than sending it over this channel.
 
 Although described as a single service for clarity, the transparency service may be implemented as a combination of services run by multiple entities, depending on security goals. For example deployments, this section first describes a single trusted service, then it describes other possible models where trust is divided between entities.
 
@@ -799,11 +799,11 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
    2. Compute the tree head for the assertion list, as described in {{building-tree}}. If this value does not match the fetched tree head, abort this procedure with an error.
 
-   3. Compute the Window structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
+   3. Compute the ValidityWindow structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
 
    4. Set the mirrored latest batch number to `i` and save the fetched batch state.
 
-[[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]
+[[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest validity window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]
 
 ## Single Update Service with Multiple Mirrors {#single-update-multiple-mirrors}
 
@@ -811,11 +811,11 @@ If the relying party has a trusted update service, but the update service does n
 
 Each mirror follows the procedure in {{single-trusted-service}} to maintain and publish a mirror of the CA's batch state.
 
-The update server maintains the latest window validated to appear in all mirrors. It updates this by polling the mirrors and running the following steps:
+The update server maintains the latest validity window validated to appear in all mirrors. It updates this by polling the mirrors and running the following steps:
 
 1. For each mirror, fetch the latest batch number.
 
-2. Let `new_latest_batch` be the highest batch number that is bounded by the value fetched from at least half of the mirrors. Let `old_latest_batch` be the batch number of the currently stored window.
+2. Let `new_latest_batch` be the highest batch number that is bounded by the value fetched from at least half of the mirrors. Let `old_latest_batch` be the batch number of the currently stored validity window.
 
 3. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
 
@@ -823,13 +823,13 @@ The update server maintains the latest window validated to appear in all mirrors
 
 5. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
 
-6. Fetch the window with `new_latest_batch` from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.
+6. Fetch the validity window with `new_latest_batch` from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.
 
-7. Verify the window signature, as described in {{signing}}. If the signature is invalid, abort this procedure with an error.
+7. Verify the validity window signature, as described in {{signing}}. If the signature is invalid, abort this procedure with an error.
 
-8. If the old and new windows contain overlapping batch numbers, verify that the tree hashes match. If not, abort this procedure with an error.
+8. If the old and new validity windows contain overlapping batch numbers, verify that the tree hashes match. If not, abort this procedure with an error.
 
-9. Update the saved window with the new value.
+9. Update the saved validity window with the new value.
 
 Compared to {{single-trusted-service}}, this model reduces trust in the mirror services, but can delay certificate usability if some of the mirrors consume CA updates too slowly. This can be tuned by adjusting the threshold in step 2.
 
@@ -837,7 +837,7 @@ In a transparency service using this model, each mirror independently publishes 
 
 ## Multiple Transparency Services {#multiple-transparency-services}
 
-Relying parties without a trusted update service can fetch from mirrors directly. Rather than relying on the update service to fetch the window state, the relying party runs the procedure described in {{single-update-multiple-mirrors}}, and uses the saved window to verify certificates.
+Relying parties without a trusted update service can fetch from mirrors directly. Rather than relying on the update service to fetch the validity window state, the relying party runs the procedure described in {{single-update-multiple-mirrors}}, and uses the saved validity window to verify certificates.
 
 ## Monitors
 
@@ -845,7 +845,7 @@ Monitors in this document are analogous to monitors in {{?RFC6962}}. Monitors wa
 
 It does so by following the procedure in {{single-trusted-service}}, fetching from the service being monitored. If the procedure fails for a reason other than the service availability, this should be viewed as misbehavior on the part of the service. If the procedure fails due to service availability and the service remains unavailable for an extended period, this should also be viewed as misbehavior. If the monitor is not maintaining a copy of the batch state, it skips saving the assertions.
 
-{{?RFC6962}} additionally defines the role of auditor, which validates that Signed Certificate Timestamps (SCTs) and Signed Tree Heads (STHs) in Certificate Transparency are correct. There is no analog to SCTs in this document. The signed window structure ({{signing}}) is analogous to an STH, but consistency is checked simply by ensuring overlapping tree heads match, so this document does not define this as an explicit role. If two inconsistent signed windows are ever observed from a Merkle Tree CA, this should be viewed as misbehavior on the part of the CA.
+{{?RFC6962}} additionally defines the role of auditor, which validates that Signed Certificate Timestamps (SCTs) and Signed Tree Heads (STHs) in Certificate Transparency are correct. There is no analog to SCTs in this document. The signed validity window structure ({{signing}}) is analogous to an STH, but consistency is checked simply by ensuring overlapping tree heads match, so this document does not define this as an explicit role. If two inconsistent signed validity windows are ever observed from a Merkle Tree CA, this should be viewed as misbehavior on the part of the CA.
 
 # HTTP Interface {#publishing}
 
@@ -853,15 +853,15 @@ It does so by following the procedure in {{single-trusted-service}}, fetching fr
 
 CAs and transparency services publish state over an HTTP {{!RFC9110}} interface described below.
 
-CAs and any components of the transparency service that maintain window information implement the following interfaces:
+CAs and any components of the transparency service that maintain validity window information implement the following interfaces:
 
 * `GET {prefix}/latest` returns the latest batch number.
 
-* `GET {prefix}/window/latest` returns the Window structure and signature (see {{signing}}) for the latest batch number.
+* `GET {prefix}/validity-window/latest` returns the ValidityWindow structure and signature (see {{signing}}) for the latest batch number.
 
-* `GET {prefix}/window/{number}` returns the Window structure and signature (see {{signing}}) for batch `number`, if it is in the "issued" state, and a 404 error otherwise.
+* `GET {prefix}/validity-window/{number}` returns the ValidityWindow structure and signature (see {{signing}}) for batch `number`, if it is in the "issued" state, and a 404 error otherwise.
 
-* `GET {prefix}/batch/{number}/info` returns the window signature and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
+* `GET {prefix}/batch/{number}/info` returns the validity window signature and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
 
 CAs and any components of the transparency service that mirror the full assertion list additionally implement the following interface:
 
@@ -877,7 +877,7 @@ Individual servers in a service MAY return different latest batch numbers. Indiv
 
 [[TODO: Once a batch has expired, do we allow a CA to stop publishing it? The transparency service can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system. #2 ]]
 
-[[TODO: If we have the window endpoint, do we still need to separate "info" and "assertions"? #12 ]]
+[[TODO: If we have the validity window endpoint, do we still need to separate "info" and "assertions"? #12]]
 
 # ACME Extensions {#acme-extensions}
 
@@ -1058,7 +1058,7 @@ This is a bit cleaner to parse, but the negotiation is more complex.
 
 ## Fallback Mechanisms {#fallback-mechanisms}
 
-Subscribers using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not recently fetched window updates, or lack connectivity to the transparency service.
+Subscribers using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not recently fetched validity window updates, or lack connectivity to the transparency service.
 
 If the pipeline of updates from the CA to the transparency service to relying parties is interrupted, certificate issuance may halt, or newly issued certificates may no longer be usable. When this happens, the optimization in this document may fail, but fallback mechanisms ensure services remain available.
 
@@ -1072,7 +1072,7 @@ To account for this, subscribers SHOULD request a new Merkle Tree certificate si
 
 Merkle Tree certificates' issuance delays make them unsuitable when rapidly deploying a new service and reacting to key compromise.
 
-When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a window containing this certificate from the transparency service and can therefore not validate this certificate until receiving them. The subscriber SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.
+When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a validity window containing this certificate from the transparency service and can therefore not validate this certificate until receiving them. The subscriber SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.
 
 If the service is performing a routine key rotation, and not in response to a known compromise, the subscriber MAY use the process described in {{rolling-renewal}}, allowing certificate negotiation to also switch the private key used. This slightly increases the lifetime of the old key but maintains the size optimization continuously.
 
@@ -1114,7 +1114,7 @@ Additionally, even if all users are served the same updates, individual users ma
 
 A key security requirement of any PKI scheme is that relying parties only accept assertions that were certified by a trusted certification authority. This is achieved by the following two properties:
 
-* The relying party MUST NOT accept any window that was not authenticated as coming from the CA.
+* The relying party MUST NOT accept any validity window that was not authenticated as coming from the CA.
 
 * For any tree head computed from a list of assertions as in {{building-tree}}, it is computationally infeasible to construct an assertion not this list, and some inclusion proof, such that the procedure in {{verifying}} succeeds.
 
@@ -1126,7 +1126,7 @@ The second property is achieved by using a collision-resistant hash in the Merkl
 
 Using the same key material in different, incompatible ways risks cross-protocol attacks when the two uses overlap. To avoid this, {{parameters}} forbids the reuse of Merkle Tree CA private keys in another protocol.
 
-To reduce the risk of attacks if this guidance is not followed, the LabeledWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
+To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
 Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
 
@@ -1140,7 +1140,7 @@ The TLSSubjectInfo structure additionally protects against cross-protocol attack
 
 Merkle Tree certificates avoid sending an additional signature for OCSP responses by using a short-lived certificates model. Per {{parameters}},  Merkle Tree CA's certificate lifetime MUST be set such that certificate expiration replaces revocation. Existing revocation mechanisms like CRLs and OCSP are themselves short-lived, signed messages, so a low enough certificate lifetime provides equivalent revocation capability.
 
-Relying parties with additional sources of revocation such as {{CRLite}} or {{CRLSets}} SHOULD provide a mechanism to express revoked assertions in such systems, in order to opportunistically revoke assertions in up-to-date relying parties sooner. It is expected that, in most deployments, relying parties can fetch this revocation data and Merkle Tree CA windows from the same service.
+Relying parties with additional sources of revocation such as {{CRLite}} or {{CRLSets}} SHOULD provide a mechanism to express revoked assertions in such systems, in order to opportunistically revoke assertions in up-to-date relying parties sooner. It is expected that, in most deployments, relying parties can fetch this revocation data and Merkle Tree CA validity windows from the same service.
 
 [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document. #41]]
 
@@ -1160,7 +1160,7 @@ Although CAs in this document publish structures similar to a Certificate Transp
 
 A CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the transparency service at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are consistent with only the other view will be rejected by relying parties. If the transparency service observes both views, the procedures in {{transparency-service}} will prevent the new, conflicting view from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.
 
-A CA could also sign a window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored by the transparency service, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.
+A CA could also sign a validity window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored by the transparency service, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.
 
 As a consequence, monitors MUST use the transparency service's view of the batch state when monitoring for unauthorized certificates. If the transparency service is a collection of mirrors, as in {{single-update-multiple-mirrors}} or {{multiple-transparency-services}}, monitors MUST monitor each mirror. Monitors MAY optionally monitor the CA directly, but this alone is not sufficient to avoid missing certificates.
 
@@ -1168,7 +1168,7 @@ As a consequence, monitors MUST use the transparency service's view of the batch
 
 This document divides CA and transparency service responsibilities differently from how {{?RFC6962}} divides CA and Certificate Transparency log. The previous section describes the implications of a failure to meet the log-like responsibilities of a CA, provided the transparency service is operating correctly.
 
-For the remainder of log-like responsibilities, the relying party trusts its choice of transparency service deployment to ensure the windows it uses are consistent with what monitors observe. Otherwise, a malicious transparency service and CA could collude to cause a relying party to accept an unauthorized certificate not visible to monitors. Where a single trusted service is not available, the {{transparency-service}} discusses possible deployment structures where the transparency service is a collection of mirrors, all or most of whom must collude instead.
+For the remainder of log-like responsibilities, the relying party trusts its choice of transparency service deployment to ensure the validity windows it uses are consistent with what monitors observe. Otherwise, a malicious transparency service and CA could collude to cause a relying party to accept an unauthorized certificate not visible to monitors. Where a single trusted service is not available, the {{transparency-service}} discusses possible deployment structures where the transparency service is a collection of mirrors, all or most of whom must collude instead.
 
 ## Security of Fallback Mechanisms
 
@@ -1217,6 +1217,8 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 
 ## Since draft-davidben-tls-merkle-tree-certs-00
 {:numbered="false"}
+
+- Rename window to validity window. #21
 
 - Add proper context to every node in the Merkle tree. #32
 
