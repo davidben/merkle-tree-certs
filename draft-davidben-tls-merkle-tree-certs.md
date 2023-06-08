@@ -448,6 +448,9 @@ A Merkle Tree certification authority is defined by the following values:
 `validity_window_size`:
 : An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `lifetime / batch_duration`.
 
+`storage_window_size`:
+: An integer describing the number of consecutive batches, ending at the latest batch issued, which the CA is guaranteed to serve. `storage_window_size` MUST be at least twice `validity_window_size`.
+
 These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.
 
 [[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -> Subscriber -> RP flow does not depend on the signature, only the CA -> Transparency Service -> RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]
@@ -456,7 +459,7 @@ Certificates are issued in batches. Batches are numbered consecutively, starting
 
 All certificates in a batch have the same expiration time, computed as `lifetime` past the issuance time. After this time, the certificates in a batch are no longer valid. Merkle Tree certificates uses a short-lived certificates model, such that certificate expiration replaces an external revocation signal like CRLs {{RFC5280}} or OCSP {{?RFC6960}}. `lifetime` SHOULD be set accordingly. For instance, a deployment with a corresponding maximum OCSP {{?RFC6960}} response lifetime of 14 days SHOULD use a value no higher than 14 days. See {{revocation}} for details.
 
-CAs are RECOMMENDED to use a `batch_duration` of one hour, and a `lifetime` of 14 days. This results in a `validity_window_size` of 336, for a total of 10,752 bytes in SHA-256 hashes.
+CAs are RECOMMENDED to use a `batch_duration` of one hour, a `lifetime` of 14 days. This results in a `validity_window_size` of 336, for a total of 10,752 bytes in SHA-256 hashes.
 
 To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be unique to that Merkle Tree CA. It MUST NOT be used in another Merkle Tree CA, or for another protocol, such as X.509 certificates.
 
@@ -775,7 +778,7 @@ The subscriber SHOULD select the smallest available certificate where the above 
 
 This section describes the role of the transparency service. The transparency service ensures all certificates accepted by the relying party are consistently and publicly logged. It performs three functions:
 
-* Mirror all abridged assertions certified by the CA and present them to monitors
+* Mirror all abridged assertions certified by the CA in the storage window and present them to monitors
 
 * Validate all tree heads and validity windows produced by the CA
 
@@ -801,13 +804,21 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
 1. Fetch the CA's latest batch number.  If this fetch fails, abort this procedure with an error.
 
-2. Let `new_latest_batch` be the result and `old_latest_batch` be the currently mirrored value. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
+2. Let `new_latest_batch` be the result.
 
-3. If `new_latest_batch` is less than `old_latest_batch`, abort this procedure with an error.
+3. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
 
-4. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
+4. Let `old_latest_batch` be the maximum of:
 
-5. For all `i` such that `old_latest_batch < i <= new_latest_batch`:
+   - The currently mirrored batch number, or -1 if no batch number was mirrored yet.
+
+   - `new_latest_batch - storage_window_size` (see {{parameters}})
+
+5. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
+
+6. If `new_latest_batch` is less than `old_latest_batch`, abort this procedure with an error.
+
+7. For all `i` such that `old_latest_batch < i <= new_latest_batch`:
 
    1. Fetch the signature, tree head, and abridged assertion list for batch `i`. If this fetch fails, abort this procedure with an error.
 
@@ -869,17 +880,20 @@ CAs and transparency services publish state over an HTTP {{!RFC9110}} interface 
 
 CAs and any components of the transparency service that maintain validity window information implement the following interfaces:
 
-* `GET {prefix}/latest` returns the latest batch number.
+* `GET {prefix}/latest` returns `latest_batch`, the number of the latest batch in the "issued" state.
 
 * `GET {prefix}/validity-window/latest` returns the ValidityWindow structure and signature (see {{signing}}) for the latest batch number.
 
 * `GET {prefix}/validity-window/{number}` returns the ValidityWindow structure and signature (see {{signing}}) for batch `number`, if it is in the "issued" state, and a 404 error otherwise.
+
 
 * `GET {prefix}/batch/{number}/info` returns the validity window signature and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
 
 CAs and any components of the transparency service that mirror the full abridged assertion list additionally implement the following interface:
 
 * `GET {prefix}/batch/{number}/assertions` returns the abridged assertion list for batch `number`, if `number` is in the issued state, and a 404 error otherwise.
+
+Alternatively, for those endpoints that take a batch number, and in the case the CA would've responded without error, it may respond instead with 410 (gone) if `number` is strictly smaller than `batch_number - storage_window_size`.
 
 If the interface is implemented by a distributed service, with multiple servers, updates may propagate to servers at different times, which will cause temporary inconsistency. This inconsistency can impede this system's transparency goals ({{transparency}}).
 
@@ -1232,6 +1246,11 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 
 > **RFC Editor's Note:** Please remove this section prior to publication of a
 > final version of this document.
+
+## Since draft-davidben-tls-merkle-tree-certs-01
+{:numbered="false"}
+
+- Only require CAs to serve (and TSs to mirror) assertions within a storage window. #2
 
 ## Since draft-davidben-tls-merkle-tree-certs-00
 {:numbered="false"}
