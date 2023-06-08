@@ -1112,6 +1112,8 @@ Using the same key material in different, incompatible ways risks cross-protocol
 
 To reduce the risk of attacks if this guidance is not followed, the LabeledWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
+Furthermore, any valid signature of a CAs `public_key` that is not of the form as defined in {{signing}}, or an extension of this protocol, MUST be considered a misissuance.
+
 Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
 
 The TLSSubjectInfo structure additionally protects against cross-protocol attacks in two further ways:
