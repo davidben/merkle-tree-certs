@@ -344,13 +344,13 @@ enum {
 
 struct {
     ClaimType claim_type;
-    opaque claim_info<0..2^24-1>;
+    opaque claim_info<0..2^16-1>;
 } Claim;
 
 struct {
     SubjectType subject_type;
-    opaque subject_info<0..2^24-1>;
-    Claim claims<0..2^24-1>;
+    opaque subject_info<0..2^16-1>;
+    Claim claims<0..2^16-1>;
 } Assertion;
 ~~~
 
@@ -359,7 +359,7 @@ An Assertion is roughly analogous to an X.509 TBSCertificate ({{Section 4.1.2 of
 ~~~
 struct {
     SignatureScheme signature;
-    opaque public_key<1..2^24-1>;
+    opaque public_key<1..2^16-1>;
 } TLSSubjectInfo;
 ~~~
 
@@ -420,7 +420,7 @@ A Merkle Tree certification authority is defined by the following values:
 : A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}, but others may be defined.
 
 `issuer_id`:
-: A short, opaque byte string that identifies the CA.
+: An opaque byte string that identifies the CA. This value should be short and is limited to at most 32 bytes.
 
 `public_key`:
 : The public half of a signing keypair. The corresponding private key, `private_key`, is known only to the CA.
@@ -608,7 +608,7 @@ struct {
 
 struct {
     TrustAnchor trust_anchor;
-    opaque proof_data<0..2^24-1>;
+    opaque proof_data<0..2^16-1>;
 } Proof;
 
 struct {
@@ -890,7 +890,7 @@ enum { tls(0), (2^16-1) } SubjectType;
 
 struct {
     SignatureScheme signature;
-    opaque public_key<1..2^24-1>;
+    opaque public_key<1..2^16-1>;
     /* TODO: Should there be an extension list? #38 */
 } TLSSubjectInfo;
 ~~~
@@ -918,7 +918,7 @@ This document does not define the public key format for other algorithms. In ord
 
 This section defines the `Bikeshed` TLS certificate type, which may be negotiated with the `client_certificate_type`, `server_certificate_type` {{!RFC7250}}, or `cert_type` {{!RFC6091}} extensions. It can only be negotiated with TLS 1.3 or later. Servers MUST NOT negotiate it in TLS 1.2 or below. If the client receives a ServerHello that negotiates it in TLS 1.2 or below, it MUST abort the connection with an `illegal_parameter` alert.
 
-[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in {{cert-type-problems}}. We may need to define a third one. #18]]
+[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in {{cert-type-problems}}. We may need to define another one. #18]]
 
 When negotiated, the Certificate message MUST contain a single CertificateEntry structure.
 CertificateEntry is updated as follows:
