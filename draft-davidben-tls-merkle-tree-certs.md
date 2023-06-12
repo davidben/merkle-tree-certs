@@ -139,6 +139,16 @@ informative:
     author:
     - org: Chromium
 
+  YETI2022BITFLIP:
+    title: Yeti2022 bitflip
+    tarfet: https://groups.google.com/a/chromium.org/g/ct-policy/c/PCkKU357M2Q/
+    date: 2023-06-12
+
+  NESSIE2024BITFLIP:
+    title: Nessie2024 bitflip
+    tarfet: https://groups.google.com/a/chromium.org/g/ct-policy/c/S17_j-WJ6dI/
+    date: 2023-06-12
+
   FIREFOX:
     title: Firefox Remote Settings
     target: https://wiki.mozilla.org/Firefox/RemoteSettings
@@ -1100,6 +1110,23 @@ However, if the transparency service's interface becomes unavailable, monitors w
 
 {{trust-anchor-negotiation}} and {{tls-trust-anchors-extension}} involve the relying party sending a list of TrustAnchor values to aid the subscriber in selecting certificates. A sufficiently large list may be impractical to fit in a ClientHello and require alternate negotiation mechanisms or a different PKI structure. To reduce overhead, `issuer_id` values SHOULD be short, no more than eight bytes long.
 
+## Bitflips
+
+Bitflips happen at scale; indeed bitflips invalidated Certificate Transparency logs: see {{NESSIE2024BITFLIP}} and {{YETI2022BITFLIP}}.
+
+Where security allows it, the present system has been designed to be lenient with bitflips. For example:
+
+1. A signature that does not verify is not considered an misissuance, but rather an availability issue. This allows for bitflips in the signature itself and the signed message.
+2. An (abridged) assertion published via the HTTP interface, is ignored unless it's included in a valid signed window.
+3. A bitflip in a MerkleTreeProofSHA256 can be safely ignored, as any BikeshedCertificate that include it will fail to verify.
+
+There are several places where bitflips cannot be tolerated. For instance, misissuances include (but are not limited to)
+
+1. A bitflip in an assertion, which is included (with bitflip) in a valid signed window.
+2. A valid signed window, for which the CA cannot *eventually* produce assertions that lead to the included tree heads.
+
+CAs should take care to catch these bitflips. For instance, a CA should double-check the computation of tree heads before signing them.
+
 # Privacy Considerations
 
 The negotiation mechanism described in {{trust-anchor-negotiation}} and {{tls-trust-anchors-extension}} presumes the relying party's trust anchor list is not sensitive. In particular, information sent in a TLS ClientHello is unencrypted without the Encrypted ClientHello extension {{?I-D.draft-ietf-tls-esni}}.
@@ -1227,3 +1254,5 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Clarify we use POSIX time. #1
 
 - Miscellaneous changes.
+
+- Elaborate on bitflips. #26
