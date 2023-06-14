@@ -387,9 +387,9 @@ struct {
 } DNSNameList;
 ~~~
 
-DNSName values use the "preferred name syntax" as specified by {{Section 3.5 of RFC1034}} and as modified by {{Section 2.1 of RFC1123}}. Alphabetic characters MUST additionally be represented in lowercase. IDNA names {{!RFC5890}} are represented as A-labels. For example, possible values include `example.com` or `xn--iv8h.example`. `EXAMPLE.COM` and `<U+1F50F>.example` would not be permitted.
+DNSName values use the "preferred name syntax" as specified by {{Section 3.5 of RFC1034}} and as modified by {{Section 2.1 of RFC1123}}. Alphabetic characters MUST additionally be represented in lowercase. IDNA names {{!RFC5890}} are represented as A-labels. For example, possible values include `example.com` or `xn--iv8h.example`. Values `EXAMPLE.COM` and `<U+1F50F>.example` would not be permitted.
 
-Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "*." and then following the steps in {{Section 6.3 of !I-D.draft-ietf-uta-rfc6125bis}}.
+Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !I-D.draft-ietf-uta-rfc6125bis}}.
 
 ## IP Claims
 
@@ -410,7 +410,7 @@ struct {
 
 # Issuing Certificates
 
-This section describes the structure of Merkle Tree certificates, and defines the process of how a Merkle Tree certification authority issues certificates for a subscriber.
+This section describes the structure of Merkle Tree certificates and defines the process of how a Merkle Tree certification authority issues certificates for a subscriber.
 
 ## Merkle Tree CA Parameters {#parameters}
 
