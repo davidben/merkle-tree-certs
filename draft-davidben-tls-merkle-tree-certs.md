@@ -504,8 +504,6 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
     HashAssertion(assertion, index) = hash(HashAssertionInput)
 ~~~~
 
-`0x00` and `0x02` denote byte strings containing a single byte with value zero and two, respectively. `||` denotes concatenation.
-
 `HashEmpyInput`, `HashNodeInput` and `HashAssertionInput` are computed by encoding the structures defined below:
 
 ~~~
