@@ -481,6 +481,8 @@ For each batch in the "issued" state, the CA maintains the following batch state
 
 * The tree head, a hash computed over this list, described in {{building-tree}}.
 
+* The batch randomizer, a random string used in the computation of the tree head, as described in {{building-tree}}.
+
 * A validity window signature computed as described in {{signing}}.
 
 The CA exposes all of this information in an HTTP {{!RFC9110}} interface described in {{publishing}}.
@@ -505,7 +507,9 @@ This section describes how to certify a given list of assertions at a given batc
 
 ### Building the Merkle Tree {#building-tree}
 
-First, the CA then builds a Merkle Tree from the list as follows:
+First, the CA samples the 16 byte randomizer from a cryptographically secure pseudorandom number generator. The randomizer MUST only be generated after the list of assertions to be included in the batch is final.
+
+Then, the CA builds a Merkle Tree from the list of assertions as follows:
 
 Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is the smallest positive integer such that `n <= 2^(l-1)`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
 
@@ -520,6 +524,7 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
 ~~~
 struct {
     uint8 distinguisher = 0;
+    opaque batch_randomizer[16];
     opaque issuer_id<1..32>;
     uint32 batch_number;
     uint64 index;
@@ -528,6 +533,7 @@ struct {
 
 struct {
     uint8 distinguisher = 1;
+    opaque batch_randomizer[16];
     opaque issuer_id<1..32>;
     uint32 batch_number;
     uint64 index;
@@ -544,6 +550,7 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
+    opaque batch_randomizer[16];
     opaque issuer_id<1..32>;
     uint32 batch_number;
     uint64 index;
@@ -551,7 +558,7 @@ struct {
 } HashAssertionInput;
 ~~~
 
-`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
+`issuer_id`, `batch_number`` and `batch_randomizer` are set to the CA's `issuer_id`, the current batch number, and randomizer. `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
@@ -659,6 +666,7 @@ opaque HashValueSHA256[32];
 
 struct {
     uint64 index;
+    opaque batch_randomizer[16];
     HashValueSHA256 path<0..2^16-1>;
 } MerkleTreeProofSHA256;
 ~~~
@@ -676,6 +684,8 @@ The `proof_data` for `merkle_tree_sha256` is a MerkleTreeProofSHA256. After buil
    right-shift, and `^` denotes a bitwise exclusive OR (XOR) operation. This
    element is the sibling of an ancestor of assertion `i` in the tree. Note the
    tree head is never included.
+
+3. Set `batch_randomizer` to the randomizer of the batch.
 
 For example, the `path` value for the third assertion in a batch of three assertions would contain the marked nodes in {{fig-example-proof}}, from bottom to top.
 
@@ -704,7 +714,7 @@ Merkle Tree proofs scale logarithmically in the batch size. {{rolling-renewal}} 
 
 Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, {{LetsEncrypt}} reported around 330,000,000 active subscribers for a single CA. {{MerkleTown}} reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from {{MerkleTown}} represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.
 
-These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding `path` lengths will be 20, 24, and 17, given proof sizes of, respectively, 640 bytes, 768 bytes, and 544 bytes.
+These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding `path` lengths will be 20, 24, and 17, given proof sizes of, respectively, 664 bytes, 792 bytes, and 568 bytes.
 
 For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.
 
@@ -875,7 +885,7 @@ CAs and any components of the transparency service that maintain validity window
 
 * `GET {prefix}/validity-window/{number}` returns the ValidityWindow structure and signature (see {{signing}}) for batch `number`, if it is in the "issued" state, and a 404 error otherwise.
 
-* `GET {prefix}/batch/{number}/info` returns the validity window signature and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
+* `GET {prefix}/batch/{number}/info` returns the validity window signature, randomizer and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
 
 CAs and any components of the transparency service that mirror the full abridged assertion list additionally implement the following interface:
 
@@ -1130,11 +1140,21 @@ A key security requirement of any PKI scheme is that relying parties only accept
 
 * The relying party MUST NOT accept any validity window that was not authenticated as coming from the CA.
 
-* For any tree head computed from a list of assertions as in {{building-tree}}, it is computationally infeasible to construct an assertion not this list, and some inclusion proof, such that the procedure in {{verifying}} succeeds.
+* For any tree head computed from a list of assertions as in {{building-tree}}, it is computationally infeasible to construct an assertion not in this list, and some inclusion proof, such that the procedure in {{verifying}} succeeds.
 
 {{transparency-service}} discusses achieving the first property.
 
-The second property is achieved by using a collision-resistant hash in the Merkle Tree construction. The `HashEmpty`, `HashNode`, and `HashAssertion` functions use distinct initial bytes when calling the hash function, to achieve domain separation.
+The second property is achieved by using a cryptographic hash in the Merkle Tree construction. A forger has several avenues of attack.
+
+1. The attacker can search for an assertion whose `HashAssertion` matches that of an existing, but different included assertion. This comes down to a second-preimage attack on the hash, for which a generic attack requires 2^256 hash calls. The issuer, index and batch number are included in `HashAssertion`, to prevent a multi-target attack. Without them, a generic attack would require 2^256/N hash calls, where N is the number of currently valid assertions.
+
+2. The attacker can search for a fake authentication path for their chosen assertion. This too comes down to a second-preimage attack on the hash.
+
+3. The attacker can search for two assertions, one innocuous which the CA would accept, and an illicit one, whose `HashAssertion` matches.  The to them yet unknown batch randomizer prevents the attacker leveraging a chosen-prefix hash collision for this purpose. In fact, a successful attack implies breaking target-collision resistance.
+
+For authenticity, we do not assume collision resistance of the hash, and could truncate it to 128 bits. However, for transparency, we do need collision resistance, see {{ca-collisions}}.
+
+The `HashEmpty`, `HashNode`, and `HashAssertion` functions use distinct initial bytes when calling the hash function, to achieve domain separation.
 
 ## Cross-protocol attacks {#cross-protocol}
 
@@ -1181,6 +1201,10 @@ A CA could violate the append-only property of its batch state, and present diff
 A CA could also sign a validity window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored by the transparency service, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.
 
 As a consequence, monitors MUST use the transparency service's view of the batch state when monitoring for unauthorized certificates. If the transparency service is a collection of mirrors, as in {{single-update-multiple-mirrors}} or {{multiple-transparency-services}}, monitors MUST monitor each mirror. Monitors MAY optionally monitor the CA directly, but this alone is not sufficient to avoid missing certificates.
+
+#### Hash collisions {#ca-collisions}
+
+To thwart transparency, the CA can also attack the hash: it could find two different assertions whose `HashAssertion` matches. It could publish one, and serve the second out of view of the Transparency Services. As the CA is free to choose the hash randomizer, we need to require collision resistance of our hash to ensure transparency.
 
 ### Misbehaving Transparency Service
 
@@ -1251,5 +1275,7 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Clarify we use a single `CertificateEntry`. #11
 
 - Clarify we use POSIX time. #1
+
+- Add batch randomizer #45 and expand upon security requirements from the hash. #55
 
 - Miscellaneous changes.
