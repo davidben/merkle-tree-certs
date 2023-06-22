@@ -448,6 +448,9 @@ A Merkle Tree certification authority is defined by the following values:
 `validity_window_size`:
 : An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `lifetime / batch_duration`.
 
+`http_server`:
+: A servername together with optional port and path prefix, under which the CA publishes, as described in {{publishing}}. For example: `example.com/ca`.
+
 These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.
 
 [[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -> Subscriber -> RP flow does not depend on the signature, only the CA -> Transparency Service -> RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]
@@ -618,9 +621,26 @@ struct {
 
 The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `issuer_id` field is the CA's `issuer_id`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
 
-The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to `batch_number`. A CA which generates such a signature is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
+A CA which generates such a signature is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
 
 A CA MUST NOT generate signatures over inputs that are parseable as LabeledValidityWindow, except via the above process. If a LabeledValidityWindow structure that was not produced in this way has a valid signature by CA's `public_key`, this indicates misuse of the private key by the CA, even if the preimages to the `tree_heads` values, or intermediate nodes, or `subject_info_hash` values are not known.
+
+For publication {{publishing}}, the CA prepares a SignedValidityWindow and an AbridgedAssertions structure for this batch:
+
+~~~
+opaque Signature<1..2^16-1>;
+
+struct {
+    ValidityWindow window;
+    Signature signature;
+} SignedValidityWindow;
+
+struct {
+    AbridgedAssertion assertions<0..2^64-1>;
+} AbridgedAssertions;
+~~~
+
+It then updates the latest batch number to `batch_number`.
 
 ### Certificate Format {#proofs}
 
@@ -799,9 +819,9 @@ Some relying parties regularly contact a trusted update service, either for soft
 
 The transparency service maintains a mirror of the CA's latest batch number, and batch state. Roughly once every `batch_duration`, it polls the CA's HTTP interface (see {{publishing}}) and runs the following steps:
 
-1. Fetch the CA's latest batch number.  If this fetch fails, abort this procedure with an error.
+1. Fetch the CA's latest SignedValidityWindow.  If this fetch fails, abort this procedure with an error.
 
-2. Let `new_latest_batch` be the result and `old_latest_batch` be the currently mirrored value. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
+2. Let `new_latest_batch` be the batch number in the fetched SignedValidityWindow, and `old_latest_batch` be the batch number of the currently mirrored value. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
 
 3. If `new_latest_batch` is less than `old_latest_batch`, abort this procedure with an error.
 
@@ -809,11 +829,11 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
 5. For all `i` such that `old_latest_batch < i <= new_latest_batch`:
 
-   1. Fetch the signature, tree head, and abridged assertion list for batch `i`. If this fetch fails, abort this procedure with an error.
+   1. Fetch the SignedValidityWindow, and abridged assertion list for batch `i`. If this fetch fails, abort this procedure with an error.
 
-   2. Compute the tree head for the assertion list, as described in {{building-tree}}. If this value does not match the fetched tree head, abort this procedure with an error.
+   2. Compute the tree head for the assertion list, as described in {{building-tree}}. If this value does not match the fetched tree heads, abort this procedure with an error.
 
-   3. Compute the ValidityWindow structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
+   3. Compute the ValidityWindow structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head computed above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
 
    4. Set the mirrored latest batch number to `i` and save the fetched batch state.
 
@@ -827,7 +847,7 @@ Each mirror follows the procedure in {{single-trusted-service}} to maintain and 
 
 The update server maintains the latest validity window validated to appear in all mirrors. It updates this by polling the mirrors and running the following steps:
 
-1. For each mirror, fetch the latest batch number.
+1. For each mirror, fetch the latest SignedValidityWindow, and extract the batch number.
 
 2. Let `new_latest_batch` be the highest batch number that is bounded by the value fetched from at least half of the mirrors. Let `old_latest_batch` be the batch number of the currently stored validity window.
 
@@ -837,7 +857,7 @@ The update server maintains the latest validity window validated to appear in al
 
 5. If the issuance time for batch `new_latest_batch` is after the current time (see {{parameters}}), abort this procedure with an error.
 
-6. Fetch the validity window with `new_latest_batch` from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.
+6. Fetch the SignedValidityWindow with `new_latest_batch` from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.
 
 7. Verify the validity window signature, as described in {{signing}}. If the signature is invalid, abort this procedure with an error.
 
@@ -863,35 +883,39 @@ It does so by following the procedure in {{single-trusted-service}}, fetching fr
 
 # HTTP Interface {#publishing}
 
-[[TODO: This section hasn't been written yet. For now, this is just an informal sketch. The real text will need to define request/response formats more precisely, with MIME types, etc. #12 ]]
-
 CAs and transparency services publish state over an HTTP {{!RFC9110}} interface described below.
 
-CAs and any components of the transparency service that maintain validity window information implement the following interfaces:
+All messages are sent as HTTPS GET requests to `https://{http_server}{path}`. Recall that `http_server` only contains a server name, optional port and path.
 
-* `GET {prefix}/latest` returns the latest batch number.
+To be consistent with the rest of the document, responses are structs encoded using the TLS presentation language ({{Section 3 of !RFC8446}}). They are served under content-type `application/octet-stream`.
 
-* `GET {prefix}/validity-window/latest` returns the ValidityWindow structure and signature (see {{signing}}) for the latest batch number.
+## CA interface {#ca-api}
 
-* `GET {prefix}/validity-window/{number}` returns the ValidityWindow structure and signature (see {{signing}}) for batch `number`, if it is in the "issued" state, and a 404 error otherwise.
+In the following two endpoints `number` is either a decimal referring to a batch by its number, or the string `latest` which refers to the latest batch in the "issued" state. If no batch has been issued, or the batch referred to by number isn't in the "issued" state, the endpoint returns a 404 error.
 
-* `GET {prefix}/batch/{number}/info` returns the validity window signature and tree head for batch `number`, if batch `number` is in the "issued" state, and a 404 error otherwise.
+* `GET https://{http_server}/mtc/v1/batches/{number}/signed-validity-window` returns the SignedValidityWindow (see {{signing}}) for the batch.
 
-CAs and any components of the transparency service that mirror the full abridged assertion list additionally implement the following interface:
-
-* `GET {prefix}/batch/{number}/assertions` returns the abridged assertion list for batch `number`, if `number` is in the issued state, and a 404 error otherwise.
+* `GET https://{http_server}/mtc/v1/batches/{number}/abridged-assertions` returns the assertion list for the given batch, as an AbridgedAssertions struct, see {{signing}}.
 
 If the interface is implemented by a distributed service, with multiple servers, updates may propagate to servers at different times, which will cause temporary inconsistency. This inconsistency can impede this system's transparency goals ({{transparency}}).
 
-Services implementing this interface SHOULD wait until batch state is fully propagated to all servers before updating the latest batch number. That is, if any server returns a latest batch number of N in either of the first two HTTP endpoints, batch numbers N and below SHOULD be available under the last three batch-number-specific HTTP endpoints in all servers. If this property does not hold at any time, it is considered a service unavailability.
+Services implementing this interface SHOULD wait until batch state is fully propagated to all servers before updating the latest batch number.  That is, the batch returned as latest batch by any server via `/batches/latest/signed-validity-window`, SHOULD be available on every server by its number. If this property does not hold at any time, it is considered a service unavailability.
 
-Individual servers in a service MAY return different latest batch numbers. Individual servers MAY also differ on whether a batch number has a response available or return a 404 error. Provided the above consistency property holds, these two inconsistencies do not constitute service unavailability.
+Individual servers in a service MAY return an older batch under the `latest` endpoint. Individual servers MAY also differ on whether a batch number has a response available or return a 404 error. Provided the above consistency property holds, these two inconsistencies do not constitute service unavailability.
 
 {{ts-and-ca-availability}} discusses service availability requirements.
 
+[[TODO: Do we want to expose the CA parameters in the HTTP interface? #12 ]]
+
+## Transparency server
+
+For each tracked CA, a transparency service publishes a separate `http_server` that exposes the same HTTP interface as {{ca-api}}.
+
+[[TODO: expand on TS API. Do we want a TS to advertise the CAs which it mirrors? #12 ]]
+
 [[TODO: Once a batch has expired, do we allow a CA to stop publishing it? The transparency service can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system. #2 ]]
 
-[[TODO: If we have the validity window endpoint, do we still need to separate "info" and "assertions"? #12]]
+[[NOTE: In designing the interface, we try to make it as simlpe as possible to implement and scale. It can be done by serving static files. ]]
 
 # ACME Extensions {#acme-extensions}
 
@@ -1251,5 +1275,7 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Clarify we use a single `CertificateEntry`. #11
 
 - Clarify we use POSIX time. #1
+
+- Flesh out HTTP interface. #12
 
 - Miscellaneous changes.
