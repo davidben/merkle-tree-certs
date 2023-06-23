@@ -584,13 +584,13 @@ opaque TreeHead[hash.length];
 
 struct {
     uint32 batch_number;
-    TreeHead tree_heads[validity_window_size];
+    TreeHead tree_heads[validity_window_size*hash.length];
 } ValidityWindow;
 ~~~
 
 `batch_number` is the batch number of the highest batch in the validity window.
 
-`tree_heads` value contains the last `validity_window_size` tree heads, starting from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < validity_window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty(0, 0)`.
+`tree_heads` value contains the last `validity_window_size` tree heads. (Recall the TLS presentation language brackets the total length of a vector in bytes; not the number of elements.) `tree_heads` starts from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < validity_window_size - 1`, any tree heads with numbers below zero are filled with `HashEmpty(0, 0)`.
 
 After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose `batch_number` is the number of the batch being issued. It then computes a signature over the following structure:
 
