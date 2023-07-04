@@ -391,6 +391,35 @@ DNSName values use the "preferred name syntax" as specified by {{Section 3.5 of 
 
 Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !I-D.draft-ietf-uta-rfc6125bis}}.
 
+### Canonical order {#dnsname-order}
+
+The values in `dns_names` MUST be sorted lexicographically by label
+from right-to-left; that is:
+
+We consider `domain1 <= domain2`, if and only if
+
+1. `label1 < label2` lexicographically, or
+
+2. `label1 = label2`, and `subdomain1 <= subdomain2`,
+
+where `label1` is a label and `subdomain1` is such that either
+
+1. `domain1 = subdomain1.label1`, or
+
+2. `domain1 = label1`, and in that case `subdomain1` is the emty string;
+
+and `label2` and `subdomain2` are defined similarly  for `domain2`.
+
+The following is a list of properly sorted names in this order:
+
+~~~
+example.com
+b.example.com
+b.b.example.com
+ba.example.com
+z.example.com
+~~~
+
 ## IP Claims
 
 The `ipv4` and `ipv6` claims indicate the subject is authoritative for a set of IPv4 and IPv6 addresses, respectively. They use the IPv4AddressList and IPv6AddressList structures, respectively, defined below. IPv4Address and IPv6Address are interpreted in network byte order.
@@ -406,6 +435,17 @@ struct {
 struct {
     IPv6Address addresses<16..2^16-1>;
 } IPv6AddressList;
+~~~
+
+The values in `addresses` MUST be sorted lexicographically.
+
+The following is a list of IPv4 addresses for which the corresponding
+IPv4AddressList would be properly sorted.
+
+~~~
+192.0.2.37
+198.51.100.60
+203.0.113.0
 ~~~
 
 # Issuing Certificates
@@ -799,7 +839,9 @@ The transparency service maintains a mirror of the CA's latest batch number, and
 
    3. Compute the ValidityWindow structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
 
-   4. Set the mirrored latest batch number to `i` and save the fetched batch state.
+   4. Validate that the list of assertions is correctly formatted. This includes, among other stipulations, that the DNS names are sorted correctly, as specified in {{dnsname-order}}. If validation fails, abort this procedure with an error.
+
+   5. Set the mirrored latest batch number to `i` and save the fetched batch state.
 
 [[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest validity window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]
 
@@ -1223,5 +1265,7 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Clarify we use a single `CertificateEntry`. #11
 
 - Clarify we use POSIX time. #1
+
+- Specify a canonical representation for assertions. #31
 
 - Miscellaneous changes.
