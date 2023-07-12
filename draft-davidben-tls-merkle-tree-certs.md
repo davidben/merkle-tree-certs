@@ -444,6 +444,7 @@ IPv4AddressList would be properly sorted.
 
 ~~~
 192.0.2.37
+192.0.12.0
 198.51.100.60
 203.0.113.0
 ~~~
