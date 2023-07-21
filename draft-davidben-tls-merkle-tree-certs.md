@@ -547,7 +547,7 @@ Tree levels are computed iteratively as follows:
 2. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
    follows:
 
-   - If level `i-1` has an odd number of elements `j`, append `HashEmpty(i, j)` to the level.
+   - If level `i-1` has an odd number of elements `j`, append `HashEmpty(i-1, j)` to the level.
 
    - Initialize level `i` with half as many elements as level `i-1`. For all `j`,
      set element `j` to the output of `HashNode(left, right, i, j)` where `left` is
