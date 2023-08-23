@@ -643,7 +643,7 @@ opaque HashValueSHA256[32];
 
 struct {
     uint64 index;
-    HashValueSHA256 path<32..2^16-1>;
+    HashValueSHA256 path<0..2^16-1>;
 } MerkleTreeProofSHA256;
 ~~~
 
