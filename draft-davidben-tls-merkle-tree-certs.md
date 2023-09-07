@@ -496,7 +496,7 @@ This section describes how to certify a given list of assertions at a given batc
 
 First, the CA then builds a Merkle Tree from the list as follows:
 
-Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is the least positive integer with `n <= 2^(l-1)`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
+Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is the smallest positive integer such that `n <= 2^(l-1)`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
 
 ~~~~
     HashEmpty(level, index) = hash(HashEmptyInput)
