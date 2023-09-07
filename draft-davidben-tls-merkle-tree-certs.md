@@ -1165,7 +1165,7 @@ Relying parties with additional sources of revocation such as {{CRLite}} or {{CR
 
 The transparency service does not prevent unauthorized certificates, but it aims to provide comparable security properties to Certificate Transparency {{?RFC6962}}. If a subscriber presents an acceptable Merkle Tree certificate to a relying party, the relying party should have assurance it was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.
 
-One notable difference with Certificate Transparency is that the present transparency services do not publish the public keys, but rather hashes of them. This does not impede a relying party to detect a misissuance, by comparing with the hash of the expected public key. However, it does complicate studies (eg. {{SharedFactors}}) of weak public keys: researchers will have to retrieve the public keys from the TLS servers by connecting to them.
+One notable difference with Certificate Transparency is that transparency services do not publish the public keys, but rather hashes of them. This is intended to reduce serving costs, particularly with large post-quantum keys. Relying partings can still detect misissuance by looking for unexpected `subject_info_hash` values. However, this optimization complicates studies of weak public keys, e.g. {{SharedFactors}}. Such studies will have to retrieve the public keys separately, such as by connecting to the TLS servers, or fetching from the CA if it retains the unabridged assertion. This document does not define a mechanism for doing this.
 
 ### Unauthorized Certificates
 
