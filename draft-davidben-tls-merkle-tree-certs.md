@@ -428,14 +428,14 @@ A Merkle Tree certification authority is defined by the following values:
 `start_time`:
 : The issuance time of the first batch of certificates, represented as a POSIX timestamp (see {{time}}).
 
-`lifetime`:
-: A number of seconds which determines the lifetime of certificates issued by this CA.
-
 `batch_duration`:
 : A number of seconds which determines how frequently the CA issues certificates. See details below.
 
+`lifetime`:
+: A number of seconds which determines the lifetime of certificates issued by this CA. MUST be a multiple of `batch_duration`.
+
 `validity_window_size`:
-: An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `floor(lifetime / batch_duration) + 1`.
+: An integer describing the maximum number of unexpired batches which may exist at a time. This value is determined from `lifetime` and `batch_duration` by `lifetime / batch_duration`.
 
 These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.
 
@@ -1217,6 +1217,8 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 {:numbered="false"}
 
 - Avoid the temptation of floating points. #66
+
+- Require `lifetime` to be a multiple of `batch_duration`. #65
 
 - Rename window to validity window. #21
 
