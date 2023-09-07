@@ -621,7 +621,9 @@ struct {
 
 The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `issuer_id` field is the CA's `issuer_id`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
 
-The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to `batch_number`. If the CA's private key signs an input that can be interpreted as a LabeledValidityWindow structure, the CA is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
+The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to `batch_number`. A CA which generates such a signature is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
+
+A CA MUST NOT generate signatures over inputs that are parseable as LabeledValidityWindow, except via the above process. If a LabeledValidityWindow structure that was not produced in this way has a valid signature by CA's `public_key`, this indicates misuse of the private key by the CA, even if the preimages to the `tree_heads` values, or intermediate nodes, or `subject_info_hash` values are not known.
 
 ### Certificate Format {#proofs}
 
@@ -1163,13 +1165,15 @@ Relying parties with additional sources of revocation such as {{CRLite}} or {{CR
 
 The transparency service does not prevent unauthorized certificates, but it aims to provide comparable security properties to Certificate Transparency {{?RFC6962}}. If a subscriber presents an acceptable Merkle Tree certificate to a relying party, the relying party should have assurance it was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.
 
-One notable difference with Certificate Transparency is that transparency services do not publish the public keys, but rather hashes of them. This is intended to reduce serving costs, particularly with large post-quantum keys. Relying parties can still detect misissuance by looking for unexpected `subject_info_hash` values. However, this optimization complicates studies of weak public keys, e.g. {{SharedFactors}}. Such studies will have to retrieve the public keys separately, such as by connecting to the TLS servers, or fetching from the CA if it retains the unabridged assertion. This document does not define a mechanism for doing this.
-
 ### Unauthorized Certificates
 
 If a Merkle Tree certificate was unauthorized, but seen and mirrored by the transparency service, the relying party may accept it. However, provided the transparency service is operating correctly, this will be detectable. Unlike Certificate Transparency, Merkle Tree certificates achieve this property without a Maximum Merge Delay (MMD). Certificates are fully mirrored by the transparency service before the relying party will accept them. However, this comes at the cost of immediate issuance, as described in {{deployment-considerations}}.
 
 If the unauthorized certificate was not seen by the transparency service, the relying party will reject it. In order to accept a certificate, the relying party must have been provisioned with the corresponding tree head. A correctly operating transparency service will never present relying parties with tree heads unless the corresponding certificates have all been mirrored.
+
+Unlike Certificate Transparency, the transparency service will not provide the preimages for `subject_info_hash`, only the hashed values. This is intended to reduce serving costs, particularly with large post-quantum keys. As a result, monitors look for unrecognized hashes instead of unrecognized keys. Any unrecognized hash, even if the preimage is unknown, indicates an unauthorized certificate.
+
+This optimization complicates studies of weak public keys, e.g. {{SharedFactors}}. Such studies will have to retrieve the public keys separately, such as by connecting to the TLS servers, or fetching from the CA if it retains the unabridged assertion. This document does not define a mechanism for doing this.
 
 ### Misbehaving Certification Authority {#misbehaving-ca}
 
