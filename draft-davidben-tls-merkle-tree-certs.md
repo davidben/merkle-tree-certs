@@ -1139,7 +1139,7 @@ The second property is achieved by using a collision-resistant hash in the Merkl
 
 ## Cross-protocol attacks {#cross-protocol}
 
-Using the same key material in different, incompatible ways risks cross-protocol attacks when the two uses overlap. To avoid this, {{parameters}} forbids the reuse of Merkle Tree CA private keys in another protocol.
+Using the same key material in different, incompatible ways risks cross-protocol attacks when the two uses overlap. To avoid this, {{parameters}} forbids the reuse of Merkle Tree CA private keys in another protocol.  A CA MUST NOT generate signatures with its private key, except as defined in {{signing}}, or an extension of this protocol. Any valid signature of a CA's `public_key` that does not meet these requirements indicates misuse of the private key by the CA.
 
 To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
