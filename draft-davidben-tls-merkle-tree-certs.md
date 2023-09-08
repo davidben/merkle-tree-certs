@@ -522,7 +522,6 @@ struct {
     uint8 distinguisher = 0;
     opaque issuer_id<1..32>;
     uint32 batch_number;
-    opaque pad[N];
     uint64 index;
     uint8 level;
 } HashEmptyInput;
@@ -531,7 +530,6 @@ struct {
     uint8 distinguisher = 1;
     opaque issuer_id<1..32>;
     uint32 batch_number;
-    opaque pad[N];
     uint64 index;
     uint8 level;
     opaque left[hash.length];
@@ -548,13 +546,12 @@ struct {
     uint8 distinguisher = 2;
     opaque issuer_id<1..32>;
     uint32 batch_number;
-    opaque pad[N];
     uint64 index;
     AbridgedAssertion abridged_assertion;
 } HashAssertionInput;
 ~~~
 
-`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `pad` is an array of zeros to pad up to the hash function's block size. For SHA-256, the block size is 64 bytes.  `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
+`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
@@ -1238,6 +1235,8 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 
 ## Since draft-davidben-tls-merkle-tree-certs-00
 {:numbered="false"}
+
+- Simpify hashing by removing the internal padding to align with block size. #72
 
 - Avoid the temptation of floating points. #66
 
