@@ -1228,7 +1228,7 @@ IANA is requested to create the following entry in the TLS Certificate Types reg
 
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.
 
-The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document.
+The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
 
 # Change log
 {:numbered="false"}
