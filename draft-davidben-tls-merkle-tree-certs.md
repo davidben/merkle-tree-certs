@@ -538,7 +538,7 @@ struct {
 
 struct {
     SubjectType subject_type;
-    opaque subject_info_hash[hash.length];
+    opaque abridged_subject_info<0..2^16-1>;
     Claim claims<0..2^16-1>;
 } AbridgedAssertion;
 
@@ -551,7 +551,7 @@ struct {
 } HashAssertionInput;
 ~~~
 
-`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
+`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `abridged_assertion.abridged_subject_info` is set to `abridge_subject_info(assertion.subject_type, assertion.subject_info)` defined in {{tls-subject-info}} from the function input `assertion`, and the remaining fields of `abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
@@ -913,7 +913,7 @@ We should also define a certificate request format, though it is broadly just re
 
 ## TLS Subjects {#tls-subject-info}
 
-This section describes the SubjectType for use with TLS {{RFC8446}}. The SubjectType value is `tls`, and the `subject_info` field contains a TLSSubjectInfo structure, defined below:
+This section describes the SubjectType for use with TLS {{RFC8446}}. The SubjectType value is `tls`. The `subject_info` and `abridged_subject_info` fields contains a TLSSubjectInfo and AbridgedTLSSubjectInfo structure respectively, defined below:
 
 ~~~
 enum { tls(0), (2^16-1) } SubjectType;
@@ -923,6 +923,11 @@ struct {
     opaque public_key<1..2^16-1>;
     /* TODO: Should there be an extension list? #38 */
 } TLSSubjectInfo;
+
+struct {
+    SignatureScheme signature;
+    opaque public_key_hash[hash.length];
+} AbridgedTLSSubjectInfo;
 ~~~
 
 A TLSSubjectInfo describes a TLS signing key. The `signature` field is a SignatureScheme {{Section 4.2.3 of RFC8446}} value describing the key type and signature algorithm it uses for CertificateVerify.
@@ -941,6 +946,8 @@ EdDSA algorithms:
 This document does not define the public key format for other algorithms. In order for a SignatureScheme to be usable with TLSSubjectInfo, this format must be defined in a corresponding document.
 
 [[TODO: If other schemes get defined before this document is done, add them here. After that, it's on the other schemes to do it. #39 ]]
+
+An `AbridgedTLSSubjectInfo` is computed from a `TLSSubjectInfo` by hashing the public key: `abridge_subject_info(tls, subject_info)` is an `AbridgedTLSSubjectInfo` with `public_key_hash = hash(subject_info.public_key)`, and the `signature` field copied over.
 
 ## The Bikeshed Certificate Type {#tls-certificate-type}
 
@@ -1232,6 +1239,11 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 
 > **RFC Editor's Note:** Please remove this section prior to publication of a
 > final version of this document.
+
+## Since draft-davidben-tls-merkle-tree-certs-00
+{:numbered="false"}
+
+- For AbridgedAssertion do not simply hash the complete `subject_info`, but instead split off an `abridged_subject_info` which can hash selected fields. For the case of TLS, we hash `public_key`, but leave `signature_algorithm` unhashed. #76
 
 ## Since draft-davidben-tls-merkle-tree-certs-00
 {:numbered="false"}
