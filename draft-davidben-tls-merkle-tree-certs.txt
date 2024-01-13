@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 25 May 2024                                    B. E. Westerbaan
+Expires: 16 July 2024                                   B. E. Westerbaan
                                                               Cloudflare
-                                                        22 November 2023
+                                                         13 January 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,11 +57,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 May 2024.
+   This Internet-Draft will expire on 16 July 2024.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -322,20 +322,20 @@ Table of Contents
    Figure 1 below shows this process.
 
      +--------------+  1. issuance request  +-------------------------+
-     |              | --------------------> |                         |
+     |              +---------------------->|                         |
      |  Subscriber  |                       | Certification Authority |
-     |              | <-------------------- |                         |
-     +--------------+   3. inclusion proof  +-------------------------+
+     |              |<----------------------+                         |
+     +---------+----+   3. inclusion proof  +-----------+-------------+
             ^  |                                        |
             |  |                                        | 2. sign and
 6. accepted |  | 7. inclusion proof                     |  publish tree
  tree heads |  |                                        |
             |  v                                        v
-    +-----------------+                      +----------------------+
+    +-------+---------+                      +----------------------+
     |                 |  5. batch tree heads |                      |
-    |  Relying Party  | <------------------- | Transparency Service |
+    |  Relying Party  |<---------------------+ Transparency Service |
     |                 |                      |                      |
-    +-----------------+                      +----------------------+
+    +-----------------+                      +----------+-----------+
                                                         |
                                                         | 4. mirror tree
                                                         v
@@ -697,8 +697,8 @@ Table of Contents
    example tree for three assertions.  The tree head in this example is
    t20.
 
-       level 2:               t20
-                         _____/ \_____
+       level 2:           ___ t20 ___
+                         /           \
                         /             \
        level 1:       t10             t11
                       / \             / \
@@ -852,8 +852,8 @@ Table of Contents
    three assertions would contain the marked nodes in Figure 3, from
    bottom to top.
 
-       level 2:               t20
-                         _____/ \_____
+       level 2:           ___ t20 ___
+                         /           \
                         /             \
        level 1:      *t10             t11
                       / \             / \

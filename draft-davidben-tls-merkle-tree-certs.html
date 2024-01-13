@@ -11,23 +11,23 @@
 <meta content="
        This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
     " name="description">
-<meta content="xml2rfc 3.18.2" name="generator">
+<meta content="xml2rfc 3.19.0" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.18.2
+  xml2rfc 3.19.0
     Python 3.11.6
-    ConfigArgParse 1.5.3
+    ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 4.0.0
+    platformdirs 4.1.0
     pycountry 22.3.5
-    PyYAML 6.0
+    PyYAML 6.0.1
     requests 2.31.0
-    setuptools 67.7.2
+    setuptools 68.2.2
     six 1.16.0
-    wcwidth 0.2.10
+    wcwidth 0.2.12
 -->
 <link href="draft-davidben-tls-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1026,11 +1026,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates for TLS</td>
-<td class="right">November 2023</td>
+<td class="right">January 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 25 May 2024</td>
+<td class="center">Expires 16 July 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1043,12 +1043,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-11-22" class="published">22 November 2023</time>
+<time datetime="2024-01-13" class="published">13 January 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-05-25">25 May 2024</time></dd>
+<dd class="expires"><time datetime="2024-07-16">16 July 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1106,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 May 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 July 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1115,7 +1115,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2023 IETF Trust and the persons identified as the
+            Copyright (c) 2024 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1496,32 +1496,80 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <p id="section-3-3"><a href="#fig-deployment" class="auto internal xref">Figure 1</a> below shows this process.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <span id="name-an-overview-of-a-merkle-tre"></span><div id="fig-deployment">
 <figure id="figure-1">
-        <div class="alignLeft art-ascii-art art-text artwork" id="section-3-4.1">
-<pre>
-     +--------------+  1. issuance request  +-------------------------+
-     |              | --------------------&gt; |                         |
-     |  Subscriber  |                       | Certification Authority |
-     |              | &lt;-------------------- |                         |
-     +--------------+   3. inclusion proof  +-------------------------+
-            ^  |                                        |
-            |  |                                        | 2. sign and
-6. accepted |  | 7. inclusion proof                     |  publish tree
- tree heads |  |                                        |
-            |  v                                        v
-    +-----------------+                      +----------------------+
-    |                 |  5. batch tree heads |                      |
-    |  Relying Party  | &lt;------------------- | Transparency Service |
-    |                 |                      |                      |
-    +-----------------+                      +----------------------+
-                                                        |
-                                                        | 4. mirror tree
-                                                        v
-                                                  +------------+
-                                                  |            |
-                                                  |  Monitors  |
-                                                  |            |
-                                                  +------------+
-</pre>
+        <div id="section-3-4.1">
+          <div class="alignLeft art-svg artwork" id="section-3-4.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="584" viewBox="0 0 584 400" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 40,192 L 40,256" fill="none" stroke="black"></path>
+              <path d="M 48,32 L 48,96" fill="none" stroke="black"></path>
+              <path d="M 104,104 L 104,192" fill="none" stroke="black"></path>
+              <path d="M 128,96 L 128,184" fill="none" stroke="black"></path>
+              <path d="M 168,32 L 168,96" fill="none" stroke="black"></path>
+              <path d="M 184,192 L 184,256" fill="none" stroke="black"></path>
+              <path d="M 360,32 L 360,96" fill="none" stroke="black"></path>
+              <path d="M 368,192 L 368,256" fill="none" stroke="black"></path>
+              <path d="M 408,320 L 408,384" fill="none" stroke="black"></path>
+              <path d="M 456,96 L 456,184" fill="none" stroke="black"></path>
+              <path d="M 456,256 L 456,312" fill="none" stroke="black"></path>
+              <path d="M 512,320 L 512,384" fill="none" stroke="black"></path>
+              <path d="M 552,192 L 552,256" fill="none" stroke="black"></path>
+              <path d="M 568,32 L 568,96" fill="none" stroke="black"></path>
+              <path d="M 48,32 L 168,32" fill="none" stroke="black"></path>
+              <path d="M 360,32 L 568,32" fill="none" stroke="black"></path>
+              <path d="M 168,48 L 352,48" fill="none" stroke="black"></path>
+              <path d="M 176,80 L 360,80" fill="none" stroke="black"></path>
+              <path d="M 48,96 L 168,96" fill="none" stroke="black"></path>
+              <path d="M 360,96 L 568,96" fill="none" stroke="black"></path>
+              <path d="M 40,192 L 184,192" fill="none" stroke="black"></path>
+              <path d="M 368,192 L 552,192" fill="none" stroke="black"></path>
+              <path d="M 192,224 L 368,224" fill="none" stroke="black"></path>
+              <path d="M 40,256 L 184,256" fill="none" stroke="black"></path>
+              <path d="M 368,256 L 552,256" fill="none" stroke="black"></path>
+              <path d="M 408,320 L 512,320" fill="none" stroke="black"></path>
+              <path d="M 408,384 L 512,384" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="464,312 452,306.4 452,317.6" fill="black" transform="rotate(90,456,312)"></polygon>
+              <polygon class="arrowhead" points="464,184 452,178.4 452,189.6" fill="black" transform="rotate(90,456,184)"></polygon>
+              <polygon class="arrowhead" points="360,48 348,42.4 348,53.6" fill="black" transform="rotate(0,352,48)"></polygon>
+              <polygon class="arrowhead" points="200,224 188,218.4 188,229.6" fill="black" transform="rotate(180,192,224)"></polygon>
+              <polygon class="arrowhead" points="184,80 172,74.4 172,85.6" fill="black" transform="rotate(180,176,80)"></polygon>
+              <polygon class="arrowhead" points="136,184 124,178.4 124,189.6" fill="black" transform="rotate(90,128,184)"></polygon>
+              <polygon class="arrowhead" points="112,104 100,98.4 100,109.6" fill="black" transform="rotate(270,104,104)"></polygon>
+              <g class="text">
+                <text x="196" y="36">1.</text>
+                <text x="244" y="36">issuance</text>
+                <text x="312" y="36">request</text>
+                <text x="108" y="68">Subscriber</text>
+                <text x="424" y="68">Certification</text>
+                <text x="520" y="68">Authority</text>
+                <text x="204" y="100">3.</text>
+                <text x="256" y="100">inclusion</text>
+                <text x="320" y="100">proof</text>
+                <text x="476" y="132">2.</text>
+                <text x="508" y="132">sign</text>
+                <text x="544" y="132">and</text>
+                <text x="12" y="148">6.</text>
+                <text x="60" y="148">accepted</text>
+                <text x="148" y="148">7.</text>
+                <text x="200" y="148">inclusion</text>
+                <text x="264" y="148">proof</text>
+                <text x="504" y="148">publish</text>
+                <text x="556" y="148">tree</text>
+                <text x="28" y="164">tree</text>
+                <text x="72" y="164">heads</text>
+                <text x="212" y="212">5.</text>
+                <text x="248" y="212">batch</text>
+                <text x="292" y="212">tree</text>
+                <text x="336" y="212">heads</text>
+                <text x="88" y="228">Relying</text>
+                <text x="144" y="228">Party</text>
+                <text x="428" y="228">Transparency</text>
+                <text x="512" y="228">Service</text>
+                <text x="476" y="292">4.</text>
+                <text x="516" y="292">mirror</text>
+                <text x="564" y="292">tree</text>
+                <text x="460" y="356">Monitors</text>
+              </g>
+            </svg><a href="#section-3-4.1.1" class="pilcrow">¶</a>
+</div>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-an-overview-of-a-merkle-tre" class="selfRef">An overview of a Merkle Tree certificate deployment</a>
@@ -1826,18 +1874,40 @@ element <code>2*j</code> of level <code>i-1</code> and <code>right</code> is ele
 <p id="section-5.4.1-9">At the end of this process, level <code>l-1</code> will have exactly one root element. This element is called the tree head. <a href="#fig-example-tree" class="auto internal xref">Figure 2</a> shows an example tree for three assertions. The tree head in this example is t20.<a href="#section-5.4.1-9" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-for-"></span><div id="fig-example-tree">
 <figure id="figure-2">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.4.1-10.1">
-<pre>
-    level 2:               t20
-                      _____/ \_____
-                     /             \
-    level 1:       t10             t11
-                   / \             / \
-                  /   \           /   \
-    level 0:   t00     t01     t02    empty
-                |       |       |
-                a0      a1      a2
-</pre>
+            <div id="section-5.4.1-10.1">
+              <div class="alignLeft art-svg artwork" id="section-5.4.1-10.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="192" width="320" viewBox="0 0 320 192" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 144,96 L 152,112" fill="none" stroke="black"></path>
+                  <path d="M 244,40 L 256,64" fill="none" stroke="black"></path>
+                  <path d="M 272,96 L 280,112" fill="none" stroke="black"></path>
+                  <path d="M 120,112 L 128,96" fill="none" stroke="black"></path>
+                  <path d="M 144,64 L 156,40" fill="none" stroke="black"></path>
+                  <path d="M 248,112 L 256,96" fill="none" stroke="black"></path>
+                  <path d="M 156,40 L 180,40" fill="none" stroke="black"></path>
+                  <path d="M 220,40 L 244,40" fill="none" stroke="black"></path>
+                  <g class="text">
+                    <text x="24" y="36">level</text>
+                    <text x="60" y="36">2:</text>
+                    <text x="200" y="36">t20</text>
+                    <text x="24" y="84">level</text>
+                    <text x="60" y="84">1:</text>
+                    <text x="136" y="84">t10</text>
+                    <text x="264" y="84">t11</text>
+                    <text x="24" y="132">level</text>
+                    <text x="60" y="132">0:</text>
+                    <text x="104" y="132">t00</text>
+                    <text x="168" y="132">t01</text>
+                    <text x="232" y="132">t02</text>
+                    <text x="296" y="132">empty</text>
+                    <text x="104" y="148">|</text>
+                    <text x="168" y="148">|</text>
+                    <text x="232" y="148">|</text>
+                    <text x="108" y="164">a0</text>
+                    <text x="172" y="164">a1</text>
+                    <text x="236" y="164">a2</text>
+                  </g>
+                </svg><a href="#section-5.4.1-10.1.1" class="pilcrow">¶</a>
+</div>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-an-example-merkle-tree-for-" class="selfRef">An example Merkle Tree for three assertions</a>
@@ -1942,18 +2012,40 @@ tree head is never included.<a href="#section-5.4.3-9.2.1" class="pilcrow">¶</a
 <p id="section-5.4.3-10">For example, the <code>path</code> value for the third assertion in a batch of three assertions would contain the marked nodes in <a href="#fig-example-proof" class="auto internal xref">Figure 3</a>, from bottom to top.<a href="#section-5.4.3-10" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-proo"></span><div id="fig-example-proof">
 <figure id="figure-3">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.4.3-11.1">
-<pre>
-    level 2:               t20
-                      _____/ \_____
-                     /             \
-    level 1:      *t10             t11
-                   / \             / \
-                  /   \           /   \
-    level 0:   t00     t01     t02   *empty
-                |       |       |
-                a0      a1      a2
-</pre>
+            <div id="section-5.4.3-11.1">
+              <div class="alignLeft art-svg artwork" id="section-5.4.3-11.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="192" width="320" viewBox="0 0 320 192" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                  <path d="M 144,96 L 152,112" fill="none" stroke="black"></path>
+                  <path d="M 244,40 L 256,64" fill="none" stroke="black"></path>
+                  <path d="M 272,96 L 280,112" fill="none" stroke="black"></path>
+                  <path d="M 120,112 L 128,96" fill="none" stroke="black"></path>
+                  <path d="M 144,64 L 156,40" fill="none" stroke="black"></path>
+                  <path d="M 248,112 L 256,96" fill="none" stroke="black"></path>
+                  <path d="M 156,40 L 180,40" fill="none" stroke="black"></path>
+                  <path d="M 220,40 L 244,40" fill="none" stroke="black"></path>
+                  <g class="text">
+                    <text x="24" y="36">level</text>
+                    <text x="60" y="36">2:</text>
+                    <text x="200" y="36">t20</text>
+                    <text x="24" y="84">level</text>
+                    <text x="60" y="84">1:</text>
+                    <text x="132" y="84">*t10</text>
+                    <text x="264" y="84">t11</text>
+                    <text x="24" y="132">level</text>
+                    <text x="60" y="132">0:</text>
+                    <text x="104" y="132">t00</text>
+                    <text x="168" y="132">t01</text>
+                    <text x="232" y="132">t02</text>
+                    <text x="292" y="132">*empty</text>
+                    <text x="104" y="148">|</text>
+                    <text x="168" y="148">|</text>
+                    <text x="232" y="148">|</text>
+                    <text x="108" y="164">a0</text>
+                    <text x="172" y="164">a1</text>
+                    <text x="236" y="164">a2</text>
+                  </g>
+                </svg><a href="#section-5.4.3-11.1.1" class="pilcrow">¶</a>
+</div>
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-an-example-merkle-tree-proo" class="selfRef">An example Merkle Tree proof for the third of three assertions</a>
