@@ -305,22 +305,22 @@ The process of issuing and using a certificate is as follows:
 
 {{fig-deployment}} below shows this process.
 
-~~~ ascii-art
+~~~ aasvg
      +--------------+  1. issuance request  +-------------------------+
-     |              | --------------------> |                         |
+     |              +---------------------->|                         |
      |  Subscriber  |                       | Certification Authority |
-     |              | <-------------------- |                         |
-     +--------------+   3. inclusion proof  +-------------------------+
+     |              |<----------------------+                         |
+     +---------+----+   3. inclusion proof  +-----------+-------------+
             ^  |                                        |
             |  |                                        | 2. sign and
 6. accepted |  | 7. inclusion proof                     |  publish tree
  tree heads |  |                                        |
             |  v                                        v
-    +-----------------+                      +----------------------+
+    +-------+---------+                      +----------------------+
     |                 |  5. batch tree heads |                      |
-    |  Relying Party  | <------------------- | Transparency Service |
+    |  Relying Party  |<---------------------+ Transparency Service |
     |                 |                      |                      |
-    +-----------------+                      +----------------------+
+    +-----------------+                      +----------+-----------+
                                                         |
                                                         | 4. mirror tree
                                                         v
@@ -570,9 +570,9 @@ Tree levels are computed iteratively as follows:
 
 At the end of this process, level `l-1` will have exactly one root element. This element is called the tree head. {{fig-example-tree}} shows an example tree for three assertions. The tree head in this example is t20.
 
-~~~~ ascii-art
-    level 2:               t20
-                      _____/ \_____
+~~~~ aasvg
+    level 2:           ___ t20 ___
+                      /           \
                      /             \
     level 1:       t10             t11
                    / \             / \
@@ -679,9 +679,9 @@ The `proof_data` for `merkle_tree_sha256` is a MerkleTreeProofSHA256. After buil
 
 For example, the `path` value for the third assertion in a batch of three assertions would contain the marked nodes in {{fig-example-proof}}, from bottom to top.
 
-~~~~ ascii-art
-    level 2:               t20
-                      _____/ \_____
+~~~~ aasvg
+    level 2:           ___ t20 ___
+                      /           \
                      /             \
     level 1:      *t10             t11
                    / \             / \
