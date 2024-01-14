@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-01-11T01:23:02.667492+00:00",
+  "timestamp": "2024-01-14T01:34:02.943090+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1425,6 +1425,30 @@
       "updatedAt": "2023-11-22T17:49:56Z",
       "closedAt": "2023-11-22T17:49:56Z",
       "comments": []
+    },
+    {
+      "number": 83,
+      "id": "I_kwDOJIBkVc57_4GN",
+      "title": "Subscriber-imposed certificate expiry",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/83",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Certificates currently all expire as the batch expires, which come from a technical requirement of the mechanism. However, when requesting a certificate, the subscriber may have even tighter opinions on expiry, based on its own key management goals. Probably not likely with MTC certificate lifetimes, but we do mean for BikeshedCertificate to be extensible and ACME does allow the subscriber to request a notAfter date.\r\n\r\nIf the subscriber requests a tighter notAfter date than the corresponding batch, the ACME server would need to choose between not issuing a Merkle tree certificate, or extending the subscriber's vulnerability to it key longer than requested. We could avoid that by adding an extra expiration time inside the certificate. The semantics would be that you check *both* that expiration time and the batch-level one. (Equivalently, require they be consistent. But checking both may be more straightforward since we need the RP to check anyway.)\r\n\r\nNot sure whether this should go in Assertion + AbridgedAssertion, or MerkleTreeProofSHA256 + HashAssertionInput. I'm envisioning the Assertion being something that the subscriber puts together, that plugs into CSRs and any other proof-of-possession checks. Saying that the subscriber's Assertion is byte-for-byte identical to the one in the certificate gives a lot of nice properties, but in other proof types, a CA may wish to express a tighter lifetime than what the subscriber requested. That would suggest the CA-imposed expiry, in general, needs to be outside the assertion. (CA-imposed expiry is implicit in MTCs, but may not be in other constructions.) But then we might want PoPs to express a subscriber-imposed expiry, which would mean this \"check both CA- and subscriber-imposed expiry separately\" model needs to become universal.\r\n\r\nPut another way, it's the difference between:\r\n* The statement \"the key 1234 is good for example.com\" is true until 2024-01-31\r\n* The statement \"the key 1234 is good for example.com until 2024-01-20\" is true until 2024-01-31\r\n",
+      "createdAt": "2024-01-13T15:22:29Z",
+      "updatedAt": "2024-01-13T15:25:40Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Hmm, I may be overthinking this. Proof-of-possession schemes can still have expiry by just putting it outside the assertion. Having assertions themselves be timeless makes it a lot easier to say things like \"I'm looking for sha256(assertion)\", without having the identity of the assertion change over time.\r\n\r\nLeaning towards doing it outside the assertion.",
+          "createdAt": "2024-01-13T15:25:39Z",
+          "updatedAt": "2024-01-13T15:25:39Z"
+        }
+      ]
     }
   ],
   "pulls": [
