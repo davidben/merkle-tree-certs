@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-01-14T01:34:02.943090+00:00",
+  "timestamp": "2024-01-16T01:22:57.752009+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1438,7 +1438,7 @@
       "labels": [],
       "body": "Certificates currently all expire as the batch expires, which come from a technical requirement of the mechanism. However, when requesting a certificate, the subscriber may have even tighter opinions on expiry, based on its own key management goals. Probably not likely with MTC certificate lifetimes, but we do mean for BikeshedCertificate to be extensible and ACME does allow the subscriber to request a notAfter date.\r\n\r\nIf the subscriber requests a tighter notAfter date than the corresponding batch, the ACME server would need to choose between not issuing a Merkle tree certificate, or extending the subscriber's vulnerability to it key longer than requested. We could avoid that by adding an extra expiration time inside the certificate. The semantics would be that you check *both* that expiration time and the batch-level one. (Equivalently, require they be consistent. But checking both may be more straightforward since we need the RP to check anyway.)\r\n\r\nNot sure whether this should go in Assertion + AbridgedAssertion, or MerkleTreeProofSHA256 + HashAssertionInput. I'm envisioning the Assertion being something that the subscriber puts together, that plugs into CSRs and any other proof-of-possession checks. Saying that the subscriber's Assertion is byte-for-byte identical to the one in the certificate gives a lot of nice properties, but in other proof types, a CA may wish to express a tighter lifetime than what the subscriber requested. That would suggest the CA-imposed expiry, in general, needs to be outside the assertion. (CA-imposed expiry is implicit in MTCs, but may not be in other constructions.) But then we might want PoPs to express a subscriber-imposed expiry, which would mean this \"check both CA- and subscriber-imposed expiry separately\" model needs to become universal.\r\n\r\nPut another way, it's the difference between:\r\n* The statement \"the key 1234 is good for example.com\" is true until 2024-01-31\r\n* The statement \"the key 1234 is good for example.com until 2024-01-20\" is true until 2024-01-31\r\n",
       "createdAt": "2024-01-13T15:22:29Z",
-      "updatedAt": "2024-01-13T15:25:40Z",
+      "updatedAt": "2024-01-15T15:39:34Z",
       "closedAt": null,
       "comments": [
         {
@@ -1447,6 +1447,27 @@
           "body": "Hmm, I may be overthinking this. Proof-of-possession schemes can still have expiry by just putting it outside the assertion. Having assertions themselves be timeless makes it a lot easier to say things like \"I'm looking for sha256(assertion)\", without having the identity of the assertion change over time.\r\n\r\nLeaning towards doing it outside the assertion.",
           "createdAt": "2024-01-13T15:25:39Z",
           "updatedAt": "2024-01-13T15:25:39Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Makes sense. We should keep this in mind when designing revocation (#41): if we want revocation that's not aligned with the issue time of batches, then we could perhaps do this by issuing and immediately revoking at the intended expiry.",
+          "createdAt": "2024-01-15T13:48:31Z",
+          "updatedAt": "2024-01-15T13:48:31Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "I think those are separate. Any kind of revocation scheme like that will necessarily be fuzzy (e.g. only work with RPs that have gotten a fresh push) because of all the usual reasons X.509-style revocation does not work.\r\n\r\nThis is about whether there should be a way to note, in the certificate, that the subscriber, at issuance time, did not want the key to last beyond Thursday.",
+          "createdAt": "2024-01-15T15:37:42Z",
+          "updatedAt": "2024-01-15T15:37:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Also really the only thing to design in \"revocation\" is some way to uniquely identify the certificate... which I suppose does have some connection to the question of where the expiration time goes, hmm...",
+          "createdAt": "2024-01-15T15:39:32Z",
+          "updatedAt": "2024-01-15T15:39:32Z"
         }
       ]
     }
