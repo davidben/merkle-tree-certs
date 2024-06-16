@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-13T01:25:46.616812+00:00",
+  "timestamp": "2024-06-16T01:38:29.245108+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1501,6 +1501,22 @@
           "updatedAt": "2024-02-17T19:19:42Z"
         }
       ]
+    },
+    {
+      "number": 85,
+      "id": "I_kwDOJIBkVc6MNxI7",
+      "title": "Use PENs to name CAs",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/85",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Once https://github.com/davidben/tls-trust-expressions/pull/30 lands, just cite the construction from there.",
+      "createdAt": "2024-06-14T03:36:40Z",
+      "updatedAt": "2024-06-14T03:36:40Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
