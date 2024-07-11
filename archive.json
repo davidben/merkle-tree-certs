@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-09T01:34:55.235596+00:00",
+  "timestamp": "2024-07-11T01:35:18.519325+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -988,7 +988,7 @@
       "labels": [],
       "body": "> [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]] ",
       "createdAt": "2023-06-05T12:08:06Z",
-      "updatedAt": "2023-06-15T10:35:16Z",
+      "updatedAt": "2024-07-09T18:16:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -1011,6 +1011,13 @@
           "body": "> Even if every certificate in a batch were revoked, it should only increase proof size by ~one extra hash, right?\r\n\r\nYes. I was thinking of the case where you want to revoke million of certificates over multiple batches.",
           "createdAt": "2023-06-15T10:35:15Z",
           "updatedAt": "2023-06-15T10:35:15Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Some more thoughts on this.\r\n\r\n1. Another downside to using the main batches for revocations: a client is only presented with a proof of inclusion \u2014 not of non-inclusion of later revocations. The transparency service would have to build something on top anyway. Together with the existing downside that it couples issuance and revocation latency, I'd say this is dead on arrival.\r\n\r\n1. That today revocation is slow, means that we don't *need* revocation in MTC to match the status quo. I wouldn't oppose adding back in better revocation later on \u2014\u00a0as David suggested a later document.\r\n\r\n1. CRLite and variants solve a strictly harder problem than we're dealing with here: the input is a hash, and there the *universe* of possible hashes is unknown to the client (but known to the service generating the CRLite filters thanks to CT.) On the other hand, here, the universe is known: we know the number of assertions in a batch. So the task is to encode a subset (of k revoked indices) of {0, ..., n}. We can reach the theoretical minimum of lg (n choose k) for a random subset within 5% using fancy coding, and ~20% using simpler methods, beating CRLite which is about ~100%. Still, if we revoke 16 million out of 725 million, we need ~15MB, which is a lot. \r\n\r\n1. We'll need to understand how much will be revoked with shorter lifetimes. I'll look into this. I also do not believe the current high rate of revocation is security critical. Could we have clients fetch the optional compressed revocation lists directly from the CAs, which incentivises them to keep them short?",
+          "createdAt": "2024-07-09T18:16:53Z",
+          "updatedAt": "2024-07-09T18:16:53Z"
         }
       ]
     },
