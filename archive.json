@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-14T01:42:00.810536+00:00",
+  "timestamp": "2024-07-16T01:37:03.360968+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -988,7 +988,7 @@
       "labels": [],
       "body": "> [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]] ",
       "createdAt": "2023-06-05T12:08:06Z",
-      "updatedAt": "2024-07-09T18:16:54Z",
+      "updatedAt": "2024-07-14T13:30:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -1018,6 +1018,13 @@
           "body": "Some more thoughts on this.\r\n\r\n1. Another downside to using the main batches for revocations: a client is only presented with a proof of inclusion \u2014 not of non-inclusion of later revocations. The transparency service would have to build something on top anyway. Together with the existing downside that it couples issuance and revocation latency, I'd say this is dead on arrival.\r\n\r\n1. That today revocation is slow, means that we don't *need* revocation in MTC to match the status quo. I wouldn't oppose adding back in better revocation later on \u2014\u00a0as David suggested a later document.\r\n\r\n1. CRLite and variants solve a strictly harder problem than we're dealing with here: the input is a hash, and there the *universe* of possible hashes is unknown to the client (but known to the service generating the CRLite filters thanks to CT.) On the other hand, here, the universe is known: we know the number of assertions in a batch. So the task is to encode a subset (of k revoked indices) of {0, ..., n}. We can reach the theoretical minimum of lg (n choose k) for a random subset within 5% using fancy coding, and ~20% using simpler methods, beating CRLite which is about ~100%. Still, if we revoke 16 million out of 725 million, we need ~15MB, which is a lot. \r\n\r\n1. We'll need to understand how much will be revoked with shorter lifetimes. I'll look into this. I also do not believe the current high rate of revocation is security critical. Could we have clients fetch the optional compressed revocation lists directly from the CAs, which incentivises them to keep them short?",
           "createdAt": "2024-07-09T18:16:53Z",
           "updatedAt": "2024-07-09T18:16:53Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "I suspect revocation can always be added later, yeah. Ultimately, all we need to revoke individual entries in a batch is:\r\n* A unique way to identify the thing being revoked. X.509's original story was issuer name + serial number. We can do better without adding anything: If you're trying to identify a certification, CA name, batch number, and index. If you're trying to identify an assertion, hash the assertion.\r\n* Some way for the relying party to get the revocation information. X.509's original story was a URLs stuck into every certificate. That is a horrible waste of space and online revocation fetches by relying parties have broadly not worked. If your revocation story goes through some out-of-band process (CRLSets, CRLite, etc), we don't need to define anything. If your revocation story looks more like the failed online revocation fetches of X.509, we can just say \"the URL or so is part of the trust anchor configuration\".\r\n\r\nBut yeah I agree with Devon that the revocation story should broadly be that the assertions are short-lived enough anyway. I wouldn't want to close the door on being able to push out faster revocations, but I think the above means we can safely defer this to later.",
+          "createdAt": "2024-07-14T13:28:44Z",
+          "updatedAt": "2024-07-14T13:30:03Z"
         }
       ]
     },
