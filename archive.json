@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-23T01:36:14.003633+00:00",
+  "timestamp": "2024-07-25T01:35:46.603620+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -988,7 +988,7 @@
       "labels": [],
       "body": "> [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]] ",
       "createdAt": "2023-06-05T12:08:06Z",
-      "updatedAt": "2024-07-14T13:30:03Z",
+      "updatedAt": "2024-07-23T13:21:45Z",
       "closedAt": null,
       "comments": [
         {
@@ -1025,6 +1025,13 @@
           "body": "I suspect revocation can always be added later, yeah. Ultimately, all we need to revoke individual entries in a batch is:\r\n* A unique way to identify the thing being revoked. X.509's original story was issuer name + serial number. We can do better without adding anything: If you're trying to identify a certification, CA name, batch number, and index. If you're trying to identify an assertion, hash the assertion.\r\n* Some way for the relying party to get the revocation information. X.509's original story was a URLs stuck into every certificate. That is a horrible waste of space and online revocation fetches by relying parties have broadly not worked. If your revocation story goes through some out-of-band process (CRLSets, CRLite, etc), we don't need to define anything. If your revocation story looks more like the failed online revocation fetches of X.509, we can just say \"the URL or so is part of the trust anchor configuration\".\r\n\r\nBut yeah I agree with Devon that the revocation story should broadly be that the assertions are short-lived enough anyway. I wouldn't want to close the door on being able to push out faster revocations, but I think the above means we can safely defer this to later.",
           "createdAt": "2024-07-14T13:28:44Z",
           "updatedAt": "2024-07-14T13:30:03Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I had a quick look at revocation behaviour of Let's Encrypt users to get some sense of what we're dealing with. July 18th (2024) I downloaded Let's Encrypt's CRLs (E1, E5, R4, R10 and R11). They contain a total of 523,178 revocations. I looked up all certificates with a _notAfter_ between July 18th 00:00:00 and August 26th 14:44:59 in Certificate Transparency (that's a bit more than 39 days). I found 166 million certificates. Of those 306,321 (0.18%) appeared in the CRLs. For each of those revoked certificates I determined how many days into its lifetime it was revoked. This is the cumulative distribution function for that:\r\n\r\n<img width=\"611\" alt=\"Screenshot 2024-07-23 at 13 31 55\" src=\"https://github.com/user-attachments/assets/99f4d821-0bc0-4747-bd99-be6f40f51d77\">\r\n\r\nNote:\r\n\r\n- 40% of revocations happen within a day of issuance.\r\n- 20% of revocations happen between 58 and 64 days after issuance. It seems likely these are revocations of certificates when they are renewed.\r\n- I didn't include the remaining 216,857 revocations with a *notAfter* after August 26th yet. This will affect the graph only for x\u226451 days. (There is a small kink at 51 days.)\r\n- There is a slight bend between the two big jumps. If we assume on every other day a certificate has the same chance to be revoked, the curve we'd get is slightly curved. The curvature would be less pronounced:\r\n\r\n<img width=\"240\" alt=\"Screenshot 2024-07-23 at 14 32 12\" src=\"https://github.com/user-attachments/assets/a80c8de8-99cb-460e-b046-473279b69733\">\r\n\r\nRough preliminary conclusion: at least 60% of Let's Encrypt revocations don't seem security related. The remaining revocations are close to uniformly distributed within a certificate's lifetime.\r\n\r\n- If we were able to ignore the former, and reduce certificate lifetime to 14 days, then only 0.0085% of certificates would be revoked. That is ~32,000 certificates, and would require a download of at least 60kB, or ~5.4kB per day (when we have sequence numbers as in MTC).\r\n- If we can't ignore the renewal and first-day revocations, then moving to 14 day certificates, the fraction of these revocations will grow to 90%. We'll have about 330k revocations. That'd be a download of at least 480kB, or 44kB per day.\r\n- Note that Let's Encrypt has relatively few revocations. If we'd keep 90 day certificates and have sequence numbers (as in MTC), the full list would take about 714kB to encode. (I'll get the actual number once I've got the full list from CT.) That's about 12.6kB per day. If we remove the renewal and first-day revocations, then it's 320kB or ~5.4kB per day.\r\n\r\nSo, shorter lived certificates makes the initial download of revocations smaller. It makes the daily updates much worse, if we do not filter out the revocations on the first day and renewals. If we do, then the daily updates should be unchanged. Similar conclusions should hold for CRLite.",
+          "createdAt": "2024-07-23T13:13:46Z",
+          "updatedAt": "2024-07-23T13:21:45Z"
         }
       ]
     },
