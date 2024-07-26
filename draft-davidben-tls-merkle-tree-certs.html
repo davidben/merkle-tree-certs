@@ -11,23 +11,22 @@
 <meta content="
        This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
     " name="description">
-<meta content="xml2rfc 3.19.0" name="generator">
+<meta content="xml2rfc 3.22.0" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.19.0
-    Python 3.11.6
+  xml2rfc 3.22.0
+    Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
-    Jinja2 3.1.2
-    lxml 4.9.3
-    platformdirs 4.1.0
+    Jinja2 3.1.4
+    lxml 4.9.4
+    platformdirs 4.2.2
     pycountry 22.3.5
     PyYAML 6.0.1
-    requests 2.31.0
-    setuptools 68.2.2
-    six 1.16.0
-    wcwidth 0.2.12
+    requests 2.32.3
+    setuptools 69.5.1
+    wcwidth 0.2.13
 -->
 <link href="draft-davidben-tls-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1026,11 +1025,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates for TLS</td>
-<td class="right">January 2024</td>
+<td class="right">July 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 16 July 2024</td>
+<td class="center">Expires 27 January 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1043,12 +1042,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-01-13" class="published">13 January 2024</time>
+<time datetime="2024-07-26" class="published">26 July 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-07-16">16 July 2024</time></dd>
+<dd class="expires"><time datetime="2025-01-27">27 January 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1105,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 16 July 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1328,18 +1327,26 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
-            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-change-log" class="internal xref">Change log</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17.2.1">
-                <p id="section-toc.1-1.17.2.1.1"><a href="#appendix-B.1" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-me" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-00</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.1">
+                <p id="section-toc.1-1.16.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-abridgedassertions" class="internal xref">(Abridged)Assertions</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
-            <p id="section-toc.1-1.18.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.18.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-change-log" class="internal xref">Change log</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.1">
+                <p id="section-toc.1-1.18.2.1.1"><a href="#appendix-C.1" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-me" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-00</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
+            <p id="section-toc.1-1.19.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -2795,6 +2802,7 @@ struct {
       </ul>
 </section>
 </div>
+<div id="sec-combined-references">
 <section id="section-15">
       <h2 id="name-references">
 <a href="#section-15" class="section-number selfRef">15. </a><a href="#name-references" class="section-name selfRef">References</a>
@@ -2924,7 +2932,7 @@ struct {
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-acme-ari">[I-D.draft-ietf-acme-ari]</dt>
         <dd>
-<span class="refAuthor">Gable, A.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-acme-ari-02</span>, <time datetime="2023-08-10" class="refDate">10 August 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-02">https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-02</a>&gt;</span>. </dd>
+<span class="refAuthor">Gable, A.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-acme-ari-04</span>, <time datetime="2024-05-31" class="refDate">31 May 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-04">https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-04</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-tls-batch-signing">[I-D.draft-ietf-tls-batch-signing]</dt>
         <dd>
@@ -2932,7 +2940,7 @@ struct {
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-tls-esni">[I-D.draft-ietf-tls-esni]</dt>
         <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Oku, K.</span>, <span class="refAuthor">Sullivan, N.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"TLS Encrypted Client Hello"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-esni-17</span>, <time datetime="2023-10-09" class="refDate">9 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17">https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Oku, K.</span>, <span class="refAuthor">Sullivan, N.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"TLS Encrypted Client Hello"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-esni-18</span>, <time datetime="2024-03-04" class="refDate">4 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18">https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="LetsEncrypt">[LetsEncrypt]</dt>
         <dd>
@@ -2974,58 +2982,116 @@ struct {
 </section>
 </div>
 </section>
-<div id="acknowledgements">
+</div>
+<div id="examples">
 <section id="appendix-A">
+      <h2 id="name-examples">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
+      </h2>
+<div id="abridgedassertions">
+<section id="appendix-A.1">
+        <h3 id="name-abridgedassertions">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-abridgedassertions" class="section-name selfRef">(Abridged)Assertions</a>
+        </h3>
+<p id="appendix-A.1-1">The following is an Assertion claiming <code>example.com</code> for
+a TLS subject with Ed25519 public key
+<code>c5d2080fa9a489a226b58166dad00be8120931a769c9c6f1f8eefafc38af9065</code>.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-2">
+<pre>
+00000024 08070020 c5d2080f a9a489a2 26b58166 dad00be8 120931a7 69c9c6f1
+f8eefafc 38af9065 00130000 000f000d 000b6578 616d706c 652e636f 6d
+</pre><a href="#appendix-A.1-2" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-3">The corresponding AbridgedAssertion:<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-4">
+<pre>
+00000022 0807d8e2 c44fc82e 175e5698 b1c25324 6c9a996f c37bad29 fd59b6aa
+838b0a93 0b000013 0000000f 000d000b 6578616d 706c652e 636f6d
+</pre><a href="#appendix-A.1-4" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-5">Next, we have an Assertion claiming <code>*.example.com</code>, <code>192.0.2.37</code>,
+<code>192.0.12.0</code>, <code>198.51.100.60</code> and <code>203.0.113.0</code> for
+a TLS subject with RSASSA-PSS public key with modulus <code>264851…51544459</code>
+and exponent 65537.<a href="#appendix-A.1-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-6">
+<pre>
+00000112 0804010e 3082010a 02820101 00d1cd9c d613c050 929e6418 14b4957c
+40f30d07 0927f653 bde7054c 06d53a89 36228b70 72fad4db a186c379 7e00300b
+a5b6de8e 7ab3fed4 cb5a537e 7674916a 130a0435 664428a9 7f1983b7 e028b9ab
+f24700de 1d6478c9 ae361176 daa64c2f 89b42ec0 270add68 85323401 35d22724
+c7bd8f65 075b25b8 96a89ab8 2a2b2194 49b029b8 97e130dc dc96fce1 37351f2b
+7a28f1d0 7b710afb 2c796211 d9ba1feb 43d30810 63f19afd b7ba2ab0 e19fd008
+e719491d d10ed235 5d4790f0 3039e3a3 31aa2644 2d656716 ebe710f2 4260599a
+2d082db1 eccfaa8f f51cfb8e 3dfca0eb e1af59c2 f007b35e 02b0582f 50090018
+b78a6b06 c0188ab3 514d60d6 6243e017 8b020301 00010029 0001000f 000d000b
+6578616d 706c652e 636f6d00 02001200 10c00002 25c0000c 00c63364 3ccb0071
+00
+</pre><a href="#appendix-A.1-6" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-7">The corresponding AbridgedAssertion:<a href="#appendix-A.1-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-8">
+<pre>
+00000022 08049a04 087a4d52 033a0a20 04333359 ccf29703 25684c5f a96f1ca1
+35cb2ab1 f2670029 0001000f 000d000b 6578616d 706c652e 636f6d00 02001200
+10c00002 25c0000c 00c63364 3ccb0071 00
+</pre><a href="#appendix-A.1-8" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="appendix-B">
       <h2 id="name-acknowledgements">
 <a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-A-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="change-log">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-change-log">
 <a href="#name-change-log" class="section-name selfRef">Change log</a>
       </h2>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="appendix-B-1.1">
-          <p id="appendix-B-1.1.1"><strong>RFC Editor's Note:</strong> Please remove this section prior to publication of a
-final version of this document.<a href="#appendix-B-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="appendix-C-1.1">
+          <p id="appendix-C-1.1.1"><strong>RFC Editor's Note:</strong> Please remove this section prior to publication of a
+final version of this document.<a href="#appendix-C-1.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <div id="since-draft-davidben-tls-merkle-tree-certs-00">
-<section id="appendix-B.1">
+<section id="appendix-C.1">
         <h3 id="name-since-draft-davidben-tls-me">
 <a href="#name-since-draft-davidben-tls-me" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-00</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="appendix-B.1-1.1">
-            <p id="appendix-B.1-1.1.1">Simpify hashing by removing the internal padding to align with block size. #72<a href="#appendix-B.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-C.1-1.1">
+            <p id="appendix-C.1-1.1.1">Simpify hashing by removing the internal padding to align with block size. #72<a href="#appendix-C.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.2">
-            <p id="appendix-B.1-1.2.1">Avoid the temptation of floating points. #66<a href="#appendix-B.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.2">
+            <p id="appendix-C.1-1.2.1">Avoid the temptation of floating points. #66<a href="#appendix-C.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.3">
-            <p id="appendix-B.1-1.3.1">Require <code>lifetime</code> to be a multiple of <code>batch_duration</code>. #65<a href="#appendix-B.1-1.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.3">
+            <p id="appendix-C.1-1.3.1">Require <code>lifetime</code> to be a multiple of <code>batch_duration</code>. #65<a href="#appendix-C.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.4">
-            <p id="appendix-B.1-1.4.1">Rename window to validity window. #21<a href="#appendix-B.1-1.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.4">
+            <p id="appendix-C.1-1.4.1">Rename window to validity window. #21<a href="#appendix-C.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.5">
-            <p id="appendix-B.1-1.5.1">Split Assertion into Assertion and AbridgedAssertion. The latter is used in the Merkle Tree and HTTP interface. It replaces <code>subject_info</code> by a hash, to save space by not serving large post-quantum public keys. The original Assertion is used everywhere else, including BikeshedCertificate. #6<a href="#appendix-B.1-1.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.5">
+            <p id="appendix-C.1-1.5.1">Split Assertion into Assertion and AbridgedAssertion. The latter is used in the Merkle Tree and HTTP interface. It replaces <code>subject_info</code> by a hash, to save space by not serving large post-quantum public keys. The original Assertion is used everywhere else, including BikeshedCertificate. #6<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.6">
-            <p id="appendix-B.1-1.6.1">Add proper context to every node in the Merkle tree. #32<a href="#appendix-B.1-1.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.6">
+            <p id="appendix-C.1-1.6.1">Add proper context to every node in the Merkle tree. #32<a href="#appendix-C.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.7">
-            <p id="appendix-B.1-1.7.1">Clarify we use a single <code>CertificateEntry</code>. #11<a href="#appendix-B.1-1.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.7">
+            <p id="appendix-C.1-1.7.1">Clarify we use a single <code>CertificateEntry</code>. #11<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.8">
-            <p id="appendix-B.1-1.8.1">Clarify we use POSIX time. #1<a href="#appendix-B.1-1.8.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.8">
+            <p id="appendix-C.1-1.8.1">Clarify we use POSIX time. #1<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-B.1-1.9">
-            <p id="appendix-B.1-1.9.1">Miscellaneous changes.<a href="#appendix-B.1-1.9.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-C.1-1.9">
+            <p id="appendix-C.1-1.9.1">Miscellaneous changes.<a href="#appendix-C.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -3033,7 +3099,7 @@ final version of this document.<a href="#appendix-B-1.1.1" class="pilcrow">¶</a
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
