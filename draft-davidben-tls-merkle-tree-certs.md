@@ -485,9 +485,9 @@ The CA exposes all of this information in an HTTP {{!RFC9110}} interface describ
 
 ## Issuance Queue and Scheduling
 
-The CA additionally maintains an issuance queue, not exposed via the HTTP interface.
+The CA additionally maintains an issuance queue, not exposed via the HTTP interface. Each element of the issuance queue is an assertion to be certified, and an optional requested expiration time. The final `not_after` will be computed from both this requested time and the expiration time of the whole batch.
 
-When an authenticating party requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges ({{Section 8 of ?RFC8555}}). Once validation is complete and the CA is willing to certify the assertion, the CA appends it to the issuance queue.
+When an authenticating party requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges ({{Section 8 of ?RFC8555}}). Once validation is complete and the CA is willing to certify the assertion, the CA appends it, and the subscriber's requested expiry time, to the issuance queue.
 
 The CA runs a regularly-scheduled issuance job which converts this queue into certificates. This job runs the following procedure:
 
@@ -510,7 +510,7 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
 ~~~~
     HashEmpty(level, index) = hash(HashEmptyInput)
     HashNode(left, right, level, index) = hash(HashNodeInput)
-    HashAssertion(assertion, index) = hash(HashAssertionInput)
+    HashAssertion(assertion, not_after, index) = hash(HashAssertionInput)
 ~~~~
 
 `HashEmpyInput`, `HashNodeInput` and `HashAssertionInput` are computed by encoding the structures defined below:
@@ -543,6 +543,7 @@ struct {
     TrustAnchorIdentifier batch_id;
     uint64 index;
     AbridgedAssertion abridged_assertion;
+    Timestamp not_after;
 } HashAssertionInput;
 ~~~
 
@@ -552,10 +553,14 @@ The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
-1. Initialize level 0 with n elements. For `j` between `0` and `n-1`, inclusive,
-   set element `j` to the output of `HashAssertion(assertion[j], j)`.
+1. Let `batch_not_after` be the expiration time for this batch, as described in {{parameters}}.
 
-2. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
+2. Initialize an array `not_after` with `n` elements. For each For `j` between `0` and `n-1`, inclusive, set `not_after[j]` to the minimum of `batch_not_after` and assertion `j`'s requested expiration time. If assertion `j` did not request an expiration time, set `not_after[j]` to `batch_not_after`. If `not_after[j]` is before the current time, discard the assertion and decrement `n`.
+
+3. Initialize level 0 with `n` elements. For `j` between `0` and `n-1`, inclusive,
+   set element `j` to the output of `HashAssertion(assertion[j], not_after[j], j)`.
+
+4. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
    follows:
 
    - If level `i-1` has an odd number of elements `j`, append `HashEmpty(i-1, j)` to the level.
@@ -582,7 +587,7 @@ At the end of this process, level `l-1` will have exactly one root element. This
 
 If `n` is zero, the CA does not build a tree and the tree head is `HashEmpty(0, 0)`.
 
-If `n` is one, the tree contains a single level, level 0, and has a tree head of `HashAssertion(assertion, 0)`.
+If `n` is one, the tree contains a single level, level 0, and has a tree head of `HashAssertion(assertion[0], not_after[0], 0)`.
 
 ### Signing a ValidityWindow {#signing}
 
@@ -625,16 +630,17 @@ A CA MUST NOT generate signatures over inputs that are parseable as LabeledValid
 
 [[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one. #15 ]]
 
-[[TODO: An authenticating party has no way to know when a certificate expires. We need to define a mandatory expiration certificate property, or do #83, which, depending on how it's done could avoid that.]]
-
 For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
 ~~~
 /* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorIdentifier<1..2^8-1>;
 
+uint64 Timestamp;
+
 struct {
     TrustAnchorIdentifier trust_anchor;
+    Timestamp not_after;
     opaque proof_data<0..2^16-1>;
 } Proof;
 
@@ -648,7 +654,9 @@ A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of 
 It is analogous to an X.509 trust anchor's subject name.
 When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.
 
-The `proof_data` is a byte string, opaque to the authenticating party, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
+A proof's `not_after` field is a POSIX timestamp (see {{time}}) describing the time after which the proof is no longer valid.
+
+A proof's `proof_data` field is a byte string, opaque to the authenticating party, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
 
 ~~~
 opaque HashValueSHA256[32];
@@ -720,17 +728,19 @@ When an authenticating party presents a BikeshedCertificate, the relying party r
 
 2. Run the verification subroutine corresponding to that trust anchor, defined below.
 
-3. Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.
+3. If the current time is greater than the `not_after` field, abort this procedure with a `certificate_expired` error.
 
-4. If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.
+4. Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.
+
+5. If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.
 
 Step 2 in the above procedure runs a trust-anchor-specific verification subroutine. This subroutine is determined by the type of trust anchor. Each mechanism using the BikeshedCertificate format MUST define a verification subroutine.
 
 For a Merkle Tree trust anchor, the trust anchor will identify a batch in the relying party's validity window. (See {{identifying}} and {{relying-parties}}.) The batch's verification subroutine is defined below:
 
-1. Compute the batch's expiration time, as described in {{parameters}}. If this value is before the current time, abort this procedure with a `certificate_expired` error.
+1. Compute the batch's expiration time, as described in {{parameters}}. If this value is before the `not_after` field, abort this procedure with a `bad_certificate` error.
 
-2. Set `hash` to the output of `HashAssertion(assertion, index)`. Set `remaining` to the certificate's `index` value.
+2. Set `hash` to the output of `HashAssertion(assertion, not_after, index)`. Set `remaining` to the certificate's `index` value.
 
 3. For each element `v` at zero-based index `i` of the certificate's `path` field, in order:
 
