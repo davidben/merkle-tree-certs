@@ -1310,31 +1310,39 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-tls-certificate-type-negoti" class="internal xref">TLS Certificate Type Negotiation Challenges</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.1">
-                <p id="section-toc.1-1.16.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-indicate-in-first-certifica" class="internal xref">Indicate in First CertificateEntry</a></p>
+                <p id="section-toc.1-1.16.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-abridgedassertions" class="internal xref">(Abridged)Assertions</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-tls-certificate-type-negoti" class="internal xref">TLS Certificate Type Negotiation Challenges</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16.2.1.2.1">
-                    <p id="section-toc.1-1.16.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-change-certificate-syntax" class="internal xref">Change Certificate Syntax</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17.2.1">
+                <p id="section-toc.1-1.17.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-indicate-in-first-certifica" class="internal xref">Indicate in First CertificateEntry</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17.2.1.2.1">
+                    <p id="section-toc.1-1.17.2.1.2.1.1"><a href="#appendix-B.1.1" class="auto internal xref">B.1.1</a>.  <a href="#name-change-certificate-syntax" class="internal xref">Change Certificate Syntax</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
-            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
-            <p id="section-toc.1-1.18.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-change-log" class="internal xref">Change log</a></p>
+            <p id="section-toc.1-1.18.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
+            <p id="section-toc.1-1.19.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-change-log" class="internal xref">Change log</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.1">
-                <p id="section-toc.1-1.18.2.1.1"><a href="#appendix-C.1" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-me" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-00</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.1">
+                <p id="section-toc.1-1.19.2.1.1"><a href="#appendix-D.1" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-me" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-00</a></p>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
-            <p id="section-toc.1-1.19.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
+            <p id="section-toc.1-1.20.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -2375,7 +2383,7 @@ struct {
         </h3>
 <p id="section-10.2-1">[[TODO: Bikeshed is a placeholder name until someone comes up with a better one. #15]]<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <p id="section-10.2-2">This section defines the <code>Bikeshed</code> TLS certificate type, which may be negotiated with the <code>client_certificate_type</code>, <code>server_certificate_type</code> <span>[<a href="#RFC7250" class="cite xref">RFC7250</a>]</span>, or <code>cert_type</code> <span>[<a href="#RFC6091" class="cite xref">RFC6091</a>]</span> extensions. It can only be negotiated with TLS 1.3 or later. Servers MUST NOT negotiate it in TLS 1.2 or below. If the client receives a ServerHello that negotiates it in TLS 1.2 or below, it MUST abort the connection with an <code>illegal_parameter</code> alert.<a href="#section-10.2-2" class="pilcrow">¶</a></p>
-<p id="section-10.2-3">[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in <a href="#cert-type-problems" class="auto internal xref">Appendix A</a>. We may need to define another one. #18]]<a href="#section-10.2-3" class="pilcrow">¶</a></p>
+<p id="section-10.2-3">[[TODO: None of these three extensions is quite right for client certificates because the negotiation isn't symmetric. See discussion in <a href="#cert-type-problems" class="auto internal xref">Appendix B</a>. We may need to define another one. #18]]<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 <p id="section-10.2-4">When negotiated, the Certificate message MUST contain a single CertificateEntry structure.
 CertificateEntry is updated as follows:<a href="#section-10.2-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-10.2-5">
@@ -2428,7 +2436,7 @@ struct {
 <p id="section-10.3-5">The subscriber's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the subscriber's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
 <p id="section-10.3-6">For each of the subscriber's BikeshedCertificate credentials, the corresponding trust anchor identifier is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_identifier</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
 <p id="section-10.3-7">The subscriber then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
-<p id="section-10.3-8">[[TODO: Certificate type negotiation doesn't work right for client certificates. See <a href="#cert-type-problems" class="auto internal xref">Appendix A</a>]]<a href="#section-10.3-8" class="pilcrow">¶</a></p>
+<p id="section-10.3-8">[[TODO: Certificate type negotiation doesn't work right for client certificates. See <a href="#cert-type-problems" class="auto internal xref">Appendix B</a>]]<a href="#section-10.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2814,85 +2822,142 @@ struct {
 </div>
 </section>
 </div>
-<div id="cert-type-problems">
+<div id="examples">
 <section id="appendix-A">
-      <h2 id="name-tls-certificate-type-negoti">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-tls-certificate-type-negoti" class="section-name selfRef">TLS Certificate Type Negotiation Challenges</a>
+      <h2 id="name-examples">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
       </h2>
-<p id="appendix-A-1">[[TODO: We may need a new TLS certificate types extension, either in this document or a separate one. For now, this section just informally describes the problem. #18 ]]<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">The server certificate type is negotiated as follows:<a href="#appendix-A-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="appendix-A-3.1">
-          <p id="appendix-A-3.1.1">The client sends <code>server_certificate_type</code> in ClientHello with accepted certificate types.<a href="#appendix-A-3.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-3.2">
-          <p id="appendix-A-3.2.1">The server selects a certificate type to use, It sends it in <code>server_certificate_type</code> in EncryptedExtensions.<a href="#appendix-A-3.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-3.3">
-          <p id="appendix-A-3.3.1">The server sends a certificate of the server-selected type in Certificate.<a href="#appendix-A-3.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="appendix-A-4">This model allows the server to select its certificate type based on not just <code>server_certificate_type</code>, but also other ClientHello extensions like <code>certificate_authorities</code> or <code>trust_anchors</code> (<span>[<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>). In particular, if there is no match in <code>trust_anchors</code>, it can fallback to X.509, rather than staying within the realm of BikeshedCertificate.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
-<p id="appendix-A-5">However, the client certificate type is negotiated differently:<a href="#appendix-A-5" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="appendix-A-6.1">
-          <p id="appendix-A-6.1.1">The client sends <code>client_certificate_type</code> in ClientHello with certificates it can send<a href="#appendix-A-6.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-6.2">
-          <p id="appendix-A-6.2.1">The server selects a certificate type to request. It sends it in <code>client_certificate_type</code> in EncryptedExtensions.<a href="#appendix-A-6.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-6.3">
-          <p id="appendix-A-6.3.1">The server requests a client certificate in CertificateRequest<a href="#appendix-A-6.3.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-6.4">
-          <p id="appendix-A-6.4.1">The client sends a certificate of the server-selected type in Certificate.<a href="#appendix-A-6.4.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="appendix-A-7">Here, the client (subscriber) does not select the certificate type. The server (relying party) does. Moreover, this selection is made before the client can see the server's <code>certificate_authorities</code> or <code>trust_anchors</code> value, in CertificateRequest. There is no opportunity for the client to fallback to X.509.<a href="#appendix-A-7" class="pilcrow">¶</a></p>
-<p id="appendix-A-8">The <code>cert_types</code> extension behaves similarly, but additionally forces the client and server types to match. These extensions were defined when TLS 1.2 was current, but TLS 1.3 aligns the client and server certificate negotiation. Most certificate negotiation extensions, such as <code>certificate_authorities</code> or <code>compress_certificate</code> <span>[<a href="#RFC8879" class="cite xref">RFC8879</a>]</span> can be offered in either direction, in ClientHello or CertificateRequest. They are then symmetrically accepted in the Certificate message.<a href="#appendix-A-8" class="pilcrow">¶</a></p>
-<p id="appendix-A-9">A more corresponding TLS 1.3 negotiation would be to defer the client certificate type negotiation to CertificateRequest, with the server offering the supported certificate types. The client can then make its selection, taking other CertificateRequest extensions into account, and indicate its selection in the Certificate message.<a href="#appendix-A-9" class="pilcrow">¶</a></p>
-<p id="appendix-A-10">Two possible design sketches:<a href="#appendix-A-10" class="pilcrow">¶</a></p>
-<div id="indicate-in-first-certificateentry">
+<div id="abridgedassertions">
 <section id="appendix-A.1">
-        <h3 id="name-indicate-in-first-certifica">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-indicate-in-first-certifica" class="section-name selfRef">Indicate in First CertificateEntry</a>
+        <h3 id="name-abridgedassertions">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-abridgedassertions" class="section-name selfRef">(Abridged)Assertions</a>
         </h3>
-<p id="appendix-A.1-1">We can have the subscriber indicate the certificate type in an extension of the first CertificateEntry. One challenge is the extensions come after the certificate, so the relying party must seek to the <code>extensions</code> field independent of the certificate type. Thus all certificate types must be updated to use a consistent <code>opaque cert_data&lt;0..2^24&gt;</code> syntax, with any type-specific structures embedded inside.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-2">RawPublicKey and X509 already meet this requirement. OpenPGP and Bikeshed need an extra length prefix.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-1">The following is an Assertion claiming <code>example.com</code> for
+a TLS subject with Ed25519 public key
+<code>c5d2080fa9a489a226b58166dad00be8120931a769c9c6f1f8eefafc38af9065</code>.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-2">
+<pre>
+00000024 08070020 c5d2080f a9a489a2 26b58166 dad00be8 120931a7 69c9c6f1
+f8eefafc 38af9065 00130000 000f000d 000b6578 616d706c 652e636f 6d
+</pre><a href="#appendix-A.1-2" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-3">The corresponding AbridgedAssertion:<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-4">
+<pre>
+00000022 0807d8e2 c44fc82e 175e5698 b1c25324 6c9a996f c37bad29 fd59b6aa
+838b0a93 0b000013 0000000f 000d000b 6578616d 706c652e 636f6d
+</pre><a href="#appendix-A.1-4" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-5">Next, we have an Assertion claiming <code>*.example.com</code>, <code>192.0.2.37</code>,
+<code>192.0.12.0</code>, <code>198.51.100.60</code> and <code>203.0.113.0</code> for
+a TLS subject with RSASSA-PSS public key with modulus <code>264851…51544459</code>
+and exponent 65537.<a href="#appendix-A.1-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-6">
+<pre>
+00000112 0804010e 3082010a 02820101 00d1cd9c d613c050 929e6418 14b4957c
+40f30d07 0927f653 bde7054c 06d53a89 36228b70 72fad4db a186c379 7e00300b
+a5b6de8e 7ab3fed4 cb5a537e 7674916a 130a0435 664428a9 7f1983b7 e028b9ab
+f24700de 1d6478c9 ae361176 daa64c2f 89b42ec0 270add68 85323401 35d22724
+c7bd8f65 075b25b8 96a89ab8 2a2b2194 49b029b8 97e130dc dc96fce1 37351f2b
+7a28f1d0 7b710afb 2c796211 d9ba1feb 43d30810 63f19afd b7ba2ab0 e19fd008
+e719491d d10ed235 5d4790f0 3039e3a3 31aa2644 2d656716 ebe710f2 4260599a
+2d082db1 eccfaa8f f51cfb8e 3dfca0eb e1af59c2 f007b35e 02b0582f 50090018
+b78a6b06 c0188ab3 514d60d6 6243e017 8b020301 00010029 0001000f 000d000b
+6578616d 706c652e 636f6d00 02001200 10c00002 25c0000c 00c63364 3ccb0071
+00
+</pre><a href="#appendix-A.1-6" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.1-7">The corresponding AbridgedAssertion:<a href="#appendix-A.1-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-8">
+<pre>
+00000022 08049a04 087a4d52 033a0a20 04333359 ccf29703 25684c5f a96f1ca1
+35cb2ab1 f2670029 0001000f 000d000b 6578616d 706c652e 636f6d00 02001200
+10c00002 25c0000c 00c63364 3ccb0071 00
+</pre><a href="#appendix-A.1-8" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="cert-type-problems">
+<section id="appendix-B">
+      <h2 id="name-tls-certificate-type-negoti">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-tls-certificate-type-negoti" class="section-name selfRef">TLS Certificate Type Negotiation Challenges</a>
+      </h2>
+<p id="appendix-B-1">[[TODO: We may need a new TLS certificate types extension, either in this document or a separate one. For now, this section just informally describes the problem. #18 ]]<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">The server certificate type is negotiated as follows:<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-3.1">
+          <p id="appendix-B-3.1.1">The client sends <code>server_certificate_type</code> in ClientHello with accepted certificate types.<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.2">
+          <p id="appendix-B-3.2.1">The server selects a certificate type to use, It sends it in <code>server_certificate_type</code> in EncryptedExtensions.<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.3">
+          <p id="appendix-B-3.3.1">The server sends a certificate of the server-selected type in Certificate.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-B-4">This model allows the server to select its certificate type based on not just <code>server_certificate_type</code>, but also other ClientHello extensions like <code>certificate_authorities</code> or <code>trust_anchors</code> (<span>[<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>). In particular, if there is no match in <code>trust_anchors</code>, it can fallback to X.509, rather than staying within the realm of BikeshedCertificate.<a href="#appendix-B-4" class="pilcrow">¶</a></p>
+<p id="appendix-B-5">However, the client certificate type is negotiated differently:<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-6.1">
+          <p id="appendix-B-6.1.1">The client sends <code>client_certificate_type</code> in ClientHello with certificates it can send<a href="#appendix-B-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-6.2">
+          <p id="appendix-B-6.2.1">The server selects a certificate type to request. It sends it in <code>client_certificate_type</code> in EncryptedExtensions.<a href="#appendix-B-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-6.3">
+          <p id="appendix-B-6.3.1">The server requests a client certificate in CertificateRequest<a href="#appendix-B-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-6.4">
+          <p id="appendix-B-6.4.1">The client sends a certificate of the server-selected type in Certificate.<a href="#appendix-B-6.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-B-7">Here, the client (subscriber) does not select the certificate type. The server (relying party) does. Moreover, this selection is made before the client can see the server's <code>certificate_authorities</code> or <code>trust_anchors</code> value, in CertificateRequest. There is no opportunity for the client to fallback to X.509.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
+<p id="appendix-B-8">The <code>cert_types</code> extension behaves similarly, but additionally forces the client and server types to match. These extensions were defined when TLS 1.2 was current, but TLS 1.3 aligns the client and server certificate negotiation. Most certificate negotiation extensions, such as <code>certificate_authorities</code> or <code>compress_certificate</code> <span>[<a href="#RFC8879" class="cite xref">RFC8879</a>]</span> can be offered in either direction, in ClientHello or CertificateRequest. They are then symmetrically accepted in the Certificate message.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+<p id="appendix-B-9">A more corresponding TLS 1.3 negotiation would be to defer the client certificate type negotiation to CertificateRequest, with the server offering the supported certificate types. The client can then make its selection, taking other CertificateRequest extensions into account, and indicate its selection in the Certificate message.<a href="#appendix-B-9" class="pilcrow">¶</a></p>
+<p id="appendix-B-10">Two possible design sketches:<a href="#appendix-B-10" class="pilcrow">¶</a></p>
+<div id="indicate-in-first-certificateentry">
+<section id="appendix-B.1">
+        <h3 id="name-indicate-in-first-certifica">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-indicate-in-first-certifica" class="section-name selfRef">Indicate in First CertificateEntry</a>
+        </h3>
+<p id="appendix-B.1-1">We can have the subscriber indicate the certificate type in an extension of the first CertificateEntry. One challenge is the extensions come after the certificate, so the relying party must seek to the <code>extensions</code> field independent of the certificate type. Thus all certificate types must be updated to use a consistent <code>opaque cert_data&lt;0..2^24&gt;</code> syntax, with any type-specific structures embedded inside.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-2">RawPublicKey and X509 already meet this requirement. OpenPGP and Bikeshed need an extra length prefix.<a href="#appendix-B.1-2" class="pilcrow">¶</a></p>
 <div id="change-certificate-syntax">
-<section id="appendix-A.1.1">
+<section id="appendix-B.1.1">
           <h4 id="name-change-certificate-syntax">
-<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-change-certificate-syntax" class="section-name selfRef">Change Certificate Syntax</a>
+<a href="#appendix-B.1.1" class="section-number selfRef">B.1.1. </a><a href="#name-change-certificate-syntax" class="section-name selfRef">Change Certificate Syntax</a>
           </h4>
-<p id="appendix-A.1.1-1">Alternatively, we can negotiate an extension that changes the syntax to Certificate to:<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-A.1.1-2">
+<p id="appendix-B.1.1-1">Alternatively, we can negotiate an extension that changes the syntax to Certificate to:<a href="#appendix-B.1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-B.1.1-2">
 <pre>
 struct {
     CertificateType certificate_type;
     opaque certificate_request_context&lt;0..2^8-1&gt;;
     CertificateEntry certificate_list&lt;0..2^24-1&gt;;
 } Certificate;
-</pre><a href="#appendix-A.1.1-2" class="pilcrow">¶</a>
+</pre><a href="#appendix-B.1.1-2" class="pilcrow">¶</a>
 </div>
-<p id="appendix-A.1.1-3">The negotiation can be:<a href="#appendix-A.1.1-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.1-3">The negotiation can be:<a href="#appendix-B.1.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-A.1.1-4.1">
-              <p id="appendix-A.1.1-4.1.1">Client sends its accepted certificate types in ClientHello. Offering this new extension also signatures it is willing to accept the new message format. Unlike the existing extensions, an X.509-only client still sends the extension with just X509 in the list.<a href="#appendix-A.1.1-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B.1.1-4.1">
+              <p id="appendix-B.1.1-4.1.1">Client sends its accepted certificate types in ClientHello. Offering this new extension also signatures it is willing to accept the new message format. Unlike the existing extensions, an X.509-only client still sends the extension with just X509 in the list.<a href="#appendix-B.1.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="appendix-A.1.1-4.2">
-              <p id="appendix-A.1.1-4.2.1">Server, if it implements the new syntax, acknowledges the syntax change with an empty extension in EncryptedExtensions. (It doesn't indicate its selection yet.)<a href="#appendix-A.1.1-4.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="appendix-B.1.1-4.2">
+              <p id="appendix-B.1.1-4.2.1">Server, if it implements the new syntax, acknowledges the syntax change with an empty extension in EncryptedExtensions. (It doesn't indicate its selection yet.)<a href="#appendix-B.1.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="appendix-A.1.1-4.3">
-              <p id="appendix-A.1.1-4.3.1">If both of the above happen, Certificate's syntax has changed. Server indicates its selection with the <code>certificate_type</code> field<a href="#appendix-A.1.1-4.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="appendix-B.1.1-4.3">
+              <p id="appendix-B.1.1-4.3.1">If both of the above happen, Certificate's syntax has changed. Server indicates its selection with the <code>certificate_type</code> field<a href="#appendix-B.1.1-4.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="appendix-A.1.1-4.4">
-              <p id="appendix-A.1.1-4.4.1">Server can also send this extension in CertificateRequest to offer non-X.509 certificate types<a href="#appendix-A.1.1-4.4.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="appendix-B.1.1-4.4">
+              <p id="appendix-B.1.1-4.4.1">Server can also send this extension in CertificateRequest to offer non-X.509 certificate types<a href="#appendix-B.1.1-4.4.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="appendix-A.1.1-4.5">
-              <p id="appendix-A.1.1-4.5.1">Client likewise indicates its selection with the <code>certificate_type</code> field.<a href="#appendix-A.1.1-4.5.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="appendix-B.1.1-4.5">
+              <p id="appendix-B.1.1-4.5.1">Client likewise indicates its selection with the <code>certificate_type</code> field.<a href="#appendix-B.1.1-4.5.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="appendix-A.1.1-5">This is a bit cleaner to parse, but the negotiation is more complex.<a href="#appendix-A.1.1-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.1-5">This is a bit cleaner to parse, but the negotiation is more complex.<a href="#appendix-B.1.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2900,60 +2965,60 @@ struct {
 </section>
 </div>
 <div id="acknowledgements">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-acknowledgements">
 <a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-B-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-C-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<p id="appendix-C-2">The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="change-log">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-change-log">
 <a href="#name-change-log" class="section-name selfRef">Change log</a>
       </h2>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="appendix-C-1.1">
-          <p id="appendix-C-1.1.1"><strong>RFC Editor's Note:</strong> Please remove this section prior to publication of a
-final version of this document.<a href="#appendix-C-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="appendix-D-1.1">
+          <p id="appendix-D-1.1.1"><strong>RFC Editor's Note:</strong> Please remove this section prior to publication of a
+final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <div id="since-draft-davidben-tls-merkle-tree-certs-00">
-<section id="appendix-C.1">
+<section id="appendix-D.1">
         <h3 id="name-since-draft-davidben-tls-me">
 <a href="#name-since-draft-davidben-tls-me" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-00</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="appendix-C.1-1.1">
-            <p id="appendix-C.1-1.1.1">Simpify hashing by removing the internal padding to align with block size. #72<a href="#appendix-C.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-D.1-1.1">
+            <p id="appendix-D.1-1.1.1">Simpify hashing by removing the internal padding to align with block size. #72<a href="#appendix-D.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.2">
-            <p id="appendix-C.1-1.2.1">Avoid the temptation of floating points. #66<a href="#appendix-C.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.2">
+            <p id="appendix-D.1-1.2.1">Avoid the temptation of floating points. #66<a href="#appendix-D.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.3">
-            <p id="appendix-C.1-1.3.1">Require <code>lifetime</code> to be a multiple of <code>batch_duration</code>. #65<a href="#appendix-C.1-1.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.3">
+            <p id="appendix-D.1-1.3.1">Require <code>lifetime</code> to be a multiple of <code>batch_duration</code>. #65<a href="#appendix-D.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.4">
-            <p id="appendix-C.1-1.4.1">Rename window to validity window. #21<a href="#appendix-C.1-1.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.4">
+            <p id="appendix-D.1-1.4.1">Rename window to validity window. #21<a href="#appendix-D.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.5">
-            <p id="appendix-C.1-1.5.1">Split Assertion into Assertion and AbridgedAssertion. The latter is used in the Merkle Tree and HTTP interface. It replaces <code>subject_info</code> by a hash, to save space by not serving large post-quantum public keys. The original Assertion is used everywhere else, including BikeshedCertificate. #6<a href="#appendix-C.1-1.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.5">
+            <p id="appendix-D.1-1.5.1">Split Assertion into Assertion and AbridgedAssertion. The latter is used in the Merkle Tree and HTTP interface. It replaces <code>subject_info</code> by a hash, to save space by not serving large post-quantum public keys. The original Assertion is used everywhere else, including BikeshedCertificate. #6<a href="#appendix-D.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.6">
-            <p id="appendix-C.1-1.6.1">Add proper context to every node in the Merkle tree. #32<a href="#appendix-C.1-1.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.6">
+            <p id="appendix-D.1-1.6.1">Add proper context to every node in the Merkle tree. #32<a href="#appendix-D.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.7">
-            <p id="appendix-C.1-1.7.1">Clarify we use a single <code>CertificateEntry</code>. #11<a href="#appendix-C.1-1.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.7">
+            <p id="appendix-D.1-1.7.1">Clarify we use a single <code>CertificateEntry</code>. #11<a href="#appendix-D.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.8">
-            <p id="appendix-C.1-1.8.1">Clarify we use POSIX time. #1<a href="#appendix-C.1-1.8.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.8">
+            <p id="appendix-D.1-1.8.1">Clarify we use POSIX time. #1<a href="#appendix-D.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.9">
-            <p id="appendix-C.1-1.9.1">Miscellaneous changes.<a href="#appendix-C.1-1.9.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.9">
+            <p id="appendix-D.1-1.9.1">Miscellaneous changes.<a href="#appendix-D.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-C.1-1.10">
-            <p id="appendix-C.1-1.10.1">Replace the negotiation mechanism with TLS Trust Anchor Identifiers.<a href="#appendix-C.1-1.10.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-D.1-1.10">
+            <p id="appendix-D.1-1.10.1">Replace the negotiation mechanism with TLS Trust Anchor Identifiers.<a href="#appendix-D.1-1.10.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -2961,7 +3026,7 @@ final version of this document.<a href="#appendix-C-1.1.1" class="pilcrow">¶</a
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
+<section id="appendix-E">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
