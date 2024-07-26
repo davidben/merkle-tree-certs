@@ -2085,39 +2085,50 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-certificate-verification" class="section-name selfRef">Certificate Verification</a>
         </h3>
 <p id="section-6.2-1">This section describes the verification process for a BikeshedCertificate. It describes error conditions with TLS alerts, defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-6.2" class="relref">Section 6.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. Non-TLS applications SHOULD map these error conditions to the corresponding application-specific errors. When multiple error conditions apply, the application MAY return any applicable error.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">When a subscriber presents a BikeshedCertificate, the relying party first determines if <code>trust_anchor</code> corresponds to a supported trust anchor, and the type of that trust anchor. If <code>trust_anchor</code> is unrecognized, the relying party rejects the certificate with an <code>unknown_ca</code> error.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
-<p id="section-6.2-3">Otherwise, the relying party runs the verification procedure corresponding to that trust anchor. Each mechanisms using the BikeshedCertificate format MUST define a verification procedure.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">For a Merkle Tree trust anchor, the trust anchor will identify a batch in the relying party's validity window. (See <a href="#identifying" class="auto internal xref">Section 5.2</a> and <a href="#relying-parties" class="auto internal xref">Section 6.1</a>.) The relying party runs the following procedure:<a href="#section-6.2-4" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6.2-5">
-<li id="section-6.2-5.1">
-            <p id="section-6.2-5.1.1">Compute the batch's expiration time, as described in <a href="#parameters" class="auto internal xref">Section 5.1</a>. If this value is before the current time, abort this procedure with a <code>certificate_expired</code> error.<a href="#section-6.2-5.1.1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">When a subscriber presents a BikeshedCertificate, the relying party runs the following procedure:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-3">
+<li id="section-6.2-3.1">
+            <p id="section-6.2-3.1.1">Determines if <code>trust_anchor</code> corresponds to a supported trust anchor, and the type of that trust anchor. If <code>trust_anchor</code> is unrecognized, the relying party rejects the certificate with an <code>unknown_ca</code> error.<a href="#section-6.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-5.2">
-            <p id="section-6.2-5.2.1">Set <code>hash</code> to the output of <code>HashAssertion(assertion, index)</code>. Set <code>remaining</code> to the certificate's <code>index</code> value.<a href="#section-6.2-5.2.1" class="pilcrow">¶</a></p>
+          <li id="section-6.2-3.2">
+            <p id="section-6.2-3.2.1">Run the verification subroutine corresponding to that trust anchor, defined below.<a href="#section-6.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-5.3">
-            <p id="section-6.2-5.3.1">For each element <code>v</code> at zero-based index <code>i</code> of the certificate's <code>path</code> field, in order:<a href="#section-6.2-5.3.1" class="pilcrow">¶</a></p>
+          <li id="section-6.2-3.3">
+            <p id="section-6.2-3.3.1">Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.<a href="#section-6.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-3.4">
+            <p id="section-6.2-3.4.1">If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.<a href="#section-6.2-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.2-4">Step 2 in the above procedure runs a trust-anchor-specific verification subroutine. This subroutine is determined by the type of trust anchor. Each mechanism using the BikeshedCertificate format MUST define a verification subroutine.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">For a Merkle Tree trust anchor, the trust anchor will identify a batch in the relying party's validity window. (See <a href="#identifying" class="auto internal xref">Section 5.2</a> and <a href="#relying-parties" class="auto internal xref">Section 6.1</a>.) The batch's verification subroutine is defined below:<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-6">
+<li id="section-6.2-6.1">
+            <p id="section-6.2-6.1.1">Compute the batch's expiration time, as described in <a href="#parameters" class="auto internal xref">Section 5.1</a>. If this value is before the current time, abort this procedure with a <code>certificate_expired</code> error.<a href="#section-6.2-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.2">
+            <p id="section-6.2-6.2.1">Set <code>hash</code> to the output of <code>HashAssertion(assertion, index)</code>. Set <code>remaining</code> to the certificate's <code>index</code> value.<a href="#section-6.2-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.3">
+            <p id="section-6.2-6.3.1">For each element <code>v</code> at zero-based index <code>i</code> of the certificate's <code>path</code> field, in order:<a href="#section-6.2-6.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.2-5.3.2.1">
-                <p id="section-6.2-5.3.2.1.1">If <code>remaining</code> is odd, set <code>hash</code> to the output of <code>HashNode(v, hash, i + 1, remaining &gt;&gt; 1)</code>.
-Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1, remaining &gt;&gt; 1)</code><a href="#section-6.2-5.3.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.2-6.3.2.1">
+                <p id="section-6.2-6.3.2.1.1">If <code>remaining</code> is odd, set <code>hash</code> to the output of <code>HashNode(v, hash, i + 1, remaining &gt;&gt; 1)</code>.
+Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1, remaining &gt;&gt; 1)</code><a href="#section-6.2-6.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-6.2-5.3.2.2">
-                <p id="section-6.2-5.3.2.2.1">Set <code>remaining</code> to <code>remaining &gt;&gt; 1</code>.<a href="#section-6.2-5.3.2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-6.2-6.3.2.2">
+                <p id="section-6.2-6.3.2.2.1">Set <code>remaining</code> to <code>remaining &gt;&gt; 1</code>.<a href="#section-6.2-6.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
-          <li id="section-6.2-5.4">
-            <p id="section-6.2-5.4.1">If <code>remaining</code> is non-zero, abort this procedure with an error.<a href="#section-6.2-5.4.1" class="pilcrow">¶</a></p>
+          <li id="section-6.2-6.4">
+            <p id="section-6.2-6.4.1">If <code>remaining</code> is non-zero, abort this procedure with an error.<a href="#section-6.2-6.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-5.5">
-            <p id="section-6.2-5.5.1">If <code>hash</code> is not equal to the batch's tree head in the relying party's saved validity window (see <a href="#relying-parties" class="auto internal xref">Section 6.1</a>), abort this procedure with a <code>bad_certificate</code> error.<a href="#section-6.2-5.5.1" class="pilcrow">¶</a></p>
+          <li id="section-6.2-6.5">
+            <p id="section-6.2-6.5.1">If <code>hash</code> is not equal to the batch's tree head in the relying party's saved validity window (see <a href="#relying-parties" class="auto internal xref">Section 6.1</a>), abort this procedure with a <code>bad_certificate</code> error.<a href="#section-6.2-6.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.2-5.6">
-            <p id="section-6.2-5.6.1">Optionally, perform any additional application-specific checks on the assertion and issuer. For example, an HTTPS client might constrain an issuer to a particular DNS subtree.<a href="#section-6.2-5.6.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-6.2-5.7">
-            <p id="section-6.2-5.7.1">If all the preceding checks succeed, the certificate is valid and the application can proceed with using the assertion.<a href="#section-6.2-5.7.1" class="pilcrow">¶</a></p>
+          <li id="section-6.2-6.6">
+            <p id="section-6.2-6.6.1">If all the preceding checks succeed, the Merkle Tree certificate verification subroutine completes successfully.<a href="#section-6.2-6.6.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 </section>

@@ -928,18 +928,31 @@ Table of Contents
    return any applicable error.
 
    When a subscriber presents a BikeshedCertificate, the relying party
-   first determines if trust_anchor corresponds to a supported trust
-   anchor, and the type of that trust anchor.  If trust_anchor is
-   unrecognized, the relying party rejects the certificate with an
-   unknown_ca error.
+   runs the following procedure:
 
-   Otherwise, the relying party runs the verification procedure
-   corresponding to that trust anchor.  Each mechanisms using the
-   BikeshedCertificate format MUST define a verification procedure.
+   1.  Determines if trust_anchor corresponds to a supported trust
+       anchor, and the type of that trust anchor.  If trust_anchor is
+       unrecognized, the relying party rejects the certificate with an
+       unknown_ca error.
+
+   2.  Run the verification subroutine corresponding to that trust
+       anchor, defined below.
+
+   3.  Optionally, perform any additional application-specific checks on
+       the assertion and issuer.  For example, an HTTPS client might
+       constrain an issuer to a particular DNS subtree.
+
+   4.  If all the preceding checks succeed, the certificate is valid and
+       the application can proceed with using the assertion.
+
+   Step 2 in the above procedure runs a trust-anchor-specific
+   verification subroutine.  This subroutine is determined by the type
+   of trust anchor.  Each mechanism using the BikeshedCertificate format
+   MUST define a verification subroutine.
 
    For a Merkle Tree trust anchor, the trust anchor will identify a
    batch in the relying party's validity window.  (See Section 5.2 and
-   Section 6.1.)  The relying party runs the following procedure:
+   Section 6.1.)  The batch's verification subroutine is defined below:
 
    1.  Compute the batch's expiration time, as described in Section 5.1.
        If this value is before the current time, abort this procedure
@@ -963,12 +976,8 @@ Table of Contents
        party's saved validity window (see Section 6.1), abort this
        procedure with a bad_certificate error.
 
-   6.  Optionally, perform any additional application-specific checks on
-       the assertion and issuer.  For example, an HTTPS client might
-       constrain an issuer to a particular DNS subtree.
-
-   7.  If all the preceding checks succeed, the certificate is valid and
-       the application can proceed with using the assertion.
+   6.  If all the preceding checks succeed, the Merkle Tree certificate
+       verification subroutine completes successfully.
 
 7.  Transparency Services
 
