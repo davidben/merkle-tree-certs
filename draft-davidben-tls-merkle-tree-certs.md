@@ -1220,6 +1220,53 @@ IANA is requested to create the following entry in the TLS Certificate Types reg
 
 --- back
 
+# Examples
+
+## (Abridged)Assertions
+
+The following is an Assertion claiming `example.com` for
+a TLS subject with Ed25519 public key
+`c5d2080fa9a489a226b58166dad00be8120931a769c9c6f1f8eefafc38af9065`.
+
+~~~
+00000024 08070020 c5d2080f a9a489a2 26b58166 dad00be8 120931a7 69c9c6f1
+f8eefafc 38af9065 00130000 000f000d 000b6578 616d706c 652e636f 6d
+~~~
+
+The corresponding AbridgedAssertion:
+
+~~~
+00000022 0807d8e2 c44fc82e 175e5698 b1c25324 6c9a996f c37bad29 fd59b6aa
+838b0a93 0b000013 0000000f 000d000b 6578616d 706c652e 636f6d
+~~~
+
+Next, we have an Assertion claiming `*.example.com`, `192.0.2.37`,
+`192.0.12.0`, `198.51.100.60` and `203.0.113.0` for
+a TLS subject with RSASSA-PSS public key with modulus `264851…51544459`
+and exponent 65537.
+
+~~~
+00000112 0804010e 3082010a 02820101 00d1cd9c d613c050 929e6418 14b4957c
+40f30d07 0927f653 bde7054c 06d53a89 36228b70 72fad4db a186c379 7e00300b
+a5b6de8e 7ab3fed4 cb5a537e 7674916a 130a0435 664428a9 7f1983b7 e028b9ab
+f24700de 1d6478c9 ae361176 daa64c2f 89b42ec0 270add68 85323401 35d22724
+c7bd8f65 075b25b8 96a89ab8 2a2b2194 49b029b8 97e130dc dc96fce1 37351f2b
+7a28f1d0 7b710afb 2c796211 d9ba1feb 43d30810 63f19afd b7ba2ab0 e19fd008
+e719491d d10ed235 5d4790f0 3039e3a3 31aa2644 2d656716 ebe710f2 4260599a
+2d082db1 eccfaa8f f51cfb8e 3dfca0eb e1af59c2 f007b35e 02b0582f 50090018
+b78a6b06 c0188ab3 514d60d6 6243e017 8b020301 00010029 0001000f 000d000b
+6578616d 706c652e 636f6d00 02001200 10c00002 25c0000c 00c63364 3ccb0071
+00
+~~~
+
+The corresponding AbridgedAssertion:
+
+~~~
+00000022 08049a04 087a4d52 033a0a20 04333359 ccf29703 25684c5f a96f1ca1
+35cb2ab1 f2670029 0001000f 000d000b 6578616d 706c652e 636f6d00 02001200
+10c00002 25c0000c 00c63364 3ccb0071 00
+~~~
+
 # Acknowledgements
 {:numbered="false"}
 
