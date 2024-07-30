@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-28T01:42:18.854076+00:00",
+  "timestamp": "2024-07-30T01:36:12.719725+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4115,7 +4115,7 @@
       "labels": [],
       "body": "The main changes:\r\n\r\n* ProofType is gone and now implicit from the trust anchor\r\n\r\n* TrustAnchor is gone and replaced with TrustAnchorIdentifier from draft-beck-tls-trust-anchor-ids.\r\n\r\n* The negotiation mechanism is removed and instead references draft-beck-tls-trust-anchor-ids, adding some guidance on how to use it.\r\n\r\n* We did lose the aliases mechanism and instead take a harder dependency on the DNS mechanism in draft-beck-tls-trust-anchor-ids. I've filed https://github.com/davidben/tls-trust-expressions/issues/62 to track restoring that.\r\n\r\n* General discussion on agility is removed as draft-beck-tls-trust-anchor-ids covers that.\r\n\r\n* Just to get it out of the way, I moved the discussion on client certificate types to an appendix.\r\n\r\nFixes #80",
       "createdAt": "2024-07-26T17:10:01Z",
-      "updatedAt": "2024-07-26T20:58:09Z",
+      "updatedAt": "2024-07-29T12:12:16Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "d7e2917521b17816aadbc113867a841527d18e77",
@@ -4160,6 +4160,79 @@
           "createdAt": "2024-07-26T20:58:09Z",
           "updatedAt": "2024-07-26T20:58:09Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6DZ1-1",
+          "commit": {
+            "abbreviatedOid": "a9afb28"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-07-29T10:49:07Z",
+          "updatedAt": "2024-07-29T10:49:07Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "You don't define the wire format `TrustAnchorIdentifier`.",
+              "createdAt": "2024-07-29T10:49:07Z",
+              "updatedAt": "2024-07-29T10:49:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6DZ3Ix",
+          "commit": {
+            "abbreviatedOid": "a9afb28"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-07-29T10:51:46Z",
+          "updatedAt": "2024-07-29T10:51:47Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "Sorry, you do. If I understand correctly this is an ASN.1 oid and so needs byte-for-byte processing. Because of that it might be better to put after `proof_data` which is length prefixed?",
+              "createdAt": "2024-07-29T10:51:47Z",
+              "updatedAt": "2024-07-29T10:51:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6DZ7am",
+          "commit": {
+            "abbreviatedOid": "a9afb28"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-07-29T11:00:12Z",
+          "updatedAt": "2024-07-29T11:00:12Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6DaeSp",
+          "commit": {
+            "abbreviatedOid": "a9afb28"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-07-29T12:12:16Z",
+          "updatedAt": "2024-07-29T12:12:16Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "Oh yeah, that's confusing. It's intended to be `TrustAnchorIdentifier` from here:\r\nhttps://davidben.github.io/tls-trust-expressions/draft-beck-tls-trust-anchor-ids.html#name-overview\r\n\r\nProbably we should just copy-paste the definition and write it as:\r\n```\r\n/* See Section 4.1 of draft-beck-tls-trust-anchor-ids */\r\nopaque TrustAnchorIdentifier<1..2^8-1>;\r\n```\r\n",
+              "createdAt": "2024-07-29T12:12:16Z",
+              "updatedAt": "2024-07-29T12:12:16Z"
+            }
+          ]
         }
       ]
     }
