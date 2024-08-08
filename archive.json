@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-06T01:36:39.330902+00:00",
+  "timestamp": "2024-08-08T01:37:24.860910+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1622,6 +1622,39 @@
       "updatedAt": "2024-07-26T05:57:00Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 88,
+      "id": "I_kwDOJIBkVc6SPX42",
+      "title": "Multi-proof certificates",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/88",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "(Not a fully-baked idea, just exploring the design space a bit.)\r\n\r\nShould we support something like multi-proof certificates? The idea would be that the certificate looks something like:\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} Proof;\r\n\r\nstruct {\r\n    Assertion assertion;\r\n    Proof proofs<0..2^16>;\r\n} Certificate;\r\n```\r\n\r\nThen pair with something like https://github.com/davidben/tls-trust-expressions/issues/54 so that the server has a bunch of proofs available and the client can ask for some subset of them.\r\n\r\nThings we could model this way:\r\n* Signature-like proofs where you expect multiple independent entities to attest to it\r\n* Something X.509 + CT-like where you have one signature from a domain validating entity and some signatures from logging entities\r\n* MTCs with optional signatures over the tree head when the client isn't up-to-date\r\n\r\nThis also enables somewhat more compact representations on the subscriber. The assertion will contain a big PQ key and this way you just need the one blob in memory. Or if different clients' requests overlap, you only need to keep one copy of each individual component around.\r\n\r\nOne subtlety: if one proof depends on another proof, this structure flattens it and loses the information. That would need to be sufficiently encoded into the trust anchor identifiers and/or different credentials that you get a good combination.",
+      "createdAt": "2024-08-07T13:34:42Z",
+      "updatedAt": "2024-08-07T14:25:47Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Some other subtleties:\r\n* CertificatePropertyList applies to the whole Certificate. The properties get more complicated if they have to correlate with individual proofs\r\n* Different proofs might expire at different times (e.g. MTCs have an upper bound). I'm thinking that, in #83, the expiry should be part of the Proof, with individual proofs being allowed to expire at different times\r\n\r\nOther directions:\r\n* Explode the structure in the protocol. First \"certificate\" in the TLS certificate list is the Assertion, the rest are individual Proofs\r\n* Explode the structure in the subscriber / CA bit. Abandon the assertion size optimization and say you just get a bunch of assertion + single-proof tuples, stitch them back together by looking for matching assertions",
+          "createdAt": "2024-08-07T13:38:31Z",
+          "updatedAt": "2024-08-07T13:38:31Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> One subtlety: if one proof depends on another proof, this structure flattens it and loses the information.\r\n\r\nWhich is the case for https://github.com/davidben/tls-trust-expressions/issues/54. However, we should think about what an analogue would look like when we have MTC in place.\r\n\r\nI'd say the CA would create a signed _promise_ that it will include a certain assertion in a future batch. One can then gather cosignatures of witnesses that will check whether the CA indeed will include the assertion is the batch. The promise is akin to the regular certificate today, and the cosignature is like an SCT.\r\n\r\nI can't quite make this fit neatly. Format of promise is alright.\r\n\r\n```\r\nstruct {\r\n    uint32 batch_number;\r\n    Signature signature;\r\n} SignedPromiseProofData;\r\n```\r\n\r\nHere `signature` is over\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier anchor; // with batch number\r\n    Assertion assertion;\r\n} Promise;\r\n```\r\n\r\nPromise can use the base TrustAnchorIdentifier of the CA. (One could move the `batch_number` into the TrustAnchorIdentifier, but would need to allocate a different TrustAnchorIdentifier. I do not think that makes sense as you wouldn't want to negotiate on the promised batch number.)\r\n\r\nNegotiation for promises works nicely: servers just need to install the regular MTC proofs with higher preference over the promises.\r\n\r\nFormat of cosignatures is alright too:\r\n\r\n```\r\nstruct {\r\n   TrustAnchorIdentifier anchor; // CA that made the promise including batch number\r\n   Signature cosignature;\r\n} WitnessProofData;\r\n```\r\n\r\n`cosignature` is over `Promise` as before.\r\n\r\nThe difficulty is the negotiation. The client trusts certain witnesses and certain CAs. It wants, say, three cosignatures of trusted witnesses on the same promise. If we use a single TAI for the witness, then the negotiation of https://github.com/davidben/tls-trust-expressions/issues/54 is unsatisfactory in two ways: 1. it could return three cosignatures on promises of different CAs and ; 2. it could return cosignatures on promises of an untrusted CA.\r\n\r\nInstead of a global TAI, we could assign a separate TAI for the combination of witness and CA. (Say, simply `witness-TAI.ca-TAI`.) That solves the second problem, but not the first.",
+          "createdAt": "2024-08-07T14:25:45Z",
+          "updatedAt": "2024-08-07T14:25:45Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -4115,7 +4148,7 @@
       "labels": [],
       "body": "The main changes:\r\n\r\n* ProofType is gone and now implicit from the trust anchor\r\n\r\n* TrustAnchor is gone and replaced with TrustAnchorIdentifier from draft-beck-tls-trust-anchor-ids.\r\n\r\n* The negotiation mechanism is removed and instead references draft-beck-tls-trust-anchor-ids, adding some guidance on how to use it.\r\n\r\n* We did lose the aliases mechanism and instead take a harder dependency on the DNS mechanism in draft-beck-tls-trust-anchor-ids. I've filed https://github.com/davidben/tls-trust-expressions/issues/62 to track restoring that.\r\n\r\n* General discussion on agility is removed as draft-beck-tls-trust-anchor-ids covers that.\r\n\r\n* Just to get it out of the way, I moved the discussion on client certificate types to an appendix.\r\n\r\nFixes #80",
       "createdAt": "2024-07-26T17:10:01Z",
-      "updatedAt": "2024-07-29T12:12:16Z",
+      "updatedAt": "2024-08-07T13:34:54Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "d7e2917521b17816aadbc113867a841527d18e77",
@@ -4126,7 +4159,36 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Bit of a nit, but why\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} Proof;\r\n\r\nstruct {\r\n    Assertion assertion;\r\n    Proof proof;\r\n} BikeshedCertificate;\r\n```\r\n\r\nand not directly\r\n\r\n```\r\nstruct {\r\n    Assertion assertion;\r\n    TrustAnchorIdentifier trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} BikeshedCertificate;\r\n```\r\n\r\nYou could say the `proof_data` doesn't make sense without the `trust_anchor`, but the `proof_data` also doesn't make sense without the `assertion`.",
+          "createdAt": "2024-08-06T12:34:39Z",
+          "updatedAt": "2024-08-06T12:35:07Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "@bwesterb Somewhat looking forward to maybe doing something like https://github.com/davidben/tls-trust-expressions/issues/54, but yeah, let's inline it for now.\r\n\r\n(I was OOO last week. Will take a pass to update this and look it over again.)",
+          "createdAt": "2024-08-07T03:38:08Z",
+          "updatedAt": "2024-08-07T03:38:08Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> @bwesterb Somewhat looking forward to maybe doing something like [davidben/tls-trust-expressions#54](https://github.com/davidben/tls-trust-expressions/issues/54), but yeah, let's inline it for now.\r\n\r\nI don't see how that'd work, but let's keep it as is then if you have something in mind.\r\n",
+          "createdAt": "2024-08-07T12:48:56Z",
+          "updatedAt": "2024-08-07T12:48:56Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Sketched it out in https://github.com/davidben/merkle-tree-certs/issues/88",
+          "createdAt": "2024-08-07T13:34:53Z",
+          "updatedAt": "2024-08-07T13:34:53Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc6DROnP",
