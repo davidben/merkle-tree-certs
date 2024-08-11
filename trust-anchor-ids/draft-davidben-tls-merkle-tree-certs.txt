@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 27 January 2025                                B. E. Westerbaan
+Expires: 12 February 2025                               B. E. Westerbaan
                                                               Cloudflare
-                                                            26 July 2024
+                                                          11 August 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 January 2025.
+   This Internet-Draft will expire on 12 February 2025.
 
 Copyright Notice
 
@@ -806,6 +806,9 @@ Table of Contents
    A proof is a message that allows the relying party to accept the
    associated assertion, provided it trusts the CA and recognizes the
    tree head.  The structures are defined below:
+
+   /* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
+   opaque TrustAnchorIdentifier<1..2^8-1>;
 
    struct {
        TrustAnchorIdentifier trust_anchor;
