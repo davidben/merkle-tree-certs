@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-08T01:37:24.860910+00:00",
+  "timestamp": "2024-08-11T01:44:03.419523+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1637,7 +1637,7 @@
       ],
       "body": "(Not a fully-baked idea, just exploring the design space a bit.)\r\n\r\nShould we support something like multi-proof certificates? The idea would be that the certificate looks something like:\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} Proof;\r\n\r\nstruct {\r\n    Assertion assertion;\r\n    Proof proofs<0..2^16>;\r\n} Certificate;\r\n```\r\n\r\nThen pair with something like https://github.com/davidben/tls-trust-expressions/issues/54 so that the server has a bunch of proofs available and the client can ask for some subset of them.\r\n\r\nThings we could model this way:\r\n* Signature-like proofs where you expect multiple independent entities to attest to it\r\n* Something X.509 + CT-like where you have one signature from a domain validating entity and some signatures from logging entities\r\n* MTCs with optional signatures over the tree head when the client isn't up-to-date\r\n\r\nThis also enables somewhat more compact representations on the subscriber. The assertion will contain a big PQ key and this way you just need the one blob in memory. Or if different clients' requests overlap, you only need to keep one copy of each individual component around.\r\n\r\nOne subtlety: if one proof depends on another proof, this structure flattens it and loses the information. That would need to be sufficiently encoded into the trust anchor identifiers and/or different credentials that you get a good combination.",
       "createdAt": "2024-08-07T13:34:42Z",
-      "updatedAt": "2024-08-07T14:25:47Z",
+      "updatedAt": "2024-08-08T12:51:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -1653,6 +1653,20 @@
           "body": "> One subtlety: if one proof depends on another proof, this structure flattens it and loses the information.\r\n\r\nWhich is the case for https://github.com/davidben/tls-trust-expressions/issues/54. However, we should think about what an analogue would look like when we have MTC in place.\r\n\r\nI'd say the CA would create a signed _promise_ that it will include a certain assertion in a future batch. One can then gather cosignatures of witnesses that will check whether the CA indeed will include the assertion is the batch. The promise is akin to the regular certificate today, and the cosignature is like an SCT.\r\n\r\nI can't quite make this fit neatly. Format of promise is alright.\r\n\r\n```\r\nstruct {\r\n    uint32 batch_number;\r\n    Signature signature;\r\n} SignedPromiseProofData;\r\n```\r\n\r\nHere `signature` is over\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier anchor; // with batch number\r\n    Assertion assertion;\r\n} Promise;\r\n```\r\n\r\nPromise can use the base TrustAnchorIdentifier of the CA. (One could move the `batch_number` into the TrustAnchorIdentifier, but would need to allocate a different TrustAnchorIdentifier. I do not think that makes sense as you wouldn't want to negotiate on the promised batch number.)\r\n\r\nNegotiation for promises works nicely: servers just need to install the regular MTC proofs with higher preference over the promises.\r\n\r\nFormat of cosignatures is alright too:\r\n\r\n```\r\nstruct {\r\n   TrustAnchorIdentifier anchor; // CA that made the promise including batch number\r\n   Signature cosignature;\r\n} WitnessProofData;\r\n```\r\n\r\n`cosignature` is over `Promise` as before.\r\n\r\nThe difficulty is the negotiation. The client trusts certain witnesses and certain CAs. It wants, say, three cosignatures of trusted witnesses on the same promise. If we use a single TAI for the witness, then the negotiation of https://github.com/davidben/tls-trust-expressions/issues/54 is unsatisfactory in two ways: 1. it could return three cosignatures on promises of different CAs and ; 2. it could return cosignatures on promises of an untrusted CA.\r\n\r\nInstead of a global TAI, we could assign a separate TAI for the combination of witness and CA. (Say, simply `witness-TAI.ca-TAI`.) That solves the second problem, but not the first.",
           "createdAt": "2024-08-07T14:25:45Z",
           "updatedAt": "2024-08-07T14:25:45Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> Instead of a global TAI, we could assign a separate TAI for the combination of witness and CA.\r\n\r\nYeah, I've been assuming that they'd be paired up like that.\r\n\r\n> That solves the second problem, but not the first.\r\n\r\nHmm. I'm assuming the client knows the details of its policy and how they translate to TAIs, so it can request a collection of things that works correctly, given the server list in DNS or EncryptedExtensions. I.e. the server-offer, client-select flow is nice in that the client policy can be somewhat arbitrarily complicated and we don't need to express it on the wire.\r\n\r\nBut it's true that, when, the selection isn't flipped, then things get tricky. The client may not be able to fully express its policy, and then the server might not quite do the right thing, since the server does not have knowledge of all these details.\r\n\r\n(Cllllearly we need to allow the client to express an arbitrary boolean expression. \ud83d\ude09  We could call it... \"trust expressions\", except that name is already taken.)\r\n\r\nYeah, I dunno. I suspect there's more iterating on this idea to do here. Life is very easy when we flip to server-offer / client-select, but I don't know how strongly we can bank on that since the DNS stuff is so early.\r\n\r\n(For completeness, the trust expressions version of this would probably have required the multi-proof policy get backed into the trust store name itself, and then the CA would provision pre-assembled proof lists, which is a lot less flexible than assembling the proof lists on the fly.)",
+          "createdAt": "2024-08-08T04:54:43Z",
+          "updatedAt": "2024-08-08T04:54:43Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> But it's true that, when, the selection isn't flipped, then things get tricky. \r\n\r\nThere is another difficulty. How does the server know which witnesses to provision? At the moment it's easy, because there is essentially one global small list of trusted CT Logs. Do we really want to assume that'll continue? One solution is for clients to be happy with an SCT from a specific log, which the TLS server could fetch on demand. That doesn't quite fit with the flow. As fallback (for servers that can't fetch), a client could be happy with an annoyingly long list of SCTs.",
+          "createdAt": "2024-08-08T12:51:35Z",
+          "updatedAt": "2024-08-08T12:51:50Z"
         }
       ]
     }
