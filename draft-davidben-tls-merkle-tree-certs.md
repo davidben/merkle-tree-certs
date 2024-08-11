@@ -634,7 +634,7 @@ A CA MUST NOT generate signatures over inputs that are parseable as LabeledValid
 
 [[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one. #15 ]]
 
-[[TODO: A subscriber has no way to know when a certificate expires. See #83, which avoids defining an expiration time certificate property.]]
+[[TODO: A subscriber has no way to know when a certificate expires. We need to define a mandatory expiration certificate property, or do #83, which, depending on how it's done could avoid that.]]
 
 For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
