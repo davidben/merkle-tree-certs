@@ -798,8 +798,8 @@ Table of Contents
    up with a better one. #15 ]]
 
    [[TODO: A subscriber has no way to know when a certificate expires.
-   See #83, which avoids defining an expiration time certificate
-   property.]]
+   We need to define a mandatory expiration certificate property, or do
+   #83, which, depending on how it's done could avoid that.]]
 
    For each assertion in the tree, the CA constructs a
    BikeshedCertificate structure containing the assertion and a proof.
