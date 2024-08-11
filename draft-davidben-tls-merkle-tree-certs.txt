@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 27 January 2025                                B. E. Westerbaan
+Expires: 12 February 2025                               B. E. Westerbaan
                                                               Cloudflare
-                                                            26 July 2024
+                                                          11 August 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 January 2025.
+   This Internet-Draft will expire on 12 February 2025.
 
 Copyright Notice
 
@@ -85,17 +85,17 @@ Table of Contents
      4.2.  IP Claims
    5.  Issuing Certificates
      5.1.  Merkle Tree CA Parameters
-     5.2.  Batch State
-     5.3.  Issuance Queue and Scheduling
-     5.4.  Certifying a Batch of Assertions
-       5.4.1.  Building the Merkle Tree
-       5.4.2.  Signing a ValidityWindow
-       5.4.3.  Certificate Format
-     5.5.  Size Estimates
+     5.2.  Identifying CAs and Batches
+     5.3.  Batch State
+     5.4.  Issuance Queue and Scheduling
+     5.5.  Certifying a Batch of Assertions
+       5.5.1.  Building the Merkle Tree
+       5.5.2.  Signing a ValidityWindow
+       5.5.3.  Certificate Format
+     5.6.  Size Estimates
    6.  Using Certificates
      6.1.  Relying Party State
      6.2.  Certificate Verification
-     6.3.  Certificate Negotiation
    7.  Transparency Services
      7.1.  Single Trusted Service
      7.2.  Single Update Service with Multiple Mirrors
@@ -106,17 +106,12 @@ Table of Contents
    10. Use in TLS
      10.1.  TLS Subjects
      10.2.  The Bikeshed Certificate Type
-     10.3.  The Trust Anchors Extension
-     10.4.  Certificate Type Negotiation
-       10.4.1.  Indicate in First CertificateEntry
-       10.4.2.  Change Certificate Syntax
+     10.3.  Certificate Negotiation
    11. Deployment Considerations
      11.1.  Fallback Mechanisms
      11.2.  Rolling Renewal
      11.3.  Deploying New Keys
-     11.4.  Agility and Extensibility
-     11.5.  Batch State Availability
-     11.6.  Trust Anchor List Size
+     11.4.  Batch State Availability
    12. Privacy Considerations
    13. Security Considerations
      13.1.  Authenticity
@@ -133,6 +128,9 @@ Table of Contents
      15.2.  Informative References
    Appendix A.  Examples
      A.1.  (Abridged)Assertions
+   Appendix B.  TLS Certificate Type Negotiation Challenges
+     B.1.  Indicate in First CertificateEntry
+       B.1.1.  Change Certificate Syntax
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -166,7 +164,7 @@ Table of Contents
 
    This document introduces Merkle Tree Certificates, an optimization
    that authenticates a subscriber key using under 1,000 bytes.  See
-   Section 5.5.  To achieve this, it reduces its scope from general
+   Section 5.6.  To achieve this, it reduces its scope from general
    authentication:
 
    *  Certificates are short-lived.  The subscriber is expected to use
@@ -276,10 +274,10 @@ Table of Contents
 
    Batch tree head:  A hash computed over all the assertions in a batch,
       by building a Merkle Tree.  The Merkle Tree construction and this
-      hash are described in more detail in Section 5.4.1.
+      hash are described in more detail in Section 5.5.1.
 
    Inclusion proof:  A structure which proves that some assertion is
-      contained in some tree head.  See Section 5.4.3.
+      contained in some tree head.  See Section 5.5.3.
 
    Validity window:  A range of consecutive batch tree heads.  A relying
       party maintains a copy of the CA's latest validity window.  At any
@@ -295,12 +293,12 @@ Table of Contents
 
    2.  The CA collects certificate requests into a batch (see
        Section 5.1) and builds the Merkle Tree and computes the tree
-       head (see Section 5.4.1).  It then signs the validity window
-       ending at this tree head (see Section 5.4.2) and publishes (see
+       head (see Section 5.5.1).  It then signs the validity window
+       ending at this tree head (see Section 5.5.2) and publishes (see
        Section 8) the result.
 
    3.  The CA constructs a certificate using the inclusion proof.  It
-       sends this certificate to the subscriber.  See Section 5.4.3.
+       sends this certificate to the subscriber.  See Section 5.5.3.
 
    4.  The transparency service downloads the abridged assertions,
        recreates the Merkle Tree, and validates the window signature.
@@ -316,7 +314,7 @@ Table of Contents
 
    7.  If the relying party’s validity window contains the subscriber’s
        certificate, the subscriber negotiates this protocol and sends
-       the Merkle Tree certificate.  See Section 6.3 for details.  If
+       the Merkle Tree certificate.  See Section 10.3 for details.  If
        there is no match, the subscriber proceeds as if this protocol
        were not in use (e.g., by sending a traditional X.509 certificate
        chain).
@@ -494,8 +492,9 @@ Table of Contents
    hash:  A cryptographic hash function.  In this document, the hash
       function is always SHA-256 [SHS], but others may be defined.
 
-   issuer_id:  An opaque byte string that identifies the CA.  This value
-      should be short and is limited to at most 32 bytes.
+   issuer_id:  A trust anchor identifier (see Section 3 of
+      [I-D.beck-tls-trust-anchor-ids]) that identifies the CA.  See
+      Section 5.2 for details.
 
    public_key:  The public half of a signing keypair.  The corresponding
       private key, private_key, is known only to the CA.
@@ -557,7 +556,22 @@ Table of Contents
    another Merkle Tree CA, or for another protocol, such as X.509
    certificates.
 
-5.2.  Batch State
+5.2.  Identifying CAs and Batches
+
+   A Merkle Tree CA's issuer_id is a trust anchor identifier, defined in
+   Section 3 of [I-D.beck-tls-trust-anchor-ids].  However, unlike an
+   X.509 CA, the entire OID arc rooted at the identifier is associated
+   with the CA.  OIDs under this arc are used to identify batches below.
+
+   An individual batch from a Merkle Tree CA also has an associated
+   trust anchor identifier.  It is determined by appending the batch
+   number to the CA's issuer_id.
+
+   For example, a Merkle Tree CA may have an issuer_id of 32473.1, in
+   the ASCII representation.  The batch with batch number 42 would then
+   have a trust anchor identifier of 32473.1.42.
+
+5.3.  Batch State
 
    Each batch is in one of three states:
 
@@ -578,15 +592,15 @@ Table of Contents
    *  The list of abridged assertions certified in this batch.
 
    *  The tree head, a hash computed over this list, described in
-      Section 5.4.1.
+      Section 5.5.1.
 
    *  A validity window signature computed as described in
-      Section 5.4.2.
+      Section 5.5.2.
 
    The CA exposes all of this information in an HTTP [RFC9110] interface
    described in Section 8.
 
-5.3.  Issuance Queue and Scheduling
+5.4.  Issuance Queue and Scheduling
 
    The CA additionally maintains an issuance queue, not exposed via the
    HTTP interface.
@@ -605,21 +619,21 @@ Table of Contents
        "pending" batch's issuance time.
 
    2.  For each batch in the "ready" state other than the latest one,
-       run the procedure in Section 5.4 with an empty assertion list, in
+       run the procedure in Section 5.5 with an empty assertion list, in
        order of increasing batch number.  Batches cannot be skipped.
 
    3.  Empty the issuance queue into an ordered list of assertions.  Run
-       the procedure in Section 5.4 using this list and the remaining
+       the procedure in Section 5.5 using this list and the remaining
        batch in the "ready" state.  This batch's issuance time will be
        at or shortly before the current time.
 
-5.4.  Certifying a Batch of Assertions
+5.5.  Certifying a Batch of Assertions
 
    This section describes how to certify a given list of assertions at a
    given batch number.  The batch MUST be in the "ready" state, and all
    preceding batches MUST be in the "issued" state.
 
-5.4.1.  Building the Merkle Tree
+5.5.1.  Building the Merkle Tree
 
    First, the CA then builds a Merkle Tree from the list as follows:
 
@@ -717,7 +731,7 @@ Table of Contents
    If n is one, the tree contains a single level, level 0, and has a
    tree head of HashAssertion(assertion, 0).
 
-5.4.2.  Signing a ValidityWindow
+5.5.2.  Signing a ValidityWindow
 
    Batches are grouped into consecutive ranges of validity_window_size
    batches, called validity windows.  As validity_window_size is
@@ -778,10 +792,14 @@ Table of Contents
    values, or intermediate nodes, or subject_info_hash values are not
    known.
 
-5.4.3.  Certificate Format
+5.5.3.  Certificate Format
 
    [[TODO: BikeshedCertificate is a placeholder name until someone comes
    up with a better one. #15 ]]
+
+   [[TODO: A subscriber has no way to know when a certificate expires.
+   We need to define a mandatory expiration certificate property, or do
+   #83, which, depending on how it's done could avoid that.]]
 
    For each assertion in the tree, the CA constructs a
    BikeshedCertificate structure containing the assertion and a proof.
@@ -789,15 +807,11 @@ Table of Contents
    associated assertion, provided it trusts the CA and recognizes the
    tree head.  The structures are defined below:
 
-   enum { merkle_tree_sha256(0), (2^16-1) } ProofType;
+   /* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
+   opaque TrustAnchorIdentifier<1..2^8-1>;
 
    struct {
-       ProofType proof_type;
-       opaque trust_anchor_data<0..2^8-1>;
-   } TrustAnchor;
-
-   struct {
-       TrustAnchor trust_anchor;
+       TrustAnchorIdentifier trust_anchor;
        opaque proof_data<0..2^16-1>;
    } Proof;
 
@@ -806,16 +820,19 @@ Table of Contents
        Proof proof;
    } BikeshedCertificate;
 
-   The proof_type identifies a type of proof.  It determines the format
-   of the trust_anchor_data and proof_data values.  The mechanism
-   defined in this document is merkle_tree_sha256, which uses
-   trust_anchor_data and proof_data formats of MerkleTreeTrustAnchor and
-   MerkleTreeProofSHA256, respectively:
+   A proof's trust_anchor field is a trust anchor identifier (see
+   Section 3 of [I-D.beck-tls-trust-anchor-ids] and Section 4.1 of
+   [I-D.beck-tls-trust-anchor-ids]), which determines the proof's type
+   and issuer.  It is analogous to an X.509 trust anchor's subject name.
+   When the issuer is a Merkle Tree CA, the trust_anchor is the
+   containing batch's trust anchor identifier, as described in
+   Section 5.2.
 
-   struct {
-       opaque issuer_id<1..32>;
-       uint32 batch_number;
-   } MerkleTreeTrustAnchor;
+   The proof_data is a byte string, opaque to the subscriber, in some
+   format agreed upon by the proof issuer and relying party.  If the
+   issuer is a Merkle Tree CA, as defined in this document, the
+   proof_data contains a MerkleTreeProofSHA256, described below.  Future
+   mechanisms using the BikeshedCertificate may define other formats.
 
    opaque HashValueSHA256[32];
 
@@ -824,19 +841,6 @@ Table of Contents
        HashValueSHA256 path<0..2^16-1>;
    } MerkleTreeProofSHA256;
 
-   A trust anchor is a short identifier that identifies a source of
-   certificates.  It is analogous to an X.509 trust anchor's subject
-   name.  These are used for certificate selection, described in
-   Section 6.3.  In Merkle Tree certificates, each batch is a distinct
-   trust anchor.  The trust_anchor_data for merkle_tree_sha256 is a
-   MerkleTreeTrustAnchor structure.  The issuer_id field is the CA's
-   issuer_id.  The batch_number field is the number of the batch.
-
-   A relying party that trusts a trust anchor must know the batch's tree
-   head.  It then trusts any assertion which can be proven to be in the
-   corresponding Merkle Tree, as described in Section 6.2.
-
-   The proof_data for merkle_tree_sha256 is a MerkleTreeProofSHA256.
    After building the tree, the CA constructs a MerkleTreeProofSHA256
    for each assertion as follows.  For each index i in the batch's
    assertion list:
@@ -871,13 +875,12 @@ Table of Contents
    index will be zero.
 
    For each assertion, the CA assembles a BikeshedCertificate structure
-   and sends it to the subscriber.  It SHOULD also send the additional
-   information described in Section 6.3.
+   and sends it to the subscriber.
 
    This certificate can be presented to supporting relying parties as
    described in Section 6.  It is valid until the batch expires.
 
-5.5.  Size Estimates
+5.6.  Size Estimates
 
    Merkle Tree proofs scale logarithmically in the batch size.
    Section 11.2 recommends subscribers renew halfway through the
@@ -916,118 +919,70 @@ Table of Contents
    regularly updated from the transparency service, as described in
    Section 7.
 
+   Each batch in the relying party's validity window is a trust anchor
+   for purposes of certificate verification (see Section 6.2) and
+   certificate negotiation (see Section 10.3).
+
 6.2.  Certificate Verification
 
-   When a subscriber presents a BikeshedCertificate whose proof_type
-   field is merkle_tree_sha256, the relying party runs the following
-   procedure to verify it.  This procedure's error conditions are
-   described with TLS alerts, defined in Section 6.2 of [RFC8446].  Non-
-   TLS applications SHOULD map these error conditions to the
-   corresponding application-specific errors.  When multiple error
-   conditions apply, the application MAY return any applicable error.
+   This section describes the verification process for a
+   BikeshedCertificate.  It describes error conditions with TLS alerts,
+   defined in Section 6.2 of [RFC8446].  Non-TLS applications SHOULD map
+   these error conditions to the corresponding application-specific
+   errors.  When multiple error conditions apply, the application MAY
+   return any applicable error.
 
-   1.   Decode the trust_anchor_data and proof_data fields as
-        MerkleTreeTrustAnchor and MerkleTreeProofSHA256 structures,
-        respectively.  If they cannot be decoded, abort this procedure
-        with a bad_certificate error.
+   When a subscriber presents a BikeshedCertificate, the relying party
+   runs the following procedure:
 
-   2.   Check if the certificate's issuer_id corresponds to a trusted
-        Merkle Tree CA with a saved validity window.  If not, abort this
-        procedure with an unknown_ca error.
+   1.  Determines if trust_anchor corresponds to a supported trust
+       anchor, and the type of that trust anchor.  If trust_anchor is
+       unrecognized, the relying party rejects the certificate with an
+       unknown_ca error.
 
-   3.   Check if the certificate's batch_number is contained in the
-        saved validity window.  If not, abort this procedure with a
-        unknown_ca error.
+   2.  Run the verification subroutine corresponding to that trust
+       anchor, defined below.
 
-   4.   Compute the expiration time of the certificate's batch_number,
-        as described in Section 5.1.  If this value is before the
-        current time, abort this procedure with a certificate_expired
-        error.
+   3.  Optionally, perform any additional application-specific checks on
+       the assertion and issuer.  For example, an HTTPS client might
+       constrain an issuer to a particular DNS subtree.
 
-   5.   Set hash to the output of HashAssertion(assertion, index).  Set
-        remaining to the certificate's index value.
+   4.  If all the preceding checks succeed, the certificate is valid and
+       the application can proceed with using the assertion.
 
-   6.   For each element v at zero-based index i of the certificate's
-        path field, in order:
+   Step 2 in the above procedure runs a trust-anchor-specific
+   verification subroutine.  This subroutine is determined by the type
+   of trust anchor.  Each mechanism using the BikeshedCertificate format
+   MUST define a verification subroutine.
 
-        *  If remaining is odd, set hash to the output of HashNode(v,
-           hash, i + 1, remaining >> 1).  Otherwise, set hash to the
-           output of HashNode(hash, v, i + 1, remaining >> 1)
+   For a Merkle Tree trust anchor, the trust anchor will identify a
+   batch in the relying party's validity window.  (See Section 5.2 and
+   Section 6.1.)  The batch's verification subroutine is defined below:
 
-        *  Set remaining to remaining >> 1.
+   1.  Compute the batch's expiration time, as described in Section 5.1.
+       If this value is before the current time, abort this procedure
+       with a certificate_expired error.
 
-   7.   If remaining is non-zero, abort this procedure with an error.
+   2.  Set hash to the output of HashAssertion(assertion, index).  Set
+       remaining to the certificate's index value.
 
-   8.   If hash is not equal to the corresponding tree head in the saved
-        validity window, abort this procedure with a bad_certificate
-        error.
+   3.  For each element v at zero-based index i of the certificate's
+       path field, in order:
 
-   9.   Optionally, perform any additional application-specific checks
-        on the assertion and issuer.  For example, an HTTPS client might
-        constrain an issuer to a particular DNS subtree.
+       *  If remaining is odd, set hash to the output of HashNode(v,
+          hash, i + 1, remaining >> 1).  Otherwise, set hash to the
+          output of HashNode(hash, v, i + 1, remaining >> 1)
 
-   10.  If all the preceding checks succeed, the certificate is valid
-        and the application can proceed with using the assertion.
+       *  Set remaining to remaining >> 1.
 
-6.3.  Certificate Negotiation
+   4.  If remaining is non-zero, abort this procedure with an error.
 
-   Merkle Tree certificates can only be presented to up-to-date relying
-   parties, so this document describes a mechanism for subscribers to
-   select certificates.  This section describes the general negotiation
-   mechanism.  Section 10.3 describes it as used in TLS.
+   5.  If hash is not equal to the batch's tree head in the relying
+       party's saved validity window (see Section 6.1), abort this
+       procedure with a bad_certificate error.
 
-   Subscribers maintain a certificate set of available
-   BikeshedCertificates.  The TrustAnchor value in each
-   BikeshedCertificate is known as the primary TrustAnchor.  Each
-   BikeshedCertificate is also associated with the following values:
-
-   *  A set of additional TrustAnchor values which also match this
-      certificate
-
-   *  An expiration time, after which the certificate is no longer
-      usable
-
-   These values can be computed from the BikeshedCertificate, given
-   knowledge of the ProofType value and the CA's parameters.  However,
-   CAs are RECOMMENDED to send this information to subscribers in a
-   ProofType-independent form.  See Section 9 for how this is
-   represented in ACME.  This simplifies subscriber deployment and
-   improves ecosystem agility, by allowing subscribers to use
-   certificates without precise knowledge of their parameters.
-
-   For Merkle Tree certificates, the expiration time is computed as
-   described in Section 5.1.  There are validity_window_size - 1
-   additional TrustAnchor values: for each i from 1 to
-   validity_window_size - 1, make a copy of the primary TrustAnchor with
-   the batch_number value replaced with batch_number + i.
-
-   Each relying party maintains a set of TrustAnchor values, which
-   describe the certificates it accepts.  This set is sent to the
-   subscriber to aid in certificate selection.  The ProofType code point
-   defines how the relying party determines the TrustAnchor values.  For
-   Merkle Tree certificates, the proof_type is merkle_tree_sha256, the
-   issuer_id is the CA's issuer_id, and the batch_number is the
-   batch_number of the relying party's validity window.
-
-   The subscriber compares this set with its certificate set.  A
-   certificate is eligible if all of the following are true:
-
-   *  The current time is before the certificate's expiration time
-
-   *  Either the certificate's primary TrustAnchor value or one of the
-      additional TrustAnchor values appears in the relying party's
-      TrustAnchor set.
-
-   *  Any additional application-specific constraints hold.  For
-      example, the TLS signature_algorithms (Section 4.2.3 of [RFC8446])
-      extension constrains the types of keys which may be used.
-
-   The subscriber SHOULD select the smallest available certificate where
-   the above checks succeed.  When two comparably-sized certificates are
-   available, the subscriber SHOULD select the one with the later
-   expiration time, to reduce clock skew risks.  If no certificate is
-   available, the subscriber SHOULD fallback to another PKI mechanism,
-   such as X.509.
+   6.  If all the preceding checks succeed, the Merkle Tree certificate
+       verification subroutine completes successfully.
 
 7.  Transparency Services
 
@@ -1110,11 +1065,11 @@ Table of Contents
            an error.
 
        2.  Compute the tree head for the assertion list, as described in
-           Section 5.4.1.  If this value does not match the fetched tree
+           Section 5.5.1.  If this value does not match the fetched tree
            head, abort this procedure with an error.
 
        3.  Compute the ValidityWindow structure and verify the
-           signature, as described in Section 5.4.2.  Set tree_heads[0]
+           signature, as described in Section 5.5.2.  Set tree_heads[0]
            to the tree head fetched above.  Set the other values in
            tree_heads to the previously mirrored values.  If signature
            verification fails, abort this procedure with an error.
@@ -1168,7 +1123,7 @@ Table of Contents
        abort this procedure with an error.
 
    7.  Verify the validity window signature, as described in
-       Section 5.4.2.  If the signature is invalid, abort this procedure
+       Section 5.5.2.  If the signature is invalid, abort this procedure
        with an error.
 
    8.  If the old and new validity windows contain overlapping batch
@@ -1215,7 +1170,7 @@ Table of Contents
    that Signed Certificate Timestamps (SCTs) and Signed Tree Heads
    (STHs) in Certificate Transparency are correct.  There is no analog
    to SCTs in this document.  The signed validity window structure
-   (Section 5.4.2) is analogous to an STH, but consistency is checked
+   (Section 5.5.2) is analogous to an STH, but consistency is checked
    simply by ensuring overlapping tree heads match, so this document
    does not define this as an explicit role.  If two inconsistent signed
    validity windows are ever observed from a Merkle Tree CA, this should
@@ -1236,11 +1191,11 @@ Table of Contents
    *  GET {prefix}/latest returns the latest batch number.
 
    *  GET {prefix}/validity-window/latest returns the ValidityWindow
-      structure and signature (see Section 5.4.2) for the latest batch
+      structure and signature (see Section 5.5.2) for the latest batch
       number.
 
    *  GET {prefix}/validity-window/{number} returns the ValidityWindow
-      structure and signature (see Section 5.4.2) for batch number, if
+      structure and signature (see Section 5.5.2) for batch number, if
       it is in the "issued" state, and a 404 error otherwise.
 
    *  GET {prefix}/batch/{number}/info returns the validity window
@@ -1274,7 +1229,7 @@ Table of Contents
    above consistency property holds, these two inconsistencies do not
    constitute service unavailability.
 
-   Section 11.5 discusses service availability requirements.
+   Section 11.4 discusses service availability requirements.
 
    [[TODO: Once a batch has expired, do we allow a CA to stop publishing
    it?  The transparency service can already log it for as long, or as
@@ -1287,31 +1242,24 @@ Table of Contents
 9.  ACME Extensions
 
    [[TODO: This section hasn't been written yet.  Instead, what follows
-   is an informal sketch and design discussion. #13 ]]
+   is an informal discussion. #13 ]]
 
-   See Section 11.4 for the overall model this should target.
+   Section 6 of [I-D.draft-beck-tls-trust-anchor-ids] defines the bulk
+   of what's needed.  The missing parts are:
 
-   Define ACME [RFC8555] extensions for requesting these.  We probably
-   need to add a new field in the Order object (Section 9.7.2 of
-   [RFC8555] to request this.  Also a new MIME type for the thing being
-   fetched Section 7.4.2 of [RFC8555].  This format should capture
-   additional metadata per Section 6.3.
+   *  Some way to specify that the client supports BikeshedCertificate.
+      At minimum a separate MIME type, but it likely needs to be known
+      at order creation.
 
-   Otherwise, the long issuance time is already modeled by the allowance
-   for the "processing" state taking a while.  The ACME server should
-   use the Retry-After header so the subscriber knows when to query
-   again.
+   *  Some way to accommodate MTC's long issuance time.  ACME has the
+      "processing" state, and the Retry-After header can tell the
+      subscriber when to query again.  But the fallback certificate will
+      issue much faster, so they cannot be issued together in the same
+      ACME order, as [I-D.draft-beck-tls-trust-anchor-ids] currently
+      does.
 
-   Also use [I-D.draft-ietf-acme-ari] to move the renewal logic in
-   Section 11.2 from the subscriber to the ACME server.
-
-   Per Section 11.4, a subscriber may need multiple certificates.  That
-   should be a service provided by the ACME server.  Come up with a
-   scheme to mint multiple orders from a single newOrder request, or
-   request multiple certificates off of a single order.  (Note different
-   certificates may have different processing time.  It seems an ACME
-   order only transitions from the "processing" state to the "valid"
-   state once, so the former is probably better.)
+   *  Use [I-D.draft-ietf-acme-ari] to move the renewal logic in
+      Section 11.2 from the subscriber to the ACME server.
 
    We should also define a certificate request format, though it is
    broadly just reusing the Assertion structure.  If the CA wishes to
@@ -1381,7 +1329,7 @@ Table of Contents
 
    [[TODO: None of these three extensions is quite right for client
    certificates because the negotiation isn't symmetric.  See discussion
-   in Section 10.4.  We may need to define another one. #18]]
+   in Appendix B.  We may need to define another one. #18]]
 
    When negotiated, the Certificate message MUST contain a single
    CertificateEntry structure.  CertificateEntry is updated as follows:
@@ -1445,137 +1393,55 @@ Table of Contents
    perhaps the certificate type should be TLSSubjectInfo or BikeshedTLS.
    #7 ]]
 
-10.3.  The Trust Anchors Extension
+10.3.  Certificate Negotiation
 
-   The TLS trust_anchors extension which implements certificate
-   negotiation (see Section 6.3).  The extension body is a TrustAnchors
-   structure, defined below:
+   Merkle Tree certificates will only be accepted in up-to-date relying
+   parties, and require a negotiation mechanism to use.  Merkle Tree
+   certificate implementations SHOULD use the trust_anchors extension
+   [I-D.draft-beck-tls-trust-anchor-ids] as described below:
 
-   enum { trust_anchors(TBD), (2^16-1) } ExtensionType;
+   For each Merkle Tree CA trusted by the relying party, the batches in
+   the validity window each determine a trust anchor, as described in
+   Section 6.1.  The trust anchor's identifier is the batch identifier,
+   as described in Section 5.2.  Future mechanisms using the
+   BikeshedCertificate format (see Section 5.5.3) MUST similarly define
+   how relying parties determine trust anchor identifiers.
 
-   struct {
-       TrustAnchor trust_anchors<1..2^16-1>;
-   } TrustAnchors;
+   As even a single validity window results in validity_window_size
+   trust anchors, sending all trust anchors in the trust_anchors
+   extension would be prohitively large in most cases.  Instead, relying
+   parties SHOULD use the retry mechanism described in Section 4.3 of
+   [I-D.draft-beck-tls-trust-anchor-ids] and the DNS hint described in
+   Section 5 of [I-D.draft-beck-tls-trust-anchor-ids].
 
-   This extension carries the relying party's trust anchor set, computed
-   as described in Section 6.3.  When the client is the relying party
-   for a server certificate, the extension is sent in the ClientHello.
-   When the server is the relying party for a client certificate, the
-   extension is sent in the CertificateRequest message.  This extension
-   is only defined for use with TLS 1.3 and later.  It MUST be ignored
-   when negotiating TLS 1.2.
+   [[TODO: We could reduce the reliance on DNS by adding
+   https://github.com/davidben/tls-trust-expressions/issues/62, either
+   in this draft or the main trust anchor IDs draft.]]
 
-   When the subscriber receives this extension, selects a certificate
-   from its certificate set, as described in Section 6.3.  If none
-   match, it does not negotiate the Bikeshed type and selects a
-   different certificate type.  [[TODO: This last step does not work.
-   See Section 10.4]]
+   The subscriber's list of candidate certification paths (see
+   Section 3.3 of [I-D.beck-tls-trust-anchor-ids]) is extended to carry
+   both X.509 and BikeshedCertificate credentials.  The two types of
+   credentials MAY appear in any relative preference order, based on the
+   subscriber's policies.  Like an X.509 credential, a
+   BikeshedCertificate credential also has a CertificatePropertyList
+   (see Section 3.1 of [I-D.beck-tls-trust-anchor-ids]).
 
-10.4.  Certificate Type Negotiation
+   For each of the subscriber's BikeshedCertificate credentials, the
+   corresponding trust anchor identifier is the trust_anchor field in
+   the BikeshedCertificate structure.  This differs from X.509
+   credentials, which require an out-of-band value in the
+   CertificatePropertyList.  It is an error for a BikeshedCertificate
+   credential's CertificatePropertyList to contain the
+   trust_anchor_identifier property.
 
-   [[TODO: We may need a new certificate types extension, either in this
-   document or a separate one.  For now, this section just informally
-   describes the problem. #18 ]]
+   The subscriber then selects certificates as described in Section 4.2
+   of [I-D.draft-beck-tls-trust-anchor-ids].  In doing so, it SHOULD
+   incorporate trust anchor negotiation and certificate type negotiation
+   (see Section 10.2) into the selection criteria for
+   BikeshedCertificate-based credentials.
 
-   The server certificate type is negotiated as follows:
-
-   *  The client sends server_certificate_type in ClientHello with
-      accepted certificate types.
-
-   *  The server selects a certificate type to use, It sends it in
-      server_certificate_type in EncryptedExtensions.
-
-   *  The server sends a certificate of the server-selected type in
-      Certificate.
-
-   This model allows the server to select its certificate type based on
-   not just server_certificate_type, but also other ClientHello
-   extensions like certificate_authorities or trust_anchors
-   (Section 10.3).  In particular, if there is no match in
-   trust_anchors, it can fallback to X.509, rather than staying within
-   the realm of BikeshedCertificate.
-
-   However, the client certificate type is negotiated differently:
-
-   *  The client sends client_certificate_type in ClientHello with
-      certificates it can send
-
-   *  The server selects a certificate type to request.  It sends it in
-      client_certificate_type in EncryptedExtensions.
-
-   *  The server requests a client certificate in CertificateRequest
-
-   *  The client sends a certificate of the server-selected type in
-      Certificate.
-
-   Here, the client (subscriber) does not select the certificate type.
-   The server (relying party) does.  Moreover, this selection is made
-   before the client can see the server's certificate_authorities or
-   trust_anchors value, in CertificateRequest.  There is no opportunity
-   for the client to fallback to X.509.
-
-   The cert_types extension behaves similarly, but additionally forces
-   the client and server types to match.  These extensions were defined
-   when TLS 1.2 was current, but TLS 1.3 aligns the client and server
-   certificate negotiation.  Most certificate negotiation extensions,
-   such as certificate_authorities or compress_certificate [RFC8879] can
-   be offered in either direction, in ClientHello or CertificateRequest.
-   They are then symmetrically accepted in the Certificate message.
-
-   A more corresponding TLS 1.3 negotiation would be to defer the client
-   certificate type negotiation to CertificateRequest, with the server
-   offering the supported certificate types.  The client can then make
-   its selection, taking other CertificateRequest extensions into
-   account, and indicate its selection in the Certificate message.
-
-   Two possible design sketches:
-
-10.4.1.  Indicate in First CertificateEntry
-
-   We can have the subscriber indicate the certificate type in an
-   extension of the first CertificateEntry.  One challenge is the
-   extensions come after the certificate, so the relying party must seek
-   to the extensions field independent of the certificate type.  Thus
-   all certificate types must be updated to use a consistent opaque
-   cert_data<0..2^24> syntax, with any type-specific structures embedded
-   inside.
-
-   RawPublicKey and X509 already meet this requirement.  OpenPGP and
-   Bikeshed need an extra length prefix.
-
-10.4.2.  Change Certificate Syntax
-
-   Alternatively, we can negotiate an extension that changes the syntax
-   to Certificate to:
-
-   struct {
-       CertificateType certificate_type;
-       opaque certificate_request_context<0..2^8-1>;
-       CertificateEntry certificate_list<0..2^24-1>;
-   } Certificate;
-
-   The negotiation can be:
-
-   *  Client sends its accepted certificate types in ClientHello.
-      Offering this new extension also signatures it is willing to
-      accept the new message format.  Unlike the existing extensions, an
-      X.509-only client still sends the extension with just X509 in the
-      list.
-
-   *  Server, if it implements the new syntax, acknowledges the syntax
-      change with an empty extension in EncryptedExtensions.  (It
-      doesn't indicate its selection yet.)
-
-   *  If both of the above happen, Certificate's syntax has changed.
-      Server indicates its selection with the certificate_type field
-
-   *  Server can also send this extension in CertificateRequest to offer
-      non-X.509 certificate types
-
-   *  Client likewise indicates its selection with the certificate_type
-      field.
-
-   This is a bit cleaner to parse, but the negotiation is more complex.
+   [[TODO: Certificate type negotiation doesn't work right for client
+   certificates.  See Appendix B]]
 
 11.  Deployment Considerations
 
@@ -1638,39 +1504,7 @@ Table of Contents
    certificate in parallel, which will restore the size optimization
    over time.
 
-11.4.  Agility and Extensibility
-
-   Beyond negotiating Merkle Tree certificates, certificate negotiation
-   can also handle variations in which CAs a relying party trusts.  With
-   a single certificate, the subscriber is limited to the intersection
-   of these sets.  Instead, Section 6.3 allows a subscriber to maintain
-   multiple certificates that, together, encompass the relying parties
-   it supports.
-
-   This improves trust agility.  If a relying party distrusts a CA, a
-   subscriber can include certificates from both the distrusted CA and a
-   replacement CA.  This allows the distrusting relying party to request
-   the replacement CA, while existing relying parties, which may not
-   trust the replacement CA, can continue to use the distrusted CA.
-   Likewise, an entity operating a CA may deploy a second CA to rotate
-   key material.  The certificate set can include both the new and old
-   CA to ensure a smooth transition.
-
-   Moreover, Section 6.3 allows subscribers to select certificates
-   without recognizing either the CA or the ProofType.  Only the
-   Assertion structure directly impacts the application protocol on the
-   subscriber's side.  This allows for a more flexible deployment model
-   where ACME servers, or other certificate management services,
-   assemble the certificate set:
-
-   Instead of each subscriber being individually configured with the CAs
-   to use, the ACME server can provide multiple certificates, covering
-   all supported relying parties.  As relying party requirements evolve,
-   CAs rotate keys, or new ProofTypes are designed, the ACME server is
-   updated to incorporate these into certificate sets.  As the PKI
-   evolves, subscribers are automatically provisioned appropriately.
-
-11.5.  Batch State Availability
+11.4.  Batch State Availability
 
    CAs and transparency services serve an HTTP interface defined in
    Section 8.  This service may be temporarily unavailable, either from
@@ -1693,38 +1527,20 @@ Table of Contents
    partially mitigate this, but service unavailability may prevent
    mirrors from replicating a batch that relying parties accept.
 
-11.6.  Trust Anchor List Size
-
-   Section 6.3 and Section 10.3 involve the relying party sending a list
-   of TrustAnchor values to aid the subscriber in selecting
-   certificates.  A sufficiently large list may be impractical to fit in
-   a ClientHello and require alternate negotiation mechanisms or a
-   different PKI structure.  To reduce overhead, issuer_id values SHOULD
-   be short, no more than eight bytes long.
-
 12.  Privacy Considerations
 
-   The negotiation mechanism described in Section 6.3 and Section 10.3
-   presumes the relying party's trust anchor list is not sensitive.  In
-   particular, information sent in a TLS ClientHello is unencrypted
-   without the Encrypted ClientHello extension
-   [I-D.draft-ietf-tls-esni].
+   The Privacy Considerations described in Section 9 of
+   [I-D.beck-tls-trust-anchor-ids] apply to its use with Merkle Tree
+   Certificates.
 
-   This mechanism SHOULD NOT be used in contexts where the list reveals
-   information about an individual user.  For example, a web browser may
-   support both a common set of trust anchors configured by the browser
-   vendor, and a set of user-specified trust anchors.  The common trust
-   anchors would only reveal which browser is used, while the user-
-   specified trust anchors may reveal information about the user.  In
-   this case, the trust anchor list SHOULD be limited to the common
-   trust anchors.
-
-   Additionally, even if all users are served the same updates,
-   individual users may fetch from the transparency service at different
-   times, resulting in variation in the trust anchor list.  Like other
-   behavior changes triggered by updates, this may, when combined with
-   other sources of user variation, lead to a fingerprinting attack
-   [RFC6973].
+   In particular, relying parties that share a transparency service will
+   fetch the same stream of updates.  However, updates may reach
+   different users at different times, resulting in some variation
+   across users.  This variation may contribute to a fingerprinting
+   attack [RFC6973].  If the Merkle Tree CA trust anchors are sent
+   unconditionally in trust_anchors, this variation will be passively
+   observable.  If they are sent conditionally, e.g. with the DNS-
+   mechanism, the trust anchor list will require active probing.
 
 13.  Security Considerations
 
@@ -1738,7 +1554,7 @@ Table of Contents
       authenticated as coming from the CA.
 
    *  For any tree head computed from a list of assertions as in
-      Section 5.4.1, it is computationally infeasible to construct an
+      Section 5.5.1, it is computationally infeasible to construct an
       assertion not this list, and some inclusion proof, such that the
       procedure in Section 6.2 succeeds.
 
@@ -1755,13 +1571,13 @@ Table of Contents
    cross-protocol attacks when the two uses overlap.  To avoid this,
    Section 5.1 forbids the reuse of Merkle Tree CA private keys in
    another protocol.  A CA MUST NOT generate signatures with its private
-   key, except as defined in Section 5.4.2, or an extension of this
+   key, except as defined in Section 5.5.2, or an extension of this
    protocol.  Any valid signature of a CA's public_key that does not
    meet these requirements indicates misuse of the private key by the
    CA.
 
    To reduce the risk of attacks if this guidance is not followed, the
-   LabeledValidityWindow structure defined in Section 5.4.2 includes a
+   LabeledValidityWindow structure defined in Section 5.5.2 includes a
    label string, and the CA's issuer_id.  Extensions of this protocol
    MAY be defined which reuse the keys, but any that do MUST use a
    different label string and analyze the security of the two uses
@@ -1907,12 +1723,11 @@ Table of Contents
 13.5.  Security of Fallback Mechanisms
 
    Merkle Tree certificates are intended to be used as an optimization
-   over other PKI mechanisms.  More generally, Section 6.3 and
-   Section 11.4 allow relying parties to support many kinds of
-   certificates, to meet different goals.  This document discusses the
-   security properties of Merkle Tree certificates, but the overall
-   system's security properties depend on all of a relying party's trust
-   anchors.
+   over other PKI mechanisms.  More generally, certificate negotiation
+   allows relying parties to support many kinds of certificates, to meet
+   different goals.  This document discusses the security properties of
+   Merkle Tree certificates, but the overall system's security
+   properties depend on all of a relying party's trust anchors.
 
    In particular, in relying parties that require a publicly auditable
    PKI, the supported fallback mechanisms must also provide a
@@ -1920,18 +1735,6 @@ Table of Contents
    or another mechanism.
 
 14.  IANA Considerations
-
-   IANA is requested to create the following entry in the TLS
-   ExtensionType registry [RFC8447].  The "Reference" column should be
-   set to this document.
-
-      +=======+================+=========+===========+=============+
-      | Value | Extension Name | TLS 1.3 | DTLS-Only | Recommended |
-      +=======+================+=========+===========+=============+
-      | TBD   | trust_anchors  | CH, CR  | N         | TBD         |
-      +-------+----------------+---------+-----------+-------------+
-
-           Table 1: Additions to the TLS ExtensionType Registry
 
    IANA is requested to create the following entry in the TLS
    Certificate Types registry [RFC8447].  The "Reference" column should
@@ -1943,7 +1746,7 @@ Table of Contents
                     | TBD   | Bikeshed | TBD         |
                     +-------+----------+-------------+
 
-                      Table 2: Additions to the TLS
+                      Table 1: Additions to the TLS
                         Certificate Types Registry
 
    [[ TODO: Define registries for the enums introduced in this document.
@@ -1953,11 +1756,23 @@ Table of Contents
 
    *  ClaimType
 
-   *  ProofType
-
 15.  References
 
 15.1.  Normative References
+
+   [I-D.beck-tls-trust-anchor-ids]
+              Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
+              Identifiers", Work in Progress, Internet-Draft, draft-
+              beck-tls-trust-anchor-ids-00, 28 June 2024,
+              <https://datatracker.ietf.org/doc/html/draft-beck-tls-
+              trust-anchor-ids-00>.
+
+   [I-D.draft-beck-tls-trust-anchor-ids]
+              Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
+              Identifiers", Work in Progress, Internet-Draft, draft-
+              beck-tls-trust-anchor-ids-00, 28 June 2024,
+              <https://datatracker.ietf.org/doc/html/draft-beck-tls-
+              trust-anchor-ids-00>.
 
    [I-D.draft-ietf-uta-rfc6125bis]
               Saint-Andre, P. and R. Salz, "Service Identity in TLS",
@@ -2112,13 +1927,6 @@ Table of Contents
               January 2020, <https://datatracker.ietf.org/doc/html/
               draft-ietf-tls-batch-signing-00>.
 
-   [I-D.draft-ietf-tls-esni]
-              Rescorla, E., Oku, K., Sullivan, N., and C. A. Wood, "TLS
-              Encrypted Client Hello", Work in Progress, Internet-Draft,
-              draft-ietf-tls-esni-18, 4 March 2024,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              esni-18>.
-
    [LetsEncrypt]
               Let's Encrypt, "Let's Encrypt Stats", 7 March 2023,
               <https://letsencrypt.org/stats/>.
@@ -2204,6 +2012,112 @@ A.1.  (Abridged)Assertions
  35cb2ab1 f2670029 0001000f 000d000b 6578616d 706c652e 636f6d00 02001200
  10c00002 25c0000c 00c63364 3ccb0071 00
 
+Appendix B.  TLS Certificate Type Negotiation Challenges
+
+   [[TODO: We may need a new TLS certificate types extension, either in
+   this document or a separate one.  For now, this section just
+   informally describes the problem. #18 ]]
+
+   The server certificate type is negotiated as follows:
+
+   *  The client sends server_certificate_type in ClientHello with
+      accepted certificate types.
+
+   *  The server selects a certificate type to use, It sends it in
+      server_certificate_type in EncryptedExtensions.
+
+   *  The server sends a certificate of the server-selected type in
+      Certificate.
+
+   This model allows the server to select its certificate type based on
+   not just server_certificate_type, but also other ClientHello
+   extensions like certificate_authorities or trust_anchors
+   ([I-D.beck-tls-trust-anchor-ids]).  In particular, if there is no
+   match in trust_anchors, it can fallback to X.509, rather than staying
+   within the realm of BikeshedCertificate.
+
+   However, the client certificate type is negotiated differently:
+
+   *  The client sends client_certificate_type in ClientHello with
+      certificates it can send
+
+   *  The server selects a certificate type to request.  It sends it in
+      client_certificate_type in EncryptedExtensions.
+
+   *  The server requests a client certificate in CertificateRequest
+
+   *  The client sends a certificate of the server-selected type in
+      Certificate.
+
+   Here, the client (subscriber) does not select the certificate type.
+   The server (relying party) does.  Moreover, this selection is made
+   before the client can see the server's certificate_authorities or
+   trust_anchors value, in CertificateRequest.  There is no opportunity
+   for the client to fallback to X.509.
+
+   The cert_types extension behaves similarly, but additionally forces
+   the client and server types to match.  These extensions were defined
+   when TLS 1.2 was current, but TLS 1.3 aligns the client and server
+   certificate negotiation.  Most certificate negotiation extensions,
+   such as certificate_authorities or compress_certificate [RFC8879] can
+   be offered in either direction, in ClientHello or CertificateRequest.
+   They are then symmetrically accepted in the Certificate message.
+
+   A more corresponding TLS 1.3 negotiation would be to defer the client
+   certificate type negotiation to CertificateRequest, with the server
+   offering the supported certificate types.  The client can then make
+   its selection, taking other CertificateRequest extensions into
+   account, and indicate its selection in the Certificate message.
+
+   Two possible design sketches:
+
+B.1.  Indicate in First CertificateEntry
+
+   We can have the subscriber indicate the certificate type in an
+   extension of the first CertificateEntry.  One challenge is the
+   extensions come after the certificate, so the relying party must seek
+   to the extensions field independent of the certificate type.  Thus
+   all certificate types must be updated to use a consistent opaque
+   cert_data<0..2^24> syntax, with any type-specific structures embedded
+   inside.
+
+   RawPublicKey and X509 already meet this requirement.  OpenPGP and
+   Bikeshed need an extra length prefix.
+
+B.1.1.  Change Certificate Syntax
+
+   Alternatively, we can negotiate an extension that changes the syntax
+   to Certificate to:
+
+   struct {
+       CertificateType certificate_type;
+       opaque certificate_request_context<0..2^8-1>;
+       CertificateEntry certificate_list<0..2^24-1>;
+   } Certificate;
+
+   The negotiation can be:
+
+   *  Client sends its accepted certificate types in ClientHello.
+      Offering this new extension also signatures it is willing to
+      accept the new message format.  Unlike the existing extensions, an
+      X.509-only client still sends the extension with just X509 in the
+      list.
+
+   *  Server, if it implements the new syntax, acknowledges the syntax
+      change with an empty extension in EncryptedExtensions.  (It
+      doesn't indicate its selection yet.)
+
+   *  If both of the above happen, Certificate's syntax has changed.
+      Server indicates its selection with the certificate_type field
+
+   *  Server can also send this extension in CertificateRequest to offer
+      non-X.509 certificate types
+
+   *  Client likewise indicates its selection with the certificate_type
+      field.
+
+   This is a bit cleaner to parse, but the negotiation is more complex.
+
 Acknowledgements
 
    This document stands on the shoulders of giants and builds upon
@@ -2246,6 +2160,9 @@ Since draft-davidben-tls-merkle-tree-certs-00
    *  Clarify we use POSIX time. #1
 
    *  Miscellaneous changes.
+
+   *  Replace the negotiation mechanism with TLS Trust Anchor
+      Identifiers.
 
 Authors' Addresses
 
