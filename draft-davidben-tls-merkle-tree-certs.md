@@ -639,6 +639,9 @@ A CA MUST NOT generate signatures over inputs that are parseable as LabeledValid
 For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
 ~~~
+/* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
+opaque TrustAnchorIdentifier<1..2^8-1>;
+
 struct {
     TrustAnchorIdentifier trust_anchor;
     opaque proof_data<0..2^16-1>;
