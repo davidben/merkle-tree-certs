@@ -11,10 +11,10 @@
 <meta content="
        This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
     " name="description">
-<meta content="xml2rfc 3.22.0" name="generator">
+<meta content="xml2rfc 3.23.0" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.22.0
+  xml2rfc 3.23.0
     Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
@@ -25,7 +25,7 @@
     pycountry 22.3.5
     PyYAML 6.0.1
     requests 2.32.3
-    setuptools 69.5.1
+    setuptools 70.3.0
     wcwidth 0.2.13
 -->
 <link href="draft-davidben-tls-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
@@ -1025,11 +1025,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates for TLS</td>
-<td class="right">August 2024</td>
+<td class="right">September 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 12 February 2025</td>
+<td class="center">Expires 16 March 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1042,12 +1042,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-08-11" class="published">11 August 2024</time>
+<time datetime="2024-09-12" class="published">12 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-02-12">12 February 2025</time></dd>
+<dd class="expires"><time datetime="2025-03-16">16 March 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1105,7 +1105,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 February 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1693,7 +1693,7 @@ struct {
 <dt id="section-5.1-2.3">
 <code>issuer_id</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.4">
-            <p id="section-5.1-2.4.1">A trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) that identifies the CA. See <a href="#identifying" class="auto internal xref">Section 5.2</a> for details.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.4.1">A trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) that identifies the CA. See <a href="#identifying" class="auto internal xref">Section 5.2</a> for details.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-2.5">
@@ -1740,7 +1740,7 @@ struct {
         <h3 id="name-identifying-cas-and-batches">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-identifying-cas-and-batches" class="section-name selfRef">Identifying CAs and Batches</a>
         </h3>
-<p id="section-5.2-1">A Merkle Tree CA's <code>issuer_id</code> is a trust anchor identifier, defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">A Merkle Tree CA's <code>issuer_id</code> is a trust anchor identifier, defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's <code>issuer_id</code>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">For example, a Merkle Tree CA may have an <code>issuer_id</code> of <code>32473.1</code>, in the ASCII representation. The batch with batch number 42 would then have a trust anchor identifier of <code>32473.1.42</code>.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
@@ -1988,7 +1988,7 @@ struct {
 } BikeshedCertificate;
 </pre><a href="#section-5.5.3-4" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5.3-5">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is the containing batch's trust anchor identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-5">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is the containing batch's trust anchor identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.5.3-5" class="pilcrow">¶</a></p>
 <p id="section-5.5.3-6">The <code>proof_data</code> is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the <code>proof_data</code> contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.<a href="#section-5.5.3-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.5.3-7">
 <pre>
@@ -2319,7 +2319,7 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">[[TODO: This section hasn't been written yet. Instead, what follows is an informal discussion. #13 ]]<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2"><span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-6" class="relref">Section 6</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> defines the bulk of what's needed. The missing parts are:<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-2"><span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-6" class="relref">Section 6</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> defines the bulk of what's needed. The missing parts are:<a href="#section-9-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-9-3.1">
           <p id="section-9-3.1.1">Some way to specify that the client supports BikeshedCertificate. At minimum a separate MIME type, but it likely needs to be known at order creation.<a href="#section-9-3.1.1" class="pilcrow">¶</a></p>
@@ -2434,11 +2434,11 @@ struct {
         </h3>
 <p id="section-10.3-1">Merkle Tree certificates will only be accepted in up-to-date relying parties, and require a negotiation mechanism to use. Merkle Tree certificate implementations SHOULD use the <code>trust_anchors</code> extension <span>[<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> as described below:<a href="#section-10.3-1" class="pilcrow">¶</a></p>
 <p id="section-10.3-2">For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in <a href="#relying-parties" class="auto internal xref">Section 6.1</a>. The trust anchor's identifier is the batch identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>. Future mechanisms using the BikeshedCertificate format (see <a href="#proofs" class="auto internal xref">Section 5.5.3</a>) MUST similarly define how relying parties determine trust anchor identifiers.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
-<p id="section-10.3-3">As even a single validity window results in <code>validity_window_size</code> trust anchors, sending all trust anchors in the <code>trust_anchors</code> extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> and the DNS hint described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-5" class="relref">Section 5</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
+<p id="section-10.3-3">As even a single validity window results in <code>validity_window_size</code> trust anchors, sending all trust anchors in the <code>trust_anchors</code> extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> and the DNS hint described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-5" class="relref">Section 5</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
 <p id="section-10.3-4">[[TODO: We could reduce the reliance on DNS by adding https://github.com/davidben/tls-trust-expressions/issues/62, either in this draft or the main trust anchor IDs draft.]]<a href="#section-10.3-4" class="pilcrow">¶</a></p>
-<p id="section-10.3-5">The subscriber's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the subscriber's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
+<p id="section-10.3-5">The subscriber's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the subscriber's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
 <p id="section-10.3-6">For each of the subscriber's BikeshedCertificate credentials, the corresponding trust anchor identifier is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_identifier</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
-<p id="section-10.3-7">The subscriber then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
+<p id="section-10.3-7">The subscriber then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <p id="section-10.3-8">[[TODO: Certificate type negotiation doesn't work right for client certificates. See <a href="#cert-type-problems" class="auto internal xref">Appendix B</a>]]<a href="#section-10.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2495,7 +2495,7 @@ struct {
       <h2 id="name-privacy-considerations">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-12-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00#section-9" class="relref">Section 9</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-9" class="relref">Section 9</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-12-1" class="pilcrow">¶</a></p>
 <p id="section-12-2">In particular, relying parties that share a transparency service will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS-mechanism, the trust anchor list will require active probing.<a href="#section-12-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2653,11 +2653,11 @@ struct {
 <dl class="references">
 <dt id="I-D.beck-tls-trust-anchor-ids">[I-D.beck-tls-trust-anchor-ids]</dt>
         <dd>
-<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, and <span class="refAuthor">D. O'Brien</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-beck-tls-trust-anchor-ids-00</span>, <time datetime="2024-06-28" class="refDate">28 June 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00">https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, and <span class="refAuthor">D. O'Brien</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-beck-tls-trust-anchor-ids-01</span>, <time datetime="2024-09-05" class="refDate">5 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01">https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-beck-tls-trust-anchor-ids">[I-D.draft-beck-tls-trust-anchor-ids]</dt>
         <dd>
-<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, and <span class="refAuthor">D. O'Brien</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-beck-tls-trust-anchor-ids-00</span>, <time datetime="2024-06-28" class="refDate">28 June 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00">https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, and <span class="refAuthor">D. O'Brien</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-beck-tls-trust-anchor-ids-01</span>, <time datetime="2024-09-05" class="refDate">5 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01">https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-uta-rfc6125bis">[I-D.draft-ietf-uta-rfc6125bis]</dt>
         <dd>
@@ -2725,7 +2725,7 @@ struct {
 <dd class="break"></dd>
 <dt id="SHS">[SHS]</dt>
         <dd>
-<span class="refAuthor">Dang, Q.</span>, <span class="refTitle">"Secure Hash Standard"</span>, <span class="refContent">National Institute of Standards and Technology</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.180-4</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.180-4">https://doi.org/10.6028/nist.fips.180-4</a>&gt;</span>. </dd>
+<span class="refTitle">"Secure hash standard"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.180-4</span>, <time datetime="2015" class="refDate">2015</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.180-4">https://doi.org/10.6028/nist.fips.180-4</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="X.690">[X.690]</dt>
       <dd>
@@ -2778,7 +2778,7 @@ struct {
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-acme-ari">[I-D.draft-ietf-acme-ari]</dt>
         <dd>
-<span class="refAuthor">Gable, A.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-acme-ari-04</span>, <time datetime="2024-05-31" class="refDate">31 May 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-04">https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Gable, A.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-acme-ari-05</span>, <time datetime="2024-08-23" class="refDate">23 August 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-05">https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-ietf-tls-batch-signing">[I-D.draft-ietf-tls-batch-signing]</dt>
         <dd>
@@ -2841,14 +2841,14 @@ a TLS subject with Ed25519 public key
 <div class="alignLeft art-text artwork" id="appendix-A.1-2">
 <pre>
 00000024 08070020 c5d2080f a9a489a2 26b58166 dad00be8 120931a7 69c9c6f1
-f8eefafc 38af9065 00130000 000f000d 000b6578 616d706c 652e636f 6d
+f8eefafc 38af9065 00120000 000e000c 0b657861 6d706c65 2e636f6d
 </pre><a href="#appendix-A.1-2" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.1-3">The corresponding AbridgedAssertion:<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-A.1-4">
 <pre>
 00000022 0807d8e2 c44fc82e 175e5698 b1c25324 6c9a996f c37bad29 fd59b6aa
-838b0a93 0b000013 0000000f 000d000b 6578616d 706c652e 636f6d
+838b0a93 0b000012 0000000e 000c0b65 78616d70 6c652e63 6f6d
 </pre><a href="#appendix-A.1-4" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.1-5">Next, we have an Assertion claiming <code>*.example.com</code>, <code>192.0.2.37</code>,
@@ -2865,17 +2865,16 @@ c7bd8f65 075b25b8 96a89ab8 2a2b2194 49b029b8 97e130dc dc96fce1 37351f2b
 7a28f1d0 7b710afb 2c796211 d9ba1feb 43d30810 63f19afd b7ba2ab0 e19fd008
 e719491d d10ed235 5d4790f0 3039e3a3 31aa2644 2d656716 ebe710f2 4260599a
 2d082db1 eccfaa8f f51cfb8e 3dfca0eb e1af59c2 f007b35e 02b0582f 50090018
-b78a6b06 c0188ab3 514d60d6 6243e017 8b020301 00010029 0001000f 000d000b
-6578616d 706c652e 636f6d00 02001200 10c00002 25c0000c 00c63364 3ccb0071
-00
+b78a6b06 c0188ab3 514d60d6 6243e017 8b020301 00010028 0001000e 000c0b65
+78616d70 6c652e63 6f6d0002 00120010 c0000225 c0000c00 c633643c cb007100
 </pre><a href="#appendix-A.1-6" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.1-7">The corresponding AbridgedAssertion:<a href="#appendix-A.1-7" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-A.1-8">
 <pre>
 00000022 08049a04 087a4d52 033a0a20 04333359 ccf29703 25684c5f a96f1ca1
-35cb2ab1 f2670029 0001000f 000d000b 6578616d 706c652e 636f6d00 02001200
-10c00002 25c0000c 00c63364 3ccb0071 00
+35cb2ab1 f2670028 0001000e 000c0b65 78616d70 6c652e63 6f6d0002 00120010
+c0000225 c0000c00 c633643c cb007100
 </pre><a href="#appendix-A.1-8" class="pilcrow">¶</a>
 </div>
 </section>
