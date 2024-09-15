@@ -430,7 +430,7 @@ A Merkle Tree certification authority is defined by the following values:
 `hash`:
 : A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}, but others may be defined.
 
-`trust_anchor`:
+`issuer_id`:
 : A trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
 
 `public_key`:
@@ -462,14 +462,15 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 ## Identifying CAs and Batches {#identifying}
 
-A Merkle Tree CA's `trust_anchor` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}.
-This trust anchor points to the issuing CA. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is
-associated with the CA. OIDs under this arc are used to identify batches below.
+A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. 
+However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. 
+OIDs under this arc are used to identify batches below.
 
-An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's `trust_anchor`.
+An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's `issuer_id`.
+In the following it is called `batch_id`.
 
-For example, a Merkle Tree CA may have an `trust_anchor` of `32473.1`, in the ASCII representation.
-The batch with batch number 42 would then have a trust anchor identifier of `32473.1.42`.
+For example, a Merkle Tree CA may have an `issuer_id` of `32473.1`, in the ASCII representation.
+The batch with batch number 42 would then have a `batch_id` of `32473.1.42`.
 
 ## Batch State {#batches}
 
@@ -531,14 +532,14 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
 ~~~
 struct {
     uint8 distinguisher = 0;
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
 } HashEmptyInput;
 
 struct {
     uint8 distinguisher = 1;
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
     opaque left[hash.length];
@@ -553,13 +554,13 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     AbridgedAssertion abridged_assertion;
 } HashAssertionInput;
 ~~~
 
-The `trust_anchor` is set to the batch specific trust anchor identifier, i.e., the conncatelation of the CA's `trust_anchor` with the batch_number.
+The `batch_id` is set to the batch-specific trust anchor identifier, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
 `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`.
 The remaining fields, such as `index`, are set to inputs of the function.
 
@@ -621,12 +622,12 @@ After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindo
 ~~~
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorIdentifier issuer_id;
     ValidityWindow window;
 } LabeledValidityWindow;
 ~~~
 
-The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `trust_anchor` field is the CA's `trust_anchor`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
+The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `issuer_id` field is the CA's `issuer_id`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
 
 The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to `batch_number`. A CA which generates such a signature is considered to have certified every assertion contained in every value in the `tree_heads` list, with expiry determined by `batch_number`, the position of the tree head in the list, and the CA's input parameters as described in {{parameters}}.
 
@@ -655,7 +656,9 @@ struct {
 } BikeshedCertificate;
 ~~~
 
-A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the `trust_anchor` is the containing batch's trust anchor identifier, as described in {{identifying}}.
+A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
+It is analogous to an X.509 trust anchor's subject name.
+When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's batch_id, as described in {{identifying}}.
 
 The `proof_data` is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
 
@@ -1043,7 +1046,7 @@ The second property is achieved by using a collision-resistant hash in the Merkl
 
 Using the same key material in different, incompatible ways risks cross-protocol attacks when the two uses overlap. To avoid this, {{parameters}} forbids the reuse of Merkle Tree CA private keys in another protocol.  A CA MUST NOT generate signatures with its private key, except as defined in {{signing}}, or an extension of this protocol. Any valid signature of a CA's `public_key` that does not meet these requirements indicates misuse of the private key by the CA.
 
-To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `trust_anchor`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
+To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
 Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
 
