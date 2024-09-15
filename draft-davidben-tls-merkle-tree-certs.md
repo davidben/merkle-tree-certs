@@ -462,9 +462,7 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 ## Identifying CAs and Batches {#identifying}
 
-A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. 
-However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. 
-OIDs under this arc are used to identify batches below.
+A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
 
 An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's `issuer_id`.
 In the following it is called `batch_id`.
@@ -658,7 +656,7 @@ struct {
 
 A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
 It is analogous to an X.509 trust anchor's subject name.
-When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's batch_id, as described in {{identifying}}.
+When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.
 
 The `proof_data` is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
 
@@ -1048,7 +1046,7 @@ Using the same key material in different, incompatible ways risks cross-protocol
 
 To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
-Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
+Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
 
 The TLSSubjectInfo structure additionally protects against cross-protocol attacks in two further ways:
 
