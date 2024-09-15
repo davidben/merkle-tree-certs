@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-12T01:42:52.304869+00:00",
+  "timestamp": "2024-09-15T01:53:03.742379+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4383,6 +4383,56 @@
               "updatedAt": "2024-08-11T23:42:50Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 90,
+      "id": "PR_kwDOJIBkVc57TvNp",
+      "title": "Corrects test vectors based on a wrong length encoding of the DNS name",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/90",
+      "state": "MERGED",
+      "author": "pohlm01",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See bwesterb/mtc#2 and bwesterb/mtc#4",
+      "createdAt": "2024-09-12T13:53:44Z",
+      "updatedAt": "2024-09-13T07:47:34Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a891b0369725f7bce42dc9e5e4cdb34c51bb2d9a",
+      "headRepository": "pohlm01/merkle-tree-certs",
+      "headRefName": "fix-test-vectors",
+      "headRefOid": "d6d1a3b46c0bb56be0c167ea20feb4f26f3623ef",
+      "closedAt": "2024-09-12T15:30:17Z",
+      "mergedAt": "2024-09-12T15:30:17Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "32322fe424030f83bf4c69dad3a56347637989b0"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Thanks!",
+          "createdAt": "2024-09-12T15:30:23Z",
+          "updatedAt": "2024-09-12T15:30:23Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6JIfwq",
+          "commit": {
+            "abbreviatedOid": "d6d1a3b"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-09-12T15:30:00Z",
+          "updatedAt": "2024-09-12T15:30:00Z",
+          "comments": []
         }
       ]
     }
