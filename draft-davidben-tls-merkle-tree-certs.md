@@ -528,7 +528,7 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
 ~~~
 struct {
     uint8 distinguisher = 0;
-    opaque issuer_id<1..32>;
+    TrustAnchorIdentifier trust_anchor;
     uint32 batch_number;
     uint64 index;
     uint8 level;
@@ -536,7 +536,7 @@ struct {
 
 struct {
     uint8 distinguisher = 1;
-    opaque issuer_id<1..32>;
+    TrustAnchorIdentifier trust_anchor;
     uint32 batch_number;
     uint64 index;
     uint8 level;
@@ -552,7 +552,7 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    opaque issuer_id<1..32>;
+    TrustAnchorIdentifier trust_anchor;
     uint32 batch_number;
     uint64 index;
     AbridgedAssertion abridged_assertion;
@@ -619,7 +619,7 @@ After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindo
 ~~~
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    opaque issuer_id<1..32>;
+    TrustAnchorIdentifier trust_anchor;
     ValidityWindow window;
 } LabeledValidityWindow;
 ~~~
