@@ -464,8 +464,7 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
 
-An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's `issuer_id`.
-In the following it is called `batch_id`.
+An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.
 
 For example, a Merkle Tree CA may have an `issuer_id` of `32473.1`, in the ASCII representation.
 The batch with batch number 42 would then have a `batch_id` of `32473.1.42`.
