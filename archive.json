@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-15T01:53:03.742379+00:00",
+  "timestamp": "2024-09-17T01:20:57.418448+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4433,6 +4433,119 @@
           "createdAt": "2024-09-12T15:30:00Z",
           "updatedAt": "2024-09-12T15:30:00Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 91,
+      "id": "PR_kwDOJIBkVc57irGj",
+      "title": "Consistently use TAI instead of issuer_id",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/91",
+      "state": "OPEN",
+      "author": "pohlm01",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I suggest replacing current `opaque issuer_id<1..32>;` fields with the new `TrustAnchorIdentifier trust_anchor;`. Alternatively, we would need to adopt the maximal number of bytes to  `opaque issuer_id<1..255>;`.",
+      "createdAt": "2024-09-15T12:28:48Z",
+      "updatedAt": "2024-09-15T15:43:20Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "32322fe424030f83bf4c69dad3a56347637989b0",
+      "headRepository": "pohlm01/merkle-tree-certs",
+      "headRefName": "main",
+      "headRefOid": "62171106b266954ab5abe30e8ea1b9448d144365",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6JaQCB",
+          "commit": {
+            "abbreviatedOid": "89ce6fd"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-15T13:18:39Z",
+          "updatedAt": "2024-09-15T13:18:39Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Oops, nice catch! Thanks! This was just a mistake in rebasing over TAI.\r\n\r\nLooks like the text down in line 562 needs to be updated since they refer to the structures. Same with line 627. It's a bit awkward because {{parameters}} and {{identifying}} still call it an `issuer_id`, but then the structures all say `trust_anchor`. Probably that should be renamed to be consistent across the board.\r\n\r\n(Do you mind fixing that in this PR? If not, I can merge this and then finish it up.)",
+              "createdAt": "2024-09-15T13:18:39Z",
+              "updatedAt": "2024-09-15T13:18:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6JaQ28",
+          "commit": {
+            "abbreviatedOid": "89ce6fd"
+          },
+          "author": "pohlm01",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-15T13:37:10Z",
+          "updatedAt": "2024-09-15T13:37:10Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "While applying the changes you proposed, I noticed that we might also remove the batch number from the `Hash...` structs altogether, and require the trust anchor to identify the specific batch. See [0e5eeca](https://github.com/davidben/merkle-tree-certs/pull/91/commits/0e5eecad5dc6d2cdbfa24b1ef7f47c60c01a2187). Let me know if you like the suggestion.\r\n\r\nIndependent of that, I'm a bit worried that it became easy to confuse when to use the CA specific TAI and when a batch specific TAI is required, i.e., if the batch number is included in the TAI. Maybe it is worth making this a bit clearer in a later change. I'm not sure if it is actually required, though, and how to do this discrimination elegantly.",
+              "createdAt": "2024-09-15T13:37:10Z",
+              "updatedAt": "2024-09-15T13:37:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6JaTdB",
+          "commit": {
+            "abbreviatedOid": "0e5eeca"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-15T14:38:13Z",
+          "updatedAt": "2024-09-15T14:42:40Z",
+          "comments": [
+            {
+              "originalPosition": 59,
+              "body": "```suggestion\r\nThe `trust_anchor` is set to the batch-specific trust anchor identifier, i.e. with the batch number appended as described in {{identifying}}.\r\n```\r\n\r\n(Just to use the same wording.)",
+              "createdAt": "2024-09-15T14:38:14Z",
+              "updatedAt": "2024-09-15T14:42:40Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "> Independent of that, I'm a bit worried that it became easy to confuse when to use the CA specific TAI and when a batch specific TAI is required, i.e., if the batch number is included in the TAI. Maybe it is worth making this a bit clearer in a later change. I'm not sure if it is actually required, though, and how to do this discrimination elegantly.\r\n\r\nHmm, that is a good point. One thought: what if we continue to call the CA-specific ID the `issuer_id` or perhaps the `ca_id` and then the batch-specific ID is called the `batch_id`? Since `BikeshedCertificate` is meant to be extensible, that probably needs to say `trust_anchor` with prose saying something like:\r\n\r\n> A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.\r\n\r\nAnd then all the MTC-specific structures can say `issuer_id` or `batch_id` depending on which it's meant to be. WDYT?",
+              "createdAt": "2024-09-15T14:42:31Z",
+              "updatedAt": "2024-09-15T14:42:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6JaYib",
+          "commit": {
+            "abbreviatedOid": "89ce6fd"
+          },
+          "author": "pohlm01",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-15T15:43:20Z",
+          "updatedAt": "2024-09-15T15:43:20Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Sounds reasonable to me. I updated the PR to include `issuer_id` and `batch_id` where appropriate. I hope it is consistent.",
+              "createdAt": "2024-09-15T15:43:20Z",
+              "updatedAt": "2024-09-15T15:43:21Z"
+            }
+          ]
         }
       ]
     }
