@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 16 March 2025                                  B. E. Westerbaan
+Expires: 21 March 2025                                  B. E. Westerbaan
                                                               Cloudflare
-                                                       12 September 2024
+                                                       17 September 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 March 2025.
+   This Internet-Draft will expire on 21 March 2025.
 
 Copyright Notice
 
@@ -564,12 +564,13 @@ Table of Contents
    with the CA.  OIDs under this arc are used to identify batches below.
 
    An individual batch from a Merkle Tree CA also has an associated
-   trust anchor identifier.  It is determined by appending the batch
-   number to the CA's issuer_id.
+   trust anchor identifier, called a batch_id.  It is determined by
+   appending the batch number, as an OID component, to the CA's
+   issuer_id.
 
    For example, a Merkle Tree CA may have an issuer_id of 32473.1, in
    the ASCII representation.  The batch with batch number 42 would then
-   have a trust anchor identifier of 32473.1.42.
+   have a batch_id of 32473.1.42.
 
 5.3.  Batch State
 
@@ -652,16 +653,14 @@ Table of Contents
 
    struct {
        uint8 distinguisher = 0;
-       opaque issuer_id<1..32>;
-       uint32 batch_number;
+       TrustAnchorIdentifier batch_id;
        uint64 index;
        uint8 level;
    } HashEmptyInput;
 
    struct {
        uint8 distinguisher = 1;
-       opaque issuer_id<1..32>;
-       uint32 batch_number;
+       TrustAnchorIdentifier batch_id;
        uint64 index;
        uint8 level;
        opaque left[hash.length];
@@ -676,19 +675,19 @@ Table of Contents
 
    struct {
        uint8 distinguisher = 2;
-       opaque issuer_id<1..32>;
-       uint32 batch_number;
+       TrustAnchorIdentifier batch_id;
        uint64 index;
        AbridgedAssertion abridged_assertion;
    } HashAssertionInput;
 
-   issuer_id and batch_number are set to the CA's issuer_id and the
-   current batch number.
-   HashAssertionInput.abridged_assertion.subject_info_hash is set to
-   hash(assertion.subject_info) from the function input assertion, and
-   the remaining fields of HashAssertionInput.abridged_assertion are
-   taken unmodified from assertion.  The remaining fields, such as
-   index, are set to inputs of the function.
+   The batch_id is set to the batch-specific trust anchor identifier,
+   i.e. the issuer_id with the batch number appended as described in
+   Section 5.2.  HashAssertionInput.abridged_assertion.subject_info_hash
+   is set to hash(assertion.subject_info) from the function input
+   assertion, and the remaining fields of
+   HashAssertionInput.abridged_assertion are taken unmodified from
+   assertion.  The remaining fields, such as index, are set to inputs of
+   the function.
 
    Tree levels are computed iteratively as follows:
 
@@ -768,7 +767,7 @@ Table of Contents
 
    struct {
        uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-       opaque issuer_id<1..32>;
+       TrustAnchorIdentifier issuer_id;
        ValidityWindow window;
    } LabeledValidityWindow;
 
@@ -824,9 +823,8 @@ Table of Contents
    Section 3 of [I-D.beck-tls-trust-anchor-ids] and Section 4.1 of
    [I-D.beck-tls-trust-anchor-ids]), which determines the proof's type
    and issuer.  It is analogous to an X.509 trust anchor's subject name.
-   When the issuer is a Merkle Tree CA, the trust_anchor is the
-   containing batch's trust anchor identifier, as described in
-   Section 5.2.
+   When the issuer is a Merkle Tree CA, the trust_anchor is a batch's
+   batch_id, as described in Section 5.2.
 
    The proof_data is a byte string, opaque to the subscriber, in some
    format agreed upon by the proof issuer and relying party.  If the

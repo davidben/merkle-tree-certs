@@ -1029,7 +1029,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 16 March 2025</td>
+<td class="center">Expires 21 March 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1042,12 +1042,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-09-12" class="published">12 September 2024</time>
+<time datetime="2024-09-17" class="published">17 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-03-16">16 March 2025</time></dd>
+<dd class="expires"><time datetime="2025-03-21">21 March 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1105,7 +1105,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 16 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1741,8 +1741,9 @@ struct {
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-identifying-cas-and-batches" class="section-name selfRef">Identifying CAs and Batches</a>
         </h3>
 <p id="section-5.2-1">A Merkle Tree CA's <code>issuer_id</code> is a trust anchor identifier, defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's <code>issuer_id</code>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">For example, a Merkle Tree CA may have an <code>issuer_id</code> of <code>32473.1</code>, in the ASCII representation. The batch with batch number 42 would then have a trust anchor identifier of <code>32473.1.42</code>.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a <code>batch_id</code>. It is determined by appending the batch number, as an OID component, to the CA's <code>issuer_id</code>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">For example, a Merkle Tree CA may have an <code>issuer_id</code> of <code>32473.1</code>, in the ASCII representation.
+The batch with batch number 42 would then have a <code>batch_id</code> of <code>32473.1.42</code>.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="batches">
@@ -1830,16 +1831,14 @@ struct {
 <pre>
 struct {
     uint8 distinguisher = 0;
-    opaque issuer_id&lt;1..32&gt;;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
 } HashEmptyInput;
 
 struct {
     uint8 distinguisher = 1;
-    opaque issuer_id&lt;1..32&gt;;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
     opaque left[hash.length];
@@ -1854,14 +1853,15 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    opaque issuer_id&lt;1..32&gt;;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     AbridgedAssertion abridged_assertion;
 } HashAssertionInput;
 </pre><a href="#section-5.5.1-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5.1-6"><code>issuer_id</code> and <code>batch_number</code> are set to the CA's <code>issuer_id</code> and the current batch number. <code>HashAssertionInput.abridged_assertion.subject_info_hash</code> is set to <code>hash(assertion.subject_info)</code> from the function input <code>assertion</code>, and the remaining fields of <code>HashAssertionInput.abridged_assertion</code> are taken unmodified from <code>assertion</code>. The remaining fields, such as <code>index</code>, are set to inputs of the function.<a href="#section-5.5.1-6" class="pilcrow">¶</a></p>
+<p id="section-5.5.1-6">The <code>batch_id</code> is set to the batch-specific trust anchor identifier, i.e. the <code>issuer_id</code> with the batch number appended as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.
+<code>HashAssertionInput.abridged_assertion.subject_info_hash</code> is set to <code>hash(assertion.subject_info)</code> from the function input <code>assertion</code>, and the remaining fields of <code>HashAssertionInput.abridged_assertion</code> are taken unmodified from <code>assertion</code>.
+The remaining fields, such as <code>index</code>, are set to inputs of the function.<a href="#section-5.5.1-6" class="pilcrow">¶</a></p>
 <p id="section-5.5.1-7">Tree levels are computed iteratively as follows:<a href="#section-5.5.1-7" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-5.5.1-8">
 <li id="section-5.5.1-8.1">
@@ -1954,7 +1954,7 @@ struct {
 <pre>
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    opaque issuer_id&lt;1..32&gt;;
+    TrustAnchorIdentifier issuer_id;
     ValidityWindow window;
 } LabeledValidityWindow;
 </pre><a href="#section-5.5.2-7" class="pilcrow">¶</a>
@@ -1988,7 +1988,9 @@ struct {
 } BikeshedCertificate;
 </pre><a href="#section-5.5.3-4" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5.3-5">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is the containing batch's trust anchor identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-5">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer.
+It is analogous to an X.509 trust anchor's subject name.
+When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is a batch's <code>batch_id</code>, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.5.3-5" class="pilcrow">¶</a></p>
 <p id="section-5.5.3-6">The <code>proof_data</code> is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the <code>proof_data</code> contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.<a href="#section-5.5.3-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.5.3-7">
 <pre>
