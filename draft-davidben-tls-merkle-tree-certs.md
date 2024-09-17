@@ -464,9 +464,10 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
 
-An individual batch from a Merkle Tree CA also has an associated trust anchor identifier. It is determined by appending the batch number to the CA's `issuer_id`.
+An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.
 
-For example, a Merkle Tree CA may have an `issuer_id` of `32473.1`, in the ASCII representation. The batch with batch number 42 would then have a trust anchor identifier of `32473.1.42`.
+For example, a Merkle Tree CA may have an `issuer_id` of `32473.1`, in the ASCII representation.
+The batch with batch number 42 would then have a `batch_id` of `32473.1.42`.
 
 ## Batch State {#batches}
 
@@ -528,16 +529,14 @@ Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tr
 ~~~
 struct {
     uint8 distinguisher = 0;
-    opaque issuer_id<1..32>;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
 } HashEmptyInput;
 
 struct {
     uint8 distinguisher = 1;
-    opaque issuer_id<1..32>;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
     opaque left[hash.length];
@@ -552,14 +551,15 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    opaque issuer_id<1..32>;
-    uint32 batch_number;
+    TrustAnchorIdentifier batch_id;
     uint64 index;
     AbridgedAssertion abridged_assertion;
 } HashAssertionInput;
 ~~~
 
-`issuer_id` and `batch_number` are set to the CA's `issuer_id` and the current batch number. `HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`. The remaining fields, such as `index`, are set to inputs of the function.
+The `batch_id` is set to the batch-specific trust anchor identifier, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
+`HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`.
+The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
@@ -619,7 +619,7 @@ After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindo
 ~~~
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    opaque issuer_id<1..32>;
+    TrustAnchorIdentifier issuer_id;
     ValidityWindow window;
 } LabeledValidityWindow;
 ~~~
@@ -653,7 +653,9 @@ struct {
 } BikeshedCertificate;
 ~~~
 
-A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer. It is analogous to an X.509 trust anchor's subject name. When the issuer is a Merkle Tree CA, the `trust_anchor` is the containing batch's trust anchor identifier, as described in {{identifying}}.
+A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
+It is analogous to an X.509 trust anchor's subject name.
+When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.
 
 The `proof_data` is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
 
@@ -1043,7 +1045,7 @@ Using the same key material in different, incompatible ways risks cross-protocol
 
 To reduce the risk of attacks if this guidance is not followed, the LabeledValidityWindow structure defined in {{signing}} includes a label string, and the CA's `issuer_id`. Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.
 
-Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
+Likewise, key material included in an assertion ({{assertions}}) MUST NOT be used in another protocol, unless that protocol was designed to be used concurrently with the original purpose. The Assertion structure is designed to facilitate this. Where X.509 uses an optional key usage extension (see {{Section 4.2.1.3 of RFC5280}}) and extended key usage extension (see {{Section 4.2.1.12 of RFC5280}}) to specify key usage, an Assertion is always defined first by a SubjectType value. Subjects cannot be constructed without first specifying the type, and subjects of different types cannot be accidentally interpreted as each other.
 
 The TLSSubjectInfo structure additionally protects against cross-protocol attacks in two further ways:
 
