@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-17T01:20:57.418448+00:00",
+  "timestamp": "2024-09-19T01:45:22.546631+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4441,25 +4441,35 @@
       "id": "PR_kwDOJIBkVc57irGj",
       "title": "Consistently use TAI instead of issuer_id",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/91",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "pohlm01",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I suggest replacing current `opaque issuer_id<1..32>;` fields with the new `TrustAnchorIdentifier trust_anchor;`. Alternatively, we would need to adopt the maximal number of bytes to  `opaque issuer_id<1..255>;`.",
       "createdAt": "2024-09-15T12:28:48Z",
-      "updatedAt": "2024-09-15T15:43:20Z",
+      "updatedAt": "2024-09-17T14:38:42Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "32322fe424030f83bf4c69dad3a56347637989b0",
       "headRepository": "pohlm01/merkle-tree-certs",
       "headRefName": "main",
-      "headRefOid": "62171106b266954ab5abe30e8ea1b9448d144365",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "e07091411e6df9029adffe823617470df94e3208",
+      "closedAt": "2024-09-17T14:38:41Z",
+      "mergedAt": "2024-09-17T14:38:41Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> Thanks! Left some minor wording change which I'll just go ahead and apply and merge.\r\n\r\n...or not? Apparently I forgot to reload the page. Let's try that again...",
+          "createdAt": "2024-09-17T14:32:19Z",
+          "updatedAt": "2024-09-17T14:32:19Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc6JaQCB",
@@ -4544,6 +4554,92 @@
               "body": "Sounds reasonable to me. I updated the PR to include `issuer_id` and `batch_id` where appropriate. I hope it is consistent.",
               "createdAt": "2024-09-15T15:43:20Z",
               "updatedAt": "2024-09-15T15:43:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6JrvPJ",
+          "commit": {
+            "abbreviatedOid": "6217110"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thanks! Left some minor wording change which I'll just go ahead and apply and merge.",
+          "createdAt": "2024-09-17T14:29:38Z",
+          "updatedAt": "2024-09-17T14:31:34Z",
+          "comments": [
+            {
+              "originalPosition": 86,
+              "body": "```suggestion\r\nWhen the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.\r\n```",
+              "createdAt": "2024-09-17T14:29:38Z",
+              "updatedAt": "2024-09-17T14:31:34Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "```suggestion\r\nAn individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.\r\n```",
+              "createdAt": "2024-09-17T14:30:23Z",
+              "updatedAt": "2024-09-17T14:31:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6Jry6w",
+          "commit": {
+            "abbreviatedOid": "6217110"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "(Attempt number 2 to do it from the web interface.)",
+          "createdAt": "2024-09-17T14:35:01Z",
+          "updatedAt": "2024-09-17T14:35:44Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "```suggestion\r\nAn individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.\r\n```",
+              "createdAt": "2024-09-17T14:35:01Z",
+              "updatedAt": "2024-09-17T14:35:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6Jrzs0",
+          "commit": {
+            "abbreviatedOid": "39b6d39"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-17T14:36:09Z",
+          "updatedAt": "2024-09-17T14:36:09Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "(Looks like you already did this one.)",
+              "createdAt": "2024-09-17T14:36:09Z",
+              "updatedAt": "2024-09-17T14:36:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6Jrz6R",
+          "commit": {
+            "abbreviatedOid": "6217110"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-17T14:36:28Z",
+          "updatedAt": "2024-09-17T14:36:28Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "applied.",
+              "createdAt": "2024-09-17T14:36:28Z",
+              "updatedAt": "2024-09-17T14:36:28Z"
             }
           ]
         }
