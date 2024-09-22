@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-19T01:45:22.546631+00:00",
+  "timestamp": "2024-09-22T01:53:34.146726+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1596,16 +1596,24 @@
       "id": "I_kwDOJIBkVc6MNxI7",
       "title": "Use PENs to name CAs",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/85",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Once https://github.com/davidben/tls-trust-expressions/pull/30 lands, just cite the construction from there.",
       "createdAt": "2024-06-14T03:36:40Z",
-      "updatedAt": "2024-06-14T03:36:40Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2024-09-19T21:25:15Z",
+      "closedAt": "2024-09-19T21:25:15Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "This was done at some point.",
+          "createdAt": "2024-09-19T21:25:15Z",
+          "updatedAt": "2024-09-19T21:25:15Z"
+        }
+      ]
     },
     {
       "number": 86,
@@ -4072,7 +4080,7 @@
       "labels": [],
       "body": "GH #76",
       "createdAt": "2023-10-13T10:33:24Z",
-      "updatedAt": "2023-10-16T12:45:41Z",
+      "updatedAt": "2024-09-19T12:17:09Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
@@ -4125,9 +4133,77 @@
           "body": "It'd be nice to be able to track the transition to PQ (see also #38 for the \"if you understand PQ, don't trust this extension\"), but it's not a blocker. I'm worried it's premature to assume we'll never want transparency on any part of the subject.",
           "createdAt": "2023-10-16T12:45:41Z",
           "updatedAt": "2023-10-16T12:45:41Z"
+        },
+        {
+          "author": "pohlm01",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@bwesterb and @davidben did you have the chance to develop an opinion on whether this PR will likely be merged? [bwesterb/mtc](https://github.com/bwesterb/mtc) currently implements this PR, and I wonder if I should follow this for [my implementation](https://github.com/pohlm01/mtc-verifier).",
+          "createdAt": "2024-09-19T09:13:09Z",
+          "updatedAt": "2024-09-19T09:31:09Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6J-reF",
+          "commit": {
+            "abbreviatedOid": "634c978"
+          },
+          "author": "pohlm01",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-19T09:05:35Z",
+          "updatedAt": "2024-09-19T09:05:35Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Is there a reason this is a (length prefixed) array? If I'm not mistaken, the `abridged_subject_info` has a fixed length implied by the CA parameters hash length, so don't see a need for the length prefix. I also don't see a reason to put multiple elements.",
+              "createdAt": "2024-09-19T09:05:35Z",
+              "updatedAt": "2024-09-19T09:05:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6KAYfE",
+          "commit": {
+            "abbreviatedOid": "634c978"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-19T12:14:17Z",
+          "updatedAt": "2024-09-19T12:14:17Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "For TLS it's fixed length at the moment. For other subjects types it might not be fixed length; and for TLS it might even change, see #38. ",
+              "createdAt": "2024-09-19T12:14:17Z",
+              "updatedAt": "2024-09-19T12:14:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6KAaAV",
+          "commit": {
+            "abbreviatedOid": "634c978"
+          },
+          "author": "pohlm01",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-09-19T12:17:09Z",
+          "updatedAt": "2024-09-19T12:17:09Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Ah, thanks for clarification!",
+              "createdAt": "2024-09-19T12:17:09Z",
+              "updatedAt": "2024-09-19T12:17:09Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 78,
@@ -4644,6 +4720,47 @@
           ]
         }
       ]
+    },
+    {
+      "number": 92,
+      "id": "PR_kwDOJIBkVc58GRCf",
+      "title": "Add an explicit not_after time to the Proof",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/92",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
+      "createdAt": "2024-09-19T22:38:00Z",
+      "updatedAt": "2024-09-19T22:52:58Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "expiry",
+      "headRefOid": "5d265587a2aab4fe8e267599d314cf80f6ed68ca",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Some notes and philosophizing:\r\n\r\n**not_after vs batch expiration time** \r\n\r\nWe could either have `not_after` be a constraint on top of what the batch would impose, with the relying party checking the minimum of the two, or say that `not_after` must be consistent with batch expiry, with the relying party rejecting the certificate if inconsistent.\r\n\r\nPut another way, is `not_after` the subscriber-requested expiry, or the effective expiry?\r\n\r\nI went with effective expiry because this means the subscriber does not need to know anything about the trust anchor to know when the certificate expires. Either it expires at the `not_after` time, or it was simply invalid and will be rejected at any time.\r\n\r\n**Proof vs Assertion vs Certificate**\r\n\r\n`not_after` could be part of the Assertion, part of the Proof, or just an extra field in the Certificate.\r\n\r\nI think the litmus test for being part of the Assertion is \"would you put this in a CSR?\", and the answer is I think no. \"example.com's key is 1234\" is a fact about the world. A certificate is the CA making a point-in-time claim that the fact about the world is true.\r\n\r\nNow, it being a point-in-time claim is kind of interesting. A CA that issues 14 day certificates and a CA that issues 1 year certificates do not actually perform different validation procedures. It's not like either CA has any better ability to make predictions about the future. So that might suggest that expiration times are all nonsense and maybe we should just say when the certificate was issued, with expiry being a relying party policy?\r\n\r\nExcept that's not only impractical but also doesn't capture some things. While expiry doesn't tell you anything about the validation process, it tells you how the whole ecosystem will manage this lifecycle of this certificate:\r\n\r\n* Until a certificate expires, CAs need to revoke the certificate if the fact stops being true\r\n* Until a certificate expires, subscribers need to request the certificate be revoked if the want clients to reject the fact (namely if the key material were compromised)\r\n* Until a certificate expires, subscribers should pay attention to it when monitoring transparency logs\r\n* Until a certificate expires, subscribers can reasonably serve it in preference to a newer but larger certificate\r\n\r\nBut that further reenforces that expiry is not inherent to the fact itself, but is specific how one certificate is managed.\r\n\r\nProof vs extra field in the Certificate is kind of meaningless right now. I think the litmus test is, if we end up doing #88, would it be a per-Proof or per-Certificate value? Because this is an effective expiry, I think the answer is per-Proof. Different MTC CAs may force different `not_after` dates, etc. ",
+          "createdAt": "2024-09-19T22:47:43Z",
+          "updatedAt": "2024-09-19T22:50:10Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Another random thought / justification\r\n\r\n**Opaque vs part of framework**\r\n\r\nWe could either make it part of the BikeshedCertificate framework, or make it something that you put in the specific proof type. Ultimately these are mostly isomorphic. If something is specific to the proof type, subscribers can't read it generically, but then we can define a certificate property that they _do_ know how to read.\r\n\r\nBut since subscribers should always be able to read this, and these kinds of offline assertions are inherently related to time, putting it in the framework made sense.",
+          "createdAt": "2024-09-19T22:52:57Z",
+          "updatedAt": "2024-09-19T22:52:57Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
