@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-22T01:53:34.146726+00:00",
+  "timestamp": "2024-09-24T01:48:08.337916+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4733,7 +4733,7 @@
       "labels": [],
       "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
       "createdAt": "2024-09-19T22:38:00Z",
-      "updatedAt": "2024-09-19T22:52:58Z",
+      "updatedAt": "2024-09-23T14:39:40Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae",
@@ -4758,6 +4758,34 @@
           "body": "Another random thought / justification\r\n\r\n**Opaque vs part of framework**\r\n\r\nWe could either make it part of the BikeshedCertificate framework, or make it something that you put in the specific proof type. Ultimately these are mostly isomorphic. If something is specific to the proof type, subscribers can't read it generically, but then we can define a certificate property that they _do_ know how to read.\r\n\r\nBut since subscribers should always be able to read this, and these kinds of offline assertions are inherently related to time, putting it in the framework made sense.",
           "createdAt": "2024-09-19T22:52:57Z",
           "updatedAt": "2024-09-19T22:52:57Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Some more things to ponder:\r\n\r\n1. How does a subscriber request the earlier expiration? Previously, the client would just send an assertion as assertion-publishing-request. Now we need a `AssertionSigningRequest` different from an Assertion that contains the expiry.\r\n\r\n2. Do we need a timestamp or can we use batches are granularity?\r\n\r\n3. Maybe also good to ponder revocation again. Depending on how we solve that, we might achieve what we want, by issuing and then immediately revoking for a set time. #41 \r\n",
+          "createdAt": "2024-09-23T12:04:58Z",
+          "updatedAt": "2024-09-23T12:04:58Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> How does a subscriber request the earlier expiration? Previously, the client would just send an assertion as assertion-publishing-request. Now we need a AssertionSigningRequest different from an Assertion that contains the expiry.\r\n\r\nOh ACME already has this. That was the original inspiration for this.\r\nhttps://www.rfc-editor.org/rfc/rfc8555.html#section-7.1.3\r\n\r\nNot sure how much CAs actually pay attention to this today but, in principle, it seems reasonable for a subscriber to say \"however long you issue certs for, I don't want to be vulnerable to this key for more than 24 hours, so please cap the lifetime accordingly\".\r\n\r\n> Do we need a timestamp or can we use batches are granularity?\r\n\r\nIsn't batches granularity just not landing this PR? I think the subscriber will need a timestamp at least, because the subscriber doesn't know the CA's parameters. Of course, if it's _just_ for the subscriber, we could put it in CertificatePropertyList and leave the certificate format alone.\r\n\r\n> Maybe also good to ponder revocation again. Depending on how we solve that, we might achieve what we want, by issuing and then immediately revoking for a set time.\r\n\r\nWell revocation only works in clients that have picked up the revocation instruction. In applications like the web, that's not perfectly reliable. Hence short-lived certificates and everything else. I don't think revocation removes the need for both subscriber and CA to contribute upper bounds on the lifetime.\r\n\r\nOn that note, the PR should probably include a sentence to allow CAs to shorten the lifetime beyond the batch too.",
+          "createdAt": "2024-09-23T13:43:07Z",
+          "updatedAt": "2024-09-23T13:43:07Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There is an issue: if you don't store not_after in the abridgedassertion, then the trust service can't compute HashAssertion and thus verify the tree.",
+          "createdAt": "2024-09-23T14:21:34Z",
+          "updatedAt": "2024-09-23T14:21:34Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah nice catch! I forgot about the HTTP interface.\r\n\r\nAbridgedAssertionAndTimestamp is a mouthful. It is annoying that probably every proof type will need a family of \"[abridged] assertion and not after\" structures and we don't good a word for that. Should it actually go in the assertion?? Trouble is this makes it harder to staple multiple proofs a la #88 if the proofs happen not to be clocked similarly, or have other lifetime constraints, and I kinda like the freedom to build PKIs out of that.",
+          "createdAt": "2024-09-23T14:39:40Z",
+          "updatedAt": "2024-09-23T14:39:40Z"
         }
       ],
       "reviews": []
