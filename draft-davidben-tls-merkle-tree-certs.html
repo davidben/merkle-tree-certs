@@ -11,17 +11,17 @@
 <meta content="
        This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
     " name="description">
-<meta content="xml2rfc 3.23.0" name="generator">
+<meta content="xml2rfc 3.23.2" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.23.0
-    Python 3.12.3
+  xml2rfc 3.23.2
+    Python 3.12.6
     ConfigArgParse 1.7
-    google-i18n-address 3.1.0
+    google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.4
     lxml 4.9.4
-    platformdirs 4.2.2
+    platformdirs 4.3.6
     pycountry 22.3.5
     PyYAML 6.0.1
     requests 2.32.3
@@ -1025,11 +1025,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates for TLS</td>
-<td class="right">September 2024</td>
+<td class="right">October 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 21 March 2025</td>
+<td class="center">Expires 6 April 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1042,12 +1042,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-09-17" class="published">17 September 2024</time>
+<time datetime="2024-10-03" class="published">3 October 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-03-21">21 March 2025</time></dd>
+<dd class="expires"><time datetime="2025-04-06">6 April 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1105,7 +1105,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 April 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1356,19 +1356,19 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-1-1">Authors' Note: This is an early draft of a proposal with many parts. While we have tried to make it as concrete as possible, we anticipate that most details will change as the proposal evolves.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">A typical TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> handshake uses many signatures to authenticate the server public key. In a certificate chain with an end-entity certificate, an intermediate certificate, and an implicit trust anchor, there are two X.509 signatures <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>. Intermediate certificates additionally send an extra public key. If the handshake uses Certificate Transparency (CT) <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>, each Signed Certificate Timestamp (SCT) also carries a signature. CT policies often require two or more SCTs per certificate <span>[<a href="#APPLE-CT" class="cite xref">APPLE-CT</a>]</span> <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>. If the handshake staples an OCSP response <span>[<a href="#RFC6066" class="cite xref">RFC6066</a>]</span> for revocation, that adds an additional signature.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, Dilithium3 <span>[<a href="#Dilithium" class="cite xref">Dilithium</a>]</span> uses 1,952 bytes per public key and 3,293 bytes per signature. A TLS Certificate message with, say, four Dilithum3 signatures (two X.509 signatures and two SCTs) and one intermediate CA's Dilithium3 public key would total 15,124 bytes of authentication overhead. Falcon-512 and Falcon-1024 <span>[<a href="#Falcon" class="cite xref">Falcon</a>]</span> would, respectively, total 3,561 and 6,913 bytes.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">This document introduces Merkle Tree Certificates, an optimization that authenticates a subscriber key using under 1,000 bytes. See <a href="#sizes" class="auto internal xref">Section 5.6</a>. To achieve this, it reduces its scope from general authentication:<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document introduces Merkle Tree Certificates, an optimization that authenticates a TLS key using under 1,000 bytes. See <a href="#sizes" class="auto internal xref">Section 5.6</a>. To achieve this, it reduces its scope from general authentication:<a href="#section-1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-5.1">
-          <p id="section-1-5.1.1">Certificates are short-lived. The subscriber is expected to use an automated issuance protocol, such as ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.1.1">Certificates are short-lived. The authenticating party is expected to use an automated issuance protocol, such as ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.2">
           <p id="section-1-5.2.1">Certificates are only usable with relying parties that have contacted a transparency service sufficiently recently. See <a href="#transparency-service" class="auto internal xref">Section 7</a>.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.3">
-          <p id="section-1-5.3.1">Certificates are issued after a significant processing delay of, in the recommended parameters (<a href="#parameters" class="auto internal xref">Section 5.1</a>), about an hour. Subscribers that need a certificate issued quickly are expected to use a different mechanism.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.3.1">Certificates are issued after a significant processing delay of, in the recommended parameters (<a href="#parameters" class="auto internal xref">Section 5.1</a>), about an hour. Authenticating parties that need a certificate issued quickly are expected to use a different mechanism.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-6">To support the reduced scope, this document also describes a certificate negotiation mechanism. Subscribers send these more efficient certificates when available, and otherwise fall back to other mechanisms.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-6">To support the reduced scope, this document also describes a certificate negotiation mechanism. Authenticating parties send these more efficient certificates when available, and otherwise fall back to other mechanisms.<a href="#section-1-6" class="pilcrow">¶</a></p>
 <p id="section-1-7">Merkle Tree Certificates are not intended to replace existing Public Key Infrastructure (PKI) mechanisms but, in applications where a significant portion of authentications meet the above requirements, complement them as an optional optimization. In particular, it is expected that, even within applications that implement it, this mechanism will not be usable for all TLS connections.<a href="#section-1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1399,19 +1399,19 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
         </h3>
 <p id="section-2.2-1">There are five roles involved in a Merkle Tree certificate deployment:<a href="#section-2.2-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-2.2-2">
-          <dt id="section-2.2-2.1">Subscriber:</dt>
+          <dt id="section-2.2-2.1">Authenticating party:</dt>
           <dd style="margin-left: 1.5em" id="section-2.2-2.2">
             <p id="section-2.2-2.2.1">The party that authenticates itself in the protocol. In TLS, this is the side sending the Certificate and CertificateVerify message.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.2-2.3">Merkle Tree certification authority (CA):</dt>
           <dd style="margin-left: 1.5em" id="section-2.2-2.4">
-            <p id="section-2.2-2.4.1">The service that issues Merkle Tree certificates to the subscriber, and publishes logs of all certificates.<a href="#section-2.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-2.2-2.4.1">The service that issues Merkle Tree certificates to the authenticating party, and publishes logs of all certificates.<a href="#section-2.2-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.2-2.5">Relying party:</dt>
           <dd style="margin-left: 1.5em" id="section-2.2-2.6">
-            <p id="section-2.2-2.6.1">The party authenticating the subscriber. In TLS, this is the side receiving the Certificate and CertificateVerify message.<a href="#section-2.2-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-2.2-2.6.1">The party whom the authenticating party presents its identity to. In TLS, this is the side receiving the Certificate and CertificateVerify message.<a href="#section-2.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.2-2.7">Transparency service:</dt>
@@ -1475,13 +1475,13 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <p id="section-3-1">The process of issuing and using a certificate is as follows:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3-2">
 <li id="section-3-2.1">
-          <p id="section-3-2.1.1">The subscriber requests a certificate from the CA. <a href="#acme-extensions" class="auto internal xref">Section 9</a> describes ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> extensions for this.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.1.1">The authenticating party requests a certificate from the CA. <a href="#acme-extensions" class="auto internal xref">Section 9</a> describes ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> extensions for this.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-2.2">
           <p id="section-3-2.2.1">The CA collects certificate requests into a batch (see <a href="#parameters" class="auto internal xref">Section 5.1</a>) and builds the Merkle Tree and computes the tree head (see <a href="#building-tree" class="auto internal xref">Section 5.5.1</a>). It then signs the validity window ending at this tree head (see <a href="#signing" class="auto internal xref">Section 5.5.2</a>) and publishes (see <a href="#publishing" class="auto internal xref">Section 8</a>) the result.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-2.3">
-          <p id="section-3-2.3.1">The CA constructs a certificate using the inclusion proof. It sends this certificate to the subscriber. See <a href="#proofs" class="auto internal xref">Section 5.5.3</a>.<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.3.1">The CA constructs a certificate using the inclusion proof. It sends this certificate to the authenticating party. See <a href="#proofs" class="auto internal xref">Section 5.5.3</a>.<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-2.4">
           <p id="section-3-2.4.1">The transparency service downloads the abridged assertions, recreates the Merkle Tree, and validates the window signature. It mirrors them for monitors to observe. See <a href="#transparency-service" class="auto internal xref">Section 7</a>.<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
@@ -1490,10 +1490,10 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-3-2.5.1">The relying party fetches the latest validity window from the transparency service. This validity window will contain the new tree head.<a href="#section-3-2.5.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-2.6">
-          <p id="section-3-2.6.1">In an application protocol such as TLS, the relying party communicates its currently saved validity window to the subscriber.<a href="#section-3-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.6.1">In an application protocol such as TLS, the relying party communicates its currently saved validity window to the authenticating party.<a href="#section-3-2.6.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-2.7">
-          <p id="section-3-2.7.1">If the relying party’s validity window contains the subscriber’s certificate, the subscriber negotiates this protocol and sends the Merkle Tree certificate. See <a href="#certificate-negotiation" class="auto internal xref">Section 10.3</a> for details. If there is no match, the subscriber proceeds as if this protocol were not in use (e.g., by sending a traditional X.509 certificate chain).<a href="#section-3-2.7.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.7.1">If the relying party’s validity window contains the authenticating party’s certificate, the authenticating party negotiates this protocol and sends the Merkle Tree certificate. See <a href="#certificate-negotiation" class="auto internal xref">Section 10.3</a> for details. If there is no match, the authenticating party proceeds as if this protocol were not in use (e.g., by sending a traditional X.509 certificate chain).<a href="#section-3-2.7.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-3-3"><a href="#fig-deployment" class="auto internal xref">Figure 1</a> below shows this process.<a href="#section-3-3" class="pilcrow">¶</a></p>
@@ -1540,7 +1540,8 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
                 <text x="196" y="36">1.</text>
                 <text x="244" y="36">issuance</text>
                 <text x="312" y="36">request</text>
-                <text x="108" y="68">Subscriber</text>
+                <text x="80" y="68">Auth.</text>
+                <text x="128" y="68">Party</text>
                 <text x="424" y="68">Certification</text>
                 <text x="520" y="68">Authority</text>
                 <text x="204" y="100">3.</text>
@@ -1625,9 +1626,9 @@ struct {
 <p id="section-4-7">This structure represents the public half of a TLS signing key. The semantics are thus that each claim in <code>claims</code> applies to the TLS client or server. This is analogous to X.509's SubjectPublicKeyInfo structure (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) but additionally incorporates the protocol. Protocols consuming an Assertion MUST check the <code>subject_type</code> is a supported value before processing <code>subject_info</code>. If unrecognized, the structure MUST be rejected.<a href="#section-4-7" class="pilcrow">¶</a></p>
 <p id="section-4-8">Other protocols aiming to integrate with this structure allocate a SubjectType codepoint and describe how it is interpreted.<a href="#section-4-8" class="pilcrow">¶</a></p>
 <p id="section-4-9">Likewise, a Claim structure describes some claim about the subject. The <code>claim_info</code> field is interpreted according to the <code>claim_type</code>. Each Claim structure in an Assertion's <code>claims</code> field MUST have a unique <code>claim_type</code> and all values MUST be sorted in order of increasing <code>claim_type</code>. Structures violating this constraint MUST be rejected.<a href="#section-4-9" class="pilcrow">¶</a></p>
-<p id="section-4-10">When a relying party interprets an Assertion certified by the CA, it MUST ignore any Claim values with unrecognized <code>claim_type</code>. When a CA interprets an Assertion in a certification request from a subscriber, it MUST reject any Claim values with unrecognized <code>claim_type</code>.<a href="#section-4-10" class="pilcrow">¶</a></p>
+<p id="section-4-10">When a relying party interprets an Assertion certified by the CA, it MUST ignore any Claim values with unrecognized <code>claim_type</code>. When a CA interprets an Assertion in a certification request from an authenticating party, it MUST reject any Claim values with unrecognized <code>claim_type</code>.<a href="#section-4-10" class="pilcrow">¶</a></p>
 <p id="section-4-11">This document defines claim types for DNS names and IP addresses, but others can be defined.<a href="#section-4-11" class="pilcrow">¶</a></p>
-<p id="section-4-12">[[TODO: For now, the claims below just transcribe the X.509 GeneralName structure. Should these be origins instead? For HTTPS, it's a pity to not capture the scheme and port. We do mandate ALPN in <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>, so cross-protocol attacks are mitigated, but it's unfortunate that subscribers cannot properly separate their HTTPS vs FTPS keys, or their port 443 vs port 444 keys. One option here is to have HTTPS claims instead, and then other protocols can have FTPS claims, etc. #35 ]]<a href="#section-4-12" class="pilcrow">¶</a></p>
+<p id="section-4-12">[[TODO: For now, the claims below just transcribe the X.509 GeneralName structure. Should these be origins instead? For HTTPS, it's a pity to not capture the scheme and port. We do mandate ALPN in <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>, so cross-protocol attacks are mitigated, but it's unfortunate that authenticating parties cannot properly separate their HTTPS vs FTPS keys, or their port 443 vs port 444 keys. One option here is to have HTTPS claims instead, and then other protocols can have FTPS claims, etc. #35 ]]<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div id="dns-claims">
 <section id="section-4.1">
         <h3 id="name-dns-claims">
@@ -1676,7 +1677,7 @@ struct {
       <h2 id="name-issuing-certificates">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-issuing-certificates" class="section-name selfRef">Issuing Certificates</a>
       </h2>
-<p id="section-5-1">This section describes the structure of Merkle Tree certificates and defines the process of how a Merkle Tree certification authority issues certificates for a subscriber.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">This section describes the structure of Merkle Tree certificates and defines the process of how a Merkle Tree certification authority issues certificates for an authenticating party.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <div id="parameters">
 <section id="section-5.1">
         <h3 id="name-merkle-tree-ca-parameters">
@@ -1728,8 +1729,8 @@ struct {
         <dd class="break"></dd>
 </dl>
 <p id="section-5.1-3">These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -&gt; Subscriber -&gt; RP flow does not depend on the signature, only the CA -&gt; Transparency Service -&gt; RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">Certificates are issued in batches. Batches are numbered consecutively, starting from zero. All certificates in a batch have the same issuance time, determined by <code>start_time + batch_duration * batch_number</code>. This is known as the batch's issuance time. That is, batch 0 has an issuance time of <code>start_time</code>, and issuance times increment by <code>batch_duration</code>. A CA can issue no more frequently than <code>batch_duration</code>. <code>batch_duration</code> determines how long it takes for the CA to return a certificate to the subscriber.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -&gt; Authenticating Party -&gt; RP flow does not depend on the signature, only the CA -&gt; Transparency Service -&gt; RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">Certificates are issued in batches. Batches are numbered consecutively, starting from zero. All certificates in a batch have the same issuance time, determined by <code>start_time + batch_duration * batch_number</code>. This is known as the batch's issuance time. That is, batch 0 has an issuance time of <code>start_time</code>, and issuance times increment by <code>batch_duration</code>. A CA can issue no more frequently than <code>batch_duration</code>. <code>batch_duration</code> determines how long it takes for the CA to return a certificate to the authenticating party.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.1-6">All certificates in a batch have the same expiration time, computed as <code>lifetime</code> past the issuance time. After this time, the certificates in a batch are no longer valid. Merkle Tree certificates uses a short-lived certificates model, such that certificate expiration replaces an external revocation signal like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> or OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>. <code>lifetime</code> SHOULD be set accordingly. For instance, a deployment with a corresponding maximum OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> response lifetime of 14 days SHOULD use a value no higher than 14 days. See <a href="#revocation" class="auto internal xref">Section 13.3</a> for details.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 <p id="section-5.1-7">CAs are RECOMMENDED to use a <code>batch_duration</code> of one hour, and a <code>lifetime</code> of 14 days. This results in a <code>validity_window_size</code> of 336, for a total of 10,752 bytes in SHA-256 hashes.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
 <p id="section-5.1-8">To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be unique to that Merkle Tree CA. It MUST NOT be used in another Merkle Tree CA, or for another protocol, such as X.509 certificates.<a href="#section-5.1-8" class="pilcrow">¶</a></p>
@@ -1791,7 +1792,7 @@ The batch with batch number 42 would then have a <code>batch_id</code> of <code>
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-issuance-queue-and-scheduli" class="section-name selfRef">Issuance Queue and Scheduling</a>
         </h3>
 <p id="section-5.4-1">The CA additionally maintains an issuance queue, not exposed via the HTTP interface.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
-<p id="section-5.4-2">When a subscriber requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-8" class="relref">Section 8</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>). Once validation is complete and the CA is willing to certify the assertion, the CA appends it to the issuance queue.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">When an authenticating party requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-8" class="relref">Section 8</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>). Once validation is complete and the CA is willing to certify the assertion, the CA appends it to the issuance queue.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
 <p id="section-5.4-3">The CA runs a regularly-scheduled issuance job which converts this queue into certificates. This job runs the following procedure:<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-5.4-4">
 <li id="section-5.4-4.1">
@@ -1970,7 +1971,7 @@ struct {
 <a href="#section-5.5.3" class="section-number selfRef">5.5.3. </a><a href="#name-certificate-format" class="section-name selfRef">Certificate Format</a>
           </h4>
 <p id="section-5.5.3-1">[[TODO: BikeshedCertificate is a placeholder name until someone comes up with a better one. #15 ]]<a href="#section-5.5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.5.3-2">[[TODO: A subscriber has no way to know when a certificate expires. We need to define a mandatory expiration certificate property, or do #83, which, depending on how it's done could avoid that.]]<a href="#section-5.5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-2">[[TODO: An authenticating party has no way to know when a certificate expires. We need to define a mandatory expiration certificate property, or do #83, which, depending on how it's done could avoid that.]]<a href="#section-5.5.3-2" class="pilcrow">¶</a></p>
 <p id="section-5.5.3-3">For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:<a href="#section-5.5.3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.5.3-4">
 <pre>
@@ -1991,7 +1992,7 @@ struct {
 <p id="section-5.5.3-5">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer.
 It is analogous to an X.509 trust anchor's subject name.
 When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is a batch's <code>batch_id</code>, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.5.3-5" class="pilcrow">¶</a></p>
-<p id="section-5.5.3-6">The <code>proof_data</code> is a byte string, opaque to the subscriber, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the <code>proof_data</code> contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.<a href="#section-5.5.3-6" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-6">The <code>proof_data</code> is a byte string, opaque to the authenticating party, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the <code>proof_data</code> contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.<a href="#section-5.5.3-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.5.3-7">
 <pre>
 opaque HashValueSHA256[32];
@@ -2058,7 +2059,7 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
             </figcaption></figure>
 </div>
 <p id="section-5.5.3-12">If the batch only contained one assertion, <code>path</code> will be empty and <code>index</code> will be zero.<a href="#section-5.5.3-12" class="pilcrow">¶</a></p>
-<p id="section-5.5.3-13">For each assertion, the CA assembles a BikeshedCertificate structure and sends it to the subscriber.<a href="#section-5.5.3-13" class="pilcrow">¶</a></p>
+<p id="section-5.5.3-13">For each assertion, the CA assembles a BikeshedCertificate structure and sends it to the authenticating party.<a href="#section-5.5.3-13" class="pilcrow">¶</a></p>
 <p id="section-5.5.3-14">This certificate can be presented to supporting relying parties as described in <a href="#using" class="auto internal xref">Section 6</a>. It is valid until the batch expires.<a href="#section-5.5.3-14" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2069,7 +2070,7 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
         <h3 id="name-size-estimates">
 <a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-size-estimates" class="section-name selfRef">Size Estimates</a>
         </h3>
-<p id="section-5.6-1">Merkle Tree proofs scale logarithmically in the batch size. <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a> recommends subscribers renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be <code>subscriber_count * 2 / validity_window_size</code>, where <code>subscriber_count</code> is a CA's active subscriber count. The recommended parameters in <a href="#parameters" class="auto internal xref">Section 5.1</a> give an average of <code>subscriber_count / 168</code>.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-1">Merkle Tree proofs scale logarithmically in the batch size. <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a> recommends authenticating parties renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be <code>subscriber_count * 2 / validity_window_size</code>, where <code>subscriber_count</code> is a CA's active subscriber count. The recommended parameters in <a href="#parameters" class="auto internal xref">Section 5.1</a> give an average of <code>subscriber_count / 168</code>.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
 <p id="section-5.6-2">Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, <span>[<a href="#LetsEncrypt" class="cite xref">LetsEncrypt</a>]</span> reported around 330,000,000 active subscribers for a single CA. <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
 <p id="section-5.6-3">These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding <code>path</code> lengths will be 20, 24, and 17, given proof sizes of, respectively, 640 bytes, 768 bytes, and 544 bytes.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
 <p id="section-5.6-4">For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
@@ -2082,7 +2083,7 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
       <h2 id="name-using-certificates">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-using-certificates" class="section-name selfRef">Using Certificates</a>
       </h2>
-<p id="section-6-1">This section describes how subscribers present and relying parties verify Merkle Tree certificates.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">This section describes how authenticating parties present and relying parties verify Merkle Tree certificates.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <div id="relying-parties">
 <section id="section-6.1">
         <h3 id="name-relying-party-state">
@@ -2098,7 +2099,7 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-certificate-verification" class="section-name selfRef">Certificate Verification</a>
         </h3>
 <p id="section-6.2-1">This section describes the verification process for a BikeshedCertificate. It describes error conditions with TLS alerts, defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-6.2" class="relref">Section 6.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. Non-TLS applications SHOULD map these error conditions to the corresponding application-specific errors. When multiple error conditions apply, the application MAY return any applicable error.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">When a subscriber presents a BikeshedCertificate, the relying party runs the following procedure:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">When an authenticating party presents a BikeshedCertificate, the relying party runs the following procedure:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.2-3">
 <li id="section-6.2-3.1">
             <p id="section-6.2-3.1.1">Determines if <code>trust_anchor</code> corresponds to a supported trust anchor, and the type of that trust anchor. If <code>trust_anchor</code> is unrecognized, the relying party rejects the certificate with an <code>unknown_ca</code> error.<a href="#section-6.2-3.1.1" class="pilcrow">¶</a></p>
@@ -2327,10 +2328,10 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
           <p id="section-9-3.1.1">Some way to specify that the client supports BikeshedCertificate. At minimum a separate MIME type, but it likely needs to be known at order creation.<a href="#section-9-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-9-3.2">
-          <p id="section-9-3.2.1">Some way to accommodate MTC's long issuance time. ACME has the "processing" state, and the Retry-After header can tell the subscriber when to query again. But the fallback certificate will issue much faster, so they cannot be issued together in the same ACME order, as <span>[<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> currently does.<a href="#section-9-3.2.1" class="pilcrow">¶</a></p>
+          <p id="section-9-3.2.1">Some way to accommodate MTC's long issuance time. ACME has the "processing" state, and the Retry-After header can tell the authenticating party when to query again. But the fallback certificate will issue much faster, so they cannot be issued together in the same ACME order, as <span>[<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> currently does.<a href="#section-9-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-9-3.3">
-          <p id="section-9-3.3.1">Use <span>[<a href="#I-D.draft-ietf-acme-ari" class="cite xref">I-D.draft-ietf-acme-ari</a>]</span> to move the renewal logic in <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a> from the subscriber to the ACME server.<a href="#section-9-3.3.1" class="pilcrow">¶</a></p>
+          <p id="section-9-3.3.1">Use <span>[<a href="#I-D.draft-ietf-acme-ari" class="cite xref">I-D.draft-ietf-acme-ari</a>]</span> to move the renewal logic in <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a> from the authenticating party to the ACME server.<a href="#section-9-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-9-4">We should also define a certificate request format, though it is broadly just reusing the Assertion structure. If the CA wishes to check possession of the private key, it'll need to come with a signature or do some online operation (e.g. if it's a KEM key). This is inherently protocol-specific, because the mechanism needs to coexist with the target protocol. (Signed CSRs implicitly assume the target protocol's signature payloads cannot overlap with that of a CSR.)<a href="#section-9-4" class="pilcrow">¶</a></p>
@@ -2359,7 +2360,7 @@ struct {
 </pre><a href="#section-10.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-10.1-3">A TLSSubjectInfo describes a TLS signing key. The <code>signature</code> field is a SignatureScheme <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.3" class="relref">Section 4.2.3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> value describing the key type and signature algorithm it uses for CertificateVerify.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
-<p id="section-10.1-4">The <code>public_key</code> field contains the subscriber's public key. The encoding is determined by the <code>signature</code> field as follows:<a href="#section-10.1-4" class="pilcrow">¶</a></p>
+<p id="section-10.1-4">The <code>public_key</code> field contains the authenticating party's public key. The encoding is determined by the <code>signature</code> field as follows:<a href="#section-10.1-4" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-10.1-5">
           <dt id="section-10.1-5.1">RSASSA-PSS algorithms:</dt>
           <dd style="margin-left: 1.5em" id="section-10.1-5.2">
@@ -2418,7 +2419,7 @@ struct {
 <p id="section-10.2-6">The <code>subject_type</code> field in the certificate MUST be of type <code>tls</code> (<a href="#tls-subject-info" class="auto internal xref">Section 10.1</a>). The CertificateVerify message is computed and processed as in <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, with the following modifications:<a href="#section-10.2-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-10.2-7.1">
-            <p id="section-10.2-7.1.1">The signature is computed and verified with the key described in the TLSSubjectInfo. The relying party uses the key decoded from the <code>public_key</code> field, and the subscriber uses the corresponding private key.<a href="#section-10.2-7.1.1" class="pilcrow">¶</a></p>
+            <p id="section-10.2-7.1.1">The signature is computed and verified with the key described in the TLSSubjectInfo. The relying party uses the key decoded from the <code>public_key</code> field, and the authenticating party uses the corresponding private key.<a href="#section-10.2-7.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-10.2-7.2">
             <p id="section-10.2-7.2.1">The SignatureScheme in the CertificateVerify MUST match the <code>signature</code> field in the TLSSubjectInfo.<a href="#section-10.2-7.2.1" class="pilcrow">¶</a></p>
@@ -2438,9 +2439,9 @@ struct {
 <p id="section-10.3-2">For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in <a href="#relying-parties" class="auto internal xref">Section 6.1</a>. The trust anchor's identifier is the batch identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>. Future mechanisms using the BikeshedCertificate format (see <a href="#proofs" class="auto internal xref">Section 5.5.3</a>) MUST similarly define how relying parties determine trust anchor identifiers.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
 <p id="section-10.3-3">As even a single validity window results in <code>validity_window_size</code> trust anchors, sending all trust anchors in the <code>trust_anchors</code> extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span> and the DNS hint described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-5" class="relref">Section 5</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
 <p id="section-10.3-4">[[TODO: We could reduce the reliance on DNS by adding https://github.com/davidben/tls-trust-expressions/issues/62, either in this draft or the main trust anchor IDs draft.]]<a href="#section-10.3-4" class="pilcrow">¶</a></p>
-<p id="section-10.3-5">The subscriber's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the subscriber's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
-<p id="section-10.3-6">For each of the subscriber's BikeshedCertificate credentials, the corresponding trust anchor identifier is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_identifier</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
-<p id="section-10.3-7">The subscriber then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
+<p id="section-10.3-5">The authenticating party's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the authenticating party's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
+<p id="section-10.3-6">For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor identifier is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_identifier</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
+<p id="section-10.3-7">The authenticating party then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-01#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.draft-beck-tls-trust-anchor-ids" class="cite xref">I-D.draft-beck-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <p id="section-10.3-8">[[TODO: Certificate type negotiation doesn't work right for client certificates. See <a href="#cert-type-problems" class="auto internal xref">Appendix B</a>]]<a href="#section-10.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2456,7 +2457,7 @@ struct {
         <h3 id="name-fallback-mechanisms">
 <a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-fallback-mechanisms" class="section-name selfRef">Fallback Mechanisms</a>
         </h3>
-<p id="section-11.1-1">Subscribers using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not recently fetched validity window updates, or lack connectivity to the transparency service.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-1">Authenticating parties using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not recently fetched validity window updates, or lack connectivity to the transparency service.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
 <p id="section-11.1-2">If the pipeline of updates from the CA to the transparency service to relying parties is interrupted, certificate issuance may halt, or newly issued certificates may no longer be usable. When this happens, the optimization in this document may fail, but fallback mechanisms ensure services remain available.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2465,8 +2466,8 @@ struct {
         <h3 id="name-rolling-renewal">
 <a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-rolling-renewal" class="section-name selfRef">Rolling Renewal</a>
         </h3>
-<p id="section-11.2-1">When a subscriber requests a certificate, the CA cannot fulfill the request until the next batch is ready. Once published, the certificate will not be accepted by relying parties until the batch state is mirrored by their respective transparency services, then pushed to relying parties.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
-<p id="section-11.2-2">To account for this, subscribers SHOULD request a new Merkle Tree certificate significantly before the previous Merkle Tree certificate expires. Renewing halfway into the previous certificate's lifetime is RECOMMENDED. Subscribers additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new tree hash is delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for clients that are not yet updated.<a href="#section-11.2-2" class="pilcrow">¶</a></p>
+<p id="section-11.2-1">When an authenticating party requests a certificate, the CA cannot fulfill the request until the next batch is ready. Once published, the certificate will not be accepted by relying parties until the batch state is mirrored by their respective transparency services, then pushed to relying parties.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+<p id="section-11.2-2">To account for this, authenticating parties SHOULD request a new Merkle Tree certificate significantly before the previous Merkle Tree certificate expires. Renewing halfway into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new tree hash is delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for clients that are not yet updated.<a href="#section-11.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="new-keys">
@@ -2475,8 +2476,8 @@ struct {
 <a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-deploying-new-keys" class="section-name selfRef">Deploying New Keys</a>
         </h3>
 <p id="section-11.3-1">Merkle Tree certificates' issuance delays make them unsuitable when rapidly deploying a new service and reacting to key compromise.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
-<p id="section-11.3-2">When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a validity window containing this certificate from the transparency service and can therefore not validate this certificate until receiving them. The subscriber SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
-<p id="section-11.3-3">If the service is performing a routine key rotation, and not in response to a known compromise, the subscriber MAY use the process described in <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a>, allowing certificate negotiation to also switch the private key used. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
+<p id="section-11.3-2">When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a validity window containing this certificate from the transparency service and can therefore not validate this certificate until receiving them. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
+<p id="section-11.3-3">If the service is performing a routine key rotation, and not in response to a known compromise, the authenticating party MAY use the process described in <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a>, allowing certificate negotiation to also switch the private key used. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
 <p id="section-11.3-4">If the service is rotating keys in response to a key compromise, this option is not available. Instead, the service SHOULD immediately discard the old key and request a more immediate issuance mechanism. As in the initial deployment case, it SHOULD request a Merkle Tree certificate in parallel, which will restore the size optimization over time.<a href="#section-11.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2486,7 +2487,7 @@ struct {
 <a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-batch-state-availability" class="section-name selfRef">Batch State Availability</a>
         </h3>
 <p id="section-11.4-1">CAs and transparency services serve an HTTP interface defined in <a href="#publishing" class="auto internal xref">Section 8</a>. This service may be temporarily unavailable, either from service outage or if the service does not meet the consistency condition mid-update. Exact availability requirements for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
-<p id="section-11.4-2">If the CA's interface becomes unavailable, the transparency service will be unavailable to update. This will prevent relying parties from accepting new certificates, so subscribers will need to use fallback mechanisms per <a href="#fallback-mechanisms" class="auto internal xref">Section 11.1</a>. This does not compromise transparency goals per <a href="#misbehaving-ca" class="auto internal xref">Section 13.4.2</a>. However, a CA which is persistently unavailable may not offer sufficient benefit to be used by subscribers or trusted by relying parties.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.4-2">If the CA's interface becomes unavailable, the transparency service will be unavailable to update. This will prevent relying parties from accepting new certificates, so authenticating parties will need to use fallback mechanisms per <a href="#fallback-mechanisms" class="auto internal xref">Section 11.1</a>. This does not compromise transparency goals per <a href="#misbehaving-ca" class="auto internal xref">Section 13.4.2</a>. However, a CA which is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
 <p id="section-11.4-3">However, if the transparency service's interface becomes unavailable, monitors will be unable to check for unauthorized certificates. This does compromise transparency goals. Mirrors of the batch state partially mitigate this, but service unavailability may prevent mirrors from replicating a batch that relying parties accept.<a href="#section-11.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2558,7 +2559,7 @@ struct {
         <h3 id="name-transparency">
 <a href="#section-13.4" class="section-number selfRef">13.4. </a><a href="#name-transparency" class="section-name selfRef">Transparency</a>
         </h3>
-<p id="section-13.4-1">The transparency service does not prevent unauthorized certificates, but it aims to provide comparable security properties to Certificate Transparency <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. If a subscriber presents an acceptable Merkle Tree certificate to a relying party, the relying party should have assurance it was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.<a href="#section-13.4-1" class="pilcrow">¶</a></p>
+<p id="section-13.4-1">The transparency service does not prevent unauthorized certificates, but it aims to provide comparable security properties to Certificate Transparency <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. If an authenticating party presents an acceptable Merkle Tree certificate to a relying party, the relying party should have assurance it was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.<a href="#section-13.4-1" class="pilcrow">¶</a></p>
 <div id="unauthorized-certificates">
 <section id="section-13.4.1">
           <h4 id="name-unauthorized-certificates">
@@ -2917,7 +2918,7 @@ c0000225 c0000c00 c633643c cb007100
           <p id="appendix-B-6.4.1">The client sends a certificate of the server-selected type in Certificate.<a href="#appendix-B-6.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="appendix-B-7">Here, the client (subscriber) does not select the certificate type. The server (relying party) does. Moreover, this selection is made before the client can see the server's <code>certificate_authorities</code> or <code>trust_anchors</code> value, in CertificateRequest. There is no opportunity for the client to fallback to X.509.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
+<p id="appendix-B-7">Here, the client (authenticating party) does not select the certificate type. The server (relying party) does. Moreover, this selection is made before the client can see the server's <code>certificate_authorities</code> or <code>trust_anchors</code> value, in CertificateRequest. There is no opportunity for the client to fallback to X.509.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
 <p id="appendix-B-8">The <code>cert_types</code> extension behaves similarly, but additionally forces the client and server types to match. These extensions were defined when TLS 1.2 was current, but TLS 1.3 aligns the client and server certificate negotiation. Most certificate negotiation extensions, such as <code>certificate_authorities</code> or <code>compress_certificate</code> <span>[<a href="#RFC8879" class="cite xref">RFC8879</a>]</span> can be offered in either direction, in ClientHello or CertificateRequest. They are then symmetrically accepted in the Certificate message.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
 <p id="appendix-B-9">A more corresponding TLS 1.3 negotiation would be to defer the client certificate type negotiation to CertificateRequest, with the server offering the supported certificate types. The client can then make its selection, taking other CertificateRequest extensions into account, and indicate its selection in the Certificate message.<a href="#appendix-B-9" class="pilcrow">¶</a></p>
 <p id="appendix-B-10">Two possible design sketches:<a href="#appendix-B-10" class="pilcrow">¶</a></p>
@@ -2926,7 +2927,7 @@ c0000225 c0000c00 c633643c cb007100
         <h3 id="name-indicate-in-first-certifica">
 <a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-indicate-in-first-certifica" class="section-name selfRef">Indicate in First CertificateEntry</a>
         </h3>
-<p id="appendix-B.1-1">We can have the subscriber indicate the certificate type in an extension of the first CertificateEntry. One challenge is the extensions come after the certificate, so the relying party must seek to the <code>extensions</code> field independent of the certificate type. Thus all certificate types must be updated to use a consistent <code>opaque cert_data&lt;0..2^24&gt;</code> syntax, with any type-specific structures embedded inside.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-1">We can have the authenticating party indicate the certificate type in an extension of the first CertificateEntry. One challenge is the extensions come after the certificate, so the relying party must seek to the <code>extensions</code> field independent of the certificate type. Thus all certificate types must be updated to use a consistent <code>opaque cert_data&lt;0..2^24&gt;</code> syntax, with any type-specific structures embedded inside.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
 <p id="appendix-B.1-2">RawPublicKey and X509 already meet this requirement. OpenPGP and Bikeshed need an extra length prefix.<a href="#appendix-B.1-2" class="pilcrow">¶</a></p>
 <div id="change-certificate-syntax">
 <section id="appendix-B.1.1">
