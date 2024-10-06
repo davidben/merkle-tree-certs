@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-03T01:47:57.660997+00:00",
+  "timestamp": "2024-10-06T01:54:37.941141+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1729,6 +1729,22 @@
           "updatedAt": "2024-08-29T14:30:14Z"
         }
       ]
+    },
+    {
+      "number": 93,
+      "id": "I_kwDOJIBkVc6Y1GSm",
+      "title": "Rename \"subscriber\" to \"authenticating party\"",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/93",
+      "state": "CLOSED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "See https://github.com/davidben/tls-trust-expressions/issues/74",
+      "createdAt": "2024-10-03T13:21:23Z",
+      "updatedAt": "2024-10-03T15:52:10Z",
+      "closedAt": "2024-10-03T15:52:10Z",
+      "comments": []
     }
   ],
   "pulls": [
@@ -4789,6 +4805,51 @@
         }
       ],
       "reviews": []
+    },
+    {
+      "number": 94,
+      "id": "PR_kwDOJIBkVc59gwDy",
+      "title": "Switch \"subscriber\" to \"authenticating party\"",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/94",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "bwesterb",
+        "devonobrien"
+      ],
+      "labels": [],
+      "body": "Closes #93. I left some instances in \"Size Estimates\" as subscriber because I think subscriber actually makes more sense in that case. (We're talking about a CA's active subscriber count.)",
+      "createdAt": "2024-10-03T14:44:53Z",
+      "updatedAt": "2024-10-03T15:52:13Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "auth-party",
+      "headRefOid": "4fc56e06584346a88670c2bd0698b2f658ea0782",
+      "closedAt": "2024-10-03T15:52:09Z",
+      "mergedAt": "2024-10-03T15:52:09Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0fe3626b2fd45f5f15fdb2a1ac56f9c23143125b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6L06Bu",
+          "commit": {
+            "abbreviatedOid": "4fc56e0"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-10-03T15:05:50Z",
+          "updatedAt": "2024-10-03T15:05:50Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
