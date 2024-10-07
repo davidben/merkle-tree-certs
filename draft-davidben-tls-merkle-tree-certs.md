@@ -434,7 +434,7 @@ A Merkle Tree certification authority is defined by the following values:
 : A trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
 
 `public_key`:
-: The public half of a signing keypair. The corresponding private key, `private_key`, is known only to the CA.
+: The public half of a signing key. For convenience, we use TLS' format, and represent the public key as a `TLSSubjectInfo`, see {{tls-subject-info}}. The corresponding private key, `private_key`, is known only to the CA.
 
 `start_time`:
 : The issuance time of the first batch of certificates, represented as a POSIX timestamp (see {{time}}).
@@ -614,7 +614,7 @@ struct {
 
 `tree_heads` value contains the last `validity_window_size` tree heads. (Recall the TLS presentation language brackets the total length of a vector in bytes; not the number of elements.) `tree_heads` starts from `batch_number`, in decreasing batch number order. That is, `tree_heads[0]` is the tree head for batch `batch_number`, `tree_heads[1]` is the tree head for `batch_number - 1`, and so on. If `batch_number < validity_window_size - 1`, any tree heads for placeholder negative batch numbers are filled with `HashEmpty(0, 0)`, computed with `batch_number` set to 0.
 
-After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose `batch_number` is the number of the batch being issued. It then computes a signature over the following structure:
+After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose `batch_number` is the number of the batch being issued. It then computes a digital signature over the following structure:
 
 ~~~
 struct {
@@ -623,6 +623,8 @@ struct {
     ValidityWindow window;
 } LabeledValidityWindow;
 ~~~
+
+The signature algorithm used is determined by `public_key.signature` as described in {{Section 4.3.2 of RFC8446}}. (Signatures are created without the domain separation of {{Section 4.4.3 of RFC8446}}.)
 
 The `label` field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The `issuer_id` field is the CA's `issuer_id`. Other parties can verify the signature by constructing the same input and verifying with the CA's `public_key`.
 
@@ -1255,6 +1257,8 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Clarify we use a single `CertificateEntry`. #11
 
 - Clarify we use POSIX time. #1
+
+- Elaborate on CA public key and signature format. #27
 
 - Miscellaneous changes.
 
