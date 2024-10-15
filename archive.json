@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-13T01:54:09.606613+00:00",
+  "timestamp": "2024-10-15T01:49:27.675833+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4850,6 +4850,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 95,
+      "id": "PR_kwDOJIBkVc5-iYLN",
+      "title": "Use `<1..2^24-1>` encoding for all certificate types",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/95",
+      "state": "OPEN",
+      "author": "pohlm01",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In favor of an easier implementation, I propose to change the `CertificateEntry` TLS message such that the Bikeshed certificate is embedded in a length prefixed array. It makes parsing the packets sent over the wire agnostic to the negotiated certificate type. The interpretation/parsing can thus be postponed to checking the certificate.\r\nAs the side effect, it is halfway to the solution for negotiating client certificate types as discussed in [Section B.1](https://datatracker.ietf.org/doc/html/draft-davidben-tls-merkle-tree-certs-03#appendix-B.1).",
+      "createdAt": "2024-10-14T12:29:21Z",
+      "updatedAt": "2024-10-14T12:29:21Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "0fe3626b2fd45f5f15fdb2a1ac56f9c23143125b",
+      "headRepository": "pohlm01/merkle-tree-certs",
+      "headRefName": "main",
+      "headRefOid": "ef4ba6a818d86b3531d5251a1712444597b00a02",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
