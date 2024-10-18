@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 6 April 2025                                   B. E. Westerbaan
+Expires: 21 April 2025                                  B. E. Westerbaan
                                                               Cloudflare
-                                                          3 October 2024
+                                                         18 October 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 April 2025.
+   This Internet-Draft will expire on 21 April 2025.
 
 Copyright Notice
 
@@ -1344,7 +1344,7 @@ Table of Contents
        select (certificate_type) {
            /* Certificate type defined in this document */
            case Bikeshed:
-               BikeshedCertificate certificate;
+               opaque bikeshed_cert_data<1..2^24-1>;
 
            /* From RFC 7250 */
            case RawPublicKey:
@@ -1769,16 +1769,16 @@ Table of Contents
    [I-D.beck-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
               Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-01, 5 September 2024,
+              beck-tls-trust-anchor-ids-02, 10 October 2024,
               <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-01>.
+              trust-anchor-ids-02>.
 
    [I-D.draft-beck-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
               Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-01, 5 September 2024,
+              beck-tls-trust-anchor-ids-02, 10 October 2024,
               <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-01>.
+              trust-anchor-ids-02>.
 
    [I-D.draft-ietf-uta-rfc6125bis]
               Saint-Andre, P. and R. Salz, "Service Identity in TLS",
@@ -1923,9 +1923,9 @@ Table of Contents
    [I-D.draft-ietf-acme-ari]
               Gable, A., "Automated Certificate Management Environment
               (ACME) Renewal Information (ARI) Extension", Work in
-              Progress, Internet-Draft, draft-ietf-acme-ari-05, 23
-              August 2024, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-acme-ari-05>.
+              Progress, Internet-Draft, draft-ietf-acme-ari-06, 17
+              October 2024, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-acme-ari-06>.
 
    [I-D.draft-ietf-tls-batch-signing]
               Benjamin, D., "Batch Signing for TLS", Work in Progress,
