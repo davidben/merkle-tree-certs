@@ -941,7 +941,7 @@ struct {
     select (certificate_type) {
         /* Certificate type defined in this document */
         case Bikeshed:
-            BikeshedCertificate certificate;
+            opaque bikeshed_cert_data<1..2^24-1>;
 
         /* From RFC 7250 */
         case RawPublicKey:
