@@ -1700,7 +1700,7 @@ struct {
 <dt id="section-5.1-2.5">
 <code>public_key</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.6">
-            <p id="section-5.1-2.6.1">The public half of a signing keypair. The corresponding private key, <code>private_key</code>, is known only to the CA.<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.6.1">The public half of a signing key. For convenience, we use TLS' format, and represent the public key as a <code>TLSSubjectInfo</code>, see <a href="#tls-subject-info" class="auto internal xref">Section 10.1</a>. The corresponding private key, <code>private_key</code>, is known only to the CA.<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-2.7">
@@ -1950,7 +1950,7 @@ struct {
 </div>
 <p id="section-5.5.2-4"><code>batch_number</code> is the batch number of the highest batch in the validity window.<a href="#section-5.5.2-4" class="pilcrow">¶</a></p>
 <p id="section-5.5.2-5"><code>tree_heads</code> value contains the last <code>validity_window_size</code> tree heads. (Recall the TLS presentation language brackets the total length of a vector in bytes; not the number of elements.) <code>tree_heads</code> starts from <code>batch_number</code>, in decreasing batch number order. That is, <code>tree_heads[0]</code> is the tree head for batch <code>batch_number</code>, <code>tree_heads[1]</code> is the tree head for <code>batch_number - 1</code>, and so on. If <code>batch_number &lt; validity_window_size - 1</code>, any tree heads for placeholder negative batch numbers are filled with <code>HashEmpty(0, 0)</code>, computed with <code>batch_number</code> set to 0.<a href="#section-5.5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.5.2-6">After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose <code>batch_number</code> is the number of the batch being issued. It then computes a signature over the following structure:<a href="#section-5.5.2-6" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-6">After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindow structure whose <code>batch_number</code> is the number of the batch being issued. It then computes a digital signature over the following structure:<a href="#section-5.5.2-6" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.5.2-7">
 <pre>
 struct {
@@ -1960,9 +1960,10 @@ struct {
 } LabeledValidityWindow;
 </pre><a href="#section-5.5.2-7" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5.2-8">The <code>label</code> field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The <code>issuer_id</code> field is the CA's <code>issuer_id</code>. Other parties can verify the signature by constructing the same input and verifying with the CA's <code>public_key</code>.<a href="#section-5.5.2-8" class="pilcrow">¶</a></p>
-<p id="section-5.5.2-9">The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to <code>batch_number</code>. A CA which generates such a signature is considered to have certified every assertion contained in every value in the <code>tree_heads</code> list, with expiry determined by <code>batch_number</code>, the position of the tree head in the list, and the CA's input parameters as described in <a href="#parameters" class="auto internal xref">Section 5.1</a>.<a href="#section-5.5.2-9" class="pilcrow">¶</a></p>
-<p id="section-5.5.2-10">A CA MUST NOT generate signatures over inputs that are parseable as LabeledValidityWindow, except via the above process. If a LabeledValidityWindow structure that was not produced in this way has a valid signature by CA's <code>public_key</code>, this indicates misuse of the private key by the CA, even if the preimages to the <code>tree_heads</code> values, or intermediate nodes, or <code>subject_info_hash</code> values are not known.<a href="#section-5.5.2-10" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-8">The signature algorithm used is determined by <code>public_key.signature</code> as described in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.3.2" class="relref">Section 4.3.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. (Signatures are created without the domain separation of <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.3" class="relref">Section 4.4.3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.)<a href="#section-5.5.2-8" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-9">The <code>label</code> field is an ASCII string. The final byte of the string, "\0", is a zero byte, or ASCII NULL character. The <code>issuer_id</code> field is the CA's <code>issuer_id</code>. Other parties can verify the signature by constructing the same input and verifying with the CA's <code>public_key</code>.<a href="#section-5.5.2-9" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-10">The CA saves this signature as the batch's validity window signature. It then updates the latest batch to point to <code>batch_number</code>. A CA which generates such a signature is considered to have certified every assertion contained in every value in the <code>tree_heads</code> list, with expiry determined by <code>batch_number</code>, the position of the tree head in the list, and the CA's input parameters as described in <a href="#parameters" class="auto internal xref">Section 5.1</a>.<a href="#section-5.5.2-10" class="pilcrow">¶</a></p>
+<p id="section-5.5.2-11">A CA MUST NOT generate signatures over inputs that are parseable as LabeledValidityWindow, except via the above process. If a LabeledValidityWindow structure that was not produced in this way has a valid signature by CA's <code>public_key</code>, this indicates misuse of the private key by the CA, even if the preimages to the <code>tree_heads</code> values, or intermediate nodes, or <code>subject_info_hash</code> values are not known.<a href="#section-5.5.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proofs">
@@ -3020,10 +3021,13 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
             <p id="appendix-D.1-1.8.1">Clarify we use POSIX time. #1<a href="#appendix-D.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-D.1-1.9">
-            <p id="appendix-D.1-1.9.1">Miscellaneous changes.<a href="#appendix-D.1-1.9.1" class="pilcrow">¶</a></p>
+            <p id="appendix-D.1-1.9.1">Elaborate on CA public key and signature format. #27<a href="#appendix-D.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-D.1-1.10">
-            <p id="appendix-D.1-1.10.1">Replace the negotiation mechanism with TLS Trust Anchor Identifiers.<a href="#appendix-D.1-1.10.1" class="pilcrow">¶</a></p>
+            <p id="appendix-D.1-1.10.1">Miscellaneous changes.<a href="#appendix-D.1-1.10.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.1-1.11">
+            <p id="appendix-D.1-1.11.1">Replace the negotiation mechanism with TLS Trust Anchor Identifiers.<a href="#appendix-D.1-1.11.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
