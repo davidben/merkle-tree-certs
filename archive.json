@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-17T01:48:10.735187+00:00",
+  "timestamp": "2024-10-20T01:56:08.867016+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -743,15 +743,15 @@
       "id": "I_kwDOJIBkVc5nnEh-",
       "title": "Elaborate on CA public key",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/27",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "In `-00` we write\r\n\r\n```\r\npublic_key: The public half of a signing keypair. The corresponding private key, private_key, is known only to the CA.\r\n```\r\n\r\nThis needs elaboration. We could pick one post-quantum signature scheme, as we have picked SHA256 as hash. Say Dilithium2. It's not unconceivable that we'll want to migrate to a new signature scheme. Perhaps because Dilithium2's security is weaker than expected, but more likely because a significantly better post-quantum signature scheme has stabilised.\r\n\r\nProofType should afford enough flexibility for this.\r\n\r\nAlternatively, we can simply use a `TLSSubjectInfo`-like structure for the CA public key.\r\n\r\nA different idea, is to use a stateful hash based signature such as LMS or XMSS. There is no need to keep state: instead we can use the `n`th one-time-signature for the `n`th window. Clients can check whether the right OTS is used. Then if the CA accidentally signs and published the same window twice, then the private key is only compromised for that window, which will be ignored anyway by TSs if such a thing happens. With `n=16`, `h=20` and `w=16`, a key pair will last 119 years, signatures will be 880 bytes, verification will take 1,181 SHA2 hashes and keygen 1 billion SHA2 hashes. The upside is that this is definitely post-quantum secure. But this is all rather more complicated to implement than a plain signature, so I suppose we're better of sticking with Dilithium for now and accept we might have to change at some point. (This would complicate signing revocation lists.)\r\n",
       "createdAt": "2023-06-02T14:19:10Z",
-      "updatedAt": "2023-06-05T12:45:43Z",
-      "closedAt": null,
+      "updatedAt": "2024-10-18T18:32:49Z",
+      "closedAt": "2024-10-18T18:32:49Z",
       "comments": [
         {
           "author": "davidben",
@@ -1744,6 +1744,22 @@
       "createdAt": "2024-10-03T13:21:23Z",
       "updatedAt": "2024-10-03T15:52:10Z",
       "closedAt": "2024-10-03T15:52:10Z",
+      "comments": []
+    },
+    {
+      "number": 96,
+      "id": "I_kwDOJIBkVc6a3JXF",
+      "title": "Define a MTC trust anchor serialization",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/96",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-10-18T18:33:05Z",
+      "updatedAt": "2024-10-18T18:33:05Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -3291,26 +3307,42 @@
       "id": "PR_kwDOJIBkVc5SxUoK",
       "title": "Elaborate on CA public key and signature format",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/50",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #27",
       "createdAt": "2023-06-12T12:55:38Z",
-      "updatedAt": "2023-06-19T22:23:40Z",
+      "updatedAt": "2024-10-18T18:32:49Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a93a321f5ca4deee7bc7b19c4b6eefdf1f0dc38a",
       "headRepository": "bwesterb/merkle-tree-certs",
       "headRefName": "issue-27",
       "headRefOid": "b508a1d500d26d061ea269197272c6cfa1c99bc5",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2024-10-18T18:32:48Z",
+      "mergedAt": "2024-10-18T18:32:48Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f74e52f630d33dcdc495de56e18af2869adbfbdb"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6NyLFb",
+          "commit": {
+            "abbreviatedOid": "b508a1d"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-10-18T18:32:44Z",
+          "updatedAt": "2024-10-18T18:32:44Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 51,
@@ -4856,26 +4888,42 @@
       "id": "PR_kwDOJIBkVc5-iYLN",
       "title": "Use `<1..2^24-1>` encoding for all certificate types",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/95",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "pohlm01",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "In favor of an easier implementation, I propose to change the `CertificateEntry` TLS message such that the Bikeshed certificate is embedded in a length prefixed array. It makes parsing the packets sent over the wire agnostic to the negotiated certificate type. The interpretation/parsing can thus be postponed to checking the certificate.\r\nAs the side effect, it is halfway to the solution for negotiating client certificate types as discussed in [Section B.1](https://datatracker.ietf.org/doc/html/draft-davidben-tls-merkle-tree-certs-03#appendix-B.1).",
       "createdAt": "2024-10-14T12:29:21Z",
-      "updatedAt": "2024-10-14T12:29:21Z",
+      "updatedAt": "2024-10-18T18:09:25Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "0fe3626b2fd45f5f15fdb2a1ac56f9c23143125b",
       "headRepository": "pohlm01/merkle-tree-certs",
       "headRefName": "main",
       "headRefOid": "ef4ba6a818d86b3531d5251a1712444597b00a02",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2024-10-18T18:09:25Z",
+      "mergedAt": "2024-10-18T18:09:25Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "236102a050d47462060cbe2351c696df4a9506f2"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6NyCB3",
+          "commit": {
+            "abbreviatedOid": "ef4ba6a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-10-18T18:09:17Z",
+          "updatedAt": "2024-10-18T18:09:17Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
