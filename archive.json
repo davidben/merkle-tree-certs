@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-29T01:50:45.790386+00:00",
+  "timestamp": "2024-10-31T01:50:39.060662+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1759,6 +1759,22 @@
       "body": "",
       "createdAt": "2024-10-18T18:33:05Z",
       "updatedAt": "2024-10-18T18:33:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 97,
+      "id": "I_kwDOJIBkVc6cY8K6",
+      "title": "Default file structure for RP and AP ",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/97",
+      "state": "OPEN",
+      "author": "pohlm01",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\r\nOperating systems often ship a list of trusted certificates in a well-known location. The [go source code](https://go.dev/src/crypto/x509/root_linux.go) is a nice place for an overview of where Linux stores its trusted roots. It might be nice to recommend a file structure as part of the RFC as well.\r\n\r\n## Relying Party\r\nI propose the following structure for a relying party, mainly inspired by Debian/Ubuntu:\r\n\r\n```text\r\netc\r\n\u2514\u2500 ssl\r\n    \u2514\u2500 mtc\r\n        \u2514\u2500 <issuer_id>\r\n            \u251c\u2500 ca-params\r\n            \u251c\u2500 validity-window\r\n            \u2514\u2500 signature\r\n```\r\n\r\nI think the prefix of the storage location may be different per distribution. For example, `etc/ssl/mtc` for Debian and `/etc/pki/tls/mtc` for Fedora/RHEL. What is more interesting is the structure thereafter.\r\n\r\nEach CA would live in its own subdirectory with the Issuer ID (i.e., TAI/OID) as the directory name. This directory contains the CA parameters, the root hashes of the validity window, and optionally the signature over the validity window. The CA parameters would be the following binary representation:\r\n\r\n```text\r\nstruct {\r\n    TrustAnchorIdentifier   issuer;\r\n    SignatureScheme         signature_scheme;\r\n    opaque                  public_key<1..2^16-1>;\r\n    ProofType               proof_type;\r\n    uint64                  start_time;\r\n    uint64                  batch_duration;\r\n    uint64                  lifetime;\r\n    uint32                  validity_window_size;\r\n    uint64                  storage_window_size;\r\n    opaque                  http_server<1..2^16-1>;\r\n}\r\n```\r\n\r\nThe validity window would contain the batch number and all currently valid root hashes, like defined in the draft already:\r\n```text\r\nstruct {\r\n    uint32      batch_number;\r\n    TreeHead    tree_heads[validity_window_size*hash.length];\r\n} ValidityWindow;\r\n```\r\nThe signature seems optional to me. If the relying party trusts its trust services, there might not be a need to sync them as well.\r\nThis would also save quite some bandwidth, depending on how often an RP gets updated and how many CAs exist.\r\n\r\nThat is also the reason I would like to have the signature and validity window separate, as it simplifies the update service to fetch only the missing tree heads and optionally the signature.\r\n\r\nFor the CA parameters, I am not sure if all information is actually required on the RP side. At the same time, the size is not very important here, as it would get updated only occasionally. Mainly, either the validity window size or lifetime might be left out, \r\nand the HTTP server location of the CA might be irrelevant as updates should get fetched from the transparency services. \r\n\r\n## Authenticating Party\r\nFor the authenticating party, a common structure does not seem as relevant; still, it might be nice to recommend one:\r\n\r\nI propose to store the certificates the server can choose from as `<batch_number>.mtc` in separate files and reuse the same format as for the RP for the CA parameters. To my understanding, the CA parameters are only required to know when a certificate becomes invalid, but keeping the other information in the struct allows reusing a parser that was written for the RP.\r\nThe private key is necessary to authenticate the handshake. It may be stored somewhere else as well.\r\n\r\n```text\r\n<some directory>\r\n\u2514\u2500 <issuer_id>\r\n    \u251c\u2500 0.mtc\r\n    \u251c\u2500 1.mtc\r\n    \u251c\u2500 ...\r\n    \u251c\u2500 ca-params\r\n    \u2514\u2500 private-key.pem\r\n```\r\n\r\nAny comments on the proposed structure, as well as the need to include this as a recommendation, are welcome.",
+      "createdAt": "2024-10-30T11:29:49Z",
+      "updatedAt": "2024-10-30T11:29:49Z",
       "closedAt": null,
       "comments": []
     }
