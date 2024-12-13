@@ -66,35 +66,15 @@ informative:
     author:
     - org: Apple
 
-  Dilithium:
-    title: CRYSTALS-Dilithium Algorithm Specifications and Supporting Documentation
-    target: https://pq-crystals.org/dilithium/data/dilithium-specification-round3-20210208.pdf
-    date: 2021-02-08
+  FIPS204:
+    target: https://csrc.nist.gov/projects/post-quantum-cryptography
+    title: >
+      Module-Lattice-based Digital Signature Standard
     author:
-    -
-      ins: "S. Bai"
-      name: "Shi Bai"
-    -
-      ins: "L. Ducas"
-      name: "Léo Ducas"
-    -
-      ins: "E. Kiltz"
-      name: "Eike Kiltz"
-    -
-      ins: "T. Lepoint"
-      name: "Tancrède Lepoint"
-    -
-      ins: "V. Lyubashevsky"
-      name: "Vadim Lyubashevsky"
-    -
-      ins: "P. Schwabe"
-      name: "Peter Schwabe"
-    -
-      ins: "G. Seiler"
-      name: "Gregor Seiler"
-    -
-      ins: "D. Stehlé"
-      name: "Damien Stehlé"
+    - org: National Institute of Standards and Technology (NIST)
+    date: 2023-08
+    seriesinfo:
+      "FIPS PUB": "204"
 
   Falcon:
     title: "Falcon: Fast-Fourier Lattice-based Compact Signatures over NTRU"
@@ -212,7 +192,7 @@ Authors' Note: This is an early draft of a proposal with many parts. While we ha
 
 A typical TLS {{!RFC8446}} handshake uses many signatures to authenticate the server public key. In a certificate chain with an end-entity certificate, an intermediate certificate, and an implicit trust anchor, there are two X.509 signatures {{?RFC5280}}. Intermediate certificates additionally send an extra public key. If the handshake uses Certificate Transparency (CT) {{?RFC6962}}, each Signed Certificate Timestamp (SCT) also carries a signature. CT policies often require two or more SCTs per certificate {{APPLE-CT}} {{CHROME-CT}}. If the handshake staples an OCSP response {{?RFC6066}} for revocation, that adds an additional signature.
 
-Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, Dilithium3 {{Dilithium}} uses 1,952 bytes per public key and 3,293 bytes per signature. A TLS Certificate message with, say, four Dilithum3 signatures (two X.509 signatures and two SCTs) and one intermediate CA's Dilithium3 public key would total 15,124 bytes of authentication overhead. Falcon-512 and Falcon-1024 {{Falcon}} would, respectively, total 3,561 and 6,913 bytes.
+Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature {{?RFC8032}}, but post-quantum replacements are much larger. For example, ML-DSA-65 {{FIPS204}} uses 1,952 bytes per public key and 3,309 bytes per signature. A TLS Certificate message with, say, four ML-DSA-65 signatures (two X.509 signatures and two SCTs) and one intermediate CA's ML-DSA-65 public key would total 15,188 bytes of authentication overhead. Falcon-512 and Falcon-1024 {{Falcon}} would, respectively, total 3,561 and 6,913 bytes.
 
 This document introduces Merkle Tree Certificates, an optimization that authenticates a TLS key using under 1,000 bytes. See {{sizes}}. To achieve this, it reduces its scope from general authentication:
 
