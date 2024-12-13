@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 23 March 2025                                  B. E. Westerbaan
+Expires: 16 June 2025                                   B. E. Westerbaan
                                                               Cloudflare
-                                                       19 September 2024
+                                                        13 December 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 March 2025.
+   This Internet-Draft will expire on 16 June 2025.
 
 Copyright Notice
 
@@ -155,20 +155,21 @@ Table of Contents
 
    Current signature schemes can use as few as 32 bytes per key and 64
    bytes per signature [RFC8032], but post-quantum replacements are much
-   larger.  For example, Dilithium3 [Dilithium] uses 1,952 bytes per
-   public key and 3,293 bytes per signature.  A TLS Certificate message
-   with, say, four Dilithum3 signatures (two X.509 signatures and two
-   SCTs) and one intermediate CA's Dilithium3 public key would total
-   15,124 bytes of authentication overhead.  Falcon-512 and Falcon-1024
+   larger.  For example, ML-DSA-65 [FIPS204] uses 1,952 bytes per public
+   key and 3,293 bytes per signature.  A TLS Certificate message with,
+   say, four ML-DSA-65 signatures (two X.509 signatures and two SCTs)
+   and one intermediate CA's ML-DSA-65 public key would total 15,124
+   bytes of authentication overhead.  Falcon-512 and Falcon-1024
    [Falcon] would, respectively, total 3,561 and 6,913 bytes.
 
    This document introduces Merkle Tree Certificates, an optimization
-   that authenticates a subscriber key using under 1,000 bytes.  See
+   that authenticates a TLS key using under 1,000 bytes.  See
    Section 5.6.  To achieve this, it reduces its scope from general
    authentication:
 
-   *  Certificates are short-lived.  The subscriber is expected to use
-      an automated issuance protocol, such as ACME [RFC8555].
+   *  Certificates are short-lived.  The authenticating party is
+      expected to use an automated issuance protocol, such as ACME
+      [RFC8555].
 
    *  Certificates are only usable with relying parties that have
       contacted a transparency service sufficiently recently.  See
@@ -176,13 +177,13 @@ Table of Contents
 
    *  Certificates are issued after a significant processing delay of,
       in the recommended parameters (Section 5.1), about an hour.
-      Subscribers that need a certificate issued quickly are expected to
-      use a different mechanism.
+      Authenticating parties that need a certificate issued quickly are
+      expected to use a different mechanism.
 
    To support the reduced scope, this document also describes a
-   certificate negotiation mechanism.  Subscribers send these more
-   efficient certificates when available, and otherwise fall back to
-   other mechanisms.
+   certificate negotiation mechanism.  Authenticating parties send these
+   more efficient certificates when available, and otherwise fall back
+   to other mechanisms.
 
    Merkle Tree Certificates are not intended to replace existing Public
    Key Infrastructure (PKI) mechanisms but, in applications where a
@@ -225,17 +226,17 @@ Table of Contents
    There are five roles involved in a Merkle Tree certificate
    deployment:
 
-   Subscriber:  The party that authenticates itself in the protocol.  In
-      TLS, this is the side sending the Certificate and
+   Authenticating party:  The party that authenticates itself in the
+      protocol.  In TLS, this is the side sending the Certificate and
       CertificateVerify message.
 
    Merkle Tree certification authority (CA):  The service that issues
-      Merkle Tree certificates to the subscriber, and publishes logs of
-      all certificates.
+      Merkle Tree certificates to the authenticating party, and
+      publishes logs of all certificates.
 
-   Relying party:  The party authenticating the subscriber.  In TLS,
-      this is the side receiving the Certificate and CertificateVerify
-      message.
+   Relying party:  The party whom the authenticating party presents its
+      identity to.  In TLS, this is the side receiving the Certificate
+      and CertificateVerify message.
 
    Transparency service:  The service that mirrors the issued
       certificates for others to monitor.  It additionally summarizes
@@ -288,8 +289,8 @@ Table of Contents
 
    The process of issuing and using a certificate is as follows:
 
-   1.  The subscriber requests a certificate from the CA.  Section 9
-       describes ACME [RFC8555] extensions for this.
+   1.  The authenticating party requests a certificate from the CA.
+       Section 9 describes ACME [RFC8555] extensions for this.
 
    2.  The CA collects certificate requests into a batch (see
        Section 5.1) and builds the Merkle Tree and computes the tree
@@ -298,7 +299,8 @@ Table of Contents
        Section 8) the result.
 
    3.  The CA constructs a certificate using the inclusion proof.  It
-       sends this certificate to the subscriber.  See Section 5.5.3.
+       sends this certificate to the authenticating party.  See
+       Section 5.5.3.
 
    4.  The transparency service downloads the abridged assertions,
        recreates the Merkle Tree, and validates the window signature.
@@ -310,20 +312,20 @@ Table of Contents
 
    6.  In an application protocol such as TLS, the relying party
        communicates its currently saved validity window to the
-       subscriber.
+       authenticating party.
 
-   7.  If the relying party’s validity window contains the subscriber’s
-       certificate, the subscriber negotiates this protocol and sends
-       the Merkle Tree certificate.  See Section 10.3 for details.  If
-       there is no match, the subscriber proceeds as if this protocol
-       were not in use (e.g., by sending a traditional X.509 certificate
-       chain).
+   7.  If the relying party’s validity window contains the
+       authenticating party’s certificate, the authenticating party
+       negotiates this protocol and sends the Merkle Tree certificate.
+       See Section 10.3 for details.  If there is no match, the
+       authenticating party proceeds as if this protocol were not in use
+       (e.g., by sending a traditional X.509 certificate chain).
 
    Figure 1 below shows this process.
 
      +--------------+  1. issuance request  +-------------------------+
      |              +---------------------->|                         |
-     |  Subscriber  |                       | Certification Authority |
+     | Auth. Party  |                       | Certification Authority |
      |              |<----------------------+                         |
      +---------+----+   3. inclusion proof  +-----------+-------------+
             ^  |                                        |
@@ -420,8 +422,9 @@ Table of Contents
 
    When a relying party interprets an Assertion certified by the CA, it
    MUST ignore any Claim values with unrecognized claim_type.  When a CA
-   interprets an Assertion in a certification request from a subscriber,
-   it MUST reject any Claim values with unrecognized claim_type.
+   interprets an Assertion in a certification request from an
+   authenticating party, it MUST reject any Claim values with
+   unrecognized claim_type.
 
    This document defines claim types for DNS names and IP addresses, but
    others can be defined.
@@ -430,10 +433,10 @@ Table of Contents
    GeneralName structure.  Should these be origins instead?  For HTTPS,
    it's a pity to not capture the scheme and port.  We do mandate ALPN
    in Section 10.2, so cross-protocol attacks are mitigated, but it's
-   unfortunate that subscribers cannot properly separate their HTTPS vs
-   FTPS keys, or their port 443 vs port 444 keys.  One option here is to
-   have HTTPS claims instead, and then other protocols can have FTPS
-   claims, etc. #35 ]]
+   unfortunate that authenticating parties cannot properly separate
+   their HTTPS vs FTPS keys, or their port 443 vs port 444 keys.  One
+   option here is to have HTTPS claims instead, and then other protocols
+   can have FTPS claims, etc. #35 ]]
 
 4.1.  DNS Claims
 
@@ -482,7 +485,7 @@ Table of Contents
 
    This section describes the structure of Merkle Tree certificates and
    defines the process of how a Merkle Tree certification authority
-   issues certificates for a subscriber.
+   issues certificates for an authenticating party.
 
 5.1.  Merkle Tree CA Parameters
 
@@ -496,8 +499,10 @@ Table of Contents
       [I-D.beck-tls-trust-anchor-ids]) that identifies the CA.  See
       Section 5.2 for details.
 
-   public_key:  The public half of a signing keypair.  The corresponding
-      private key, private_key, is known only to the CA.
+   public_key:  The public half of a signing key.  For convenience, we
+      use TLS' format, and represent the public key as a TLSSubjectInfo,
+      see Section 10.1.  The corresponding private key, private_key, is
+      known only to the CA.
 
    start_time:  The issuance time of the first batch of certificates,
       represented as a POSIX timestamp (see Section 2.1).
@@ -522,11 +527,12 @@ Table of Contents
 
    [[TODO: The signing key case is interesting.  A CA could actually
    maintain a single stream of Merkle Trees, but then sign everything
-   with multiple keys to support rotation.  The CA -> Subscriber -> RP
-   flow does not depend on the signature, only the CA -> Transparency
-   Service -> RP flow.  The document is not currently arranged to
-   capture this, but it probably should be.  We probably need to
-   decouple the signing half and the Merkle Tree half slightly. #36 ]]
+   with multiple keys to support rotation.  The CA -> Authenticating
+   Party -> RP flow does not depend on the signature, only the CA ->
+   Transparency Service -> RP flow.  The document is not currently
+   arranged to capture this, but it probably should be.  We probably
+   need to decouple the signing half and the Merkle Tree half slightly.
+   #36 ]]
 
    Certificates are issued in batches.  Batches are numbered
    consecutively, starting from zero.  All certificates in a batch have
@@ -535,7 +541,7 @@ Table of Contents
    batch 0 has an issuance time of start_time, and issuance times
    increment by batch_duration.  A CA can issue no more frequently than
    batch_duration. batch_duration determines how long it takes for the
-   CA to return a certificate to the subscriber.
+   CA to return a certificate to the authenticating party.
 
    All certificates in a batch have the same expiration time, computed
    as lifetime past the issuance time.  After this time, the
@@ -604,17 +610,14 @@ Table of Contents
 5.4.  Issuance Queue and Scheduling
 
    The CA additionally maintains an issuance queue, not exposed via the
-   HTTP interface.  Each element of the issuance queue is an assertion
-   to be certified, and an optional requested expiration time.  The
-   final not_after will be computed from both this requested time and
-   the expiration time of the whole batch.
+   HTTP interface.
 
-   When a subscriber requests a certificate for some assertion, the CA
-   first validates it per its issuance policy.  For example, it may
-   perform ACME identifier validation challenges (Section 8 of
-   [RFC8555]).  Once validation is complete and the CA is willing to
-   certify the assertion, the CA appends it, and the subscriber's
-   requested expiry time, to the issuance queue.
+   When an authenticating party requests a certificate for some
+   assertion, the CA first validates it per its issuance policy.  For
+   example, it may perform ACME identifier validation challenges
+   (Section 8 of [RFC8555]).  Once validation is complete and the CA is
+   willing to certify the assertion, the CA appends it to the issuance
+   queue.
 
    The CA runs a regularly-scheduled issuance job which converts this
    queue into certificates.  This job runs the following procedure:
@@ -648,9 +651,9 @@ Table of Contents
    contains a hash value.  Hashes in the tree are built from the
    following functions:
 
-    HashEmpty(level, index) = hash(HashEmptyInput)
-    HashNode(left, right, level, index) = hash(HashNodeInput)
-    HashAssertion(assertion, not_after, index) = hash(HashAssertionInput)
+       HashEmpty(level, index) = hash(HashEmptyInput)
+       HashNode(left, right, level, index) = hash(HashNodeInput)
+       HashAssertion(assertion, index) = hash(HashAssertionInput)
 
    HashEmpyInput, HashNodeInput and HashAssertionInput are computed by
    encoding the structures defined below:
@@ -682,7 +685,6 @@ Table of Contents
        TrustAnchorIdentifier batch_id;
        uint64 index;
        AbridgedAssertion abridged_assertion;
-       Timestamp not_after;
    } HashAssertionInput;
 
    The batch_id is set to the batch-specific trust anchor identifier,
@@ -696,21 +698,11 @@ Table of Contents
 
    Tree levels are computed iteratively as follows:
 
-   1.  Let batch_not_after be the expiration time for this batch, as
-       described in Section 5.1.
-
-   2.  Initialize an array not_after with n elements.  For each For j
-       between 0 and n-1, inclusive, set not_after[j] to the minimum of
-       batch_not_after and assertion j's requested expiration time.  If
-       assertion j did not request an expiration time, set not_after[j]
-       to batch_not_after.  If not_after[j] is before the current time,
-       discard the assertion and decrement n.
-
-   3.  Initialize level 0 with n elements.  For j between 0 and n-1,
+   1.  Initialize level 0 with n elements.  For j between 0 and n-1,
        inclusive, set element j to the output of
-       HashAssertion(assertion[j], not_after[j], j).
+       HashAssertion(assertion[j], j).
 
-   4.  For i between 1 and l-1, inclusive, compute level i from level
+   2.  For i between 1 and l-1, inclusive, compute level i from level
        i-1 as follows:
 
        *  If level i-1 has an odd number of elements j, append
@@ -743,7 +735,7 @@ Table of Contents
    HashEmpty(0, 0).
 
    If n is one, the tree contains a single level, level 0, and has a
-   tree head of HashAssertion(assertion[0], not_after[0], 0).
+   tree head of HashAssertion(assertion, 0).
 
 5.5.2.  Signing a ValidityWindow
 
@@ -777,14 +769,18 @@ Table of Contents
 
    After the CA builds the Merkle Tree for a batch, it constructs the
    ValidityWindow structure whose batch_number is the number of the
-   batch being issued.  It then computes a signature over the following
-   structure:
+   batch being issued.  It then computes a digital signature over the
+   following structure:
 
    struct {
        uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
        TrustAnchorIdentifier issuer_id;
        ValidityWindow window;
    } LabeledValidityWindow;
+
+   The signature algorithm used is determined by public_key.signature as
+   described in Section 4.3.2 of [RFC8446].  (Signatures are created
+   without the domain separation of Section 4.4.3 of [RFC8446].)
 
    The label field is an ASCII string.  The final byte of the string,
    "\0", is a zero byte, or ASCII NULL character.  The issuer_id field
@@ -811,6 +807,11 @@ Table of Contents
    [[TODO: BikeshedCertificate is a placeholder name until someone comes
    up with a better one. #15 ]]
 
+   [[TODO: An authenticating party has no way to know when a certificate
+   expires.  We need to define a mandatory expiration certificate
+   property, or do #83, which, depending on how it's done could avoid
+   that.]]
+
    For each assertion in the tree, the CA constructs a
    BikeshedCertificate structure containing the assertion and a proof.
    A proof is a message that allows the relying party to accept the
@@ -820,11 +821,8 @@ Table of Contents
    /* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
    opaque TrustAnchorIdentifier<1..2^8-1>;
 
-   uint64 Timestamp;
-
    struct {
        TrustAnchorIdentifier trust_anchor;
-       Timestamp not_after;
        opaque proof_data<0..2^16-1>;
    } Proof;
 
@@ -840,15 +838,11 @@ Table of Contents
    When the issuer is a Merkle Tree CA, the trust_anchor is a batch's
    batch_id, as described in Section 5.2.
 
-   A proof's not_after field is a POSIX timestamp (see Section 2.1)
-   describing the time after which the proof is no longer valid.
-
-   A proof's proof_data field is a byte string, opaque to the
-   subscriber, in some format agreed upon by the proof issuer and
-   relying party.  If the issuer is a Merkle Tree CA, as defined in this
-   document, the proof_data contains a MerkleTreeProofSHA256, described
-   below.  Future mechanisms using the BikeshedCertificate may define
-   other formats.
+   The proof_data is a byte string, opaque to the authenticating party,
+   in some format agreed upon by the proof issuer and relying party.  If
+   the issuer is a Merkle Tree CA, as defined in this document, the
+   proof_data contains a MerkleTreeProofSHA256, described below.  Future
+   mechanisms using the BikeshedCertificate may define other formats.
 
    opaque HashValueSHA256[32];
 
@@ -891,7 +885,7 @@ Table of Contents
    index will be zero.
 
    For each assertion, the CA assembles a BikeshedCertificate structure
-   and sends it to the subscriber.
+   and sends it to the authenticating party.
 
    This certificate can be presented to supporting relying parties as
    described in Section 6.  It is valid until the batch expires.
@@ -899,9 +893,9 @@ Table of Contents
 5.6.  Size Estimates
 
    Merkle Tree proofs scale logarithmically in the batch size.
-   Section 11.2 recommends subscribers renew halfway through the
-   previous certificate's lifetime.  Batch sizes will thus, on average,
-   be subscriber_count * 2 / validity_window_size, where
+   Section 11.2 recommends authenticating parties renew halfway through
+   the previous certificate's lifetime.  Batch sizes will thus, on
+   average, be subscriber_count * 2 / validity_window_size, where
    subscriber_count is a CA's active subscriber count.  The recommended
    parameters in Section 5.1 give an average of subscriber_count / 168.
 
@@ -924,8 +918,8 @@ Table of Contents
 
 6.  Using Certificates
 
-   This section describes how subscribers present and relying parties
-   verify Merkle Tree certificates.
+   This section describes how authenticating parties present and relying
+   parties verify Merkle Tree certificates.
 
 6.1.  Relying Party State
 
@@ -948,8 +942,8 @@ Table of Contents
    errors.  When multiple error conditions apply, the application MAY
    return any applicable error.
 
-   When a subscriber presents a BikeshedCertificate, the relying party
-   runs the following procedure:
+   When an authenticating party presents a BikeshedCertificate, the
+   relying party runs the following procedure:
 
    1.  Determines if trust_anchor corresponds to a supported trust
        anchor, and the type of that trust anchor.  If trust_anchor is
@@ -959,14 +953,11 @@ Table of Contents
    2.  Run the verification subroutine corresponding to that trust
        anchor, defined below.
 
-   3.  If the current time is greater than the not_after field, abort
-       this procedure with a certificate_expired error.
-
-   4.  Optionally, perform any additional application-specific checks on
+   3.  Optionally, perform any additional application-specific checks on
        the assertion and issuer.  For example, an HTTPS client might
        constrain an issuer to a particular DNS subtree.
 
-   5.  If all the preceding checks succeed, the certificate is valid and
+   4.  If all the preceding checks succeed, the certificate is valid and
        the application can proceed with using the assertion.
 
    Step 2 in the above procedure runs a trust-anchor-specific
@@ -979,11 +970,11 @@ Table of Contents
    Section 6.1.)  The batch's verification subroutine is defined below:
 
    1.  Compute the batch's expiration time, as described in Section 5.1.
-       If this value is before the not_after field, abort this procedure
-       with a bad_certificate error.
+       If this value is before the current time, abort this procedure
+       with a certificate_expired error.
 
-   2.  Set hash to the output of HashAssertion(assertion, not_after,
-       index).  Set remaining to the certificate's index value.
+   2.  Set hash to the output of HashAssertion(assertion, index).  Set
+       remaining to the certificate's index value.
 
    3.  For each element v at zero-based index i of the certificate's
        path field, in order:
@@ -1272,13 +1263,13 @@ Table of Contents
 
    *  Some way to accommodate MTC's long issuance time.  ACME has the
       "processing" state, and the Retry-After header can tell the
-      subscriber when to query again.  But the fallback certificate will
-      issue much faster, so they cannot be issued together in the same
-      ACME order, as [I-D.draft-beck-tls-trust-anchor-ids] currently
-      does.
+      authenticating party when to query again.  But the fallback
+      certificate will issue much faster, so they cannot be issued
+      together in the same ACME order, as
+      [I-D.draft-beck-tls-trust-anchor-ids] currently does.
 
    *  Use [I-D.draft-ietf-acme-ari] to move the renewal logic in
-      Section 11.2 from the subscriber to the ACME server.
+      Section 11.2 from the authenticating party to the ACME server.
 
    We should also define a certificate request format, though it is
    broadly just reusing the Assertion structure.  If the CA wishes to
@@ -1309,8 +1300,8 @@ Table of Contents
    a SignatureScheme Section 4.2.3 of [RFC8446] value describing the key
    type and signature algorithm it uses for CertificateVerify.
 
-   The public_key field contains the subscriber's public key.  The
-   encoding is determined by the signature field as follows:
+   The public_key field contains the authenticating party's public key.
+   The encoding is determined by the signature field as follows:
 
    RSASSA-PSS algorithms:  The public key is an RSAPublicKey structure
       [RFC8017] encoded in DER [X.690].  BER encodings which are not DER
@@ -1359,7 +1350,7 @@ Table of Contents
        select (certificate_type) {
            /* Certificate type defined in this document */
            case Bikeshed:
-               BikeshedCertificate certificate;
+               opaque bikeshed_cert_data<1..2^24-1>;
 
            /* From RFC 7250 */
            case RawPublicKey:
@@ -1380,8 +1371,8 @@ Table of Contents
 
    *  The signature is computed and verified with the key described in
       the TLSSubjectInfo.  The relying party uses the key decoded from
-      the public_key field, and the subscriber uses the corresponding
-      private key.
+      the public_key field, and the authenticating party uses the
+      corresponding private key.
 
    *  The SignatureScheme in the CertificateVerify MUST match the
       signature field in the TLSSubjectInfo.
@@ -1437,26 +1428,26 @@ Table of Contents
    https://github.com/davidben/tls-trust-expressions/issues/62, either
    in this draft or the main trust anchor IDs draft.]]
 
-   The subscriber's list of candidate certification paths (see
+   The authenticating party's list of candidate certification paths (see
    Section 3.3 of [I-D.beck-tls-trust-anchor-ids]) is extended to carry
    both X.509 and BikeshedCertificate credentials.  The two types of
    credentials MAY appear in any relative preference order, based on the
-   subscriber's policies.  Like an X.509 credential, a
+   authenticating party's policies.  Like an X.509 credential, a
    BikeshedCertificate credential also has a CertificatePropertyList
    (see Section 3.1 of [I-D.beck-tls-trust-anchor-ids]).
 
-   For each of the subscriber's BikeshedCertificate credentials, the
-   corresponding trust anchor identifier is the trust_anchor field in
-   the BikeshedCertificate structure.  This differs from X.509
-   credentials, which require an out-of-band value in the
-   CertificatePropertyList.  It is an error for a BikeshedCertificate
-   credential's CertificatePropertyList to contain the
-   trust_anchor_identifier property.
+   For each of the authenticating party's BikeshedCertificate
+   credentials, the corresponding trust anchor identifier is the
+   trust_anchor field in the BikeshedCertificate structure.  This
+   differs from X.509 credentials, which require an out-of-band value in
+   the CertificatePropertyList.  It is an error for a
+   BikeshedCertificate credential's CertificatePropertyList to contain
+   the trust_anchor_identifier property.
 
-   The subscriber then selects certificates as described in Section 4.2
-   of [I-D.draft-beck-tls-trust-anchor-ids].  In doing so, it SHOULD
-   incorporate trust anchor negotiation and certificate type negotiation
-   (see Section 10.2) into the selection criteria for
+   The authenticating party then selects certificates as described in
+   Section 4.2 of [I-D.draft-beck-tls-trust-anchor-ids].  In doing so,
+   it SHOULD incorporate trust anchor negotiation and certificate type
+   negotiation (see Section 10.2) into the selection criteria for
    BikeshedCertificate-based credentials.
 
    [[TODO: Certificate type negotiation doesn't work right for client
@@ -1466,11 +1457,11 @@ Table of Contents
 
 11.1.  Fallback Mechanisms
 
-   Subscribers using Merkle Tree certificates SHOULD additionally
-   provision certificates from another PKI mechanism, such as X.509.
-   This ensures the service remains available to relying parties that
-   have not recently fetched validity window updates, or lack
-   connectivity to the transparency service.
+   Authenticating parties using Merkle Tree certificates SHOULD
+   additionally provision certificates from another PKI mechanism, such
+   as X.509.  This ensures the service remains available to relying
+   parties that have not recently fetched validity window updates, or
+   lack connectivity to the transparency service.
 
    If the pipeline of updates from the CA to the transparency service to
    relying parties is interrupted, certificate issuance may halt, or
@@ -1480,21 +1471,21 @@ Table of Contents
 
 11.2.  Rolling Renewal
 
-   When a subscriber requests a certificate, the CA cannot fulfill the
-   request until the next batch is ready.  Once published, the
-   certificate will not be accepted by relying parties until the batch
-   state is mirrored by their respective transparency services, then
-   pushed to relying parties.
+   When an authenticating party requests a certificate, the CA cannot
+   fulfill the request until the next batch is ready.  Once published,
+   the certificate will not be accepted by relying parties until the
+   batch state is mirrored by their respective transparency services,
+   then pushed to relying parties.
 
-   To account for this, subscribers SHOULD request a new Merkle Tree
-   certificate significantly before the previous Merkle Tree certificate
-   expires.  Renewing halfway into the previous certificate's lifetime
-   is RECOMMENDED.  Subscribers additionally SHOULD retain both the new
-   and old certificates in the certificate set until the old certificate
-   expires.  As the new tree hash is delivered to relying parties,
-   certificate negotiation will transition relying parties to the new
-   certificate, while retaining the old certificate for clients that are
-   not yet updated.
+   To account for this, authenticating parties SHOULD request a new
+   Merkle Tree certificate significantly before the previous Merkle Tree
+   certificate expires.  Renewing halfway into the previous
+   certificate's lifetime is RECOMMENDED.  Authenticating parties
+   additionally SHOULD retain both the new and old certificates in the
+   certificate set until the old certificate expires.  As the new tree
+   hash is delivered to relying parties, certificate negotiation will
+   transition relying parties to the new certificate, while retaining
+   the old certificate for clients that are not yet updated.
 
 11.3.  Deploying New Keys
 
@@ -1505,16 +1496,17 @@ Table of Contents
    certificate, relying parties will not yet have received a validity
    window containing this certificate from the transparency service and
    can therefore not validate this certificate until receiving them.
-   The subscriber SHOULD, in parallel, also provision a certificate
-   using another PKI mechanism (e.g.  X.509).  Certificate negotiation
-   will then switch over to serving the Merkle Tree certificate as
-   relying parties are updated.
+   The authenticating party SHOULD, in parallel, also provision a
+   certificate using another PKI mechanism (e.g.  X.509).  Certificate
+   negotiation will then switch over to serving the Merkle Tree
+   certificate as relying parties are updated.
 
    If the service is performing a routine key rotation, and not in
-   response to a known compromise, the subscriber MAY use the process
-   described in Section 11.2, allowing certificate negotiation to also
-   switch the private key used.  This slightly increases the lifetime of
-   the old key but maintains the size optimization continuously.
+   response to a known compromise, the authenticating party MAY use the
+   process described in Section 11.2, allowing certificate negotiation
+   to also switch the private key used.  This slightly increases the
+   lifetime of the old key but maintains the size optimization
+   continuously.
 
    If the service is rotating keys in response to a key compromise, this
    option is not available.  Instead, the service SHOULD immediately
@@ -1534,11 +1526,11 @@ Table of Contents
 
    If the CA's interface becomes unavailable, the transparency service
    will be unavailable to update.  This will prevent relying parties
-   from accepting new certificates, so subscribers will need to use
-   fallback mechanisms per Section 11.1.  This does not compromise
-   transparency goals per Section 13.4.2.  However, a CA which is
-   persistently unavailable may not offer sufficient benefit to be used
-   by subscribers or trusted by relying parties.
+   from accepting new certificates, so authenticating parties will need
+   to use fallback mechanisms per Section 11.1.  This does not
+   compromise transparency goals per Section 13.4.2.  However, a CA
+   which is persistently unavailable may not offer sufficient benefit to
+   be used by authenticating parties or trusted by relying parties.
 
    However, if the transparency service's interface becomes unavailable,
    monitors will be unable to check for unauthorized certificates.  This
@@ -1652,10 +1644,11 @@ Table of Contents
 
    The transparency service does not prevent unauthorized certificates,
    but it aims to provide comparable security properties to Certificate
-   Transparency [RFC6962].  If a subscriber presents an acceptable
-   Merkle Tree certificate to a relying party, the relying party should
-   have assurance it was published in some form that monitors and, in
-   particular, the subject of the certificate will be able to notice.
+   Transparency [RFC6962].  If an authenticating party presents an
+   acceptable Merkle Tree certificate to a relying party, the relying
+   party should have assurance it was published in some form that
+   monitors and, in particular, the subject of the certificate will be
+   able to notice.
 
 13.4.1.  Unauthorized Certificates
 
@@ -1782,16 +1775,16 @@ Table of Contents
    [I-D.beck-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
               Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-01, 5 September 2024,
+              beck-tls-trust-anchor-ids-02, 10 October 2024,
               <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-01>.
+              trust-anchor-ids-02>.
 
    [I-D.draft-beck-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
               Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-01, 5 September 2024,
+              beck-tls-trust-anchor-ids-02, 10 October 2024,
               <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-01>.
+              trust-anchor-ids-02>.
 
    [I-D.draft-ietf-uta-rfc6125bis]
               Saint-Andre, P. and R. Salz, "Service Identity in TLS",
@@ -1908,7 +1901,7 @@ Table of Contents
    [CRLite]   Larisch, J., Choffnes, D., Levin, D., Maggs, B., Mislove,
               A., and C. Wilson, "CRLite: A Scalable System for Pushing
               All TLS Revocations to All Browsers", IEEE, 2017 IEEE
-              Symposium on Security and Privacy (SP),
+              Symposium on Security and Privacy (SP) pp. 539-556,
               DOI 10.1109/sp.2017.17, May 2017,
               <https://doi.org/10.1109/sp.2017.17>.
 
@@ -1916,19 +1909,16 @@ Table of Contents
               <https://www.chromium.org/Home/chromium-security/
               crlsets/>.
 
-   [Dilithium]
-              Bai, S., Ducas, L., Kiltz, E., Lepoint, T., Lyubashevsky,
-              V., Schwabe, P., Seiler, G., and D. Stehlé, "CRYSTALS-
-              Dilithium Algorithm Specifications and Supporting
-              Documentation", 8 February 2021, <https://pq-
-              crystals.org/dilithium/data/dilithium-specification-
-              round3-20210208.pdf>.
-
    [Falcon]   Fouque, P., Hoffstein, J., Kirchner, P., Lyubashevsky, V.,
               Pornin, T., Prest, T., Ricosset, T., Seiler, G., Whyte,
               W., and Z. Zhang, "Falcon: Fast-Fourier Lattice-based
               Compact Signatures over NTRU", 10 January 2020,
               <https://falcon-sign.info/falcon.pdf>.
+
+   [FIPS204]  National Institute of Standards and Technology (NIST),
+              "Module-Lattice-based Digital Signature Standard", FIPS
+              PUB 204, August 2023, <https://csrc.nist.gov/projects/
+              post-quantum-cryptography>.
 
    [FIREFOX]  Mozilla, "Firefox Remote Settings", 20 August 2022,
               <https://wiki.mozilla.org/Firefox/RemoteSettings>.
@@ -1936,9 +1926,9 @@ Table of Contents
    [I-D.draft-ietf-acme-ari]
               Gable, A., "Automated Certificate Management Environment
               (ACME) Renewal Information (ARI) Extension", Work in
-              Progress, Internet-Draft, draft-ietf-acme-ari-05, 23
-              August 2024, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-acme-ari-05>.
+              Progress, Internet-Draft, draft-ietf-acme-ari-07, 6
+              December 2024, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-acme-ari-07>.
 
    [I-D.draft-ietf-tls-batch-signing]
               Benjamin, D., "Batch Signing for TLS", Work in Progress,
@@ -2067,11 +2057,12 @@ Appendix B.  TLS Certificate Type Negotiation Challenges
    *  The client sends a certificate of the server-selected type in
       Certificate.
 
-   Here, the client (subscriber) does not select the certificate type.
-   The server (relying party) does.  Moreover, this selection is made
-   before the client can see the server's certificate_authorities or
-   trust_anchors value, in CertificateRequest.  There is no opportunity
-   for the client to fallback to X.509.
+   Here, the client (authenticating party) does not select the
+   certificate type.  The server (relying party) does.  Moreover, this
+   selection is made before the client can see the server's
+   certificate_authorities or trust_anchors value, in
+   CertificateRequest.  There is no opportunity for the client to
+   fallback to X.509.
 
    The cert_types extension behaves similarly, but additionally forces
    the client and server types to match.  These extensions were defined
@@ -2091,8 +2082,8 @@ Appendix B.  TLS Certificate Type Negotiation Challenges
 
 B.1.  Indicate in First CertificateEntry
 
-   We can have the subscriber indicate the certificate type in an
-   extension of the first CertificateEntry.  One challenge is the
+   We can have the authenticating party indicate the certificate type in
+   an extension of the first CertificateEntry.  One challenge is the
    extensions come after the certificate, so the relying party must seek
    to the extensions field independent of the certificate type.  Thus
    all certificate types must be updated to use a consistent opaque
@@ -2176,6 +2167,8 @@ Since draft-davidben-tls-merkle-tree-certs-00
    *  Clarify we use a single CertificateEntry. #11
 
    *  Clarify we use POSIX time. #1
+
+   *  Elaborate on CA public key and signature format. #27
 
    *  Miscellaneous changes.
 
