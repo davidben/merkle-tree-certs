@@ -156,9 +156,9 @@ Table of Contents
    Current signature schemes can use as few as 32 bytes per key and 64
    bytes per signature [RFC8032], but post-quantum replacements are much
    larger.  For example, ML-DSA-65 [FIPS204] uses 1,952 bytes per public
-   key and 3,293 bytes per signature.  A TLS Certificate message with,
+   key and 3,309 bytes per signature.  A TLS Certificate message with,
    say, four ML-DSA-65 signatures (two X.509 signatures and two SCTs)
-   and one intermediate CA's ML-DSA-65 public key would total 15,124
+   and one intermediate CA's ML-DSA-65 public key would total 15,188
    bytes of authentication overhead.  Falcon-512 and Falcon-1024
    [Falcon] would, respectively, total 3,561 and 6,913 bytes.
 
