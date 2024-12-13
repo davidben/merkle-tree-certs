@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 21 April 2025                                  B. E. Westerbaan
+Expires: 16 June 2025                                   B. E. Westerbaan
                                                               Cloudflare
-                                                         18 October 2024
+                                                        13 December 2024
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 April 2025.
+   This Internet-Draft will expire on 16 June 2025.
 
 Copyright Notice
 
@@ -155,11 +155,11 @@ Table of Contents
 
    Current signature schemes can use as few as 32 bytes per key and 64
    bytes per signature [RFC8032], but post-quantum replacements are much
-   larger.  For example, Dilithium3 [Dilithium] uses 1,952 bytes per
-   public key and 3,293 bytes per signature.  A TLS Certificate message
-   with, say, four Dilithum3 signatures (two X.509 signatures and two
-   SCTs) and one intermediate CA's Dilithium3 public key would total
-   15,124 bytes of authentication overhead.  Falcon-512 and Falcon-1024
+   larger.  For example, ML-DSA-65 [FIPS204] uses 1,952 bytes per public
+   key and 3,309 bytes per signature.  A TLS Certificate message with,
+   say, four ML-DSA-65 signatures (two X.509 signatures and two SCTs)
+   and one intermediate CA's ML-DSA-65 public key would total 15,188
+   bytes of authentication overhead.  Falcon-512 and Falcon-1024
    [Falcon] would, respectively, total 3,561 and 6,913 bytes.
 
    This document introduces Merkle Tree Certificates, an optimization
@@ -1901,7 +1901,7 @@ Table of Contents
    [CRLite]   Larisch, J., Choffnes, D., Levin, D., Maggs, B., Mislove,
               A., and C. Wilson, "CRLite: A Scalable System for Pushing
               All TLS Revocations to All Browsers", IEEE, 2017 IEEE
-              Symposium on Security and Privacy (SP),
+              Symposium on Security and Privacy (SP) pp. 539-556,
               DOI 10.1109/sp.2017.17, May 2017,
               <https://doi.org/10.1109/sp.2017.17>.
 
@@ -1909,19 +1909,16 @@ Table of Contents
               <https://www.chromium.org/Home/chromium-security/
               crlsets/>.
 
-   [Dilithium]
-              Bai, S., Ducas, L., Kiltz, E., Lepoint, T., Lyubashevsky,
-              V., Schwabe, P., Seiler, G., and D. Stehlé, "CRYSTALS-
-              Dilithium Algorithm Specifications and Supporting
-              Documentation", 8 February 2021, <https://pq-
-              crystals.org/dilithium/data/dilithium-specification-
-              round3-20210208.pdf>.
-
    [Falcon]   Fouque, P., Hoffstein, J., Kirchner, P., Lyubashevsky, V.,
               Pornin, T., Prest, T., Ricosset, T., Seiler, G., Whyte,
               W., and Z. Zhang, "Falcon: Fast-Fourier Lattice-based
               Compact Signatures over NTRU", 10 January 2020,
               <https://falcon-sign.info/falcon.pdf>.
+
+   [FIPS204]  National Institute of Standards and Technology (NIST),
+              "Module-Lattice-based Digital Signature Standard", FIPS
+              PUB 204, August 2023, <https://csrc.nist.gov/projects/
+              post-quantum-cryptography>.
 
    [FIREFOX]  Mozilla, "Firefox Remote Settings", 20 August 2022,
               <https://wiki.mozilla.org/Firefox/RemoteSettings>.
@@ -1929,9 +1926,9 @@ Table of Contents
    [I-D.draft-ietf-acme-ari]
               Gable, A., "Automated Certificate Management Environment
               (ACME) Renewal Information (ARI) Extension", Work in
-              Progress, Internet-Draft, draft-ietf-acme-ari-06, 17
-              October 2024, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-acme-ari-06>.
+              Progress, Internet-Draft, draft-ietf-acme-ari-07, 6
+              December 2024, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-acme-ari-07>.
 
    [I-D.draft-ietf-tls-batch-signing]
               Benjamin, D., "Batch Signing for TLS", Work in Progress,
