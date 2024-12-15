@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-12-12T01:57:57.767286+00:00",
+  "timestamp": "2024-12-15T02:05:16.443069+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4937,6 +4937,63 @@
           "body": "",
           "createdAt": "2024-10-18T18:09:17Z",
           "updatedAt": "2024-10-18T18:09:17Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 98,
+      "id": "PR_kwDOJIBkVc6FFR0r",
+      "title": "Update Dilithium reference to ML-DSA",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/98",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-12-13T00:00:59Z",
+      "updatedAt": "2024-12-13T00:33:16Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "f74e52f630d33dcdc495de56e18af2869adbfbdb",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "mldsa",
+      "headRefOid": "edf8c0fca993ae93dc7fc18c8944dfe3a2238f33",
+      "closedAt": "2024-12-13T00:33:14Z",
+      "mergedAt": "2024-12-13T00:33:14Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f44aefce79d9b684e771cc0624e529aa7ee2e468"
+      },
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sizes of signatures are slightly different now.\r\n\r\n<img width=\"530\" alt=\"Screenshot 2024-12-13 at 01 05 04\" src=\"https://github.com/user-attachments/assets/84710eae-f0e1-4b14-98bc-3f2ff93f93ae\" />\r\n",
+          "createdAt": "2024-12-13T00:05:23Z",
+          "updatedAt": "2024-12-13T00:05:39Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "\ud83d\ude22 \r\n\r\nFixed.",
+          "createdAt": "2024-12-13T00:24:56Z",
+          "updatedAt": "2024-12-13T00:24:56Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6VEkq4",
+          "commit": {
+            "abbreviatedOid": "bbfa111"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-12-13T00:03:40Z",
+          "updatedAt": "2024-12-13T00:03:40Z",
           "comments": []
         }
       ]
