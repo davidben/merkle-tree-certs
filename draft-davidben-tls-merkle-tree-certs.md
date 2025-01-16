@@ -267,7 +267,9 @@ Validity window:
 
 # Overview
 
-The process of issuing and using a certificate is as follows:
+The process of issuing and using a certificate occurs in three stages.
+
+First, the CA issues a certificate to the authenticating party:
 
 1. The authenticating party requests a certificate from the CA. {{acme-extensions}} describes ACME {{?RFC8555}} extensions for this.
 
@@ -275,15 +277,21 @@ The process of issuing and using a certificate is as follows:
 
 3. The CA constructs a certificate using the inclusion proof. It sends this certificate to the authenticating party. See {{proofs}}.
 
-4. The transparency service downloads the abridged assertions, recreates the Merkle Tree, and validates the window signature. It mirrors them for monitors to observe. See {{transparency-service}}.
+Next, tree heads flow to the relying party, after being durably and consistently logged. This occurs periodically in the background, unconnected from uses of individual certificates:
 
-5. The relying party fetches the latest validity window from the transparency service. This validity window will contain the new tree head.
+{:start="4"}
+4. The transparency service periodically downloads the abridged assertions, recreates the Merkle Tree, and validates the window signature. It mirrors them for monitors to observe. See {{transparency-service}}.
 
-6. In an application protocol such as TLS, the relying party communicates its currently saved validity window to the authenticating party.
+5. The relying party periodically fetches the latest validity window from the transparency service. This validity window will contain the new tree head.
+
+Finally, these certificates are used in an application protocol such as TLS:
+
+{:start="6"}
+6. The relying party communicates its currently saved validity window to the authenticating party.
 
 7. If the relying party’s validity window contains the authenticating party’s certificate, the authenticating party negotiates this protocol and sends the Merkle Tree certificate. See {{certificate-negotiation}} for details. If there is no match, the authenticating party proceeds as if this protocol were not in use (e.g., by sending a traditional X.509 certificate chain).
 
-{{fig-deployment}} below shows this process.
+{{fig-deployment}} below shows the three stages combined.
 
 ~~~ aasvg
      +--------------+  1. issuance request  +-------------------------+
