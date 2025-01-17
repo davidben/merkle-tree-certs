@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 16 June 2025                                   B. E. Westerbaan
+Expires: 21 July 2025                                   B. E. Westerbaan
                                                               Cloudflare
-                                                        13 December 2024
+                                                         17 January 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,11 +57,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 June 2025.
+   This Internet-Draft will expire on 21 July 2025.
 
 Copyright Notice
 
-   Copyright (c) 2024 IETF Trust and the persons identified as the
+   Copyright (c) 2025 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -287,7 +287,10 @@ Table of Contents
 
 3.  Overview
 
-   The process of issuing and using a certificate is as follows:
+   The process of issuing and using a certificate occurs in three
+   stages.
+
+   First, the CA issues a certificate to the authenticating party:
 
    1.  The authenticating party requests a certificate from the CA.
        Section 9 describes ACME [RFC8555] extensions for this.
@@ -302,17 +305,24 @@ Table of Contents
        sends this certificate to the authenticating party.  See
        Section 5.5.3.
 
-   4.  The transparency service downloads the abridged assertions,
-       recreates the Merkle Tree, and validates the window signature.
-       It mirrors them for monitors to observe.  See Section 7.
+   Next, tree heads flow to the relying party, after being durably and
+   consistently logged.  This occurs periodically in the background,
+   unconnected from uses of individual certificates:
 
-   5.  The relying party fetches the latest validity window from the
-       transparency service.  This validity window will contain the new
-       tree head.
+   4.  The transparency service periodically downloads the abridged
+       assertions, recreates the Merkle Tree, and validates the window
+       signature.  It mirrors them for monitors to observe.  See
+       Section 7.
 
-   6.  In an application protocol such as TLS, the relying party
-       communicates its currently saved validity window to the
-       authenticating party.
+   5.  The relying party periodically fetches the latest validity window
+       from the transparency service.  This validity window will contain
+       the new tree head.
+
+   Finally, these certificates are used in an application protocol such
+   as TLS:
+
+   6.  The relying party communicates its currently saved validity
+       window to the authenticating party.
 
    7.  If the relying party’s validity window contains the
        authenticating party’s certificate, the authenticating party
@@ -321,7 +331,7 @@ Table of Contents
        authenticating party proceeds as if this protocol were not in use
        (e.g., by sending a traditional X.509 certificate chain).
 
-   Figure 1 below shows this process.
+   Figure 1 below shows the three stages combined.
 
      +--------------+  1. issuance request  +-------------------------+
      |              +---------------------->|                         |
@@ -1773,18 +1783,18 @@ Table of Contents
 15.1.  Normative References
 
    [I-D.beck-tls-trust-anchor-ids]
-              Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
-              Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-02, 10 October 2024,
-              <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-02>.
+              Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
+              Trust Anchor Identifiers", Work in Progress, Internet-
+              Draft, draft-beck-tls-trust-anchor-ids-03, 18 December
+              2024, <https://datatracker.ietf.org/doc/html/draft-beck-
+              tls-trust-anchor-ids-03>.
 
    [I-D.draft-beck-tls-trust-anchor-ids]
-              Beck, B., Benjamin, D., and D. O'Brien, "TLS Trust Anchor
-              Identifiers", Work in Progress, Internet-Draft, draft-
-              beck-tls-trust-anchor-ids-02, 10 October 2024,
-              <https://datatracker.ietf.org/doc/html/draft-beck-tls-
-              trust-anchor-ids-02>.
+              Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
+              Trust Anchor Identifiers", Work in Progress, Internet-
+              Draft, draft-beck-tls-trust-anchor-ids-03, 18 December
+              2024, <https://datatracker.ietf.org/doc/html/draft-beck-
+              tls-trust-anchor-ids-03>.
 
    [I-D.draft-ietf-uta-rfc6125bis]
               Saint-Andre, P. and R. Salz, "Service Identity in TLS",
