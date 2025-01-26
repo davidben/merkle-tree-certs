@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-23T01:45:58.690001+00:00",
+  "timestamp": "2025-01-26T01:48:32.576688+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -662,9 +662,17 @@
       "labels": [],
       "body": "When a CA issues an assertion, it could provide evidence for it. For instance, a (list of) serialised dnssec proof(s) for a ACME dns-01 challenge or CAA record, if that was used. Most validations are http-01 for which no proof can be produced, except perhaps a signature of an independent multi-path DCV service, if that becomes a thing. Is evidence of assertions in scope? I suppose not for an initial version.",
       "createdAt": "2023-04-06T13:53:29Z",
-      "updatedAt": "2023-04-06T13:54:47Z",
+      "updatedAt": "2025-01-23T13:45:05Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Another application is in the initial testing phase, where some MTCAs might want to back a MTCert with an X509 cert.\n\nA basic generic type is simple enough.\n\n```\nenum {\n dnssec(0),\n x509(1),\n (2^16-1)\n} EvidenceType\n\nstruct {\n    EvidenceType evidence_type;\n    opaque evidence_info<0..2^24-1>; // or 2^16-1?\n} Evidence;\n```\n\nFor `x509`,  `evidence_info` could be a CT `X509ChainEntry`.\n\n(Maybe *supplement* is better name than *evidence*, but let's not mince words just yet.)\n\nThe question is where to put it. We'd want to have it available to transparency services, but not serve it in the certificate.\n\n1. Add a `Evidence evidence<0..2^24-1>` to AbridgedAssertion and `opaque evidence_hash[hash.length]` to Assertion. We should rename `AbridgedAssertion` then, as it's not merely an abridged version of an `Assertion`.\n2. If we only intend this for initial testing, we can add an `opaque X509ChainEntry<0..2^64-1>` in a `shadow_assertions` file next to `abrdged-assertions`.\n3. A mix is a separate `evidence` file, and `evidence_hash` in (abridged)assertion.",
+          "createdAt": "2025-01-23T13:45:04Z",
+          "updatedAt": "2025-01-23T13:45:04Z"
+        }
+      ]
     },
     {
       "number": 24,
