@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 21 July 2025                                   B. E. Westerbaan
+Expires: 8 August 2025                                  B. E. Westerbaan
                                                               Cloudflare
-                                                         17 January 2025
+                                                         4 February 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 July 2025.
+   This Internet-Draft will expire on 8 August 2025.
 
 Copyright Notice
 
@@ -1507,7 +1507,7 @@ Table of Contents
    window containing this certificate from the transparency service and
    can therefore not validate this certificate until receiving them.
    The authenticating party SHOULD, in parallel, also provision a
-   certificate using another PKI mechanism (e.g.  X.509).  Certificate
+   certificate using another PKI mechanism (e.g. X.509).  Certificate
    negotiation will then switch over to serving the Merkle Tree
    certificate as relying parties are updated.
 
