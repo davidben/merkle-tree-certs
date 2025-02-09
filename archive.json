@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-06T01:47:41.831348+00:00",
+  "timestamp": "2025-02-09T01:51:50.952965+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1794,11 +1794,29 @@
       "state": "OPEN",
       "author": "davidben",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "davidben"
+      ],
       "labels": [],
       "body": "The transparency service is described as a single service just for clarity, but its role can be fulfilled by whatever the relying party wants, including e.g. a quorum of multiple TSes or whatever else.\n\nThis has always been the intent of this design, but it seems folks get confused by this. Perhaps we can rename it to avoid those folks getting confused.\n\nAlso \"transparency service\" makes it sound more lofty than it really is. It's basically just a mirror (or set of mirrors) of what the CA publishes, trusted to remain accessible and not introduce split views. Maybe \"trusted mirror(s)\"?",
       "createdAt": "2025-01-16T21:06:14Z",
-      "updatedAt": "2025-01-16T21:06:14Z",
+      "updatedAt": "2025-02-07T22:12:27Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 101,
+      "id": "I_kwDOJIBkVc6pOqcV",
+      "title": "Give mirrors signing keys too?",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/101",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "After the clarifying refactor in https://github.com/davidben/merkle-tree-certs/issues/99, and along the way to defining the actual formats, it might make sense for mirrors to have signing keys?\n\nThis does make the story for signed windows a little complicated, and now mirrors need to also have ways to identify themselves. (Probably borrow the same OIDs.)",
+      "createdAt": "2025-02-07T22:17:38Z",
+      "updatedAt": "2025-02-07T22:17:38Z",
       "closedAt": null,
       "comments": []
     }
