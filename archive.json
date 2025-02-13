@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-11T01:47:32.112909+00:00",
+  "timestamp": "2025-02-13T01:48:17.829276+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -408,7 +408,7 @@
       "labels": [],
       "body": "Filing this to capture TODO in the doc",
       "createdAt": "2023-03-22T20:58:34Z",
-      "updatedAt": "2023-05-26T20:21:09Z",
+      "updatedAt": "2025-02-12T20:06:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -417,6 +417,13 @@
           "body": "From an absolutely minimalist perspective, ACME can do *almost* everything necessary for MTC today:\r\n- the newOrder request contains a list of identifiers\r\n- fulfilling challenges to prove domain control remains the same\r\n- the finalize request should be updated to not contain a CSR (to avoid big x509 structures and signatures in the MTC world), but otherwise works the same\r\n- finalization would take a long time (up to `batch_duration` minutes) but ACME already supports async finalization\r\n- after finalization, the order's `certificate` URL would return a (base64-encoded?) BikeshedCertificate rather than a PEM-encoded x509 Certificate\r\n\r\nThat's just two minor changes for the most basic level of support.\r\n\r\nBut, that leaves on the floor a few key questions:\r\n- How do subscribers request an MTC? Do they make their requests to a wholly different ACME server (different base directory url, etc)? Do they include some information in the newOrder or finalize request indicating that they want an MTC?\r\n- How do subscribers get both an MTC and a backup traditional certificate to use before the new batch is issued and propagated to browsers? Do they make separate newOrder requests (and potentially fulfill separate domain control challenges) for each kind? Do they make a single newOrder request which then creates multiple Order objects to be finalized separately? Does a single Order end up with multiple different certificate download links after finalization?\r\n- Imagining the future pointed at by the current draft's extensible ProofTypes, how does an ACME server indicate to the client which certificate they should present in which circumstances?\r\n\r\nI'm personally leaning towards a world where a single newOrder request can end up resulting in issuance of multiple certificates for the same pubkey+identifiers. Perhaps where the finalized Order object contains a list of both certificate download URLs and metadata about each of those certificates.",
           "createdAt": "2023-05-26T20:21:08Z",
           "updatedAt": "2023-05-26T20:21:08Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "From work elsewhere, it sounds like we're now leaning towards separate orders for separate issuances, with a [profile](https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/) per flavor of issuance, and some other general layer directing the client to make multiple orders. If so, that would suggest that this draft's ACME integration should just be about the one ACME order, and potentially be as minimal as defining a MIME type for BikeshedCertificate.\n\nI dunno if it's worth bothering with a way for requests to signal ahead of time they'll able to handle BikeshedCertificate (if you wait until fetching the cert, we'll waste an issuance), or just continue to leave this to \"we assume the human configuring things has made sure everything is compatible\".",
+          "createdAt": "2025-02-12T20:06:52Z",
+          "updatedAt": "2025-02-12T20:06:52Z"
         }
       ]
     },
