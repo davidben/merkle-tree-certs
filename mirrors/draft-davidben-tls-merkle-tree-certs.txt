@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 17 August 2025                                 B. E. Westerbaan
+Expires: 18 August 2025                                 B. E. Westerbaan
                                                               Cloudflare
-                                                        13 February 2025
+                                                        14 February 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 August 2025.
+   This Internet-Draft will expire on 18 August 2025.
 
 Copyright Notice
 
@@ -1092,7 +1092,7 @@ Table of Contents
    following properties:
 
    Authenticity:  The relying party only accepts validity windows that
-      were certificated by the CA
+      were certified by the CA
 
    Transparency:  The relying party only accepts validity windows
       covering certificates that are published in some publicly-
@@ -1484,13 +1484,12 @@ Table of Contents
    rapidly deploying a new service and reacting to key compromise.
 
    When a new service is provisioned with a brand new Merkle Tree
-   certificate, relying parties will not yet have received a validity
-   window containing this certificate and can therefore not validate
-   this certificate until receiving them.  The authenticating party
-   SHOULD, in parallel, also provision a certificate using another PKI
-   mechanism (e.g. X.509).  Certificate negotiation will then switch
-   over to serving the Merkle Tree certificate as relying parties are
-   updated.
+   certificate, relying parties cannot validate the certificate until
+   they have received a validity window containing said certificate.
+   The authenticating party SHOULD, in parallel, also provision a
+   certificate using another PKI mechanism (e.g. X.509).  Certificate
+   negotiation will then switch over to serving the Merkle Tree
+   certificate as relying parties are updated.
 
    If the service is performing a routine key rotation, and not in
    response to a known compromise, the authenticating party MAY use the
@@ -1636,7 +1635,7 @@ Table of Contents
 13.4.  Transparency
 
    The mechanisms described in Section 7 do not prevent unauthorized
-   certificates, but they aims to provide comparable security properties
+   certificates, but they aim to provide comparable security properties
    to Certificate Transparency [RFC6962].  Before the relying party
    accepts a Merkle Tree Certificate, the relying party should have
    assurance the certificate was published in some form that monitors
@@ -1698,10 +1697,10 @@ Table of Contents
    Certificate Transparency log, this would not compromise transparency.
    Whichever view is presented to the relying party's trusted mirrors at
    the time of updates determines the canonical batch state for both
-   relying parties and monitors.  Certificates that are consistent with
-   only the other view will be rejected by relying parties.  If a mirror
-   observes both views, the procedure in Section 7.1.1 will prevent the
-   new, conflicting view from overwriting the originally saved view.
+   relying parties and monitors.  Certificates that are inconsistent
+   with that view will be rejected by relying parties.  If a mirror
+   observes multiple views, the procedure in Section 7.1.1 will prevent
+   conflicting views from overwriting the originally saved view.
    Instead, the update process will fail and further certificates will
    not be accepted.
 
