@@ -280,11 +280,11 @@ First, the CA issues a certificate to the authenticating party:
 Next, tree heads flow to the relying party, after being durably and consistently logged. This occurs periodically in the background, unconnected from uses of individual certificates:
 
 {:start="4"}
-4. Mirrors periodically download the abridged assertions, recreate the Merkle Tree, and validate the window signature. They mirror the contents for monitors to observe. See {{transparency-ecosystem}}.
+4. Mirrors periodically download the abridged assertions, recreate the Merkle Tree, and validate the window signature. They mirror the contents for monitors to observe. See {{mirrors}}.
 
-5. The relying party periodically fetches the latest validity window from mirrors that it trusts. This validity window will contain the new tree head.
+5. The relying party periodically obtains an updated validity window, after the window's contents have been logged in mirrors that it trusts. See {{relying-party-policy}}.
 
-Finally, these certificates are used in an application protocol such as TLS:
+Once the relying party has a validity window with the new tree head, the certificate is usable in an application protocol such as TLS:
 
 {:start="6"}
 6. The relying party communicates its currently saved validity window to the authenticating party.
@@ -809,13 +809,21 @@ How the relying party does this has no direct impact on certificate issuance ({{
 
 Relying parties SHOULD ensure transparency by obtaining validity windows from the CA and/or some combination of trusted mirrors. The relying party picks sources which, together, are trusted to satisfy the requirements described in {{mirrors}}. Mirrors allow the relying party to maintain transparency in the face of a misbehaving CA that may, for example, stop serving some unauthorized certificate in a batch to evade detection.
 
-Some relying parties regularly contact a trusted update service, either for software updates or to update individual components, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. Where these services are already trusted for the components such as the trust anchor list or certificate validation software, that service could be used as a single trusted mirror.
+A relying party might trust a combination of mirrors, and only accept a validity window once some minimum number of mirrors have consumed it. When combining multiple mirrors, the following procedure determines the latest validity window for an update:
 
-A relying party might trust a combination of mirrors, and only accept a validity window once some minimum number of mirrors have consumed it. Such a relying party would fetch the latest batch number from each mirror, then compute the highest batch number that is contained in sufficiently many mirrors. It would then fetch that validity window from each containing mirror, check their tree hashes match and, if so, accept the update.
+1. Fetch the latest batch number from each mirror.
 
-This procedure MAY also be performed by the relying party's update service, or some aggregation service, which forwards the signatures from each mirror to the relying party. This allows the relying party to avoid directly contacting each mirror. [[TODO: This assumes mirrors re-sign validity windows, but we have not actually defined that yet. #101]]
+2. Compute the highest batch number that satisfies the policy. For example, if requiring windows be represented in at least two mirrors, use the second highest batch number.
 
-Relying parties SHOULD ensure authenticity by verifying the CA's signature on the validity window. If a relying party has an authenticated channel to some service trusted to perform this check (e.g. a software or trust anchor update channel), it MAY rely on that service to validate signatures, instead of downloading the signature itself.
+3. Fetch the validity window from each mirror that contains it.
+
+4. Check that each fetched window gives identical tree hashes. If so, accept the updated window.
+
+To avoid the relying party directly contacting each mirror, this procedure can be performed with some aggregating service on behalf of the relying party, or the relying party's update service.  [[TODO: If the relying party doesn't trust the aggregator, this requires mirrors re-sign validity windows, but we still need to define that. #101]]
+
+Some relying parties regularly contact a trusted update service, either for software updates or to update individual components, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), a mirror operated by that service could be used as a single trusted mirror.
+
+Relying parties SHOULD ensure authenticity by verifying the CA's signature on the validity window. If a relying party has an authenticated channel to some service trusted to perform this check, it MAY rely on that service to validate signatures, instead of downloading the signature itself.
 
 When fetching any of the above information, the relying party MAY use the interfaces described in {{publishing}}, or it MAY use some other application-specific channel.
 
