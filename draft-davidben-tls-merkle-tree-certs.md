@@ -800,7 +800,7 @@ A mirror maintains a copy of the CA's latest batch number, and batch state. Roug
 In order to accept certificates from a CA that it trusts, a relying party must, in the background, obtain an up-to-date copy of the CA's validity window. In doing so, a relying party SHOULD ensure the following properties:
 
 Authenticity:
-: The relying party only accepts validity windows that were certificated by the CA
+: The relying party only accepts validity windows that were certified by the CA
 
 Transparency:
 : The relying party only accepts validity windows covering certificates that are published in some publicly-accessible form, so that, in particular, the subject of the certificate can notice any unauthorized certificates
@@ -988,7 +988,7 @@ To account for this, authenticating parties SHOULD request a new Merkle Tree cer
 
 Merkle Tree certificates' issuance delays make them unsuitable when rapidly deploying a new service and reacting to key compromise.
 
-When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a validity window containing this certificate and can therefore not validate this certificate until receiving them. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.
+When a new service is provisioned with a brand new Merkle Tree certificate, relying parties cannot validate the certificate until they have received a validity window containing said certificate. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.
 
 If the service is performing a routine key rotation, and not in response to a known compromise, the authenticating party MAY use the process described in {{rolling-renewal}}, allowing certificate negotiation to also switch the private key used. This slightly increases the lifetime of the old key but maintains the size optimization continuously.
 
@@ -1046,7 +1046,7 @@ Relying parties with additional sources of revocation such as {{CRLite}} or {{CR
 
 ## Transparency
 
-The mechanisms described in {{transparency-ecosystem}} do not prevent unauthorized certificates, but they aims to provide comparable security properties to Certificate Transparency {{?RFC6962}}. Before the relying party accepts a Merkle Tree Certificate, the relying party should have assurance the certificate was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.
+The mechanisms described in {{transparency-ecosystem}} do not prevent unauthorized certificates, but they aim to provide comparable security properties to Certificate Transparency {{?RFC6962}}. Before the relying party accepts a Merkle Tree Certificate, the relying party should have assurance the certificate was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.
 
 ### Unauthorized Certificates
 
@@ -1068,7 +1068,7 @@ Additionally, accepted Merkle Tree certificates are expected to be immediately p
 
 Although CAs in this document publish structures similar to a Certificate Transparency log, they do not need to function correctly to provide transparency.
 
-A CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the relying party's trusted mirrors at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are consistent with only the other view will be rejected by relying parties. If a mirror observes both views, the procedure in {{updating-a-mirror}} will prevent the new, conflicting view from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.
+A CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the relying party's trusted mirrors at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are inconsistent with that view will be rejected by relying parties. If a mirror observes multiple views, the procedure in {{updating-a-mirror}} will prevent conflicting views from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.
 
 A CA could also sign a validity window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.
 
