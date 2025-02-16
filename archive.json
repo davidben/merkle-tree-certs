@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-13T01:48:17.829276+00:00",
+  "timestamp": "2025-02-16T01:55:19.274440+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1824,6 +1824,22 @@
       "body": "After the clarifying refactor in https://github.com/davidben/merkle-tree-certs/issues/99, and along the way to defining the actual formats, it might make sense for mirrors to have signing keys?\n\nThis does make the story for signed windows a little complicated, and now mirrors need to also have ways to identify themselves. (Probably borrow the same OIDs.)",
       "createdAt": "2025-02-07T22:17:38Z",
       "updatedAt": "2025-02-07T22:17:38Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 103,
+      "id": "I_kwDOJIBkVc6qIljT",
+      "title": "CA publishes signed tree head over tree of batch tree heads instead of signed validity window",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/103",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "This idea is mentioned in #84 in the context of allowing RPs who have been offline for a while to catch up:\n> Now, we could optimize this by using a tree structure, rather than a linear structure. Then consistency proofs are smaller and this is starting to look a lot more like vanilla CT, with all the operational challenges that entailed. The update process is still complex, but at least allows an arbitrarily out-of-date client to catch up.\n\nTo expand on this a bit, the basic idea is that the CA maintains their append-only log of batch tree heads as a Merkle tree, and publishes an [STH](https://datatracker.ietf.org/doc/html/rfc6962#section-3.5) over that tree instead of a signed validity window over only the latest batches. The only additional storage restraint on the CA is that they must maintain the right-most edge of the tree in order to append new batches to it. (As an added benefit, if a CA has been offline for a while they can skip generating validity window signatures for no-longer-valid batches. If I understand correctly, currently a CA has to publish [one signature per batch tree head](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#section-5.4-4.2.1).)\n\nWhen mirrors retrieve the CA state, they do the same thing as before, and make sure they can reconstruct all batch tree heads and the final STH from what the CA publishes. Mirrors can additionally publish the log as [static tiles](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#merkle-tree) to make it easy for clients to construct consistency and inclusion proofs.\n\nAs discussed in #84, RPs that have been offline for a while can get a succinct Merkle tree consistency proof from the mirror to catch up, instead of needing to retrieve all batch tree heads and validity windows between `old_latest_batch` and `new_latest_batch`.\n\nMonitors can also easily get a consistency proof to ensure that any long-expired batches they retrieve from a mirror are consistent with the latest STH from the mirror.\n\nAside from the the above, there are some additional benefits if the STHs are put in [tlog-checkpoint](https://github.com/C2SP/C2SP/blob/main/tlog-checkpoint.md) format (like in [static-ct](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md)). This format makes it easy for mirrors to append signatures to checkpoints (#101).\n\nDepending on the RP's transparency policy, the tlog-checkpoint format also allows for interoperability with [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md) networks for lightweight split view protection. Witnesses keep minimal state per CA, and can add their signature to a checkpoint after confirming consistency with a previous checkpoint. (See https://blog.transparency.dev/can-i-get-a-witness-network for more context on witness networks.)",
+      "createdAt": "2025-02-14T17:42:39Z",
+      "updatedAt": "2025-02-14T17:42:39Z",
       "closedAt": null,
       "comments": []
     }
@@ -5086,6 +5102,143 @@
           "createdAt": "2025-01-16T23:05:17Z",
           "updatedAt": "2025-01-16T23:05:17Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 102,
+      "id": "PR_kwDOJIBkVc6LKX2H",
+      "title": "Rework discussion of the transparency ecosystem",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/102",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Although the transparency service was clearly described throughout the document as an abstraction and not actually necessarily one single centralized service, this seems to have been a point of confusion. The intent was to observe that this system actually allows the ecosystem to freely design trust models, mirroring roles, etc., all without impact to interoperability. As this all happens out of band, neither certificate issuance nor certificate usage is impacted by these choices, except that a certificate may or may not be selected by negotiation.\r\n\r\nThis seems to have been a confusing notion. To avoid that mess, recut these concepts in the document.\r\n\r\nFirst, define the role of a mirror as a concrete service with some responsibility. This picks up the mirroring aspects of the old example transparency services, but not the direct connection to an RP or trustworthiness. It's a freefloating service with some responsibility. You may or may not believe it meets those responsibilities.\r\n\r\nThen, define a relying party policy, for how an RP gets gets validity windows. This is more explicitly the source of implementation dependence. RPs can choose to trust some combination of mirrors when formulating this policy. We give several example policies, but don't mandate anything in particular.\r\n\r\nRewrite the rest of this text according to this framing.\r\n\r\nCloses #99.",
+      "createdAt": "2025-02-13T21:13:40Z",
+      "updatedAt": "2025-02-14T23:57:24Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a5c49577810d4b7c05672201dc31a0352ca6a932",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "mirrors",
+      "headRefOid": "f0469ed328bfbc716c99620059ce23517f919c75",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Please feel free to go over this with a fine-toothed comb and nitpick. This probably does need a editing pass. (I'll try to do a review pass myself later in the day.)",
+          "createdAt": "2025-02-13T21:14:14Z",
+          "updatedAt": "2025-02-13T21:14:14Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6b8T0e",
+          "commit": {
+            "abbreviatedOid": "0e87eaf"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-13T21:37:55Z",
+          "updatedAt": "2025-02-13T21:38:45Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "I think we're missing the distinction between the RP and the RP's out-of-band update service here. This is important because of the privacy implications of a browser reaching out directly to mirrors, for example. Maybe we need separate boxes for those two entities to make things crystal clear?\r\n```suggestion\r\n5. The relying party's update service periodically fetches the latest validity window from mirrors that it trusts. This validity window will contain the new tree head.\r\n```",
+              "createdAt": "2025-02-13T21:37:55Z",
+              "updatedAt": "2025-02-13T21:38:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6b9jyB",
+          "commit": {
+            "abbreviatedOid": "0e87eaf"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "Left some suggestions, but overall the change looks good to me.",
+          "createdAt": "2025-02-14T02:07:56Z",
+          "updatedAt": "2025-02-14T14:24:21Z",
+          "comments": [
+            {
+              "originalPosition": 166,
+              "body": "Or maybe just `signed`\r\n```suggestion\r\n: The relying party only accepts validity windows that were certified by the CA\r\n```",
+              "createdAt": "2025-02-14T02:07:57Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 264,
+              "body": "An attempt to make this sentence a little more direct.\r\n```suggestion\r\nWhen a new service is provisioned with a brand new Merkle Tree certificate, relying parties cannot validate the certificate until they have received a validity window containing said certificate. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.\r\n```",
+              "createdAt": "2025-02-14T02:21:25Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 305,
+              "body": "```suggestion\r\nThe mechanisms described in {{transparency-ecosystem}} do not prevent unauthorized certificates, but they aim to provide comparable security properties to Certificate Transparency {{?RFC6962}}. Before the relying party accepts a Merkle Tree Certificate, the relying party should have assurance the certificate was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.\r\n```",
+              "createdAt": "2025-02-14T13:09:16Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 264,
+              "body": "or perhaps just replace `receiving them` with `receiving such a window`",
+              "createdAt": "2025-02-14T13:36:27Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 331,
+              "body": "```suggestion\r\nA CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the relying party's trusted mirrors at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are inconsistent with that view will be rejected by relying parties. If a mirror observes multiple views, the procedure in {{updating-a-mirror}} will prevent conflicting views from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.\r\n```",
+              "createdAt": "2025-02-14T13:43:30Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "Not sure this is the best phrasing, but this is meant as an alternative to the suggestion at https://github.com/davidben/merkle-tree-certs/pull/102/files#r1955248648, to make sure a first-time reader of this document has the right mental model of how a RP is composed and to nip privacy concerns of browsers directly contacting mirrors in the bud. Otherwise, the reader has to wait until https://github.com/davidben/merkle-tree-certs/pull/102/files#diff-8ad89f700140e1da4a6c2c15605f9c168e6f85be9b64c9de2d2b1654be49ea8eR818.\r\n```suggestion\r\n: The party whom the authenticating party presents its identity to. In TLS, this is the side receiving the Certificate and CertificateVerify message. The relying party itself can consist of multiple components, such as a centralized update service that periodically updates software on end-user devices.\r\n```",
+              "createdAt": "2025-02-14T13:59:47Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            },
+            {
+              "originalPosition": 185,
+              "body": "Just noting that if we go this route, it would be nice to leverage the co-signing mechanism of [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md).",
+              "createdAt": "2025-02-14T14:05:41Z",
+              "updatedAt": "2025-02-14T14:24:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6cGD5n",
+          "commit": {
+            "abbreviatedOid": "f0469ed"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-14T21:25:53Z",
+          "updatedAt": "2025-02-14T23:57:24Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "Oh good call. Hmm. I was hoping to be not very specific in most places and punt it all to the policy section. (Current takeaway is that scattering specific text leads without the big loud \"this is just an example!!\" is easy to misread.) But this is definitely accidentally specific in the other direction.\r\n\r\nRephrased but went more in the vague direction, WDYT?",
+              "createdAt": "2025-02-14T21:25:53Z",
+              "updatedAt": "2025-02-14T23:57:24Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "Not sure. Rather than be too prescriptive about the structure of the RP, I tried making the text outside policy bits more general, and then reworded the policy bits a bit.\r\n\r\nStill not sure if it's quite right, but maybe an okay direction. I'm sure we'll keep refining this more (and figuring out what to specify and what not) later, so I was mostly aiming here to contain the fluid part to the Transparency Ecosystem section.\r\n\r\nWDYT?",
+              "createdAt": "2025-02-14T23:56:09Z",
+              "updatedAt": "2025-02-14T23:57:24Z"
+            }
+          ]
         }
       ]
     }
