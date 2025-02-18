@@ -1113,9 +1113,9 @@ Table of Contents
    windows from the CA and/or some combination of trusted mirrors.  The
    relying party picks sources which, together, are trusted to satisfy
    the requirements described in Section 7.1.  Mirrors allow the relying
-   party to maintain transparency in the face of a misbehaving CA that
-   may, for example, stop serving some unauthorized certificate in a
-   batch to evade detection.
+   party to maintain transparency in the face of a misbehaving or
+   compromised CA that may, for example, stop serving some unauthorized
+   certificate in a batch to evade detection.
 
    A relying party might trust a combination of mirrors, and only accept
    a validity window once some minimum number of mirrors have consumed
