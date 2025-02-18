@@ -807,7 +807,7 @@ Transparency:
 
 How the relying party does this has no direct impact on certificate issuance ({{issuing-certificates}}) or usage ({{using}}). Different relying parties can obtain validity windows from different sources or apply different policies, while supporting the same unmodified certificates and CAs. Thus this section does not prescribe particular policies or mechanisms, but provides examples and general guidance. Relying parties MAY implement policies other than those described below, and MAY incorporate entities acting in roles not described in this document.
 
-Relying parties SHOULD ensure transparency by obtaining validity windows from the CA and/or some combination of trusted mirrors. The relying party picks sources which, together, are trusted to satisfy the requirements described in {{mirrors}}. Mirrors allow the relying party to maintain transparency in the face of a misbehaving CA that may, for example, stop serving some unauthorized certificate in a batch to evade detection.
+Relying parties SHOULD ensure transparency by obtaining validity windows from the CA and/or some combination of trusted mirrors. The relying party picks sources which, together, are trusted to satisfy the requirements described in {{mirrors}}. Mirrors allow the relying party to maintain transparency in the face of a misbehaving or compromised CA that may, for example, stop serving some unauthorized certificate in a batch to evade detection.
 
 A relying party might trust a combination of mirrors, and only accept a validity window once some minimum number of mirrors have consumed it. When combining multiple mirrors, the following procedure determines the latest validity window for an update:
 
