@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 8 August 2025                                  B. E. Westerbaan
+Expires: 22 August 2025                                 B. E. Westerbaan
                                                               Cloudflare
-                                                         4 February 2025
+                                                        18 February 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -17,10 +17,10 @@ Abstract
 
    This document describes Merkle Tree certificates, a new certificate
    type for use with TLS.  A relying party that regularly fetches
-   information from a transparency service can use this certificate type
-   as a size optimization over more conventional mechanisms with post-
-   quantum signatures.  Merkle Tree certificates integrate the roles of
-   X.509 and Certificate Transparency, achieving comparable security
+   information from trusted mirrors can use this certificate type as a
+   size optimization over more conventional mechanisms with post-quantum
+   signatures.  Merkle Tree certificates integrate the roles of X.509
+   and Certificate Transparency, achieving comparable security
    properties with a smaller message size, at the cost of more limited
    applicability.
 
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 August 2025.
+   This Internet-Draft will expire on 22 August 2025.
 
 Copyright Notice
 
@@ -96,11 +96,11 @@ Table of Contents
    6.  Using Certificates
      6.1.  Relying Party State
      6.2.  Certificate Verification
-   7.  Transparency Services
-     7.1.  Single Trusted Service
-     7.2.  Single Update Service with Multiple Mirrors
-     7.3.  Multiple Transparency Services
-     7.4.  Monitors
+   7.  Transparency Ecosystem
+     7.1.  Mirrors
+       7.1.1.  Updating a Mirror
+     7.2.  Relying Party Policy
+     7.3.  Monitors
    8.  HTTP Interface
    9.  ACME Extensions
    10. Use in TLS
@@ -120,7 +120,7 @@ Table of Contents
      13.4.  Transparency
        13.4.1.  Unauthorized Certificates
        13.4.2.  Misbehaving Certification Authority
-       13.4.3.  Misbehaving Transparency Service
+       13.4.3.  Misbehaving Mirror
      13.5.  Security of Fallback Mechanisms
    14. IANA Considerations
    15. References
@@ -171,14 +171,14 @@ Table of Contents
       expected to use an automated issuance protocol, such as ACME
       [RFC8555].
 
-   *  Certificates are only usable with relying parties that have
-      contacted a transparency service sufficiently recently.  See
-      Section 7.
+   *  Certificates are issued in batches after a significant processing
+      delay of, in the recommended parameters (Section 5.1), about an
+      hour.  Authenticating parties that need a certificate issued
+      quickly are expected to use a different mechanism.
 
-   *  Certificates are issued after a significant processing delay of,
-      in the recommended parameters (Section 5.1), about an hour.
-      Authenticating parties that need a certificate issued quickly are
-      expected to use a different mechanism.
+   *  Certificates are only usable with relying parties that have, via a
+      background update process, obtained out-of-band assurance that a
+      batch of certificates is publicly accessible.  See Section 7.
 
    To support the reduced scope, this document also describes a
    certificate negotiation mechanism.  Authenticating parties send these
@@ -238,17 +238,10 @@ Table of Contents
       identity to.  In TLS, this is the side receiving the Certificate
       and CertificateVerify message.
 
-   Transparency service:  The service that mirrors the issued
-      certificates for others to monitor.  It additionally summarizes
-      the CA's activity for relying parties, in order for certificates
-      to be accepted.  This is conceptually a single service, but may be
-      multiple services, run by multiple entities in concert.  See
-      Section 7.  For example, if the relying party is a web browser,
-      the browser vendor might run the transparency service, or it may
-      trust a collection of third-party mirrors.
+   Mirror:  A service that mirrors the issued certificates for others to
+      monitor.
 
-   Monitors:  Parties who monitor the list of valid certificates,
-      published by the transparency service, for unauthorized
+   Monitor:  A party who monitors CAs and/or mirrors for unauthorized
       certificates.
 
    Additionally, there are several terms used throughout this document
@@ -309,17 +302,16 @@ Table of Contents
    consistently logged.  This occurs periodically in the background,
    unconnected from uses of individual certificates:
 
-   4.  The transparency service periodically downloads the abridged
-       assertions, recreates the Merkle Tree, and validates the window
-       signature.  It mirrors them for monitors to observe.  See
-       Section 7.
+   4.  Mirrors periodically download the abridged assertions, recreate
+       the Merkle Tree, and validate the window signature.  They mirror
+       the contents for monitors to observe.  See Section 7.1.
 
-   5.  The relying party periodically fetches the latest validity window
-       from the transparency service.  This validity window will contain
-       the new tree head.
+   5.  The relying party periodically obtains an updated validity
+       window, after the window's contents have been logged in mirrors
+       that it trusts.  See Section 7.2.
 
-   Finally, these certificates are used in an application protocol such
-   as TLS:
+   Once the relying party has a validity window with the new tree head,
+   the certificate is usable in an application protocol such as TLS:
 
    6.  The relying party communicates its currently saved validity
        window to the authenticating party.
@@ -344,12 +336,13 @@ Table of Contents
  tree heads |  |                                        |
             |  v                                        v
     +-------+---------+                      +----------------------+
-    |                 |  5. batch tree heads |                      |
-    |  Relying Party  |<---------------------+ Transparency Service |
-    |                 |                      |                      |
-    +-----------------+                      +----------+-----------+
+    |                 |  5. batch tree heads |                      +-+
+    |  Relying Party  |<---------------------+        Mirrors       | |
+    |                 |                      |                      | |
+    +-----------------+                      +-+--------------------+ |
+                                               +--------+-------------+
                                                         |
-                                                        | 4. mirror tree
+                                                        | 4. publish tree
                                                         v
                                                   +------------+
                                                   |            |
@@ -539,10 +532,9 @@ Table of Contents
    maintain a single stream of Merkle Trees, but then sign everything
    with multiple keys to support rotation.  The CA -> Authenticating
    Party -> RP flow does not depend on the signature, only the CA ->
-   Transparency Service -> RP flow.  The document is not currently
-   arranged to capture this, but it probably should be.  We probably
-   need to decouple the signing half and the Merkle Tree half slightly.
-   #36 ]]
+   Mirror -> RP flow.  The document is not currently arranged to capture
+   this, but it probably should be.  We probably need to decouple the
+   signing half and the Merkle Tree half slightly. #36 ]]
 
    Certificates are issued in batches.  Batches are numbered
    consecutively, starting from zero.  All certificates in a batch have
@@ -936,8 +928,7 @@ Table of Contents
    For each Merkle Tree CA it trusts, a relying party maintains a copy
    of the most recent validity window from the CA.  This structure
    determines which certificates the relying party will accept.  It is
-   regularly updated from the transparency service, as described in
-   Section 7.
+   regularly updated from mirrors, as described in Section 7.
 
    Each batch in the relying party's validity window is a trust anchor
    for purposes of certificate verification (see Section 6.2) and
@@ -1004,75 +995,65 @@ Table of Contents
    6.  If all the preceding checks succeed, the Merkle Tree certificate
        verification subroutine completes successfully.
 
-7.  Transparency Services
+7.  Transparency Ecosystem
 
-   This section describes the role of the transparency service.  The
-   transparency service ensures all certificates accepted by the relying
-   party are consistently and publicly logged.  It performs three
+   This section discusses how relying parties achieve transparency, via
+   a combination of _mirrors_ (Section 7.1), who republish information
+   from the CA; _relying party policy_ (Section 7.2), which determines
+   which validity windows to accept; and _monitors_ (Section 7.3), who
+   watch for certificates of interest.
+
+7.1.  Mirrors
+
+   A mirror is a service that consumes and saves information hosted by
+   CAs (or other mirrors) and presents it to other parties in the
+   ecosystem.  Mirrors are used to ensure transparency even in the face
+   of CA misbehavior or outage.  A mirror performs the following
    functions:
 
-   *  Mirror all abridged assertions certified by the CA and present
-      them to monitors
+   *  Record all abridged assertions certified by the CA and mirror them
+      to monitors
 
-   *  Validate all tree heads and validity windows produced by the CA
+   *  Ensure all tree heads and validity windows that it records and
+      mirrors are self-consistent
 
-   *  Provide the latest valid validity window to relying parties
+   *  Provide information about the latest valid validity window
+      recorded
 
-   In doing so, the transparency service MUST satisfy the following
-   requirements:
+   In doing so, the mirror MUST satisfy the following requirements:
 
    *  The mirrored CA state is append-only.  That is, the hashes,
       signatures, and assertions for a given batch number MUST NOT
-      change.
+      change, even if a CA signs conflicting information.
 
-   *  All tree hashes sent to relying parties MUST be reflected in the
-      mirrored CA state.
+   *  All tree hashes that it reports MUST be reflected in the mirrored
+      CA state.
 
-   The transparency service publishes the mirrored CA state using the
-   same interface as Section 8.  The protocol between the relying party
-   and transparency service is out of scope of this document.  The
-   relying party MAY use the interface defined here, or an existing
-   application-specific authenticated channel.
+   The mirror publishes its state using the same interface as Section 8.
 
-   As discussed in Section 13.1, relying parties MUST ensure that any
-   validity windows obtained were asserted by the CA.  This SHOULD be
-   done by having the transparency service forward the CA's signature,
-   with the relying party verifying it.  However, if the transparency
-   service already maintains a trusted, authenticated channel to the
-   relying parties (e.g. a software or root store update channel),
-   relying parties MAY rely on the transparency service to validate the
-   signature on their behalf, rather than sending it over this channel.
+7.1.1.  Updating a Mirror
 
-   Although described as a single service for clarity, the transparency
-   service may be implemented as a combination of services run by
-   multiple entities, depending on security goals.  For example
-   deployments, this section first describes a single trusted service,
-   then it describes other possible models where trust is divided
-   between entities.
+   A mirror maintains a copy of the CA's latest batch number, and batch
+   state.  Roughly once every batch_duration, it polls the HTTP
+   interface (see Section 8) from the CA, or another mirror, and runs
+   the following steps:
 
-7.1.  Single Trusted Service
-
-   Some relying parties regularly contact a trusted update service,
-   either for software updates or to update individual components, such
-   as the services described in [CHROMIUM] and [FIREFOX].  Where these
-   services are already trusted for the components such as the trust
-   anchor list or certificate validation software, a single trusted
-   transparency service may be a suitable model.
-
-   The transparency service maintains a mirror of the CA's latest batch
-   number, and batch state.  Roughly once every batch_duration, it polls
-   the CA's HTTP interface (see Section 8) and runs the following steps:
-
-   1.  Fetch the CA's latest batch number.  If this fetch fails, abort
-       this procedure with an error.
+   1.  Fetch the latest batch number.  If this fetch fails, abort this
+       procedure with an error.
 
    2.  Let new_latest_batch be the result and old_latest_batch be the
        currently mirrored value.  If new_latest_batch equals
        old_latest_batch, finish this procedure without reporting an
        error.
 
-   3.  If new_latest_batch is less than old_latest_batch, abort this
-       procedure with an error.
+   3.  If new_latest_batch is less than old_latest_batch:
+
+       1.  If the source is the CA, or if old_latest_batch was fetched
+           from this mirror, abort this procedure with an error.
+
+       2.  Otherwise, finish this procedure without reporting an error.
+           A mirror that combines multiple sources may observe a source
+           mirror that is behind.
 
    4.  If the issuance time for batch new_latest_batch is after the
        current time (see Section 5.1), abort this procedure with an
@@ -1097,87 +1078,96 @@ Table of Contents
        4.  Set the mirrored latest batch number to i and save the
            fetched batch state.
 
-   [[TODO: If the mirror gets far behind, if the CA just stops
+   [[TODO: If the mirror gets far behind, or if the CA just stops
    publishing for a while, it may suddenly have to catch up on many
    batches.  Should we allow the mirror to catch up to the latest
    validity window and skip the intervening batches?  The intervening
    batches are guaranteed to have been expired #37 ]]
 
-7.2.  Single Update Service with Multiple Mirrors
+7.2.  Relying Party Policy
 
-   If the relying party has a trusted update service, but the update
-   service does not have the resources to mirror the full batch state,
-   the transparency service can be composed of this update service and
-   several, less trusted mirrors.  In this model, the mirrors are not
-   trusted to serve authoritative trust anchor information to relying
-   parties, but the update service trusts at least half of them to
-   faithfully and consistently mirror the batch state.
+   In order to accept certificates from a CA that it trusts, a relying
+   party must, in the background, obtain an up-to-date copy of the CA's
+   validity window.  In doing so, a relying party SHOULD ensure the
+   following properties:
 
-   Each mirror follows the procedure in Section 7.1 to maintain and
-   publish a mirror of the CA's batch state.
+   Authenticity:  The relying party only accepts validity windows that
+      were certified by the CA
 
-   The update server maintains the latest validity window validated to
-   appear in all mirrors.  It updates this by polling the mirrors and
-   running the following steps:
+   Transparency:  The relying party only accepts validity windows
+      covering certificates that are published in some publicly-
+      accessible form, so that, in particular, the subject of the
+      certificate can notice any unauthorized certificates
 
-   1.  For each mirror, fetch the latest batch number.
+   How the relying party does this has no direct impact on certificate
+   issuance (Section 5) or usage (Section 6).  Different relying parties
+   can obtain validity windows from different sources or apply different
+   policies, while supporting the same unmodified certificates and CAs.
+   Thus this section does not prescribe particular policies or
+   mechanisms, but provides examples and general guidance.  Relying
+   parties MAY implement policies other than those described below, and
+   MAY incorporate entities acting in roles not described in this
+   document.
 
-   2.  Let new_latest_batch be the highest batch number that is bounded
-       by the value fetched from at least half of the mirrors.  Let
-       old_latest_batch be the batch number of the currently stored
-       validity window.
+   Relying parties SHOULD ensure transparency by obtaining validity
+   windows from the CA and/or some combination of trusted mirrors.  The
+   relying party picks sources which, together, are trusted to satisfy
+   the requirements described in Section 7.1.  Mirrors allow the relying
+   party to maintain transparency in the face of a misbehaving or
+   compromised CA that may, for example, stop serving some unauthorized
+   certificate in a batch to evade detection.
 
-   3.  If new_latest_batch equals old_latest_batch, finish this
-       procedure without reporting an error.
+   A relying party might trust a combination of mirrors, and only accept
+   a validity window once some minimum number of mirrors have consumed
+   it.  When combining multiple mirrors, the following procedure
+   determines the latest validity window for an update:
 
-   4.  If new_latest_batch is less than old_latest_batch, abort this
-       procedure with an error.
+   1.  Fetch the latest batch number from each mirror.
 
-   5.  If the issuance time for batch new_latest_batch is after the
-       current time (see Section 5.1), abort this procedure with an
-       error.
+   2.  Compute the highest batch number that satisfies the policy.  For
+       example, if requiring windows be represented in at least two
+       mirrors, use the second-to-last batch number after sorting in
+       ascending order.
 
-   6.  Fetch the validity window with new_latest_batch from each mirror
-       that returned an equal or higher latest batch number.  If any
-       fetches fail, or if the results do not match across all mirrors,
-       abort this procedure with an error.
+   3.  Fetch the validity window from each mirror that contains it.
 
-   7.  Verify the validity window signature, as described in
-       Section 5.5.2.  If the signature is invalid, abort this procedure
-       with an error.
+   4.  Check that each fetched window gives identical tree hashes.  If
+       so, accept the updated window.
 
-   8.  If the old and new validity windows contain overlapping batch
-       numbers, verify that the tree hashes match.  If not, abort this
-       procedure with an error.
+   To avoid the relying party directly contacting each mirror, this
+   procedure can be performed with some aggregating service on behalf of
+   the relying party, or the relying party's update service.  [[TODO: If
+   the relying party doesn't trust the aggregator, this requires mirrors
+   re-sign validity windows, but we still need to define that. #101]]
 
-   9.  Update the saved validity window with the new value.
+   Some relying parties regularly contact a trusted update service,
+   either for software updates or to update individual components, such
+   as the services described in [CHROMIUM] and [FIREFOX].  If the
+   relying party considers the service sufficiently trusted (e.g. if the
+   service provides the trust anchor list or certificate validation
+   software), a mirror operated by that service could be used as a
+   single trusted mirror.
 
-   Compared to Section 7.1, this model reduces trust in the mirror
-   services, but can delay certificate usability if some of the mirrors
-   consume CA updates too slowly.  This can be tuned by adjusting the
-   threshold in step 2.
+   Relying parties SHOULD ensure authenticity by verifying the CA's
+   signature on the validity window.  If a relying party has an
+   authenticated channel to some service trusted to perform this check,
+   it MAY rely on that service to validate signatures, instead of
+   downloading the signature itself.
 
-   In a transparency service using this model, each mirror independently
-   publishes the batch state via Section 8.
+   When fetching any of the above information, the relying party MAY use
+   the interfaces described in Section 8, or it MAY use some other
+   application-specific channel.
 
-7.3.  Multiple Transparency Services
-
-   Relying parties without a trusted update service can fetch from
-   mirrors directly.  Rather than relying on the update service to fetch
-   the validity window state, the relying party runs the procedure
-   described in Section 7.2, and uses the saved validity window to
-   verify certificates.
-
-7.4.  Monitors
+7.3.  Monitors
 
    Monitors in this document are analogous to monitors in [RFC6962].
    Monitors watch an implementation of the HTTP APIs in Section 8 to
    verify correct behavior and watch for certificates of interest.  This
-   is typically the transparency service.  A monitor needs to, at least,
+   may be a mirror or the CA itself.  A monitor needs to, at least,
    inspect every new batch.  It may also maintain a copy of the batch
    state.
 
-   It does so by following the procedure in Section 7.1, fetching from
+   It does so by following the procedure in Section 7.1.1, fetching from
    the service being monitored.  If the procedure fails for a reason
    other than the service availability, this should be viewed as
    misbehavior on the part of the service.  If the procedure fails due
@@ -1202,11 +1192,11 @@ Table of Contents
    an informal sketch.  The real text will need to define request/
    response formats more precisely, with MIME types, etc. #12 ]]
 
-   CAs and transparency services publish state over an HTTP [RFC9110]
-   interface described below.
+   CAs and mirrors publish state over an HTTP [RFC9110] interface
+   described below.
 
-   CAs and any components of the transparency service that maintain
-   validity window information implement the following interfaces:
+   CAs and any mirrors that maintain validity window information
+   implement the following interfaces:
 
    *  GET {prefix}/latest returns the latest batch number.
 
@@ -1222,9 +1212,8 @@ Table of Contents
       signature and tree head for batch number, if batch number is in
       the "issued" state, and a 404 error otherwise.
 
-   CAs and any components of the transparency service that mirror the
-   full abridged assertion list additionally implement the following
-   interface:
+   CAs and any mirrors that maintain the full abridged assertion list
+   additionally implement the following interface:
 
    *  GET {prefix}/batch/{number}/assertions returns the abridged
       assertion list for batch number, if number is in the issued state,
@@ -1252,9 +1241,9 @@ Table of Contents
    Section 11.4 discusses service availability requirements.
 
    [[TODO: Once a batch has expired, do we allow a CA to stop publishing
-   it?  The transparency service can already log it for as long, or as
-   little, as it wishes.  We effectively have CT log temporal sharding
-   built into the system. #2 ]]
+   it?  A mirror can already log it for as long, or as little, as it
+   wishes.  We effectively have CT log temporal sharding built into the
+   system. #2 ]]
 
    [[TODO: If we have the validity window endpoint, do we still need to
    separate "info" and "assertions"? #12]]
@@ -1470,22 +1459,22 @@ Table of Contents
    Authenticating parties using Merkle Tree certificates SHOULD
    additionally provision certificates from another PKI mechanism, such
    as X.509.  This ensures the service remains available to relying
-   parties that have not recently fetched validity window updates, or
-   lack connectivity to the transparency service.
+   parties that have not, or are unable to, fetch a sufficiently new
+   validity window.
 
-   If the pipeline of updates from the CA to the transparency service to
-   relying parties is interrupted, certificate issuance may halt, or
-   newly issued certificates may no longer be usable.  When this
-   happens, the optimization in this document may fail, but fallback
-   mechanisms ensure services remain available.
+   If the pipeline of updates from the CA to mirrors to relying parties
+   is interrupted, certificate issuance may halt, or newly issued
+   certificates may no longer be usable.  When this happens, the
+   optimization in this document may fail, but fallback mechanisms
+   ensure services remain available.
 
 11.2.  Rolling Renewal
 
    When an authenticating party requests a certificate, the CA cannot
    fulfill the request until the next batch is ready.  Once published,
    the certificate will not be accepted by relying parties until the
-   batch state is mirrored by their respective transparency services,
-   then pushed to relying parties.
+   batch state is mirrored by their respective trusted mirrors, then
+   pushed to relying parties.
 
    To account for this, authenticating parties SHOULD request a new
    Merkle Tree certificate significantly before the previous Merkle Tree
@@ -1503,9 +1492,8 @@ Table of Contents
    rapidly deploying a new service and reacting to key compromise.
 
    When a new service is provisioned with a brand new Merkle Tree
-   certificate, relying parties will not yet have received a validity
-   window containing this certificate from the transparency service and
-   can therefore not validate this certificate until receiving them.
+   certificate, relying parties cannot validate the certificate until
+   they have received a validity window containing said certificate.
    The authenticating party SHOULD, in parallel, also provision a
    certificate using another PKI mechanism (e.g. X.509).  Certificate
    negotiation will then switch over to serving the Merkle Tree
@@ -1527,26 +1515,28 @@ Table of Contents
 
 11.4.  Batch State Availability
 
-   CAs and transparency services serve an HTTP interface defined in
-   Section 8.  This service may be temporarily unavailable, either from
-   service outage or if the service does not meet the consistency
-   condition mid-update.  Exact availability requirements for these
-   services are out of scope for this document, but this section
-   provides some general guidance.
+   CAs and mirrors serve an HTTP interface defined in Section 8.  This
+   service may be temporarily unavailable, either from service outage or
+   if the service does not meet the consistency condition mid-update.
+   Exact availability requirements for these services are out of scope
+   for this document, but this section provides some general guidance.
 
-   If the CA's interface becomes unavailable, the transparency service
-   will be unavailable to update.  This will prevent relying parties
-   from accepting new certificates, so authenticating parties will need
-   to use fallback mechanisms per Section 11.1.  This does not
-   compromise transparency goals per Section 13.4.2.  However, a CA
-   which is persistently unavailable may not offer sufficient benefit to
-   be used by authenticating parties or trusted by relying parties.
+   If the CA's interface becomes unavailable, mirrors will be
+   unavailable to update.  This will prevent relying parties from
+   accepting new certificates, so authenticating parties will need to
+   use fallback mechanisms per Section 11.1.  This does not compromise
+   transparency goals per Section 13.4.2.  However, a CA which is
+   persistently unavailable may not offer sufficient benefit to be used
+   by authenticating parties or trusted by relying parties.
 
-   However, if the transparency service's interface becomes unavailable,
-   monitors will be unable to check for unauthorized certificates.  This
-   does compromise transparency goals.  Mirrors of the batch state
-   partially mitigate this, but service unavailability may prevent
-   mirrors from replicating a batch that relying parties accept.
+   However, if a mirror's interface becomes unavailable, monitors may be
+   unable to check for unauthorized certificates, if the certificates
+   are not available in another mirror.  This does compromise
+   transparency goals.  This can be partially mitigated by a combination
+   of state being replicated in additional mirrors, a relying party
+   requiring multiple mirrors log a batch (see Section 7.2), or a
+   relying party requiring a sufficiently trusted and reliable mirror
+   log a batch.
 
 12.  Privacy Considerations
 
@@ -1554,7 +1544,7 @@ Table of Contents
    [I-D.beck-tls-trust-anchor-ids] apply to its use with Merkle Tree
    Certificates.
 
-   In particular, relying parties that share a transparency service will
+   In particular, relying parties that share an update process will
    fetch the same stream of updates.  However, updates may reach
    different users at different times, resulting in some variation
    across users.  This variation may contribute to a fingerprinting
@@ -1579,7 +1569,7 @@ Table of Contents
       assertion not this list, and some inclusion proof, such that the
       procedure in Section 6.2 succeeds.
 
-   Section 7 discusses achieving the first property.
+   Section 7.2 discusses achieving the first property.
 
    The second property is achieved by using a collision-resistant hash
    in the Merkle Tree construction.  The HashEmpty, HashNode, and
@@ -1652,36 +1642,42 @@ Table of Contents
 
 13.4.  Transparency
 
-   The transparency service does not prevent unauthorized certificates,
-   but it aims to provide comparable security properties to Certificate
-   Transparency [RFC6962].  If an authenticating party presents an
-   acceptable Merkle Tree certificate to a relying party, the relying
-   party should have assurance it was published in some form that
-   monitors and, in particular, the subject of the certificate will be
-   able to notice.
+   The mechanisms described in Section 7 do not prevent unauthorized
+   certificates, but they aim to provide comparable security properties
+   to Certificate Transparency [RFC6962].  Before the relying party
+   accepts a Merkle Tree Certificate, the relying party should have
+   assurance the certificate was published in some form that monitors
+   and, in particular, the subject of the certificate will be able to
+   notice.
 
 13.4.1.  Unauthorized Certificates
 
-   If a Merkle Tree certificate was unauthorized, but seen and mirrored
-   by the transparency service, the relying party may accept it.
-   However, provided the transparency service is operating correctly,
-   this will be detectable.  Unlike Certificate Transparency, Merkle
-   Tree certificates achieve this property without a Maximum Merge Delay
-   (MMD).  Certificates are fully mirrored by the transparency service
-   before the relying party will accept them.  However, this comes at
-   the cost of immediate issuance, as described in Section 11.
+   If a CA issues an unauthorized Merkle Tree certificate, the
+   certificate will be rejected by the relying party, publicly logged
+   among the relying party's trusted mirrors, or both:
 
-   If the unauthorized certificate was not seen by the transparency
-   service, the relying party will reject it.  In order to accept a
-   certificate, the relying party must have been provisioned with the
-   corresponding tree head.  A correctly operating transparency service
-   will never present relying parties with tree heads unless the
-   corresponding certificates have all been mirrored.
+   The relying party will only accept the certificate if has been
+   configured with the corresponding tree head (see Section 6.1).  For
+   this to happen, the tree head must be in some validity window that
+   satisfied the relying party's policy (see Section 7.2), which is
+   expected to only accept validity windows whose contents are publicly
+   logged.  For example, if the relying party requires a quorum of
+   trusted mirrors, the certificate will be visible as long as
+   sufficiently many trusted mirrors are correctly operated.
 
-   Unlike Certificate Transparency, the transparency service will not
-   provide the preimages for subject_info_hash, only the hashed values.
-   This is intended to reduce serving costs, particularly with large
-   post-quantum keys.  As a result, monitors look for unrecognized
+   If the certificate did not meet relying party policy because, e.g.,
+   the CA withheld publishing the certificate or mirrors could not reach
+   the CA, the certificate may not be publicly visible.  However, in
+   that case, the relying party will not trust the corresponding tree
+   head and thus reject the certificate.
+
+   This is analogous to Certificate Transparency, but has some
+   differences:
+
+   Unlike Certificate Transparency, the mechanisms in this document do
+   not provide the preimages for subject_info_hash, only the hashed
+   values.  This is intended to reduce serving costs, particularly with
+   large post-quantum keys.  As a result, monitors look for unrecognized
    hashes instead of unrecognized keys.  Any unrecognized hash, even if
    the preimage is unknown, indicates an unauthorized certificate.
 
@@ -1690,6 +1686,13 @@ Table of Contents
    separately, such as by connecting to the TLS servers, or fetching
    from the CA if it retains the unabridged assertion.  This document
    does not define a mechanism for doing this.
+
+   Additionally, accepted Merkle Tree certificates are expected to be
+   immediately publicly visible, rather than after a Maximum Merge Delay
+   (see Section 3 of [RFC6962]).  Relying party policies SHOULD require
+   that certificates be fully mirrored before accepting a tree head.
+   Merkle Tree certificates do not aim to support immediate issuance, as
+   described in Section 11.
 
 13.4.2.  Misbehaving Certification Authority
 
@@ -1700,47 +1703,47 @@ Table of Contents
    A CA could violate the append-only property of its batch state, and
    present differing views to different parties.  Unlike a misbehaving
    Certificate Transparency log, this would not compromise transparency.
-   Whichever view is presented to the transparency service at the time
-   of updates determines the canonical batch state for both relying
-   parties and monitors.  Certificates that are consistent with only the
-   other view will be rejected by relying parties.  If the transparency
-   service observes both views, the procedures in Section 7 will prevent
-   the new, conflicting view from overwriting the originally saved view.
+   Whichever view is presented to the relying party's trusted mirrors at
+   the time of updates determines the canonical batch state for both
+   relying parties and monitors.  Certificates that are inconsistent
+   with that view will be rejected by relying parties.  If a mirror
+   observes multiple views, the procedure in Section 7.1.1 will prevent
+   conflicting views from overwriting the originally saved view.
    Instead, the update process will fail and further certificates will
    not be accepted.
 
    A CA could also sign a validity window containing an unauthorized
    certificate and feign an outage when asked to serve the corresponding
-   assertions.  However, if the assertion list was never mirrored by the
-   transparency service, the tree head will never be pushed to relying
-   parties, so the relying party will reject the certificate.  If the
-   assertion list was mirrored, the unauthorized certificate continues
-   to be available to monitors.
+   assertions.  However, if the assertion list was never mirrored, the
+   tree head will never be pushed to relying parties, so the relying
+   party will reject the certificate.  If the assertion list was
+   mirrored, the unauthorized certificate continues to be available to
+   monitors.
 
-   As a consequence, monitors MUST use the transparency service's view
-   of the batch state when monitoring for unauthorized certificates.  If
-   the transparency service is a collection of mirrors, as in
-   Section 7.2 or Section 7.3, monitors MUST monitor each mirror.
-   Monitors MAY optionally monitor the CA directly, but this alone is
-   not sufficient to avoid missing certificates.
+   As a consequence, when looking for unauthorized certificates that
+   some relying party may accept, monitors SHOULD use tree heads from
+   each of the relying party's trusted mirrors.  A monitor MAY skip
+   downloading the contents of a batch if an identical tree head was
+   already checked from another source.  Monitors MAY also monitor the
+   CA directly, but this alone is not sufficient to avoid missing
+   certificates if the CA misbehaves.
 
-13.4.3.  Misbehaving Transparency Service
+13.4.3.  Misbehaving Mirror
 
-   This document divides CA and transparency service responsibilities
-   differently from how [RFC6962] divides CA and Certificate
-   Transparency log.  The previous section describes the implications of
-   a failure to meet the log-like responsibilities of a CA, provided the
-   transparency service is operating correctly.
+   This document divides CA and mirror responsibilities differently from
+   how [RFC6962] divides CA and Certificate Transparency log
+   responsibilities.  The previous section describes the implications of
+   a failure to meet the log-like responsibilities of a CA, provided
+   trusted mirrors are operating correctly.
 
-   For the remainder of log-like responsibilities, the relying party
-   trusts its choice of transparency service deployment to ensure the
-   validity windows it uses are consistent with what monitors observe.
-   Otherwise, a malicious transparency service and CA could collude to
-   cause a relying party to accept an unauthorized certificate not
-   visible to monitors.  Where a single trusted service is not
-   available, the Section 7 discusses possible deployment structures
-   where the transparency service is a collection of mirrors, all or
-   most of whom must collude instead.
+   For the remainder of log-like responsibilities, a relying party's
+   policy (see Section 7.2) trusts its choice of mirrors to, together,
+   ensure the validity windows it uses are consistent with what monitors
+   observe.  If untrustworthy, a malicious mirror and CA could collude
+   to cause a relying party to accept an unauthorized certificate not
+   visible to monitors.  If the relying party requires a quorum of
+   trusted mirrors, all or most of the mirrors must collude to succeed
+   in this attack.
 
 13.5.  Security of Fallback Mechanisms
 

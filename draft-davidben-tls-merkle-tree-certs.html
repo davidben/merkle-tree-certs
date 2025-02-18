@@ -9,13 +9,13 @@
 <meta content="Devon O'Brien" name="author">
 <meta content="Bas Westerbaan" name="author">
 <meta content="
-       This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
+       This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from trusted mirrors can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability. 
     " name="description">
-<meta content="xml2rfc 3.26.0" name="generator">
+<meta content="xml2rfc 3.27.0" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.26.0
-    Python 3.12.8
+  xml2rfc 3.27.0
+    Python 3.12.9
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
@@ -436,7 +436,7 @@ dl {
     margin-bottom: 0;
   }
 }
-dl > dt {
+dl:not(.dlNewline) > dt {
   float: left;
   margin-right: 2ch;
   min-width: 8ch;
@@ -1049,7 +1049,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 8 August 2025</td>
+<td class="center">Expires 22 August 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-02-04" class="published">4 February 2025</time>
+<time datetime="2025-02-18" class="published">18 February 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-08-08">8 August 2025</time></dd>
+<dd class="expires"><time datetime="2025-08-22">22 August 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1088,7 +1088,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Merkle Tree Certificates for TLS</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from a transparency service can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document describes Merkle Tree certificates, a new certificate type for use with TLS. A relying party that regularly fetches information from trusted mirrors can use this certificate type as a size optimization over more conventional mechanisms with post-quantum signatures. Merkle Tree certificates integrate the roles of X.509 and Certificate Transparency, achieving comparable security properties with a smaller message size, at the cost of more limited applicability.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1125,7 +1125,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 August 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 August 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1228,19 +1228,21 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-transparency-services" class="internal xref">Transparency Services</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-transparency-ecosystem" class="internal xref">Transparency Ecosystem</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-single-trusted-service" class="internal xref">Single Trusted Service</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-mirrors" class="internal xref">Mirrors</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.1">
+                    <p id="section-toc.1-1.7.2.1.2.1.1"><a href="#section-7.1.1" class="auto internal xref">7.1.1</a>.  <a href="#name-updating-a-mirror" class="internal xref">Updating a Mirror</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-single-update-service-with-" class="internal xref">Single Update Service with Multiple Mirrors</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-relying-party-policy" class="internal xref">Relying Party Policy</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-multiple-transparency-servi" class="internal xref">Multiple Transparency Services</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-monitors" class="internal xref">Monitors</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-monitors" class="internal xref">Monitors</a></p>
 </li>
             </ul>
 </li>
@@ -1306,7 +1308,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                     <p id="section-toc.1-1.13.2.4.2.2.1"><a href="#section-13.4.2" class="auto internal xref">13.4.2</a>.  <a href="#name-misbehaving-certification-a" class="internal xref">Misbehaving Certification Authority</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.4.2.3">
-                    <p id="section-toc.1-1.13.2.4.2.3.1"><a href="#section-13.4.3" class="auto internal xref">13.4.3</a>.  <a href="#name-misbehaving-transparency-se" class="internal xref">Misbehaving Transparency Service</a></p>
+                    <p id="section-toc.1-1.13.2.4.2.3.1"><a href="#section-13.4.3" class="auto internal xref">13.4.3</a>.  <a href="#name-misbehaving-mirror" class="internal xref">Misbehaving Mirror</a></p>
 </li>
                 </ul>
 </li>
@@ -1382,10 +1384,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-5.1.1">Certificates are short-lived. The authenticating party is expected to use an automated issuance protocol, such as ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.2">
-          <p id="section-1-5.2.1">Certificates are only usable with relying parties that have contacted a transparency service sufficiently recently. See <a href="#transparency-service" class="auto internal xref">Section 7</a>.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.2.1">Certificates are issued in batches after a significant processing delay of, in the recommended parameters (<a href="#parameters" class="auto internal xref">Section 5.1</a>), about an hour. Authenticating parties that need a certificate issued quickly are expected to use a different mechanism.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.3">
-          <p id="section-1-5.3.1">Certificates are issued after a significant processing delay of, in the recommended parameters (<a href="#parameters" class="auto internal xref">Section 5.1</a>), about an hour. Authenticating parties that need a certificate issued quickly are expected to use a different mechanism.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.3.1">Certificates are only usable with relying parties that have, via a background update process, obtained out-of-band assurance that a batch of certificates is publicly accessible. See <a href="#transparency-ecosystem" class="auto internal xref">Section 7</a>.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-1-6">To support the reduced scope, this document also describes a certificate negotiation mechanism. Authenticating parties send these more efficient certificates when available, and otherwise fall back to other mechanisms.<a href="#section-1-6" class="pilcrow">¶</a></p>
@@ -1434,14 +1436,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
             <p id="section-2.2-2.6.1">The party whom the authenticating party presents its identity to. In TLS, this is the side receiving the Certificate and CertificateVerify message.<a href="#section-2.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.2-2.7">Transparency service:</dt>
+<dt id="section-2.2-2.7">Mirror:</dt>
           <dd style="margin-left: 1.5em" id="section-2.2-2.8">
-            <p id="section-2.2-2.8.1">The service that mirrors the issued certificates for others to monitor. It additionally summarizes the CA's activity for relying parties, in order for certificates to be accepted. This is conceptually a single service, but may be multiple services, run by multiple entities in concert. See <a href="#transparency-service" class="auto internal xref">Section 7</a>. For example, if the relying party is a web browser, the browser vendor might run the transparency service, or it may trust a collection of third-party mirrors.<a href="#section-2.2-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-2.2-2.8.1">A service that mirrors the issued certificates for others to monitor.<a href="#section-2.2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.2-2.9">Monitors:</dt>
+<dt id="section-2.2-2.9">Monitor:</dt>
           <dd style="margin-left: 1.5em" id="section-2.2-2.10">
-            <p id="section-2.2-2.10.1">Parties who monitor the list of valid certificates, published by the transparency service, for unauthorized certificates.<a href="#section-2.2-2.10.1" class="pilcrow">¶</a></p>
+            <p id="section-2.2-2.10.1">A party who monitors CAs and/or mirrors for unauthorized certificates.<a href="#section-2.2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -1508,13 +1510,13 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <p id="section-3-4">Next, tree heads flow to the relying party, after being durably and consistently logged. This occurs periodically in the background, unconnected from uses of individual certificates:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <ol start="4" type="1" class="normal type-1" id="section-3-5">
 <li id="section-3-5.1">
-          <p id="section-3-5.1.1">The transparency service periodically downloads the abridged assertions, recreates the Merkle Tree, and validates the window signature. It mirrors them for monitors to observe. See <a href="#transparency-service" class="auto internal xref">Section 7</a>.<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-5.1.1">Mirrors periodically download the abridged assertions, recreate the Merkle Tree, and validate the window signature. They mirror the contents for monitors to observe. See <a href="#mirrors" class="auto internal xref">Section 7.1</a>.<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-5.2">
-          <p id="section-3-5.2.1">The relying party periodically fetches the latest validity window from the transparency service. This validity window will contain the new tree head.<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-5.2.1">The relying party periodically obtains an updated validity window, after the window's contents have been logged in mirrors that it trusts. See <a href="#relying-party-policy" class="auto internal xref">Section 7.2</a>.<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-3-6">Finally, these certificates are used in an application protocol such as TLS:<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-6">Once the relying party has a validity window with the new tree head, the certificate is usable in an application protocol such as TLS:<a href="#section-3-6" class="pilcrow">¶</a></p>
 <ol start="6" type="1" class="normal type-1" id="section-3-7">
 <li id="section-3-7.1">
           <p id="section-3-7.1.1">The relying party communicates its currently saved validity window to the authenticating party.<a href="#section-3-7.1.1" class="pilcrow">¶</a></p>
@@ -1528,7 +1530,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <figure id="figure-1">
         <div id="section-3-9.1">
           <div class="alignLeft art-svg artwork" id="section-3-9.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="584" viewBox="0 0 584 400" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="416" width="592" viewBox="0 0 592 416" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
               <path d="M 40,192 L 40,256" fill="none" stroke="black"></path>
               <path d="M 48,32 L 48,96" fill="none" stroke="black"></path>
               <path d="M 104,104 L 104,192" fill="none" stroke="black"></path>
@@ -1537,12 +1539,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
               <path d="M 184,192 L 184,256" fill="none" stroke="black"></path>
               <path d="M 360,32 L 360,96" fill="none" stroke="black"></path>
               <path d="M 368,192 L 368,256" fill="none" stroke="black"></path>
-              <path d="M 408,320 L 408,384" fill="none" stroke="black"></path>
+              <path d="M 384,256 L 384,272" fill="none" stroke="black"></path>
+              <path d="M 408,336 L 408,400" fill="none" stroke="black"></path>
               <path d="M 456,96 L 456,184" fill="none" stroke="black"></path>
-              <path d="M 456,256 L 456,312" fill="none" stroke="black"></path>
-              <path d="M 512,320 L 512,384" fill="none" stroke="black"></path>
+              <path d="M 456,272 L 456,328" fill="none" stroke="black"></path>
+              <path d="M 512,336 L 512,400" fill="none" stroke="black"></path>
               <path d="M 552,192 L 552,256" fill="none" stroke="black"></path>
               <path d="M 568,32 L 568,96" fill="none" stroke="black"></path>
+              <path d="M 568,208 L 568,272" fill="none" stroke="black"></path>
               <path d="M 48,32 L 168,32" fill="none" stroke="black"></path>
               <path d="M 360,32 L 568,32" fill="none" stroke="black"></path>
               <path d="M 168,48 L 352,48" fill="none" stroke="black"></path>
@@ -1551,12 +1555,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
               <path d="M 360,96 L 568,96" fill="none" stroke="black"></path>
               <path d="M 40,192 L 184,192" fill="none" stroke="black"></path>
               <path d="M 368,192 L 552,192" fill="none" stroke="black"></path>
+              <path d="M 552,208 L 568,208" fill="none" stroke="black"></path>
               <path d="M 192,224 L 368,224" fill="none" stroke="black"></path>
               <path d="M 40,256 L 184,256" fill="none" stroke="black"></path>
               <path d="M 368,256 L 552,256" fill="none" stroke="black"></path>
-              <path d="M 408,320 L 512,320" fill="none" stroke="black"></path>
-              <path d="M 408,384 L 512,384" fill="none" stroke="black"></path>
-              <polygon class="arrowhead" points="464,312 452,306.4 452,317.6" fill="black" transform="rotate(90,456,312)"></polygon>
+              <path d="M 384,272 L 568,272" fill="none" stroke="black"></path>
+              <path d="M 408,336 L 512,336" fill="none" stroke="black"></path>
+              <path d="M 408,400 L 512,400" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="464,328 452,322.4 452,333.6" fill="black" transform="rotate(90,456,328)"></polygon>
               <polygon class="arrowhead" points="464,184 452,178.4 452,189.6" fill="black" transform="rotate(90,456,184)"></polygon>
               <polygon class="arrowhead" points="360,48 348,42.4 348,53.6" fill="black" transform="rotate(0,352,48)"></polygon>
               <polygon class="arrowhead" points="200,224 188,218.4 188,229.6" fill="black" transform="rotate(180,192,224)"></polygon>
@@ -1592,12 +1598,11 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
                 <text x="336" y="212">heads</text>
                 <text x="88" y="228">Relying</text>
                 <text x="144" y="228">Party</text>
-                <text x="428" y="228">Transparency</text>
-                <text x="512" y="228">Service</text>
-                <text x="476" y="292">4.</text>
-                <text x="516" y="292">mirror</text>
-                <text x="564" y="292">tree</text>
-                <text x="460" y="356">Monitors</text>
+                <text x="464" y="228">Mirrors</text>
+                <text x="476" y="308">4.</text>
+                <text x="520" y="308">publish</text>
+                <text x="572" y="308">tree</text>
+                <text x="460" y="372">Monitors</text>
               </g>
             </svg><a href="#section-3-9.1.1" class="pilcrow">¶</a>
 </div>
@@ -1756,7 +1761,7 @@ struct {
         <dd class="break"></dd>
 </dl>
 <p id="section-5.1-3">These values are public and known by the relying party and the CA. They may not be changed for the lifetime of the CA. To change these parameters, the entity operating a CA may deploy a second CA and either operate both during a transition, or stop issuing from the previous CA.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -&gt; Authenticating Party -&gt; RP flow does not depend on the signature, only the CA -&gt; Transparency Service -&gt; RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">[[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -&gt; Authenticating Party -&gt; RP flow does not depend on the signature, only the CA -&gt; Mirror -&gt; RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly. #36 ]]<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.1-5">Certificates are issued in batches. Batches are numbered consecutively, starting from zero. All certificates in a batch have the same issuance time, determined by <code>start_time + batch_duration * batch_number</code>. This is known as the batch's issuance time. That is, batch 0 has an issuance time of <code>start_time</code>, and issuance times increment by <code>batch_duration</code>. A CA can issue no more frequently than <code>batch_duration</code>. <code>batch_duration</code> determines how long it takes for the CA to return a certificate to the authenticating party.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.1-6">All certificates in a batch have the same expiration time, computed as <code>lifetime</code> past the issuance time. After this time, the certificates in a batch are no longer valid. Merkle Tree certificates uses a short-lived certificates model, such that certificate expiration replaces an external revocation signal like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> or OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span>. <code>lifetime</code> SHOULD be set accordingly. For instance, a deployment with a corresponding maximum OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> response lifetime of 14 days SHOULD use a value no higher than 14 days. See <a href="#revocation" class="auto internal xref">Section 13.3</a> for details.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 <p id="section-5.1-7">CAs are RECOMMENDED to use a <code>batch_duration</code> of one hour, and a <code>lifetime</code> of 14 days. This results in a <code>validity_window_size</code> of 336, for a total of 10,752 bytes in SHA-256 hashes.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
@@ -2117,7 +2122,7 @@ tree head is never included.<a href="#section-5.5.3-9.2.1" class="pilcrow">¶</a
         <h3 id="name-relying-party-state">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-relying-party-state" class="section-name selfRef">Relying Party State</a>
         </h3>
-<p id="section-6.1-1">For each Merkle Tree CA it trusts, a relying party maintains a copy of the most recent validity window from the CA. This structure determines which certificates the relying party will accept. It is regularly updated from the transparency service, as described in <a href="#transparency-service" class="auto internal xref">Section 7</a>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">For each Merkle Tree CA it trusts, a relying party maintains a copy of the most recent validity window from the CA. This structure determines which certificates the relying party will accept. It is regularly updated from mirrors, as described in <a href="#transparency-ecosystem" class="auto internal xref">Section 7</a>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">Each batch in the relying party's validity window is a trust anchor for purposes of certificate verification (see <a href="#verifying" class="auto internal xref">Section 6.2</a>) and certificate negotiation (see <a href="#certificate-negotiation" class="auto internal xref">Section 10.3</a>).<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2177,133 +2182,138 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
 </div>
 </section>
 </div>
-<div id="transparency-service">
+<div id="transparency-ecosystem">
 <section id="section-7">
-      <h2 id="name-transparency-services">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-transparency-services" class="section-name selfRef">Transparency Services</a>
+      <h2 id="name-transparency-ecosystem">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-transparency-ecosystem" class="section-name selfRef">Transparency Ecosystem</a>
       </h2>
-<p id="section-7-1">This section describes the role of the transparency service. The transparency service ensures all certificates accepted by the relying party are consistently and publicly logged. It performs three functions:<a href="#section-7-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7-2.1">
-          <p id="section-7-2.1.1">Mirror all abridged assertions certified by the CA and present them to monitors<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-7-2.2">
-          <p id="section-7-2.2.1">Validate all tree heads and validity windows produced by the CA<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-7-2.3">
-          <p id="section-7-2.3.1">Provide the latest valid validity window to relying parties<a href="#section-7-2.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="section-7-3">In doing so, the transparency service MUST satisfy the following requirements:<a href="#section-7-3" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7-4.1">
-          <p id="section-7-4.1.1">The mirrored CA state is append-only. That is, the hashes, signatures, and assertions for a given batch number MUST NOT change.<a href="#section-7-4.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-7-4.2">
-          <p id="section-7-4.2.1">All tree hashes sent to relying parties MUST be reflected in the mirrored CA state.<a href="#section-7-4.2.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="section-7-5">The transparency service publishes the mirrored CA state using the same interface as <a href="#publishing" class="auto internal xref">Section 8</a>. The protocol between the relying party and transparency service is out of scope of this document. The relying party MAY use the interface defined here, or an existing application-specific authenticated channel.<a href="#section-7-5" class="pilcrow">¶</a></p>
-<p id="section-7-6">As discussed in <a href="#authenticity" class="auto internal xref">Section 13.1</a>, relying parties MUST ensure that any validity windows obtained were asserted by the CA. This SHOULD be done by having the transparency service forward the CA's signature, with the relying party verifying it. However, if the transparency service already maintains a trusted, authenticated channel to the relying parties (e.g. a software or root store update channel), relying parties MAY rely on the transparency service to validate the signature on their behalf, rather than sending it over this channel.<a href="#section-7-6" class="pilcrow">¶</a></p>
-<p id="section-7-7">Although described as a single service for clarity, the transparency service may be implemented as a combination of services run by multiple entities, depending on security goals. For example deployments, this section first describes a single trusted service, then it describes other possible models where trust is divided between entities.<a href="#section-7-7" class="pilcrow">¶</a></p>
-<div id="single-trusted-service">
+<p id="section-7-1">This section discusses how relying parties achieve transparency, via a combination of <em>mirrors</em> (<a href="#mirrors" class="auto internal xref">Section 7.1</a>), who republish information from the CA; <em>relying party policy</em> (<a href="#relying-party-policy" class="auto internal xref">Section 7.2</a>), which determines which validity windows to accept; and <em>monitors</em> (<a href="#monitors" class="auto internal xref">Section 7.3</a>), who watch for certificates of interest.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="mirrors">
 <section id="section-7.1">
-        <h3 id="name-single-trusted-service">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-single-trusted-service" class="section-name selfRef">Single Trusted Service</a>
+        <h3 id="name-mirrors">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-mirrors" class="section-name selfRef">Mirrors</a>
         </h3>
-<p id="section-7.1-1">Some relying parties regularly contact a trusted update service, either for software updates or to update individual components, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. Where these services are already trusted for the components such as the trust anchor list or certificate validation software, a single trusted transparency service may be a suitable model.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2">The transparency service maintains a mirror of the CA's latest batch number, and batch state. Roughly once every <code>batch_duration</code>, it polls the CA's HTTP interface (see <a href="#publishing" class="auto internal xref">Section 8</a>) and runs the following steps:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.1-3">
-<li id="section-7.1-3.1">
-            <p id="section-7.1-3.1.1">Fetch the CA's latest batch number.  If this fetch fails, abort this procedure with an error.<a href="#section-7.1-3.1.1" class="pilcrow">¶</a></p>
+<p id="section-7.1-1">A mirror is a service that consumes and saves information hosted by CAs (or other mirrors) and presents it to other parties in the ecosystem. Mirrors are used to ensure transparency even in the face of CA misbehavior or outage. A mirror performs the following functions:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.1-2.1">
+            <p id="section-7.1-2.1.1">Record all abridged assertions certified by the CA and mirror them to monitors<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.1-3.2">
-            <p id="section-7.1-3.2.1">Let <code>new_latest_batch</code> be the result and <code>old_latest_batch</code> be the currently mirrored value. If <code>new_latest_batch</code> equals <code>old_latest_batch</code>, finish this procedure without reporting an error.<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.1-2.2">
+            <p id="section-7.1-2.2.1">Ensure all tree heads and validity windows that it records and mirrors are self-consistent<a href="#section-7.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.1-3.3">
-            <p id="section-7.1-3.3.1">If <code>new_latest_batch</code> is less than <code>old_latest_batch</code>, abort this procedure with an error.<a href="#section-7.1-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.1-2.3">
+            <p id="section-7.1-2.3.1">Provide information about the latest valid validity window recorded<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.1-3.4">
-            <p id="section-7.1-3.4.1">If the issuance time for batch <code>new_latest_batch</code> is after the current time (see <a href="#parameters" class="auto internal xref">Section 5.1</a>), abort this procedure with an error.<a href="#section-7.1-3.4.1" class="pilcrow">¶</a></p>
+        </ul>
+<p id="section-7.1-3">In doing so, the mirror MUST satisfy the following requirements:<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.1-4.1">
+            <p id="section-7.1-4.1.1">The mirrored CA state is append-only. That is, the hashes, signatures, and assertions for a given batch number MUST NOT change, even if a CA signs conflicting information.<a href="#section-7.1-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.1-3.5">
-            <p id="section-7.1-3.5.1">For all <code>i</code> such that <code>old_latest_batch &lt; i &lt;= new_latest_batch</code>:<a href="#section-7.1-3.5.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.1-3.5.2">
-<li id="section-7.1-3.5.2.1">
-                <p id="section-7.1-3.5.2.1.1">Fetch the signature, tree head, and abridged assertion list for batch <code>i</code>. If this fetch fails, abort this procedure with an error.<a href="#section-7.1-3.5.2.1.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.1-4.2">
+            <p id="section-7.1-4.2.1">All tree hashes that it reports MUST be reflected in the mirrored CA state.<a href="#section-7.1-4.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.1-3.5.2.2">
-                <p id="section-7.1-3.5.2.2.1">Compute the tree head for the assertion list, as described in <a href="#building-tree" class="auto internal xref">Section 5.5.1</a>. If this value does not match the fetched tree head, abort this procedure with an error.<a href="#section-7.1-3.5.2.2.1" class="pilcrow">¶</a></p>
+        </ul>
+<p id="section-7.1-5">The mirror publishes its state using the same interface as <a href="#publishing" class="auto internal xref">Section 8</a>.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+<div id="updating-a-mirror">
+<section id="section-7.1.1">
+          <h4 id="name-updating-a-mirror">
+<a href="#section-7.1.1" class="section-number selfRef">7.1.1. </a><a href="#name-updating-a-mirror" class="section-name selfRef">Updating a Mirror</a>
+          </h4>
+<p id="section-7.1.1-1">A mirror maintains a copy of the CA's latest batch number, and batch state. Roughly once every <code>batch_duration</code>, it polls the HTTP interface (see <a href="#publishing" class="auto internal xref">Section 8</a>) from the CA, or another mirror, and runs the following steps:<a href="#section-7.1.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.1.1-2">
+<li id="section-7.1.1-2.1">
+              <p id="section-7.1.1-2.1.1">Fetch the latest batch number.  If this fetch fails, abort this procedure with an error.<a href="#section-7.1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.1-3.5.2.3">
-                <p id="section-7.1-3.5.2.3.1">Compute the ValidityWindow structure and verify the signature, as described in <a href="#signing" class="auto internal xref">Section 5.5.2</a>. Set <code>tree_heads[0]</code> to the tree head fetched above. Set the other values in <code>tree_heads</code> to the previously mirrored values. If signature verification fails, abort this procedure with an error.<a href="#section-7.1-3.5.2.3.1" class="pilcrow">¶</a></p>
+            <li id="section-7.1.1-2.2">
+              <p id="section-7.1.1-2.2.1">Let <code>new_latest_batch</code> be the result and <code>old_latest_batch</code> be the currently mirrored value. If <code>new_latest_batch</code> equals <code>old_latest_batch</code>, finish this procedure without reporting an error.<a href="#section-7.1.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.1-3.5.2.4">
-                <p id="section-7.1-3.5.2.4.1">Set the mirrored latest batch number to <code>i</code> and save the fetched batch state.<a href="#section-7.1-3.5.2.4.1" class="pilcrow">¶</a></p>
+            <li id="section-7.1.1-2.3">
+              <p id="section-7.1.1-2.3.1">If <code>new_latest_batch</code> is less than <code>old_latest_batch</code>:<a href="#section-7.1.1-2.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.1.1-2.3.2">
+<li id="section-7.1.1-2.3.2.1">
+                  <p id="section-7.1.1-2.3.2.1.1">If the source is the CA, or if <code>old_latest_batch</code> was fetched from this mirror, abort this procedure with an error.<a href="#section-7.1.1-2.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-            </ol>
+                <li id="section-7.1.1-2.3.2.2">
+                  <p id="section-7.1.1-2.3.2.2.1">Otherwise, finish this procedure without reporting an error. A mirror that combines multiple sources may observe a source mirror that is behind.<a href="#section-7.1.1-2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
-        </ol>
-<p id="section-7.1-4">[[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest validity window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+              </ol>
+</li>
+            <li id="section-7.1.1-2.4">
+              <p id="section-7.1.1-2.4.1">If the issuance time for batch <code>new_latest_batch</code> is after the current time (see <a href="#parameters" class="auto internal xref">Section 5.1</a>), abort this procedure with an error.<a href="#section-7.1.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-7.1.1-2.5">
+              <p id="section-7.1.1-2.5.1">For all <code>i</code> such that <code>old_latest_batch &lt; i &lt;= new_latest_batch</code>:<a href="#section-7.1.1-2.5.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.1.1-2.5.2">
+<li id="section-7.1.1-2.5.2.1">
+                  <p id="section-7.1.1-2.5.2.1.1">Fetch the signature, tree head, and abridged assertion list for batch <code>i</code>. If this fetch fails, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-7.1.1-2.5.2.2">
+                  <p id="section-7.1.1-2.5.2.2.1">Compute the tree head for the assertion list, as described in <a href="#building-tree" class="auto internal xref">Section 5.5.1</a>. If this value does not match the fetched tree head, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-7.1.1-2.5.2.3">
+                  <p id="section-7.1.1-2.5.2.3.1">Compute the ValidityWindow structure and verify the signature, as described in <a href="#signing" class="auto internal xref">Section 5.5.2</a>. Set <code>tree_heads[0]</code> to the tree head fetched above. Set the other values in <code>tree_heads</code> to the previously mirrored values. If signature verification fails, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-7.1.1-2.5.2.4">
+                  <p id="section-7.1.1-2.5.2.4.1">Set the mirrored latest batch number to <code>i</code> and save the fetched batch state.<a href="#section-7.1.1-2.5.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+          </ol>
+<p id="section-7.1.1-3">[[TODO: If the mirror gets far behind, or if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest validity window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]<a href="#section-7.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="single-update-multiple-mirrors">
+</section>
+</div>
+<div id="relying-party-policy">
 <section id="section-7.2">
-        <h3 id="name-single-update-service-with-">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-single-update-service-with-" class="section-name selfRef">Single Update Service with Multiple Mirrors</a>
+        <h3 id="name-relying-party-policy">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-relying-party-policy" class="section-name selfRef">Relying Party Policy</a>
         </h3>
-<p id="section-7.2-1">If the relying party has a trusted update service, but the update service does not have the resources to mirror the full batch state, the transparency service can be composed of this update service and several, less trusted mirrors. In this model, the mirrors are not trusted to serve authoritative trust anchor information to relying parties, but the update service trusts at least half of them to faithfully and consistently mirror the batch state.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">Each mirror follows the procedure in <a href="#single-trusted-service" class="auto internal xref">Section 7.1</a> to maintain and publish a mirror of the CA's batch state.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-<p id="section-7.2-3">The update server maintains the latest validity window validated to appear in all mirrors. It updates this by polling the mirrors and running the following steps:<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.2-4">
-<li id="section-7.2-4.1">
-            <p id="section-7.2-4.1.1">For each mirror, fetch the latest batch number.<a href="#section-7.2-4.1.1" class="pilcrow">¶</a></p>
+<p id="section-7.2-1">In order to accept certificates from a CA that it trusts, a relying party must, in the background, obtain an up-to-date copy of the CA's validity window. In doing so, a relying party SHOULD ensure the following properties:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2-2">
+          <dt id="section-7.2-2.1">Authenticity:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.2">
+            <p id="section-7.2-2.2.1">The relying party only accepts validity windows that were certified by the CA<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-7.2-2.3">Transparency:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.4">
+            <p id="section-7.2-2.4.1">The relying party only accepts validity windows covering certificates that are published in some publicly-accessible form, so that, in particular, the subject of the certificate can notice any unauthorized certificates<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-7.2-3">How the relying party does this has no direct impact on certificate issuance (<a href="#issuing-certificates" class="auto internal xref">Section 5</a>) or usage (<a href="#using" class="auto internal xref">Section 6</a>). Different relying parties can obtain validity windows from different sources or apply different policies, while supporting the same unmodified certificates and CAs. Thus this section does not prescribe particular policies or mechanisms, but provides examples and general guidance. Relying parties MAY implement policies other than those described below, and MAY incorporate entities acting in roles not described in this document.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">Relying parties SHOULD ensure transparency by obtaining validity windows from the CA and/or some combination of trusted mirrors. The relying party picks sources which, together, are trusted to satisfy the requirements described in <a href="#mirrors" class="auto internal xref">Section 7.1</a>. Mirrors allow the relying party to maintain transparency in the face of a misbehaving or compromised CA that may, for example, stop serving some unauthorized certificate in a batch to evade detection.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-5">A relying party might trust a combination of mirrors, and only accept a validity window once some minimum number of mirrors have consumed it. When combining multiple mirrors, the following procedure determines the latest validity window for an update:<a href="#section-7.2-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.2-6">
+<li id="section-7.2-6.1">
+            <p id="section-7.2-6.1.1">Fetch the latest batch number from each mirror.<a href="#section-7.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.2-4.2">
-            <p id="section-7.2-4.2.1">Let <code>new_latest_batch</code> be the highest batch number that is bounded by the value fetched from at least half of the mirrors. Let <code>old_latest_batch</code> be the batch number of the currently stored validity window.<a href="#section-7.2-4.2.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-6.2">
+            <p id="section-7.2-6.2.1">Compute the highest batch number that satisfies the policy. For example, if requiring windows be represented in at least two mirrors, use the second-to-last batch number after sorting in ascending order.<a href="#section-7.2-6.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.2-4.3">
-            <p id="section-7.2-4.3.1">If <code>new_latest_batch</code> equals <code>old_latest_batch</code>, finish this procedure without reporting an error.<a href="#section-7.2-4.3.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-6.3">
+            <p id="section-7.2-6.3.1">Fetch the validity window from each mirror that contains it.<a href="#section-7.2-6.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.2-4.4">
-            <p id="section-7.2-4.4.1">If <code>new_latest_batch</code> is less than <code>old_latest_batch</code>, abort this procedure with an error.<a href="#section-7.2-4.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-4.5">
-            <p id="section-7.2-4.5.1">If the issuance time for batch <code>new_latest_batch</code> is after the current time (see <a href="#parameters" class="auto internal xref">Section 5.1</a>), abort this procedure with an error.<a href="#section-7.2-4.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-4.6">
-            <p id="section-7.2-4.6.1">Fetch the validity window with <code>new_latest_batch</code> from each mirror that returned an equal or higher latest batch number. If any fetches fail, or if the results do not match across all mirrors, abort this procedure with an error.<a href="#section-7.2-4.6.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-4.7">
-            <p id="section-7.2-4.7.1">Verify the validity window signature, as described in <a href="#signing" class="auto internal xref">Section 5.5.2</a>. If the signature is invalid, abort this procedure with an error.<a href="#section-7.2-4.7.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-4.8">
-            <p id="section-7.2-4.8.1">If the old and new validity windows contain overlapping batch numbers, verify that the tree hashes match. If not, abort this procedure with an error.<a href="#section-7.2-4.8.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-7.2-4.9">
-            <p id="section-7.2-4.9.1">Update the saved validity window with the new value.<a href="#section-7.2-4.9.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-6.4">
+            <p id="section-7.2-6.4.1">Check that each fetched window gives identical tree hashes. If so, accept the updated window.<a href="#section-7.2-6.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-7.2-5">Compared to <a href="#single-trusted-service" class="auto internal xref">Section 7.1</a>, this model reduces trust in the mirror services, but can delay certificate usability if some of the mirrors consume CA updates too slowly. This can be tuned by adjusting the threshold in step 2.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
-<p id="section-7.2-6">In a transparency service using this model, each mirror independently publishes the batch state via <a href="#publishing" class="auto internal xref">Section 8</a>.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="multiple-transparency-services">
-<section id="section-7.3">
-        <h3 id="name-multiple-transparency-servi">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-multiple-transparency-servi" class="section-name selfRef">Multiple Transparency Services</a>
-        </h3>
-<p id="section-7.3-1">Relying parties without a trusted update service can fetch from mirrors directly. Rather than relying on the update service to fetch the validity window state, the relying party runs the procedure described in <a href="#single-update-multiple-mirrors" class="auto internal xref">Section 7.2</a>, and uses the saved validity window to verify certificates.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-7">To avoid the relying party directly contacting each mirror, this procedure can be performed with some aggregating service on behalf of the relying party, or the relying party's update service.  [[TODO: If the relying party doesn't trust the aggregator, this requires mirrors re-sign validity windows, but we still need to define that. #101]]<a href="#section-7.2-7" class="pilcrow">¶</a></p>
+<p id="section-7.2-8">Some relying parties regularly contact a trusted update service, either for software updates or to update individual components, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), a mirror operated by that service could be used as a single trusted mirror.<a href="#section-7.2-8" class="pilcrow">¶</a></p>
+<p id="section-7.2-9">Relying parties SHOULD ensure authenticity by verifying the CA's signature on the validity window. If a relying party has an authenticated channel to some service trusted to perform this check, it MAY rely on that service to validate signatures, instead of downloading the signature itself.<a href="#section-7.2-9" class="pilcrow">¶</a></p>
+<p id="section-7.2-10">When fetching any of the above information, the relying party MAY use the interfaces described in <a href="#publishing" class="auto internal xref">Section 8</a>, or it MAY use some other application-specific channel.<a href="#section-7.2-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitors">
-<section id="section-7.4">
+<section id="section-7.3">
         <h3 id="name-monitors">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-monitors" class="section-name selfRef">Monitors</a>
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-monitors" class="section-name selfRef">Monitors</a>
         </h3>
-<p id="section-7.4-1">Monitors in this document are analogous to monitors in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. Monitors watch an implementation of the HTTP APIs in <a href="#publishing" class="auto internal xref">Section 8</a> to verify correct behavior and watch for certificates of interest. This is typically the transparency service. A monitor needs to, at least, inspect every new batch. It may also maintain a copy of the batch state.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<p id="section-7.4-2">It does so by following the procedure in <a href="#single-trusted-service" class="auto internal xref">Section 7.1</a>, fetching from the service being monitored. If the procedure fails for a reason other than the service availability, this should be viewed as misbehavior on the part of the service. If the procedure fails due to service availability and the service remains unavailable for an extended period, this should also be viewed as misbehavior. If the monitor is not maintaining a copy of the batch state, it skips saving the abridged assertions.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
-<p id="section-7.4-3"><span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> additionally defines the role of auditor, which validates that Signed Certificate Timestamps (SCTs) and Signed Tree Heads (STHs) in Certificate Transparency are correct. There is no analog to SCTs in this document. The signed validity window structure (<a href="#signing" class="auto internal xref">Section 5.5.2</a>) is analogous to an STH, but consistency is checked simply by ensuring overlapping tree heads match, so this document does not define this as an explicit role. If two inconsistent signed validity windows are ever observed from a Merkle Tree CA, this should be viewed as misbehavior on the part of the CA.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-1">Monitors in this document are analogous to monitors in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. Monitors watch an implementation of the HTTP APIs in <a href="#publishing" class="auto internal xref">Section 8</a> to verify correct behavior and watch for certificates of interest. This may be a mirror or the CA itself. A monitor needs to, at least, inspect every new batch. It may also maintain a copy of the batch state.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">It does so by following the procedure in <a href="#updating-a-mirror" class="auto internal xref">Section 7.1.1</a>, fetching from the service being monitored. If the procedure fails for a reason other than the service availability, this should be viewed as misbehavior on the part of the service. If the procedure fails due to service availability and the service remains unavailable for an extended period, this should also be viewed as misbehavior. If the monitor is not maintaining a copy of the batch state, it skips saving the abridged assertions.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<p id="section-7.3-3"><span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> additionally defines the role of auditor, which validates that Signed Certificate Timestamps (SCTs) and Signed Tree Heads (STHs) in Certificate Transparency are correct. There is no analog to SCTs in this document. The signed validity window structure (<a href="#signing" class="auto internal xref">Section 5.5.2</a>) is analogous to an STH, but consistency is checked simply by ensuring overlapping tree heads match, so this document does not define this as an explicit role. If two inconsistent signed validity windows are ever observed from a Merkle Tree CA, this should be viewed as misbehavior on the part of the CA.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2314,8 +2324,8 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-http-interface" class="section-name selfRef">HTTP Interface</a>
       </h2>
 <p id="section-8-1">[[TODO: This section hasn't been written yet. For now, this is just an informal sketch. The real text will need to define request/response formats more precisely, with MIME types, etc. #12 ]]<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">CAs and transparency services publish state over an HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> interface described below.<a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">CAs and any components of the transparency service that maintain validity window information implement the following interfaces:<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-2">CAs and mirrors publish state over an HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> interface described below.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">CAs and any mirrors that maintain validity window information implement the following interfaces:<a href="#section-8-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8-4.1">
           <p id="section-8-4.1.1"><code>GET {prefix}/latest</code> returns the latest batch number.<a href="#section-8-4.1.1" class="pilcrow">¶</a></p>
@@ -2330,7 +2340,7 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
           <p id="section-8-4.4.1"><code>GET {prefix}/batch/{number}/info</code> returns the validity window signature and tree head for batch <code>number</code>, if batch <code>number</code> is in the "issued" state, and a 404 error otherwise.<a href="#section-8-4.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-8-5">CAs and any components of the transparency service that mirror the full abridged assertion list additionally implement the following interface:<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-5">CAs and any mirrors that maintain the full abridged assertion list additionally implement the following interface:<a href="#section-8-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8-6.1">
           <p id="section-8-6.1.1"><code>GET {prefix}/batch/{number}/assertions</code> returns the abridged assertion list for batch <code>number</code>, if <code>number</code> is in the issued state, and a 404 error otherwise.<a href="#section-8-6.1.1" class="pilcrow">¶</a></p>
@@ -2339,8 +2349,8 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
 <p id="section-8-7">If the interface is implemented by a distributed service, with multiple servers, updates may propagate to servers at different times, which will cause temporary inconsistency. This inconsistency can impede this system's transparency goals (<a href="#transparency" class="auto internal xref">Section 13.4</a>).<a href="#section-8-7" class="pilcrow">¶</a></p>
 <p id="section-8-8">Services implementing this interface SHOULD wait until batch state is fully propagated to all servers before updating the latest batch number. That is, if any server returns a latest batch number of N in either of the first two HTTP endpoints, batch numbers N and below SHOULD be available under the last three batch-number-specific HTTP endpoints in all servers. If this property does not hold at any time, it is considered a service unavailability.<a href="#section-8-8" class="pilcrow">¶</a></p>
 <p id="section-8-9">Individual servers in a service MAY return different latest batch numbers. Individual servers MAY also differ on whether a batch number has a response available or return a 404 error. Provided the above consistency property holds, these two inconsistencies do not constitute service unavailability.<a href="#section-8-9" class="pilcrow">¶</a></p>
-<p id="section-8-10"><a href="#ts-and-ca-availability" class="auto internal xref">Section 11.4</a> discusses service availability requirements.<a href="#section-8-10" class="pilcrow">¶</a></p>
-<p id="section-8-11">[[TODO: Once a batch has expired, do we allow a CA to stop publishing it? The transparency service can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system. #2 ]]<a href="#section-8-11" class="pilcrow">¶</a></p>
+<p id="section-8-10"><a href="#batch-state-availability" class="auto internal xref">Section 11.4</a> discusses service availability requirements.<a href="#section-8-10" class="pilcrow">¶</a></p>
+<p id="section-8-11">[[TODO: Once a batch has expired, do we allow a CA to stop publishing it? A mirror can already log it for as long, or as little, as it wishes. We effectively have CT log temporal sharding built into the system. #2 ]]<a href="#section-8-11" class="pilcrow">¶</a></p>
 <p id="section-8-12">[[TODO: If we have the validity window endpoint, do we still need to separate "info" and "assertions"? #12]]<a href="#section-8-12" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2485,8 +2495,8 @@ struct {
         <h3 id="name-fallback-mechanisms">
 <a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-fallback-mechanisms" class="section-name selfRef">Fallback Mechanisms</a>
         </h3>
-<p id="section-11.1-1">Authenticating parties using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not recently fetched validity window updates, or lack connectivity to the transparency service.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<p id="section-11.1-2">If the pipeline of updates from the CA to the transparency service to relying parties is interrupted, certificate issuance may halt, or newly issued certificates may no longer be usable. When this happens, the optimization in this document may fail, but fallback mechanisms ensure services remain available.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
+<p id="section-11.1-1">Authenticating parties using Merkle Tree certificates SHOULD additionally provision certificates from another PKI mechanism, such as X.509. This ensures the service remains available to relying parties that have not, or are unable to, fetch a sufficiently new validity window.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+<p id="section-11.1-2">If the pipeline of updates from the CA to mirrors to relying parties is interrupted, certificate issuance may halt, or newly issued certificates may no longer be usable. When this happens, the optimization in this document may fail, but fallback mechanisms ensure services remain available.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rolling-renewal">
@@ -2494,7 +2504,7 @@ struct {
         <h3 id="name-rolling-renewal">
 <a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-rolling-renewal" class="section-name selfRef">Rolling Renewal</a>
         </h3>
-<p id="section-11.2-1">When an authenticating party requests a certificate, the CA cannot fulfill the request until the next batch is ready. Once published, the certificate will not be accepted by relying parties until the batch state is mirrored by their respective transparency services, then pushed to relying parties.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+<p id="section-11.2-1">When an authenticating party requests a certificate, the CA cannot fulfill the request until the next batch is ready. Once published, the certificate will not be accepted by relying parties until the batch state is mirrored by their respective trusted mirrors, then pushed to relying parties.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
 <p id="section-11.2-2">To account for this, authenticating parties SHOULD request a new Merkle Tree certificate significantly before the previous Merkle Tree certificate expires. Renewing halfway into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new tree hash is delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for clients that are not yet updated.<a href="#section-11.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2504,19 +2514,19 @@ struct {
 <a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-deploying-new-keys" class="section-name selfRef">Deploying New Keys</a>
         </h3>
 <p id="section-11.3-1">Merkle Tree certificates' issuance delays make them unsuitable when rapidly deploying a new service and reacting to key compromise.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
-<p id="section-11.3-2">When a new service is provisioned with a brand new Merkle Tree certificate, relying parties will not yet have received a validity window containing this certificate from the transparency service and can therefore not validate this certificate until receiving them. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
+<p id="section-11.3-2">When a new service is provisioned with a brand new Merkle Tree certificate, relying parties cannot validate the certificate until they have received a validity window containing said certificate. The authenticating party SHOULD, in parallel, also provision a certificate using another PKI mechanism (e.g. X.509). Certificate negotiation will then switch over to serving the Merkle Tree certificate as relying parties are updated.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
 <p id="section-11.3-3">If the service is performing a routine key rotation, and not in response to a known compromise, the authenticating party MAY use the process described in <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a>, allowing certificate negotiation to also switch the private key used. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
 <p id="section-11.3-4">If the service is rotating keys in response to a key compromise, this option is not available. Instead, the service SHOULD immediately discard the old key and request a more immediate issuance mechanism. As in the initial deployment case, it SHOULD request a Merkle Tree certificate in parallel, which will restore the size optimization over time.<a href="#section-11.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="ts-and-ca-availability">
+<div id="batch-state-availability">
 <section id="section-11.4">
         <h3 id="name-batch-state-availability">
 <a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-batch-state-availability" class="section-name selfRef">Batch State Availability</a>
         </h3>
-<p id="section-11.4-1">CAs and transparency services serve an HTTP interface defined in <a href="#publishing" class="auto internal xref">Section 8</a>. This service may be temporarily unavailable, either from service outage or if the service does not meet the consistency condition mid-update. Exact availability requirements for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
-<p id="section-11.4-2">If the CA's interface becomes unavailable, the transparency service will be unavailable to update. This will prevent relying parties from accepting new certificates, so authenticating parties will need to use fallback mechanisms per <a href="#fallback-mechanisms" class="auto internal xref">Section 11.1</a>. This does not compromise transparency goals per <a href="#misbehaving-ca" class="auto internal xref">Section 13.4.2</a>. However, a CA which is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
-<p id="section-11.4-3">However, if the transparency service's interface becomes unavailable, monitors will be unable to check for unauthorized certificates. This does compromise transparency goals. Mirrors of the batch state partially mitigate this, but service unavailability may prevent mirrors from replicating a batch that relying parties accept.<a href="#section-11.4-3" class="pilcrow">¶</a></p>
+<p id="section-11.4-1">CAs and mirrors serve an HTTP interface defined in <a href="#publishing" class="auto internal xref">Section 8</a>. This service may be temporarily unavailable, either from service outage or if the service does not meet the consistency condition mid-update. Exact availability requirements for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+<p id="section-11.4-2">If the CA's interface becomes unavailable, mirrors will be unavailable to update. This will prevent relying parties from accepting new certificates, so authenticating parties will need to use fallback mechanisms per <a href="#fallback-mechanisms" class="auto internal xref">Section 11.1</a>. This does not compromise transparency goals per <a href="#misbehaving-ca" class="auto internal xref">Section 13.4.2</a>. However, a CA which is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.4-3">However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized certificates, if the certificates are not available in another mirror. This does compromise transparency goals. This can be partially mitigated by a combination of state being replicated in additional mirrors, a relying party requiring multiple mirrors log a batch (see <a href="#relying-party-policy" class="auto internal xref">Section 7.2</a>), or a relying party requiring a sufficiently trusted and reliable mirror log a batch.<a href="#section-11.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2527,7 +2537,7 @@ struct {
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
 <p id="section-12-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-beck-tls-trust-anchor-ids-03#section-9" class="relref">Section 9</a> of [<a href="#I-D.beck-tls-trust-anchor-ids" class="cite xref">I-D.beck-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-12-1" class="pilcrow">¶</a></p>
-<p id="section-12-2">In particular, relying parties that share a transparency service will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS-mechanism, the trust anchor list will require active probing.<a href="#section-12-2" class="pilcrow">¶</a></p>
+<p id="section-12-2">In particular, relying parties that share an update process will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS-mechanism, the trust anchor list will require active probing.<a href="#section-12-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -2549,7 +2559,7 @@ struct {
             <p id="section-13.1-2.2.1">For any tree head computed from a list of assertions as in <a href="#building-tree" class="auto internal xref">Section 5.5.1</a>, it is computationally infeasible to construct an assertion not this list, and some inclusion proof, such that the procedure in <a href="#verifying" class="auto internal xref">Section 6.2</a> succeeds.<a href="#section-13.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-13.1-3"><a href="#transparency-service" class="auto internal xref">Section 7</a> discusses achieving the first property.<a href="#section-13.1-3" class="pilcrow">¶</a></p>
+<p id="section-13.1-3"><a href="#relying-party-policy" class="auto internal xref">Section 7.2</a> discusses achieving the first property.<a href="#section-13.1-3" class="pilcrow">¶</a></p>
 <p id="section-13.1-4">The second property is achieved by using a collision-resistant hash in the Merkle Tree construction. The <code>HashEmpty</code>, <code>HashNode</code>, and <code>HashAssertion</code> functions use distinct initial bytes when calling the hash function, to achieve domain separation.<a href="#section-13.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2587,16 +2597,19 @@ struct {
         <h3 id="name-transparency">
 <a href="#section-13.4" class="section-number selfRef">13.4. </a><a href="#name-transparency" class="section-name selfRef">Transparency</a>
         </h3>
-<p id="section-13.4-1">The transparency service does not prevent unauthorized certificates, but it aims to provide comparable security properties to Certificate Transparency <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. If an authenticating party presents an acceptable Merkle Tree certificate to a relying party, the relying party should have assurance it was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.<a href="#section-13.4-1" class="pilcrow">¶</a></p>
+<p id="section-13.4-1">The mechanisms described in <a href="#transparency-ecosystem" class="auto internal xref">Section 7</a> do not prevent unauthorized certificates, but they aim to provide comparable security properties to Certificate Transparency <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>. Before the relying party accepts a Merkle Tree Certificate, the relying party should have assurance the certificate was published in some form that monitors and, in particular, the subject of the certificate will be able to notice.<a href="#section-13.4-1" class="pilcrow">¶</a></p>
 <div id="unauthorized-certificates">
 <section id="section-13.4.1">
           <h4 id="name-unauthorized-certificates">
 <a href="#section-13.4.1" class="section-number selfRef">13.4.1. </a><a href="#name-unauthorized-certificates" class="section-name selfRef">Unauthorized Certificates</a>
           </h4>
-<p id="section-13.4.1-1">If a Merkle Tree certificate was unauthorized, but seen and mirrored by the transparency service, the relying party may accept it. However, provided the transparency service is operating correctly, this will be detectable. Unlike Certificate Transparency, Merkle Tree certificates achieve this property without a Maximum Merge Delay (MMD). Certificates are fully mirrored by the transparency service before the relying party will accept them. However, this comes at the cost of immediate issuance, as described in <a href="#deployment-considerations" class="auto internal xref">Section 11</a>.<a href="#section-13.4.1-1" class="pilcrow">¶</a></p>
-<p id="section-13.4.1-2">If the unauthorized certificate was not seen by the transparency service, the relying party will reject it. In order to accept a certificate, the relying party must have been provisioned with the corresponding tree head. A correctly operating transparency service will never present relying parties with tree heads unless the corresponding certificates have all been mirrored.<a href="#section-13.4.1-2" class="pilcrow">¶</a></p>
-<p id="section-13.4.1-3">Unlike Certificate Transparency, the transparency service will not provide the preimages for <code>subject_info_hash</code>, only the hashed values. This is intended to reduce serving costs, particularly with large post-quantum keys. As a result, monitors look for unrecognized hashes instead of unrecognized keys. Any unrecognized hash, even if the preimage is unknown, indicates an unauthorized certificate.<a href="#section-13.4.1-3" class="pilcrow">¶</a></p>
-<p id="section-13.4.1-4">This optimization complicates studies of weak public keys, e.g. <span>[<a href="#SharedFactors" class="cite xref">SharedFactors</a>]</span>. Such studies will have to retrieve the public keys separately, such as by connecting to the TLS servers, or fetching from the CA if it retains the unabridged assertion. This document does not define a mechanism for doing this.<a href="#section-13.4.1-4" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-1">If a CA issues an unauthorized Merkle Tree certificate, the certificate will be rejected by the relying party, publicly logged among the relying party's trusted mirrors, or both:<a href="#section-13.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-2">The relying party will only accept the certificate if has been configured with the corresponding tree head (see <a href="#relying-parties" class="auto internal xref">Section 6.1</a>). For this to happen, the tree head must be in some validity window that satisfied the relying party's policy (see <a href="#relying-party-policy" class="auto internal xref">Section 7.2</a>), which is expected to only accept validity windows whose contents are publicly logged. For example, if the relying party requires a quorum of trusted mirrors, the certificate will be visible as long as sufficiently many trusted mirrors are correctly operated.<a href="#section-13.4.1-2" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-3">If the certificate did not meet relying party policy because, e.g., the CA withheld publishing the certificate or mirrors could not reach the CA, the certificate may not be publicly visible. However, in that case, the relying party will not trust the corresponding tree head and thus reject the certificate.<a href="#section-13.4.1-3" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-4">This is analogous to Certificate Transparency, but has some differences:<a href="#section-13.4.1-4" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-5">Unlike Certificate Transparency, the mechanisms in this document do not provide the preimages for <code>subject_info_hash</code>, only the hashed values. This is intended to reduce serving costs, particularly with large post-quantum keys. As a result, monitors look for unrecognized hashes instead of unrecognized keys. Any unrecognized hash, even if the preimage is unknown, indicates an unauthorized certificate.<a href="#section-13.4.1-5" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-6">This optimization complicates studies of weak public keys, e.g. <span>[<a href="#SharedFactors" class="cite xref">SharedFactors</a>]</span>. Such studies will have to retrieve the public keys separately, such as by connecting to the TLS servers, or fetching from the CA if it retains the unabridged assertion. This document does not define a mechanism for doing this.<a href="#section-13.4.1-6" class="pilcrow">¶</a></p>
+<p id="section-13.4.1-7">Additionally, accepted Merkle Tree certificates are expected to be immediately publicly visible, rather than after a Maximum Merge Delay (see <span><a href="https://rfc-editor.org/rfc/rfc6962#section-3" class="relref">Section 3</a> of [<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>). Relying party policies SHOULD require that certificates be fully mirrored before accepting a tree head. Merkle Tree certificates do not aim to support immediate issuance, as described in <a href="#deployment-considerations" class="auto internal xref">Section 11</a>.<a href="#section-13.4.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="misbehaving-ca">
@@ -2605,18 +2618,18 @@ struct {
 <a href="#section-13.4.2" class="section-number selfRef">13.4.2. </a><a href="#name-misbehaving-certification-a" class="section-name selfRef">Misbehaving Certification Authority</a>
           </h4>
 <p id="section-13.4.2-1">Although CAs in this document publish structures similar to a Certificate Transparency log, they do not need to function correctly to provide transparency.<a href="#section-13.4.2-1" class="pilcrow">¶</a></p>
-<p id="section-13.4.2-2">A CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the transparency service at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are consistent with only the other view will be rejected by relying parties. If the transparency service observes both views, the procedures in <a href="#transparency-service" class="auto internal xref">Section 7</a> will prevent the new, conflicting view from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.<a href="#section-13.4.2-2" class="pilcrow">¶</a></p>
-<p id="section-13.4.2-3">A CA could also sign a validity window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored by the transparency service, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.<a href="#section-13.4.2-3" class="pilcrow">¶</a></p>
-<p id="section-13.4.2-4">As a consequence, monitors MUST use the transparency service's view of the batch state when monitoring for unauthorized certificates. If the transparency service is a collection of mirrors, as in <a href="#single-update-multiple-mirrors" class="auto internal xref">Section 7.2</a> or <a href="#multiple-transparency-services" class="auto internal xref">Section 7.3</a>, monitors MUST monitor each mirror. Monitors MAY optionally monitor the CA directly, but this alone is not sufficient to avoid missing certificates.<a href="#section-13.4.2-4" class="pilcrow">¶</a></p>
+<p id="section-13.4.2-2">A CA could violate the append-only property of its batch state, and present differing views to different parties. Unlike a misbehaving Certificate Transparency log, this would not compromise transparency. Whichever view is presented to the relying party's trusted mirrors at the time of updates determines the canonical batch state for both relying parties and monitors. Certificates that are inconsistent with that view will be rejected by relying parties. If a mirror observes multiple views, the procedure in <a href="#updating-a-mirror" class="auto internal xref">Section 7.1.1</a> will prevent conflicting views from overwriting the originally saved view. Instead, the update process will fail and further certificates will not be accepted.<a href="#section-13.4.2-2" class="pilcrow">¶</a></p>
+<p id="section-13.4.2-3">A CA could also sign a validity window containing an unauthorized certificate and feign an outage when asked to serve the corresponding assertions. However, if the assertion list was never mirrored, the tree head will never be pushed to relying parties, so the relying party will reject the certificate. If the assertion list was mirrored, the unauthorized certificate continues to be available to monitors.<a href="#section-13.4.2-3" class="pilcrow">¶</a></p>
+<p id="section-13.4.2-4">As a consequence, when looking for unauthorized certificates that some relying party may accept, monitors SHOULD use tree heads from each of the relying party's trusted mirrors. A monitor MAY skip downloading the contents of a batch if an identical tree head was already checked from another source. Monitors MAY also monitor the CA directly, but this alone is not sufficient to avoid missing certificates if the CA misbehaves.<a href="#section-13.4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="misbehaving-transparency-service">
+<div id="misbehaving-mirror">
 <section id="section-13.4.3">
-          <h4 id="name-misbehaving-transparency-se">
-<a href="#section-13.4.3" class="section-number selfRef">13.4.3. </a><a href="#name-misbehaving-transparency-se" class="section-name selfRef">Misbehaving Transparency Service</a>
+          <h4 id="name-misbehaving-mirror">
+<a href="#section-13.4.3" class="section-number selfRef">13.4.3. </a><a href="#name-misbehaving-mirror" class="section-name selfRef">Misbehaving Mirror</a>
           </h4>
-<p id="section-13.4.3-1">This document divides CA and transparency service responsibilities differently from how <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> divides CA and Certificate Transparency log. The previous section describes the implications of a failure to meet the log-like responsibilities of a CA, provided the transparency service is operating correctly.<a href="#section-13.4.3-1" class="pilcrow">¶</a></p>
-<p id="section-13.4.3-2">For the remainder of log-like responsibilities, the relying party trusts its choice of transparency service deployment to ensure the validity windows it uses are consistent with what monitors observe. Otherwise, a malicious transparency service and CA could collude to cause a relying party to accept an unauthorized certificate not visible to monitors. Where a single trusted service is not available, the <a href="#transparency-service" class="auto internal xref">Section 7</a> discusses possible deployment structures where the transparency service is a collection of mirrors, all or most of whom must collude instead.<a href="#section-13.4.3-2" class="pilcrow">¶</a></p>
+<p id="section-13.4.3-1">This document divides CA and mirror responsibilities differently from how <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> divides CA and Certificate Transparency log responsibilities. The previous section describes the implications of a failure to meet the log-like responsibilities of a CA, provided trusted mirrors are operating correctly.<a href="#section-13.4.3-1" class="pilcrow">¶</a></p>
+<p id="section-13.4.3-2">For the remainder of log-like responsibilities, a relying party's policy (see <a href="#relying-party-policy" class="auto internal xref">Section 7.2</a>) trusts its choice of mirrors to, together, ensure the validity windows it uses are consistent with what monitors observe. If untrustworthy, a malicious mirror and CA could collude to cause a relying party to accept an unauthorized certificate not visible to monitors. If the relying party requires a quorum of trusted mirrors, all or most of the mirrors must collude to succeed in this attack.<a href="#section-13.4.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
