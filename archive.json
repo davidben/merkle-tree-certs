@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-16T01:55:19.274440+00:00",
+  "timestamp": "2025-02-18T01:47:47.643422+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1823,9 +1823,17 @@
       "labels": [],
       "body": "After the clarifying refactor in https://github.com/davidben/merkle-tree-certs/issues/99, and along the way to defining the actual formats, it might make sense for mirrors to have signing keys?\n\nThis does make the story for signed windows a little complicated, and now mirrors need to also have ways to identify themselves. (Probably borrow the same OIDs.)",
       "createdAt": "2025-02-07T22:17:38Z",
-      "updatedAt": "2025-02-07T22:17:38Z",
+      "updatedAt": "2025-02-17T12:01:19Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There are a few related questions. Do we want to allow the CA to publish cosignatures on the new window? In that case the mirror can act as a witness. Also, don't we want to tackle the update transparency #58 issue more head-on?",
+          "createdAt": "2025-02-17T12:01:18Z",
+          "updatedAt": "2025-02-17T12:01:18Z"
+        }
+      ]
     },
     {
       "number": 103,
@@ -5117,7 +5125,7 @@
       "labels": [],
       "body": "Although the transparency service was clearly described throughout the document as an abstraction and not actually necessarily one single centralized service, this seems to have been a point of confusion. The intent was to observe that this system actually allows the ecosystem to freely design trust models, mirroring roles, etc., all without impact to interoperability. As this all happens out of band, neither certificate issuance nor certificate usage is impacted by these choices, except that a certificate may or may not be selected by negotiation.\r\n\r\nThis seems to have been a confusing notion. To avoid that mess, recut these concepts in the document.\r\n\r\nFirst, define the role of a mirror as a concrete service with some responsibility. This picks up the mirroring aspects of the old example transparency services, but not the direct connection to an RP or trustworthiness. It's a freefloating service with some responsibility. You may or may not believe it meets those responsibilities.\r\n\r\nThen, define a relying party policy, for how an RP gets gets validity windows. This is more explicitly the source of implementation dependence. RPs can choose to trust some combination of mirrors when formulating this policy. We give several example policies, but don't mandate anything in particular.\r\n\r\nRewrite the rest of this text according to this framing.\r\n\r\nCloses #99.",
       "createdAt": "2025-02-13T21:13:40Z",
-      "updatedAt": "2025-02-14T23:57:24Z",
+      "updatedAt": "2025-02-17T11:53:31Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a5c49577810d4b7c05672201dc31a0352ca6a932",
@@ -5239,6 +5247,39 @@
               "updatedAt": "2025-02-14T23:57:24Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6cNuEu",
+          "commit": {
+            "abbreviatedOid": "f0469ed"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-17T11:52:42Z",
+          "updatedAt": "2025-02-17T11:52:42Z",
+          "comments": [
+            {
+              "originalPosition": 175,
+              "body": "I like *misbehaving or compromised*. Transparency isn't just about keeping CAs honest, but also giving a well-behaving CA some assurance they've not been compromised.",
+              "createdAt": "2025-02-17T11:52:42Z",
+              "updatedAt": "2025-02-17T11:52:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6cNuge",
+          "commit": {
+            "abbreviatedOid": "f0469ed"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-02-17T11:53:31Z",
+          "updatedAt": "2025-02-17T11:53:31Z",
+          "comments": []
         }
       ]
     }
