@@ -813,7 +813,7 @@ A relying party might trust a combination of mirrors, and only accept a validity
 
 1. Fetch the latest batch number from each mirror.
 
-2. Compute the highest batch number that satisfies the policy. For example, if requiring windows be represented in at least two mirrors, use the second highest batch number.
+2. Compute the highest batch number that satisfies the policy. For example, if requiring windows be represented in at least two mirrors, use the second-to-last batch number after sorting in ascending order.
 
 3. Fetch the validity window from each mirror that contains it.
 
