@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 18 August 2025                                 B. E. Westerbaan
+Expires: 22 August 2025                                 B. E. Westerbaan
                                                               Cloudflare
-                                                        14 February 2025
+                                                        18 February 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 August 2025.
+   This Internet-Draft will expire on 22 August 2025.
 
 Copyright Notice
 
@@ -1126,7 +1126,8 @@ Table of Contents
 
    2.  Compute the highest batch number that satisfies the policy.  For
        example, if requiring windows be represented in at least two
-       mirrors, use the second highest batch number.
+       mirrors, use the second-to-last batch number after sorting in
+       ascending order.
 
    3.  Fetch the validity window from each mirror that contains it.
 
