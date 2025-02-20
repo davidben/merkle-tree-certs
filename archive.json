@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-18T01:47:47.643422+00:00",
+  "timestamp": "2025-02-20T01:49:11.452467+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1798,7 +1798,7 @@
       "id": "I_kwDOJIBkVc6mhYC6",
       "title": "Rename transparency service?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/99",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1807,8 +1807,8 @@
       "labels": [],
       "body": "The transparency service is described as a single service just for clarity, but its role can be fulfilled by whatever the relying party wants, including e.g. a quorum of multiple TSes or whatever else.\n\nThis has always been the intent of this design, but it seems folks get confused by this. Perhaps we can rename it to avoid those folks getting confused.\n\nAlso \"transparency service\" makes it sound more lofty than it really is. It's basically just a mirror (or set of mirrors) of what the CA publishes, trusted to remain accessible and not introduce split views. Maybe \"trusted mirror(s)\"?",
       "createdAt": "2025-01-16T21:06:14Z",
-      "updatedAt": "2025-02-07T22:12:27Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-18T18:30:25Z",
+      "closedAt": "2025-02-18T18:30:25Z",
       "comments": []
     },
     {
@@ -1842,12 +1842,12 @@
       "url": "https://github.com/davidben/merkle-tree-certs/issues/103",
       "state": "OPEN",
       "author": "lukevalenta",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
-      "body": "This idea is mentioned in #84 in the context of allowing RPs who have been offline for a while to catch up:\n> Now, we could optimize this by using a tree structure, rather than a linear structure. Then consistency proofs are smaller and this is starting to look a lot more like vanilla CT, with all the operational challenges that entailed. The update process is still complex, but at least allows an arbitrarily out-of-date client to catch up.\n\nTo expand on this a bit, the basic idea is that the CA maintains their append-only log of batch tree heads as a Merkle tree, and publishes an [STH](https://datatracker.ietf.org/doc/html/rfc6962#section-3.5) over that tree instead of a signed validity window over only the latest batches. The only additional storage restraint on the CA is that they must maintain the right-most edge of the tree in order to append new batches to it. (As an added benefit, if a CA has been offline for a while they can skip generating validity window signatures for no-longer-valid batches. If I understand correctly, currently a CA has to publish [one signature per batch tree head](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#section-5.4-4.2.1).)\n\nWhen mirrors retrieve the CA state, they do the same thing as before, and make sure they can reconstruct all batch tree heads and the final STH from what the CA publishes. Mirrors can additionally publish the log as [static tiles](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#merkle-tree) to make it easy for clients to construct consistency and inclusion proofs.\n\nAs discussed in #84, RPs that have been offline for a while can get a succinct Merkle tree consistency proof from the mirror to catch up, instead of needing to retrieve all batch tree heads and validity windows between `old_latest_batch` and `new_latest_batch`.\n\nMonitors can also easily get a consistency proof to ensure that any long-expired batches they retrieve from a mirror are consistent with the latest STH from the mirror.\n\nAside from the the above, there are some additional benefits if the STHs are put in [tlog-checkpoint](https://github.com/C2SP/C2SP/blob/main/tlog-checkpoint.md) format (like in [static-ct](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md)). This format makes it easy for mirrors to append signatures to checkpoints (#101).\n\nDepending on the RP's transparency policy, the tlog-checkpoint format also allows for interoperability with [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md) networks for lightweight split view protection. Witnesses keep minimal state per CA, and can add their signature to a checkpoint after confirming consistency with a previous checkpoint. (See https://blog.transparency.dev/can-i-get-a-witness-network for more context on witness networks.)",
+      "body": "This idea is mentioned in #84 in the context of allowing RPs who have been offline for a while to catch up:\n> Now, we could optimize this by using a tree structure, rather than a linear structure. Then consistency proofs are smaller and this is starting to look a lot more like vanilla CT, with all the operational challenges that entailed. The update process is still complex, but at least allows an arbitrarily out-of-date client to catch up.\n\nTo expand on this a bit, the basic idea is that the CA maintains their append-only log of batch tree heads as a Merkle tree, and publishes an [STH](https://datatracker.ietf.org/doc/html/rfc6962#section-3.5) over that tree instead of a signed validity window over only the latest batches. The only additional storage requirement for the CA is that they must maintain the right-most edge of the tree in order to append new batches to it. (As an added benefit, if a CA has been offline for a while they can skip generating validity window signatures for no-longer-valid batches. If I understand correctly, currently a CA has to publish [one signature per batch tree head](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#section-5.4-4.2.1).)\n\nWhen mirrors retrieve the CA state, they do the same thing as before, and make sure they can reconstruct all batch tree heads and the final STH from what the CA publishes. Mirrors can additionally publish the log as [static tiles](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#merkle-tree) to make it easy for clients to construct consistency and inclusion proofs.\n\nAs discussed in #84, RPs that have been offline for a while can get a succinct Merkle tree consistency proof from the mirror to catch up, instead of needing to retrieve all batch tree heads and validity windows between `old_latest_batch` and `new_latest_batch`.\n\nMonitors can also easily get a consistency proof to ensure that any long-expired batches they retrieve from a mirror are consistent with the latest STH from the mirror.\n\nAside from the the above, there are some additional benefits if the STHs are put in [tlog-checkpoint](https://github.com/C2SP/C2SP/blob/main/tlog-checkpoint.md) format (like in [static-ct](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md)). This format makes it easy for mirrors to append signatures to checkpoints (#101).\n\nDepending on the RP's transparency policy, the tlog-checkpoint format also allows for interoperability with [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md) networks for lightweight split view protection. Witnesses keep minimal state per CA, and can add their signature to the latest checkpoint after confirming consistency with their previous latest checkpoint. (See https://blog.transparency.dev/can-i-get-a-witness-network for more context on witness networks.)",
       "createdAt": "2025-02-14T17:42:39Z",
-      "updatedAt": "2025-02-14T17:42:39Z",
+      "updatedAt": "2025-02-18T14:43:59Z",
       "closedAt": null,
       "comments": []
     }
@@ -3710,7 +3710,7 @@
       "labels": [],
       "body": "See #12.\r\n\r\nI tried to keep it as simple as possible.\r\n\r\nNeeds to be updated after we add the storage window. #46 \r\nSignatures are defined in #50 \r\nNeeds to be updated after merging #46, #57 and #49\r\n",
       "createdAt": "2023-06-22T11:13:29Z",
-      "updatedAt": "2023-10-15T10:33:49Z",
+      "updatedAt": "2025-02-18T19:30:50Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
@@ -3730,7 +3730,28 @@
           "updatedAt": "2023-10-15T10:33:48Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6ccy_C",
+          "commit": {
+            "abbreviatedOid": "d9f661c"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-18T19:30:50Z",
+          "updatedAt": "2025-02-18T19:30:50Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "If we go with the `tlog` approach (#103), we probably want to make this the same as the submission prefix/origin line from https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#checkpoints.",
+              "createdAt": "2025-02-18T19:30:50Z",
+              "updatedAt": "2025-02-18T19:30:51Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 60,
@@ -5118,24 +5139,26 @@
       "id": "PR_kwDOJIBkVc6LKX2H",
       "title": "Rework discussion of the transparency ecosystem",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/102",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Although the transparency service was clearly described throughout the document as an abstraction and not actually necessarily one single centralized service, this seems to have been a point of confusion. The intent was to observe that this system actually allows the ecosystem to freely design trust models, mirroring roles, etc., all without impact to interoperability. As this all happens out of band, neither certificate issuance nor certificate usage is impacted by these choices, except that a certificate may or may not be selected by negotiation.\r\n\r\nThis seems to have been a confusing notion. To avoid that mess, recut these concepts in the document.\r\n\r\nFirst, define the role of a mirror as a concrete service with some responsibility. This picks up the mirroring aspects of the old example transparency services, but not the direct connection to an RP or trustworthiness. It's a freefloating service with some responsibility. You may or may not believe it meets those responsibilities.\r\n\r\nThen, define a relying party policy, for how an RP gets gets validity windows. This is more explicitly the source of implementation dependence. RPs can choose to trust some combination of mirrors when formulating this policy. We give several example policies, but don't mandate anything in particular.\r\n\r\nRewrite the rest of this text according to this framing.\r\n\r\nCloses #99.",
       "createdAt": "2025-02-13T21:13:40Z",
-      "updatedAt": "2025-02-17T11:53:31Z",
+      "updatedAt": "2025-02-18T18:30:29Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a5c49577810d4b7c05672201dc31a0352ca6a932",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "mirrors",
-      "headRefOid": "f0469ed328bfbc716c99620059ce23517f919c75",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "60a486abf743e7e9f002edd5cae3bb058b5701b6",
+      "closedAt": "2025-02-18T18:30:24Z",
+      "mergedAt": "2025-02-18T18:30:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "de60f87670588158889968975c315fcbe1acf3d9"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -5152,7 +5175,7 @@
             "abbreviatedOid": "0e87eaf"
           },
           "author": "lukevalenta",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2025-02-13T21:37:55Z",
@@ -5172,7 +5195,7 @@
             "abbreviatedOid": "0e87eaf"
           },
           "author": "lukevalenta",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "APPROVED",
           "body": "Left some suggestions, but overall the change looks good to me.",
           "createdAt": "2025-02-14T02:07:56Z",
@@ -5280,6 +5303,58 @@
           "createdAt": "2025-02-17T11:53:31Z",
           "updatedAt": "2025-02-17T11:53:31Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6cYq3j",
+          "commit": {
+            "abbreviatedOid": "f0469ed"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-02-18T14:13:36Z",
+          "updatedAt": "2025-02-18T14:26:49Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Yeah, I like the approach you took here \ud83d\udc4d ",
+              "createdAt": "2025-02-18T14:13:36Z",
+              "updatedAt": "2025-02-18T14:26:49Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "The change to de-emphasize the RP directly contacting the mirror looks good!",
+              "createdAt": "2025-02-18T14:14:20Z",
+              "updatedAt": "2025-02-18T14:26:49Z"
+            },
+            {
+              "originalPosition": 184,
+              "body": "nit: if the two mirrors both serve the highest batch number then we don't want the second-highest\r\n```suggestion\r\n2. Compute the highest batch number that satisfies the policy. For example, if requiring windows be represented in at least two mirrors, use the second-to-last batch number after sorting in ascending order.\r\n```",
+              "createdAt": "2025-02-18T14:26:43Z",
+              "updatedAt": "2025-02-18T14:26:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6cb3dT",
+          "commit": {
+            "abbreviatedOid": "f0469ed"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-18T18:29:42Z",
+          "updatedAt": "2025-02-18T18:29:42Z",
+          "comments": [
+            {
+              "originalPosition": 175,
+              "body": "Fair enough. I guess I would say that the CA is the service with a private key and the _CA operator_ is the entity that maintains it. If the CA is compromised, the _CA operator_ may well be honest, but the service is still misbehaving. But people are often sloppy enough about this that adding the extra word SGTM.\r\n\r\n```suggestion\r\nRelying parties SHOULD ensure transparency by obtaining validity windows from the CA and/or some combination of trusted mirrors. The relying party picks sources which, together, are trusted to satisfy the requirements described in {{mirrors}}. Mirrors allow the relying party to maintain transparency in the face of a misbehaving or compromised CA that may, for example, stop serving some unauthorized certificate in a batch to evade detection.\r\n```",
+              "createdAt": "2025-02-18T18:29:42Z",
+              "updatedAt": "2025-02-18T18:29:42Z"
+            }
+          ]
         }
       ]
     }
