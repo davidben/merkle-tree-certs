@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-20T01:49:11.452467+00:00",
+  "timestamp": "2025-02-23T01:55:25.603181+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1848,6 +1848,22 @@
       "body": "This idea is mentioned in #84 in the context of allowing RPs who have been offline for a while to catch up:\n> Now, we could optimize this by using a tree structure, rather than a linear structure. Then consistency proofs are smaller and this is starting to look a lot more like vanilla CT, with all the operational challenges that entailed. The update process is still complex, but at least allows an arbitrarily out-of-date client to catch up.\n\nTo expand on this a bit, the basic idea is that the CA maintains their append-only log of batch tree heads as a Merkle tree, and publishes an [STH](https://datatracker.ietf.org/doc/html/rfc6962#section-3.5) over that tree instead of a signed validity window over only the latest batches. The only additional storage requirement for the CA is that they must maintain the right-most edge of the tree in order to append new batches to it. (As an added benefit, if a CA has been offline for a while they can skip generating validity window signatures for no-longer-valid batches. If I understand correctly, currently a CA has to publish [one signature per batch tree head](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#section-5.4-4.2.1).)\n\nWhen mirrors retrieve the CA state, they do the same thing as before, and make sure they can reconstruct all batch tree heads and the final STH from what the CA publishes. Mirrors can additionally publish the log as [static tiles](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#merkle-tree) to make it easy for clients to construct consistency and inclusion proofs.\n\nAs discussed in #84, RPs that have been offline for a while can get a succinct Merkle tree consistency proof from the mirror to catch up, instead of needing to retrieve all batch tree heads and validity windows between `old_latest_batch` and `new_latest_batch`.\n\nMonitors can also easily get a consistency proof to ensure that any long-expired batches they retrieve from a mirror are consistent with the latest STH from the mirror.\n\nAside from the the above, there are some additional benefits if the STHs are put in [tlog-checkpoint](https://github.com/C2SP/C2SP/blob/main/tlog-checkpoint.md) format (like in [static-ct](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md)). This format makes it easy for mirrors to append signatures to checkpoints (#101).\n\nDepending on the RP's transparency policy, the tlog-checkpoint format also allows for interoperability with [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md) networks for lightweight split view protection. Witnesses keep minimal state per CA, and can add their signature to the latest checkpoint after confirming consistency with their previous latest checkpoint. (See https://blog.transparency.dev/can-i-get-a-witness-network for more context on witness networks.)",
       "createdAt": "2025-02-14T17:42:39Z",
       "updatedAt": "2025-02-18T14:43:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 104,
+      "id": "I_kwDOJIBkVc6rA_SG",
+      "title": "Default batch duration and lifetime",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/104",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "At the moment we have hourly batches with 14 day lifetimes. Those numbers are easy to think about. In practice we might want to tweak them.\n\n**Lifetime.** In the current CA/B baseline requirements, CAs are allowed to forego supporting revocation if their certificates are *short lived*. The latter is defined as less than 7 days. (Strictly speaking it's 10 days now, but that's the transitional value.) I think it makes sense to align here and use 7 days as the default lifetime.\n\n**Batch duration**. Although we don't have good data yet, I think it's safe to say that we can't expect RPs to pull new roots hourly. A batch duration of 6 hours might make more sense.",
+      "createdAt": "2025-02-21T14:21:35Z",
+      "updatedAt": "2025-02-21T14:21:35Z",
       "closedAt": null,
       "comments": []
     }
