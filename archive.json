@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-25T01:51:35.422695+00:00",
+  "timestamp": "2025-02-27T01:51:34.091694+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1866,6 +1866,37 @@
       "updatedAt": "2025-02-21T14:21:35Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 105,
+      "id": "I_kwDOJIBkVc6rwab6",
+      "title": "Backdated assertions",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/105",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Suppose we have a bunch of assertions queued, but forget to issue for a few hours. The current implementation puts all assertions in the most recent batch. We could also put all queued assertions in the oldest to-be-issued batch (this could backdate an assertion). Or put each assertion in the next batch for when it was accepted.\n\nThe I-D doesn't say anything about this.",
+      "createdAt": "2025-02-26T13:24:27Z",
+      "updatedAt": "2025-02-26T14:04:28Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "I think the draft currently says you put them in the current one by way of this procedure:\nhttps://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#name-issuance-queue-and-scheduli\n\nThis does mean the assertions last potentially longer than you expected, which is another reason to do #92. (I really got to go finish that.)",
+          "createdAt": "2025-02-26T14:02:36Z",
+          "updatedAt": "2025-02-26T14:02:36Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I think the draft currently says you put them in the current one by way of this procedure: \n\nOops, you're right.\n\n> This does mean the assertions last potentially longer than you expected, which is another reason to do https://github.com/davidben/merkle-tree-certs/pull/92. (I really got to go finish that.)\n\nThat's an elegant solution.",
+          "createdAt": "2025-02-26T14:04:27Z",
+          "updatedAt": "2025-02-26T14:04:27Z"
+        }
+      ]
     }
   ],
   "pulls": [
