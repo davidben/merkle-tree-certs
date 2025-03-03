@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 22 August 2025                                 B. E. Westerbaan
+Expires: 4 September 2025                               B. E. Westerbaan
                                                               Cloudflare
-                                                        18 February 2025
+                                                            3 March 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 August 2025.
+   This Internet-Draft will expire on 4 September 2025.
 
 Copyright Notice
 
@@ -463,7 +463,7 @@ Table of Contents
    Names in a dns claim represent the exact DNS name specified.  Names
    in a dns_wildcard claim represent wildcard DNS names and are
    processed as if prepended with the string "*." and then following the
-   steps in Section 6.3 of [I-D.draft-ietf-uta-rfc6125bis].
+   steps in Section 6.3 of [I-D.ietf-uta-rfc6125bis].
 
 4.2.  IP Claims
 
@@ -499,7 +499,7 @@ Table of Contents
       function is always SHA-256 [SHS], but others may be defined.
 
    issuer_id:  A trust anchor identifier (see Section 3 of
-      [I-D.beck-tls-trust-anchor-ids]) that identifies the CA.  See
+      [I-D.ietf-tls-trust-anchor-ids]) that identifies the CA.  See
       Section 5.2 for details.
 
    public_key:  The public half of a signing key.  For convenience, we
@@ -567,7 +567,7 @@ Table of Contents
 5.2.  Identifying CAs and Batches
 
    A Merkle Tree CA's issuer_id is a trust anchor identifier, defined in
-   Section 3 of [I-D.beck-tls-trust-anchor-ids].  However, unlike an
+   Section 3 of [I-D.ietf-tls-trust-anchor-ids].  However, unlike an
    X.509 CA, the entire OID arc rooted at the identifier is associated
    with the CA.  OIDs under this arc are used to identify batches below.
 
@@ -820,7 +820,7 @@ Table of Contents
    associated assertion, provided it trusts the CA and recognizes the
    tree head.  The structures are defined below:
 
-   /* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
+   /* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
    opaque TrustAnchorIdentifier<1..2^8-1>;
 
    struct {
@@ -834,8 +834,8 @@ Table of Contents
    } BikeshedCertificate;
 
    A proof's trust_anchor field is a trust anchor identifier (see
-   Section 3 of [I-D.beck-tls-trust-anchor-ids] and Section 4.1 of
-   [I-D.beck-tls-trust-anchor-ids]), which determines the proof's type
+   Section 3 of [I-D.ietf-tls-trust-anchor-ids] and Section 4.1 of
+   [I-D.ietf-tls-trust-anchor-ids]), which determines the proof's type
    and issuer.  It is analogous to an X.509 trust anchor's subject name.
    When the issuer is a Merkle Tree CA, the trust_anchor is a batch's
    batch_id, as described in Section 5.2.
@@ -1253,8 +1253,8 @@ Table of Contents
    [[TODO: This section hasn't been written yet.  Instead, what follows
    is an informal discussion. #13 ]]
 
-   Section 6 of [I-D.draft-beck-tls-trust-anchor-ids] defines the bulk
-   of what's needed.  The missing parts are:
+   Section 6 of [I-D.ietf-tls-trust-anchor-ids] defines the bulk of
+   what's needed.  The missing parts are:
 
    *  Some way to specify that the client supports BikeshedCertificate.
       At minimum a separate MIME type, but it likely needs to be known
@@ -1265,10 +1265,10 @@ Table of Contents
       authenticating party when to query again.  But the fallback
       certificate will issue much faster, so they cannot be issued
       together in the same ACME order, as
-      [I-D.draft-beck-tls-trust-anchor-ids] currently does.
+      [I-D.ietf-tls-trust-anchor-ids] currently does.
 
-   *  Use [I-D.draft-ietf-acme-ari] to move the renewal logic in
-      Section 11.2 from the authenticating party to the ACME server.
+   *  Use [I-D.ietf-acme-ari] to move the renewal logic in Section 11.2
+      from the authenticating party to the ACME server.
 
    We should also define a certificate request format, though it is
    broadly just reusing the Assertion structure.  If the CA wishes to
@@ -1384,9 +1384,9 @@ Table of Contents
    with the value in TLSSubjectInfo.  In particular, the underlying
    signature algorithm MUST match, and there MUST be appropriate domain
    separation between the two modes.  For example,
-   [I-D.draft-ietf-tls-batch-signing] defines new SignatureSchemes, but
-   the same keypair can be safely used with one of the new values and
-   the corresponding base SignatureScheme.
+   [I-D.ietf-tls-batch-signing] defines new SignatureSchemes, but the
+   same keypair can be safely used with one of the new values and the
+   corresponding base SignatureScheme.
 
    If this certificate type is used for either the client or server
    certificate, the ALPN [RFC7301] extension MUST be negotiated.  If no
@@ -1407,7 +1407,7 @@ Table of Contents
    Merkle Tree certificates will only be accepted in up-to-date relying
    parties, and require a negotiation mechanism to use.  Merkle Tree
    certificate implementations SHOULD use the trust_anchors extension
-   [I-D.draft-beck-tls-trust-anchor-ids] as described below:
+   [I-D.ietf-tls-trust-anchor-ids] as described below:
 
    For each Merkle Tree CA trusted by the relying party, the batches in
    the validity window each determine a trust anchor, as described in
@@ -1420,20 +1420,20 @@ Table of Contents
    trust anchors, sending all trust anchors in the trust_anchors
    extension would be prohitively large in most cases.  Instead, relying
    parties SHOULD use the retry mechanism described in Section 4.3 of
-   [I-D.draft-beck-tls-trust-anchor-ids] and the DNS hint described in
-   Section 5 of [I-D.draft-beck-tls-trust-anchor-ids].
+   [I-D.ietf-tls-trust-anchor-ids] and the DNS hint described in
+   Section 5 of [I-D.ietf-tls-trust-anchor-ids].
 
    [[TODO: We could reduce the reliance on DNS by adding
    https://github.com/davidben/tls-trust-expressions/issues/62, either
    in this draft or the main trust anchor IDs draft.]]
 
    The authenticating party's list of candidate certification paths (see
-   Section 3.3 of [I-D.beck-tls-trust-anchor-ids]) is extended to carry
+   Section 3.3 of [I-D.ietf-tls-trust-anchor-ids]) is extended to carry
    both X.509 and BikeshedCertificate credentials.  The two types of
    credentials MAY appear in any relative preference order, based on the
    authenticating party's policies.  Like an X.509 credential, a
    BikeshedCertificate credential also has a CertificatePropertyList
-   (see Section 3.1 of [I-D.beck-tls-trust-anchor-ids]).
+   (see Section 3.1 of [I-D.ietf-tls-trust-anchor-ids]).
 
    For each of the authenticating party's BikeshedCertificate
    credentials, the corresponding trust anchor identifier is the
@@ -1444,8 +1444,8 @@ Table of Contents
    the trust_anchor_identifier property.
 
    The authenticating party then selects certificates as described in
-   Section 4.2 of [I-D.draft-beck-tls-trust-anchor-ids].  In doing so,
-   it SHOULD incorporate trust anchor negotiation and certificate type
+   Section 4.2 of [I-D.ietf-tls-trust-anchor-ids].  In doing so, it
+   SHOULD incorporate trust anchor negotiation and certificate type
    negotiation (see Section 10.2) into the selection criteria for
    BikeshedCertificate-based credentials.
 
@@ -1541,7 +1541,7 @@ Table of Contents
 12.  Privacy Considerations
 
    The Privacy Considerations described in Section 9 of
-   [I-D.beck-tls-trust-anchor-ids] apply to its use with Merkle Tree
+   [I-D.ietf-tls-trust-anchor-ids] apply to its use with Merkle Tree
    Certificates.
 
    In particular, relying parties that share an update process will
@@ -1785,21 +1785,14 @@ Table of Contents
 
 15.1.  Normative References
 
-   [I-D.beck-tls-trust-anchor-ids]
+   [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-beck-tls-trust-anchor-ids-03, 18 December
-              2024, <https://datatracker.ietf.org/doc/html/draft-beck-
-              tls-trust-anchor-ids-03>.
+              Draft, draft-ietf-tls-trust-anchor-ids-00, 25 February
+              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              tls-trust-anchor-ids-00>.
 
-   [I-D.draft-beck-tls-trust-anchor-ids]
-              Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
-              Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-beck-tls-trust-anchor-ids-03, 18 December
-              2024, <https://datatracker.ietf.org/doc/html/draft-beck-
-              tls-trust-anchor-ids-03>.
-
-   [I-D.draft-ietf-uta-rfc6125bis]
+   [I-D.ietf-uta-rfc6125bis]
               Saint-Andre, P. and R. Salz, "Service Identity in TLS",
               Work in Progress, Internet-Draft, draft-ietf-uta-
               rfc6125bis-15, 10 August 2023,
@@ -1936,14 +1929,14 @@ Table of Contents
    [FIREFOX]  Mozilla, "Firefox Remote Settings", 20 August 2022,
               <https://wiki.mozilla.org/Firefox/RemoteSettings>.
 
-   [I-D.draft-ietf-acme-ari]
+   [I-D.ietf-acme-ari]
               Gable, A., "Automated Certificate Management Environment
               (ACME) Renewal Information (ARI) Extension", Work in
-              Progress, Internet-Draft, draft-ietf-acme-ari-07, 6
-              December 2024, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-acme-ari-07>.
+              Progress, Internet-Draft, draft-ietf-acme-ari-08, 26
+              February 2025, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-acme-ari-08>.
 
-   [I-D.draft-ietf-tls-batch-signing]
+   [I-D.ietf-tls-batch-signing]
               Benjamin, D., "Batch Signing for TLS", Work in Progress,
               Internet-Draft, draft-ietf-tls-batch-signing-00, 13
               January 2020, <https://datatracker.ietf.org/doc/html/
@@ -2053,7 +2046,7 @@ Appendix B.  TLS Certificate Type Negotiation Challenges
    This model allows the server to select its certificate type based on
    not just server_certificate_type, but also other ClientHello
    extensions like certificate_authorities or trust_anchors
-   ([I-D.beck-tls-trust-anchor-ids]).  In particular, if there is no
+   ([I-D.ietf-tls-trust-anchor-ids]).  In particular, if there is no
    match in trust_anchors, it can fallback to X.509, rather than staying
    within the realm of BikeshedCertificate.
 
