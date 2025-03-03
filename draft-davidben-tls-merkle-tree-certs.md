@@ -389,7 +389,7 @@ struct {
 
 DNSName values use the "preferred name syntax" as specified by {{Section 3.5 of RFC1034}} and as modified by {{Section 2.1 of RFC1123}}. Alphabetic characters MUST additionally be represented in lowercase. IDNA names {{!RFC5890}} are represented as A-labels. For example, possible values include `example.com` or `xn--iv8h.example`. Values `EXAMPLE.COM` and `<U+1F50F>.example` would not be permitted.
 
-Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !I-D.ietf-uta-rfc6125bis}}.
+Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !RFC9525}}.
 
 ## IP Claims
 
