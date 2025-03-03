@@ -389,7 +389,7 @@ struct {
 
 DNSName values use the "preferred name syntax" as specified by {{Section 3.5 of RFC1034}} and as modified by {{Section 2.1 of RFC1123}}. Alphabetic characters MUST additionally be represented in lowercase. IDNA names {{!RFC5890}} are represented as A-labels. For example, possible values include `example.com` or `xn--iv8h.example`. Values `EXAMPLE.COM` and `<U+1F50F>.example` would not be permitted.
 
-Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !I-D.draft-ietf-uta-rfc6125bis}}.
+Names in a `dns` claim represent the exact DNS name specified. Names in a `dns_wildcard` claim represent wildcard DNS names and are processed as if prepended with the string "`*.`" and then following the steps in {{Section 6.3 of !I-D.ietf-uta-rfc6125bis}}.
 
 ## IP Claims
 
@@ -420,7 +420,7 @@ A Merkle Tree certification authority is defined by the following values:
 : A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}, but others may be defined.
 
 `issuer_id`:
-: A trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
+: A trust anchor identifier (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
 
 `public_key`:
 : The public half of a signing key. For convenience, we use TLS' format, and represent the public key as a `TLSSubjectInfo`, see {{tls-subject-info}}. The corresponding private key, `private_key`, is known only to the CA.
@@ -451,7 +451,7 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 ## Identifying CAs and Batches {#identifying}
 
-A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.beck-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
+A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
 
 An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.
 
@@ -630,7 +630,7 @@ A CA MUST NOT generate signatures over inputs that are parseable as LabeledValid
 For each assertion in the tree, the CA constructs a BikeshedCertificate structure containing the assertion and a proof. A proof is a message that allows the relying party to accept the associated assertion, provided it trusts the CA and recognizes the tree head. The structures are defined below:
 
 ~~~
-/* See Section 4.1 of draft-beck-tls-trust-anchor-ids */
+/* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorIdentifier<1..2^8-1>;
 
 struct {
@@ -644,7 +644,7 @@ struct {
 } BikeshedCertificate;
 ~~~
 
-A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.beck-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.beck-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
+A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
 It is analogous to an X.509 trust anchor's subject name.
 When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.
 
@@ -871,13 +871,13 @@ Individual servers in a service MAY return different latest batch numbers. Indiv
 
 [[TODO: This section hasn't been written yet. Instead, what follows is an informal discussion. #13 ]]
 
-{{Section 6 of !I-D.draft-beck-tls-trust-anchor-ids}} defines the bulk of what's needed. The missing parts are:
+{{Section 6 of !I-D.ietf-tls-trust-anchor-ids}} defines the bulk of what's needed. The missing parts are:
 
 * Some way to specify that the client supports BikeshedCertificate. At minimum a separate MIME type, but it likely needs to be known at order creation.
 
-* Some way to accommodate MTC's long issuance time. ACME has the "processing" state, and the Retry-After header can tell the authenticating party when to query again. But the fallback certificate will issue much faster, so they cannot be issued together in the same ACME order, as {{!I-D.draft-beck-tls-trust-anchor-ids}} currently does.
+* Some way to accommodate MTC's long issuance time. ACME has the "processing" state, and the Retry-After header can tell the authenticating party when to query again. But the fallback certificate will issue much faster, so they cannot be issued together in the same ACME order, as {{!I-D.ietf-tls-trust-anchor-ids}} currently does.
 
-* Use {{?I-D.draft-ietf-acme-ari}} to move the renewal logic in {{rolling-renewal}} from the authenticating party to the ACME server.
+* Use {{?I-D.ietf-acme-ari}} to move the renewal logic in {{rolling-renewal}} from the authenticating party to the ACME server.
 
 We should also define a certificate request format, though it is broadly just reusing the Assertion structure. If the CA wishes to check possession of the private key, it'll need to come with a signature or do some online operation (e.g. if it's a KEM key). This is inherently protocol-specific, because the mechanism needs to coexist with the target protocol. (Signed CSRs implicitly assume the target protocol's signature payloads cannot overlap with that of a CSR.)
 
@@ -954,7 +954,7 @@ The `subject_type` field in the certificate MUST be of type `tls` ({{tls-subject
 
 * The SignatureScheme in the CertificateVerify MUST match the `signature` field in the TLSSubjectInfo.
 
-The second modification differs from {{RFC8446}}. Where {{RFC8446}} allowed an id-rsaEncryption key to sign both `rsa_pss_rsae_sha256` and `rsa_pss_rsae_sha384`, TLSSubjectInfo keys are specific to a single algorithm. Future documents MAY relax this restriction for a new SignatureScheme, provided it was designed to be used concurrently with the value in TLSSubjectInfo. In particular, the underlying signature algorithm MUST match, and there MUST be appropriate domain separation between the two modes. For example, {{?I-D.draft-ietf-tls-batch-signing}} defines new SignatureSchemes, but the same keypair can be safely used with one of the new values and the corresponding base SignatureScheme.
+The second modification differs from {{RFC8446}}. Where {{RFC8446}} allowed an id-rsaEncryption key to sign both `rsa_pss_rsae_sha256` and `rsa_pss_rsae_sha384`, TLSSubjectInfo keys are specific to a single algorithm. Future documents MAY relax this restriction for a new SignatureScheme, provided it was designed to be used concurrently with the value in TLSSubjectInfo. In particular, the underlying signature algorithm MUST match, and there MUST be appropriate domain separation between the two modes. For example, {{?I-D.ietf-tls-batch-signing}} defines new SignatureSchemes, but the same keypair can be safely used with one of the new values and the corresponding base SignatureScheme.
 
 If this certificate type is used for either the client or server certificate, the ALPN {{!RFC7301}} extension MUST be negotiated. If no application protocol is selected, endpoints MUST close the connection with a `no_application_protocol` alert.
 
@@ -962,19 +962,19 @@ If this certificate type is used for either the client or server certificate, th
 
 ## Certificate Negotiation
 
-Merkle Tree certificates will only be accepted in up-to-date relying parties, and require a negotiation mechanism to use. Merkle Tree certificate implementations SHOULD use the `trust_anchors` extension {{!I-D.draft-beck-tls-trust-anchor-ids}} as described below:
+Merkle Tree certificates will only be accepted in up-to-date relying parties, and require a negotiation mechanism to use. Merkle Tree certificate implementations SHOULD use the `trust_anchors` extension {{!I-D.ietf-tls-trust-anchor-ids}} as described below:
 
 For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in {{relying-parties}}. The trust anchor's identifier is the batch identifier, as described in {{identifying}}. Future mechanisms using the BikeshedCertificate format (see {{proofs}}) MUST similarly define how relying parties determine trust anchor identifiers.
 
-As even a single validity window results in `validity_window_size` trust anchors, sending all trust anchors in the `trust_anchors` extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in {{Section 4.3 of !I-D.draft-beck-tls-trust-anchor-ids}} and the DNS hint described in {{Section 5 of !I-D.draft-beck-tls-trust-anchor-ids}}.
+As even a single validity window results in `validity_window_size` trust anchors, sending all trust anchors in the `trust_anchors` extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}} and the DNS hint described in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
 [[TODO: We could reduce the reliance on DNS by adding https://github.com/davidben/tls-trust-expressions/issues/62, either in this draft or the main trust anchor IDs draft.]]
 
-The authenticating party's list of candidate certification paths (see {{Section 3.3 of !I-D.beck-tls-trust-anchor-ids}}) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the authenticating party's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see {{Section 3.1 of !I-D.beck-tls-trust-anchor-ids}}).
+The authenticating party's list of candidate certification paths (see {{Section 3.3 of !I-D.ietf-tls-trust-anchor-ids}}) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the authenticating party's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see {{Section 3.1 of !I-D.ietf-tls-trust-anchor-ids}}).
 
 For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor identifier is the `trust_anchor` field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the `trust_anchor_identifier` property.
 
-The authenticating party then selects certificates as described in {{Section 4.2 of !I-D.draft-beck-tls-trust-anchor-ids}}. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see {{tls-certificate-type}}) into the selection criteria for BikeshedCertificate-based credentials.
+The authenticating party then selects certificates as described in {{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}}. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see {{tls-certificate-type}}) into the selection criteria for BikeshedCertificate-based credentials.
 
 [[TODO: Certificate type negotiation doesn't work right for client certificates. See {{cert-type-problems}}]]
 
@@ -1012,7 +1012,7 @@ However, if a mirror's interface becomes unavailable, monitors may be unable to 
 
 # Privacy Considerations
 
-The Privacy Considerations described in {{Section 9 of !I-D.beck-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
+The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
 
 In particular, relying parties that share an update process will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS-mechanism, the trust anchor list will require active probing.
 
@@ -1169,7 +1169,7 @@ The server certificate type is negotiated as follows:
 
 * The server sends a certificate of the server-selected type in Certificate.
 
-This model allows the server to select its certificate type based on not just `server_certificate_type`, but also other ClientHello extensions like `certificate_authorities` or `trust_anchors` ({{!I-D.beck-tls-trust-anchor-ids}}). In particular, if there is no match in `trust_anchors`, it can fallback to X.509, rather than staying within the realm of BikeshedCertificate.
+This model allows the server to select its certificate type based on not just `server_certificate_type`, but also other ClientHello extensions like `certificate_authorities` or `trust_anchors` ({{!I-D.ietf-tls-trust-anchor-ids}}). In particular, if there is no match in `trust_anchors`, it can fallback to X.509, rather than staying within the realm of BikeshedCertificate.
 
 However, the client certificate type is negotiated differently:
 
