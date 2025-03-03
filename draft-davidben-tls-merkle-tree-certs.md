@@ -1258,3 +1258,11 @@ The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jacks
 - Miscellaneous changes.
 
 - Replace the negotiation mechanism with TLS Trust Anchor Identifiers.
+
+- Switch terminology from "subscriber" to "authenticating party".
+
+- Use <1..2^24-1> encoding for all certificate types in the CertificateEntry TLS message
+
+- Clarify discussion and roles in transparency ecosystem
+
+- Update references
