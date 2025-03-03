@@ -463,7 +463,7 @@ Table of Contents
    Names in a dns claim represent the exact DNS name specified.  Names
    in a dns_wildcard claim represent wildcard DNS names and are
    processed as if prepended with the string "*." and then following the
-   steps in Section 6.3 of [I-D.ietf-uta-rfc6125bis].
+   steps in Section 6.3 of [RFC9525].
 
 4.2.  IP Claims
 
@@ -1792,13 +1792,6 @@ Table of Contents
               2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
               tls-trust-anchor-ids-00>.
 
-   [I-D.ietf-uta-rfc6125bis]
-              Saint-Andre, P. and R. Salz, "Service Identity in TLS",
-              Work in Progress, Internet-Draft, draft-ietf-uta-
-              rfc6125bis-15, 10 August 2023,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-uta-
-              rfc6125bis-15>.
-
    [POSIX]    "IEEE Standard for Information Technology--Portable
               Operating System Interface (POSIX(TM)) Base
               Specifications, Issue 7", IEEE,
@@ -1872,6 +1865,10 @@ Table of Contents
               Ed., "HTTP Semantics", STD 97, RFC 9110,
               DOI 10.17487/RFC9110, June 2022,
               <https://www.rfc-editor.org/rfc/rfc9110>.
+
+   [RFC9525]  Saint-Andre, P. and R. Salz, "Service Identity in TLS",
+              RFC 9525, DOI 10.17487/RFC9525, November 2023,
+              <https://www.rfc-editor.org/rfc/rfc9525>.
 
    [SHS]      "Secure hash standard", National Institute of Standards
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
