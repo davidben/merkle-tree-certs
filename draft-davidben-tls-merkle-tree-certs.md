@@ -485,9 +485,16 @@ The CA exposes all of this information in an HTTP {{!RFC9110}} interface describ
 
 ## Issuance Queue and Scheduling
 
-The CA additionally maintains an issuance queue, not exposed via the HTTP interface. Each element of the issuance queue is an assertion to be certified, and an optional requested expiration time. The final `not_after` will be computed from both this requested time and the expiration time of the whole batch.
+The CA additionally maintains an issuance queue, not exposed via the HTTP interface. Each element of the issuance queue is an assertion to be certified and an expiration time.
 
-When an authenticating party requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges ({{Section 8 of ?RFC8555}}). Once validation is complete and the CA is willing to certify the assertion, the CA appends it, and the subscriber's requested expiry time, to the issuance queue.
+When an authenticating party requests a certificate for some assertion, the CA first validates it per its issuance policy. For example, it may perform ACME identifier validation challenges ({{Section 8 of ?RFC8555}}). Once validation is complete and the CA is willing to certify the assertion, up to some expiration time, the CA appends this information to the issuance queue.
+
+The CA sets the expiration time based on criteria such as:
+
+* The subscriber's requested expiration time, e.g. the "notAfter" field in an ACME order ({{Section 7.1.3 of ?RFC8555}})
+* Other policies the CA may have, such as a maximum lifetime for some class of certificate, or limits imposed by the validation method
+
+The CA SHOULD set the expiration to the tightest of all criteria it considers. The final `not_after` will be computed from both this time and the expiration time of the whole batch. If the CA has no criteria beyond the batch-wide expiration, it MAY set this value to infinity.
 
 The CA runs a regularly-scheduled issuance job which converts this queue into certificates. This job runs the following procedure:
 
@@ -495,17 +502,23 @@ The CA runs a regularly-scheduled issuance job which converts this queue into ce
 
 2. For each batch in the "ready" state other than the latest one, run the procedure in {{certifying-batch}} with an empty assertion list, in order of increasing batch number. Batches cannot be skipped.
 
-3. Empty the issuance queue into an ordered list of assertions. Run the procedure in {{certifying-batch}} using this list and the remaining batch in the "ready" state. This batch's issuance time will be at or shortly before the current time.
+3. Copy and empty the issuance queue. Run the procedure in {{certifying-batch}} to certify the copied contents at the final batch in the "ready" state. This batch's issuance time will be at or shortly before the current time.
 
 ## Certifying a Batch of Assertions {#certifying-batch}
 
-This section describes how to certify a given list of assertions at a given batch number. The batch MUST be in the "ready" state, and all preceding batches MUST be in the "issued" state.
+This section describes how to certify the issuance queue a given batch number. The batch MUST be in the "ready" state, and all preceding batches MUST be in the "issued" state.
+
+1. The CA builds a Merkle Tree from the list of assertions, as described in {{building-tree}}.
+2. The CA signs a validity window, ending at the new batch, as described in {{signing}}.
+3. The CA constructs a certificate for each assertion, as described in {{proofs}}.
 
 ### Building the Merkle Tree {#building-tree}
 
-First, the CA then builds a Merkle Tree from the list as follows:
+The CA builds a Merkle Tree from the list as follows:
 
-Let `n` be the number of input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is the smallest positive integer such that `n <= 2^(l-1)`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
+First, the CA preprocesses the issuance queue state to compute the final expiry. For each entry, set the expiry value to the smaller of the original value and the expiration for this batch, as described in {{parameters}}. If the result is before the current time, discard this entry from the issuance queue.
+
+Let `n` be the number of remaining input assertions. If `n > 0`, the CA builds a binary tree with l levels numbered `0` to `l-1`, where `l` is the smallest positive integer such that `n <= 2^(l-1)`. Each node in the tree contains a hash value. Hashes in the tree are built from the following functions:
 
 ~~~~
     HashEmpty(level, index) = hash(HashEmptyInput)
@@ -553,14 +566,12 @@ The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
 
-1. Let `batch_not_after` be the expiration time for this batch, as described in {{parameters}}.
+1. Let `assertion[j]` and `not_after[j]` be the assertion and expiration, respectively, of the `j`th entry in the issuance queue.
 
-2. Initialize an array `not_after` with `n` elements. For each For `j` between `0` and `n-1`, inclusive, set `not_after[j]` to the minimum of `batch_not_after` and assertion `j`'s requested expiration time. If assertion `j` did not request an expiration time, set `not_after[j]` to `batch_not_after`. If `not_after[j]` is before the current time, discard the assertion and decrement `n`.
-
-3. Initialize level 0 with `n` elements. For `j` between `0` and `n-1`, inclusive,
+2. Initialize level 0 with `n` elements. For `j` between `0` and `n-1`, inclusive,
    set element `j` to the output of `HashAssertion(assertion[j], not_after[j], j)`.
 
-4. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
+3. For `i` between `1` and `l-1`, inclusive, compute level `i` from level `i-1` as
    follows:
 
    - If level `i-1` has an odd number of elements `j`, append `HashEmpty(i-1, j)` to the level.
@@ -694,9 +705,7 @@ For example, the `path` value for the third assertion in a batch of three assert
 
 If the batch only contained one assertion, `path` will be empty and `index` will be zero.
 
-For each assertion, the CA assembles a BikeshedCertificate structure and sends it to the authenticating party.
-
-This certificate can be presented to supporting relying parties as described in {{using}}. It is valid until the batch expires.
+For each assertion in the tree, the CA assembles a BikeshedCertificate structure and sends it to the authenticating party. This certificate can be presented to supporting relying parties as described in {{using}}. If an assertion was discarded in {{building-tree}} and thus isn't in the tree, certificate issuance has failed for that assertion. The CA reports an error to the corresponding authenticating party.
 
 ## Size Estimates {#sizes}
 
