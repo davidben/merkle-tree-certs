@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-04T01:53:21.031170+00:00",
+  "timestamp": "2025-03-06T01:53:19.876342+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4938,7 +4938,7 @@
       "labels": [],
       "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
       "createdAt": "2024-09-19T22:38:00Z",
-      "updatedAt": "2024-09-23T14:39:40Z",
+      "updatedAt": "2025-03-05T20:43:54Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae",
@@ -4993,7 +4993,54 @@
           "updatedAt": "2024-09-23T14:39:40Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6efAgc",
+          "commit": {
+            "abbreviatedOid": "5d26558"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-03-04T20:37:15Z",
+          "updatedAt": "2025-03-04T20:42:52Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "In our current implementation (which of course we're happy to change), subscribers submit an `AssertionRequest` to the CA which contains the assertion, evidence, and requested maximum `not_after`. But before queuing that `AssertionRequest`, the CA computes the effective `not_after` as the minimum of the subscriber-requested `not_after`, the next-to-be-issued-batch's expiration time, and any constraints for the evidence (e.g., X.509 cert or revocation check expiry).\r\n\r\nThe reason we compute the effective `not_after` date at queue time is that otherwise we'd have to re-validate all of the evidence at issuance time, which could be a bottleneck and doesn't allow us to return a clear error to the subscriber about why the assertion request was rejected. It also means that we use the next-to-be-issued batch's expiration time instead of the actual batch's expiration time, which prevents assertions from having a longer-than-expected lifetime if there are issuance delays (related to #105).",
+              "createdAt": "2025-03-04T20:37:15Z",
+              "updatedAt": "2025-03-04T20:43:51Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "Regarding evidence (#23), that's also going into the queue in our implementation as part of the `AssertionRequest`, but should be fine to leave that out of this PR.",
+              "createdAt": "2025-03-04T20:40:02Z",
+              "updatedAt": "2025-03-04T20:42:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6esa22",
+          "commit": {
+            "abbreviatedOid": "5d26558"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-03-05T20:43:54Z",
+          "updatedAt": "2025-03-05T20:43:54Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Ah hmm. I mean, both behaviors seem perfectly legitimate to me, so ideally the text would admit both. I guess what you're doing could be modeled as computing a different requested expiration time _before_ entering the queue, which happens to be always less than `batch_not_after`. But that is definitely on the confusing side. Will wordsmith a bit.",
+              "createdAt": "2025-03-05T20:43:54Z",
+              "updatedAt": "2025-03-05T20:43:54Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 94,
