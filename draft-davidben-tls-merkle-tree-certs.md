@@ -549,6 +549,8 @@ struct {
     SubjectType subject_type;
     opaque subject_info_hash[hash.length];
     Claim claims<0..2^16-1>;
+    /* TODO: This isn't really an abridged assertion now. Perhaps MerkleTreeEntry? */
+    Timestamp not_after;
 } AbridgedAssertion;
 
 struct {
@@ -556,12 +558,11 @@ struct {
     TrustAnchorIdentifier batch_id;
     uint64 index;
     AbridgedAssertion abridged_assertion;
-    Timestamp not_after;
 } HashAssertionInput;
 ~~~
 
-The `batch_id` is set to the batch-specific trust anchor identifier, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
-`HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, and the remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`.
+In these inputs, the `batch_id` is set to the batch-specific trust anchor identifier, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
+`HashAssertionInput.abridged_assertion.subject_info_hash` is set to `hash(assertion.subject_info)` from the function input `assertion`, `not_after` is the input of the function. The remaining fields of `HashAssertionInput.abridged_assertion` are taken unmodified from `assertion`.
 The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
