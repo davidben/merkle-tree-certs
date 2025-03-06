@@ -488,9 +488,12 @@ The CA exposes all of this information in an HTTP {{!RFC9110}} interface describ
 An issued batch contains a list of batch entries, each of which certifies some assertion up to some expiration time. A batch entry is described by a MerkleTreeEntry structure, defined below.
 
 ~~~
+/* In this document, hash is always SHA-256, and hash.length is 32. */
+opaque HashValue[hash.length];
+
 struct {
     SubjectType subject_type;
-    opaque subject_info_hash[hash.length];
+    HashValue subject_info_hash;
     Claim claims<0..2^16-1>;
     Timestamp not_after;
 } MerkleTreeEntry;
@@ -556,8 +559,8 @@ struct {
     TrustAnchorIdentifier batch_id;
     uint64 index;
     uint8 level;
-    opaque left[hash.length];
-    opaque right[hash.length];
+    HashValue left;
+    HashValue right;
 } HashNodeInput;
 
 struct {
@@ -672,18 +675,16 @@ When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`,
 
 A proof's `not_after` field is a POSIX timestamp (see {{time}}) describing the time after which the proof is no longer valid.
 
-A proof's `proof_data` field is a byte string, opaque to the authenticating party, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProofSHA256, described below. Future mechanisms using the BikeshedCertificate may define other formats.
+A proof's `proof_data` field is a byte string, opaque to the authenticating party, in some format agreed upon by the proof issuer and relying party. If the issuer is a Merkle Tree CA, as defined in this document, the `proof_data` contains a MerkleTreeProof, described below. Future mechanisms using the BikeshedCertificate may define other formats.
 
 ~~~
-opaque HashValueSHA256[32];
-
 struct {
     uint64 index;
-    HashValueSHA256 path<0..2^16-1>;
-} MerkleTreeProofSHA256;
+    HashValue path<0..2^16-1>;
+} MerkleTreeProof;
 ~~~
 
-After building the tree, the CA constructs a MerkleTreeProofSHA256 for each entry as follows. For each index `i` in the batch's entry list:
+After building the tree, the CA constructs a MerkleTreeProof for each entry as follows. For each index `i` in the batch's entry list:
 
 1. Set `index` to `i`. This will be a value between `0` and `n-1`, inclusive.
 
