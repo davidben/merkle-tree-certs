@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-06T01:53:19.876342+00:00",
+  "timestamp": "2025-03-09T01:37:21.473641+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1897,6 +1897,22 @@
           "updatedAt": "2025-02-26T14:04:27Z"
         }
       ]
+    },
+    {
+      "number": 106,
+      "id": "I_kwDOJIBkVc6s7r7t",
+      "title": "Move non-MTC-specific BikeshedCertificate definition up with Assertions",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/106",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In putting together #92, I noticed that BikeshedCertificate is presented kinda weirdly. The format is buried deep in the instructions for how to run a CA. Maybe we should pull that up with Assertions.",
+      "createdAt": "2025-03-06T20:09:52Z",
+      "updatedAt": "2025-03-06T20:09:52Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -4938,13 +4954,13 @@
       "labels": [],
       "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
       "createdAt": "2024-09-19T22:38:00Z",
-      "updatedAt": "2025-03-05T20:43:54Z",
+      "updatedAt": "2025-03-07T14:34:15Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "ce779c60c77cce4d2d0679d268ba979af6fa41ae",
+      "baseRefOid": "fb6edac3f2fbe769500e1c86a665ecec95dcc376",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "expiry",
-      "headRefOid": "5d265587a2aab4fe8e267599d314cf80f6ed68ca",
+      "headRefOid": "9f2a9846ff25730a26f65ddd62199c8e51f33a1f",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -4991,6 +5007,20 @@
           "body": "Ah nice catch! I forgot about the HTTP interface.\r\n\r\nAbridgedAssertionAndTimestamp is a mouthful. It is annoying that probably every proof type will need a family of \"[abridged] assertion and not after\" structures and we don't good a word for that. Should it actually go in the assertion?? Trouble is this makes it harder to staple multiple proofs a la #88 if the proofs happen not to be clocked similarly, or have other lifetime constraints, and I kinda like the freedom to build PKIs out of that.",
           "createdAt": "2024-09-23T14:39:40Z",
           "updatedAt": "2024-09-23T14:39:40Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Alright, rebased and then reworked a bunch. This probably warrants a fresh review and possibly looking at individual commits for clarity.\r\n\r\nI rebased the PR.\r\n\r\nI addressed @lukevalenta's comment by being less prescriptive about where you get the expiration time.\r\n\r\nI addressed @bwesterb's comment by putting not_after into AbridgedAssertion.\r\n\r\nIn doing that, I realized calling this an abridged assertion gets... kinda weird, so I did a bigger change in hopes of resolving this. I tried calling them \"batch entries\" which seems to work? This resolves a few issues:\r\n* Abridged assertions contain more information than just the assertion (maybe not_after should just be in the assertion??? https://github.com/davidben/merkle-tree-certs/pull/92#issuecomment-2362330928 was the rationale for sticking them with the proof)\r\n* Abridged assertions are currently presented as a funny implementation detail of leaf hashing, but they're more than that. They're also the thing we serve in the HTTP list.\r\n\r\nSo the phrasing around \"batch entries\" tries to talk about them as being *the* contents of the Merkle Tree.\r\n\r\nFinally, I noticed a weird inconsistency in how we refer to hash values so cleaned that up.\r\n\r\nThoughts?",
+          "createdAt": "2025-03-06T20:07:58Z",
+          "updatedAt": "2025-03-06T20:08:08Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> So the phrasing around \"batch entries\" tries to talk about them as being _the_ contents of the Merkle Tree.\r\n\r\nWhat about *commitments*? Or is that too crypto-y?",
+          "createdAt": "2025-03-06T20:16:53Z",
+          "updatedAt": "2025-03-06T20:16:53Z"
         }
       ],
       "reviews": [
@@ -5037,6 +5067,26 @@
               "body": "Ah hmm. I mean, both behaviors seem perfectly legitimate to me, so ideally the text would admit both. I guess what you're doing could be modeled as computing a different requested expiration time _before_ entering the queue, which happens to be always less than `batch_not_after`. But that is definitely on the confusing side. Will wordsmith a bit.",
               "createdAt": "2025-03-05T20:43:54Z",
               "updatedAt": "2025-03-05T20:43:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6e4cZs",
+          "commit": {
+            "abbreviatedOid": "9f2a984"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "Modulo a missing period and whether to call the leaves 'commitments' or 'entries' (I think either is fine, although 'entries' is more succinct), looks good to me!\r\n\r\nOne implementation consideration (which doesn't need to be part of the spec): right now the [Key()](https://github.com/bwesterb/mtc/blob/main/mtc.go#L1285) function computes a key for an abridged assertion, which is used in various indices and by authenticating parties to request a BikeshedCertificate for a given issued assertion. I think we'll want to omit the `NotAfter` field from that key as it's mutable. Instead, the key should be derived from fields in the Assertion structure itself.\r\n\r\n",
+          "createdAt": "2025-03-06T20:50:33Z",
+          "updatedAt": "2025-03-07T14:34:15Z",
+          "comments": [
+            {
+              "originalPosition": 58,
+              "body": "typo: missing period\r\n```suggestion\r\nA MerkleTreeEntry describes an Assertion ({{assertions}}) that has been certified up to expiration time. The `subject_info_hash` field is the hash of the `subject_info` field of the assertion. `not_after` is the expiration time as a POSIX timestamp (see {{time}}). The remaining fields match the Assertion structure.\r\n```",
+              "createdAt": "2025-03-06T20:50:33Z",
+              "updatedAt": "2025-03-07T14:33:15Z"
             }
           ]
         }
