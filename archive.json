@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-09T01:37:21.473641+00:00",
+  "timestamp": "2025-03-11T01:54:13.976010+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -4954,7 +4954,7 @@
       "labels": [],
       "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
       "createdAt": "2024-09-19T22:38:00Z",
-      "updatedAt": "2025-03-07T14:34:15Z",
+      "updatedAt": "2025-03-10T12:40:36Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "fb6edac3f2fbe769500e1c86a665ecec95dcc376",
@@ -5089,6 +5089,39 @@
               "updatedAt": "2025-03-07T14:33:15Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6fMJpL",
+          "commit": {
+            "abbreviatedOid": "9f2a984"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-03-10T12:21:51Z",
+          "updatedAt": "2025-03-10T12:21:52Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Not ideal to have *batch entry*, *merkle tree entry* and *merkle tree leaf*. We should make this `BatchEntry` or use *Merkle tree entry* everywhere.",
+              "createdAt": "2025-03-10T12:21:51Z",
+              "updatedAt": "2025-03-10T12:39:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6fMWSo",
+          "commit": {
+            "abbreviatedOid": "9f2a984"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Don't think naming is ideal yet, but let's just move forward.",
+          "createdAt": "2025-03-10T12:40:36Z",
+          "updatedAt": "2025-03-10T12:40:36Z",
+          "comments": []
         }
       ]
     },
