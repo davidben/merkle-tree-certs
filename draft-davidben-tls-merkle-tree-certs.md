@@ -485,7 +485,7 @@ The CA exposes all of this information in an HTTP {{!RFC9110}} interface describ
 
 ## Batch Entries {#entries}
 
-An issued batch contains a list of batch entries, each of which certifies some assertion up to some expiration time. A batch entry is described by a MerkleTreeEntry structure, defined below.
+An issued batch contains a list of batch entries, each of which certifies some assertion up to some expiration time. A batch entry is described by a BatchEntry structure, defined below.
 
 ~~~
 /* In this document, hash is always SHA-256, and hash.length is 32. */
@@ -496,10 +496,10 @@ struct {
     HashValue subject_info_hash;
     Claim claims<0..2^16-1>;
     Timestamp not_after;
-} MerkleTreeEntry;
+} BatchEntry;
 ~~~
 
-A MerkleTreeEntry describes an Assertion ({{assertions}}) that has been certified up to expiration time. The `subject_info_hash` field is the hash of the `subject_info` field of the assertion. `not_after` is the expiration time as a POSIX timestamp (see {{time}}). The remaining fields match the Assertion structure.
+A BatchEntry describes an Assertion ({{assertions}}) that has been certified up to expiration time. The `subject_info_hash` field is the hash of the `subject_info` field of the assertion. `not_after` is the expiration time as a POSIX timestamp (see {{time}}). The remaining fields match the Assertion structure.
 
 ## Issuance Queue and Scheduling
 
@@ -567,7 +567,7 @@ struct {
     uint8 distinguisher = 2;
     TrustAnchorIdentifier batch_id;
     uint64 index;
-    MerkleTreeEntry entry;
+    BatchEntry entry;
 } HashLeafInput;
 ~~~
 
@@ -755,7 +755,7 @@ For a Merkle Tree trust anchor, the trust anchor will identify a batch in the re
 
 1. Compute the batch's expiration time, as described in {{parameters}}. If this value is before the `not_after` field, abort this procedure with a `bad_certificate` error.
 
-2. Let `entry` be the MerkleTreeEntry computed from `assertion` and `not_after`, as described in {{entries}}.
+2. Let `entry` be the BatchEntry computed from `assertion` and `not_after`, as described in {{entries}}.
 
 3. Set `hash` to the output of `HashLeaf(entry, index)`. Set `remaining` to the certificate's `index` value.
 
