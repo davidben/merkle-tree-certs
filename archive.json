@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-11T01:54:13.976010+00:00",
+  "timestamp": "2025-03-13T01:54:50.051668+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1911,6 +1911,22 @@
       "body": "In putting together #92, I noticed that BikeshedCertificate is presented kinda weirdly. The format is buried deep in the instructions for how to run a CA. Maybe we should pull that up with Assertions.",
       "createdAt": "2025-03-06T20:09:52Z",
       "updatedAt": "2025-03-06T20:09:52Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 107,
+      "id": "I_kwDOJIBkVc6teasj",
+      "title": "Mirroring nits",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/107",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "1. \u00a77.1.1 (2)\n\n> Let new_latest_batch be the result and old_latest_batch be the currently mirrored value. If new_latest_batch equals old_latest_batch, finish this procedure without reporting an error.\n\nMaybe just define `old_latest_batch` to be -1 if no batch was mirrored yet.\n\n2. We should mention that the mirror checks the batch number in the signed validity window.",
+      "createdAt": "2025-03-11T12:51:19Z",
+      "updatedAt": "2025-03-11T13:25:10Z",
       "closedAt": null,
       "comments": []
     }
