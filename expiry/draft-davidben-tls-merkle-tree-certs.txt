@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 7 September 2025                               B. E. Westerbaan
+Expires: 14 September 2025                              B. E. Westerbaan
                                                               Cloudflare
-                                                            6 March 2025
+                                                           13 March 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 September 2025.
+   This Internet-Draft will expire on 14 September 2025.
 
 Copyright Notice
 
@@ -628,8 +628,8 @@ Table of Contents
    A MerkleTreeEntry describes an Assertion (Section 4) that has been
    certified up to expiration time.  The subject_info_hash field is the
    hash of the subject_info field of the assertion. not_after is the
-   expiration time as a POSIX timestamp (see Section 2.1) The remaining
-   fields match the Assertion structure.
+   expiration time as a POSIX timestamp (see Section 2.1).  The
+   remaining fields match the Assertion structure.
 
 5.5.  Issuance Queue and Scheduling
 
