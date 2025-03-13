@@ -2272,7 +2272,7 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
               <p id="section-7.1.1-2.1.1">Fetch the latest batch number.  If this fetch fails, abort this procedure with an error.<a href="#section-7.1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.1.1-2.2">
-              <p id="section-7.1.1-2.2.1">Let <code>new_latest_batch</code> be the result and <code>old_latest_batch</code> be the currently mirrored value. If <code>new_latest_batch</code> equals <code>old_latest_batch</code>, finish this procedure without reporting an error.<a href="#section-7.1.1-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-7.1.1-2.2.1">Let <code>new_latest_batch</code> be the result. Let <code>old_latest_batch</code> be the currently mirrored value, or -1 if no batch was yet mirrored. If <code>new_latest_batch</code> equals <code>old_latest_batch</code>, finish this procedure without reporting an error.<a href="#section-7.1.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-7.1.1-2.3">
               <p id="section-7.1.1-2.3.1">If <code>new_latest_batch</code> is less than <code>old_latest_batch</code>:<a href="#section-7.1.1-2.3.1" class="pilcrow">¶</a></p>
@@ -2298,10 +2298,13 @@ Otherwise, set <code>hash</code> to the output of <code>HashNode(hash, v, i + 1,
                   <p id="section-7.1.1-2.5.2.2.1">Compute the tree head for the assertion list, as described in <a href="#building-tree" class="auto internal xref">Section 5.6.1</a>. If this value does not match the fetched tree head, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.2.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-7.1.1-2.5.2.3">
-                  <p id="section-7.1.1-2.5.2.3.1">Compute the ValidityWindow structure and verify the signature, as described in <a href="#signing" class="auto internal xref">Section 5.6.2</a>. Set <code>tree_heads[0]</code> to the tree head fetched above. Set the other values in <code>tree_heads</code> to the previously mirrored values. If signature verification fails, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.3.1" class="pilcrow">¶</a></p>
+                  <p id="section-7.1.1-2.5.2.3.1">Compute the expected ValidityWindow structure as follows: Set <code>batch_number</code> to <code>i</code>. Set <code>tree_heads[0]</code> to the tree head fetched above. Set the other values in <code>tree_heads</code> to the previously mirrored values.<a href="#section-7.1.1-2.5.2.3.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-7.1.1-2.5.2.4">
-                  <p id="section-7.1.1-2.5.2.4.1">Set the mirrored latest batch number to <code>i</code> and save the fetched batch state.<a href="#section-7.1.1-2.5.2.4.1" class="pilcrow">¶</a></p>
+                  <p id="section-7.1.1-2.5.2.4.1">Verify the fetched signature against this computed ValidityWindow structure by computing the LabeledValidityWindow as described in <a href="#signing" class="auto internal xref">Section 5.6.2</a> and verifying the signature is valid for the LabeledValidityWindow. If signature verification fails, abort this procedure with an error.<a href="#section-7.1.1-2.5.2.4.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-7.1.1-2.5.2.5">
+                  <p id="section-7.1.1-2.5.2.5.1">If all of the above succeed, set the mirrored latest batch number to <code>i</code> and save the fetched batch state.<a href="#section-7.1.1-2.5.2.5.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
