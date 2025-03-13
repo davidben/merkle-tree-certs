@@ -499,7 +499,7 @@ struct {
 } MerkleTreeEntry;
 ~~~
 
-A MerkleTreeEntry describes an Assertion ({{assertions}}) that has been certified up to expiration time. The `subject_info_hash` field is the hash of the `subject_info` field of the assertion. `not_after` is the expiration time as a POSIX timestamp (see {{time}}) The remaining fields match the Assertion structure.
+A MerkleTreeEntry describes an Assertion ({{assertions}}) that has been certified up to expiration time. The `subject_info_hash` field is the hash of the `subject_info` field of the assertion. `not_after` is the expiration time as a POSIX timestamp (see {{time}}). The remaining fields match the Assertion structure.
 
 ## Issuance Queue and Scheduling
 
