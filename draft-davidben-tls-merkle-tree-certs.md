@@ -417,7 +417,7 @@ This section describes the structure of Merkle Tree certificates and defines the
 A Merkle Tree certification authority is defined by the following values:
 
 `hash`:
-: A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}, but others may be defined.
+: A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}. [[NOTE: We can add support for others as needed, though the CA would need to indicate which hash function it uses.]]
 
 `issuer_id`:
 : A trust anchor identifier (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
