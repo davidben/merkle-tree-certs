@@ -613,7 +613,7 @@ Table of Contents
 
    An issued batch contains a list of batch entries, each of which
    certifies some assertion up to some expiration time.  A batch entry
-   is described by a MerkleTreeEntry structure, defined below.
+   is described by a BatchEntry structure, defined below.
 
   /* In this document, hash is always SHA-256, and hash.length is 32. */
   opaque HashValue[hash.length];
@@ -623,9 +623,9 @@ Table of Contents
       HashValue subject_info_hash;
       Claim claims<0..2^16-1>;
       Timestamp not_after;
-  } MerkleTreeEntry;
+  } BatchEntry;
 
-   A MerkleTreeEntry describes an Assertion (Section 4) that has been
+   A BatchEntry describes an Assertion (Section 4) that has been
    certified up to expiration time.  The subject_info_hash field is the
    hash of the subject_info field of the assertion. not_after is the
    expiration time as a POSIX timestamp (see Section 2.1).  The
@@ -733,7 +733,7 @@ Table of Contents
        uint8 distinguisher = 2;
        TrustAnchorIdentifier batch_id;
        uint64 index;
-       MerkleTreeEntry entry;
+       BatchEntry entry;
    } HashLeafInput;
 
    In these inputs, the batch_id is set to the batch-specific trust
@@ -1020,7 +1020,7 @@ Table of Contents
        If this value is before the not_after field, abort this procedure
        with a bad_certificate error.
 
-   2.  Let entry be the MerkleTreeEntry computed from assertion and
+   2.  Let entry be the BatchEntry computed from assertion and
        not_after, as described in Section 5.4.
 
    3.  Set hash to the output of HashLeaf(entry, index).  Set remaining

@@ -1826,7 +1826,7 @@ The batch with batch number 42 would then have a <code>batch_id</code> of <code>
         <h3 id="name-batch-entries">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-batch-entries" class="section-name selfRef">Batch Entries</a>
         </h3>
-<p id="section-5.4-1">An issued batch contains a list of batch entries, each of which certifies some assertion up to some expiration time. A batch entry is described by a MerkleTreeEntry structure, defined below.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-1">An issued batch contains a list of batch entries, each of which certifies some assertion up to some expiration time. A batch entry is described by a BatchEntry structure, defined below.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.4-2">
 <pre>
 /* In this document, hash is always SHA-256, and hash.length is 32. */
@@ -1837,10 +1837,10 @@ struct {
     HashValue subject_info_hash;
     Claim claims&lt;0..2^16-1&gt;;
     Timestamp not_after;
-} MerkleTreeEntry;
+} BatchEntry;
 </pre><a href="#section-5.4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-5.4-3">A MerkleTreeEntry describes an Assertion (<a href="#assertions" class="auto internal xref">Section 4</a>) that has been certified up to expiration time. The <code>subject_info_hash</code> field is the hash of the <code>subject_info</code> field of the assertion. <code>not_after</code> is the expiration time as a POSIX timestamp (see <a href="#time" class="auto internal xref">Section 2.1</a>). The remaining fields match the Assertion structure.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-3">A BatchEntry describes an Assertion (<a href="#assertions" class="auto internal xref">Section 4</a>) that has been certified up to expiration time. The <code>subject_info_hash</code> field is the hash of the <code>subject_info</code> field of the assertion. <code>not_after</code> is the expiration time as a POSIX timestamp (see <a href="#time" class="auto internal xref">Section 2.1</a>). The remaining fields match the Assertion structure.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="issuance-queue-and-scheduling">
@@ -1929,7 +1929,7 @@ struct {
     uint8 distinguisher = 2;
     TrustAnchorIdentifier batch_id;
     uint64 index;
-    MerkleTreeEntry entry;
+    BatchEntry entry;
 } HashLeafInput;
 </pre><a href="#section-5.6.1-6" class="pilcrow">¶</a>
 </div>
@@ -2197,7 +2197,7 @@ tree head is never included.<a href="#section-5.6.3-9.2.1" class="pilcrow">¶</a
             <p id="section-6.2-6.1.1">Compute the batch's expiration time, as described in <a href="#parameters" class="auto internal xref">Section 5.1</a>. If this value is before the <code>not_after</code> field, abort this procedure with a <code>bad_certificate</code> error.<a href="#section-6.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.2-6.2">
-            <p id="section-6.2-6.2.1">Let <code>entry</code> be the MerkleTreeEntry computed from <code>assertion</code> and <code>not_after</code>, as described in <a href="#entries" class="auto internal xref">Section 5.4</a>.<a href="#section-6.2-6.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-6.2.1">Let <code>entry</code> be the BatchEntry computed from <code>assertion</code> and <code>not_after</code>, as described in <a href="#entries" class="auto internal xref">Section 5.4</a>.<a href="#section-6.2-6.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.2-6.3">
             <p id="section-6.2-6.3.1">Set <code>hash</code> to the output of <code>HashLeaf(entry, index)</code>. Set <code>remaining</code> to the certificate's <code>index</code> value.<a href="#section-6.2-6.3.1" class="pilcrow">¶</a></p>
