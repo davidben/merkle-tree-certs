@@ -800,7 +800,7 @@ A mirror maintains a copy of the CA's latest batch number, and batch state. Roug
 
 1. Fetch the latest batch number.  If this fetch fails, abort this procedure with an error.
 
-2. Let `new_latest_batch` be the result and `old_latest_batch` be the currently mirrored value. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
+2. Let `new_latest_batch` be the result. Let `old_latest_batch` be the currently mirrored value, or -1 if no batch was yet mirrored. If `new_latest_batch` equals `old_latest_batch`, finish this procedure without reporting an error.
 
 3. If `new_latest_batch` is less than `old_latest_batch`:
 
@@ -816,9 +816,11 @@ A mirror maintains a copy of the CA's latest batch number, and batch state. Roug
 
    2. Compute the tree head for the assertion list, as described in {{building-tree}}. If this value does not match the fetched tree head, abort this procedure with an error.
 
-   3. Compute the ValidityWindow structure and verify the signature, as described in {{signing}}. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values. If signature verification fails, abort this procedure with an error.
+   3. Compute the expected ValidityWindow structure as follows: Set `batch_number` to `i`. Set `tree_heads[0]` to the tree head fetched above. Set the other values in `tree_heads` to the previously mirrored values.
 
-   4. Set the mirrored latest batch number to `i` and save the fetched batch state.
+   4. Verify the fetched signature against this computed ValidityWindow structure by computing the LabeledValidityWindow as described in {{signing}} and verifying the signature is valid for the LabeledValidityWindow. If signature verification fails, abort this procedure with an error.
+
+   5. If all of the above succeed, set the mirrored latest batch number to `i` and save the fetched batch state.
 
 [[TODO: If the mirror gets far behind, or if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest validity window and skip the intervening batches? The intervening batches are guaranteed to have been expired #37 ]]
 
