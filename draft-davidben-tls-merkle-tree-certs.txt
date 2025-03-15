@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 14 September 2025                              B. E. Westerbaan
+Expires: 16 September 2025                              B. E. Westerbaan
                                                               Cloudflare
-                                                           13 March 2025
+                                                           15 March 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 September 2025.
+   This Internet-Draft will expire on 16 September 2025.
 
 Copyright Notice
 
@@ -1365,7 +1365,7 @@ Table of Contents
       SignatureScheme.
 
    EdDSA algorithms:  The public key is the byte string encoding defined
-      in [RFC8032]
+      in [RFC8032].
 
    This document does not define the public key format for other
    algorithms.  In order for a SignatureScheme to be usable with
