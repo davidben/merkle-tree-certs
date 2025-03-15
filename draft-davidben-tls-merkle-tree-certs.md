@@ -937,7 +937,7 @@ ECDSA algorithms:
 : The public key is a UncompressedPointRepresentation structure defined in {{Section 4.2.8.2 of !RFC8446}}, using the curve specified by the SignatureScheme.
 
 EdDSA algorithms:
-: The public key is the byte string encoding defined in {{!RFC8032}}
+: The public key is the byte string encoding defined in {{!RFC8032}}.
 
 This document does not define the public key format for other algorithms. In order for a SignatureScheme to be usable with TLSSubjectInfo, this format must be defined in a corresponding document.
 
