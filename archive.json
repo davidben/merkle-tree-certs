@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-13T01:54:50.051668+00:00",
+  "timestamp": "2025-03-16T02:00:45.224446+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1526,7 +1526,7 @@
       "id": "I_kwDOJIBkVc57_4GN",
       "title": "Subscriber-imposed certificate expiry",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/83",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1535,8 +1535,8 @@
       "labels": [],
       "body": "Certificates currently all expire as the batch expires, which come from a technical requirement of the mechanism. However, when requesting a certificate, the subscriber may have even tighter opinions on expiry, based on its own key management goals. Probably not likely with MTC certificate lifetimes, but we do mean for BikeshedCertificate to be extensible and ACME does allow the subscriber to request a notAfter date.\r\n\r\nIf the subscriber requests a tighter notAfter date than the corresponding batch, the ACME server would need to choose between not issuing a Merkle tree certificate, or extending the subscriber's vulnerability to it key longer than requested. We could avoid that by adding an extra expiration time inside the certificate. The semantics would be that you check *both* that expiration time and the batch-level one. (Equivalently, require they be consistent. But checking both may be more straightforward since we need the RP to check anyway.)\r\n\r\nNot sure whether this should go in Assertion + AbridgedAssertion, or MerkleTreeProofSHA256 + HashAssertionInput. I'm envisioning the Assertion being something that the subscriber puts together, that plugs into CSRs and any other proof-of-possession checks. Saying that the subscriber's Assertion is byte-for-byte identical to the one in the certificate gives a lot of nice properties, but in other proof types, a CA may wish to express a tighter lifetime than what the subscriber requested. That would suggest the CA-imposed expiry, in general, needs to be outside the assertion. (CA-imposed expiry is implicit in MTCs, but may not be in other constructions.) But then we might want PoPs to express a subscriber-imposed expiry, which would mean this \"check both CA- and subscriber-imposed expiry separately\" model needs to become universal.\r\n\r\nPut another way, it's the difference between:\r\n* The statement \"the key 1234 is good for example.com\" is true until 2024-01-31\r\n* The statement \"the key 1234 is good for example.com until 2024-01-20\" is true until 2024-01-31\r\n",
       "createdAt": "2024-01-13T15:22:29Z",
-      "updatedAt": "2024-07-26T08:11:45Z",
-      "closedAt": null,
+      "updatedAt": "2025-03-13T02:43:04Z",
+      "closedAt": "2025-03-13T02:43:04Z",
       "comments": [
         {
           "author": "davidben",
@@ -1872,15 +1872,15 @@
       "id": "I_kwDOJIBkVc6rwab6",
       "title": "Backdated assertions",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/105",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Suppose we have a bunch of assertions queued, but forget to issue for a few hours. The current implementation puts all assertions in the most recent batch. We could also put all queued assertions in the oldest to-be-issued batch (this could backdate an assertion). Or put each assertion in the next batch for when it was accepted.\n\nThe I-D doesn't say anything about this.",
       "createdAt": "2025-02-26T13:24:27Z",
-      "updatedAt": "2025-02-26T14:04:28Z",
-      "closedAt": null,
+      "updatedAt": "2025-03-13T02:43:26Z",
+      "closedAt": "2025-03-13T02:43:25Z",
       "comments": [
         {
           "author": "davidben",
@@ -1895,6 +1895,13 @@
           "body": "> I think the draft currently says you put them in the current one by way of this procedure: \n\nOops, you're right.\n\n> This does mean the assertions last potentially longer than you expected, which is another reason to do https://github.com/davidben/merkle-tree-certs/pull/92. (I really got to go finish that.)\n\nThat's an elegant solution.",
           "createdAt": "2025-02-26T14:04:27Z",
           "updatedAt": "2025-02-26T14:04:27Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Think this is now resolved with #92.",
+          "createdAt": "2025-03-13T02:43:25Z",
+          "updatedAt": "2025-03-13T02:43:25Z"
         }
       ]
     },
@@ -1919,14 +1926,30 @@
       "id": "I_kwDOJIBkVc6teasj",
       "title": "Mirroring nits",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/107",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "1. \u00a77.1.1 (2)\n\n> Let new_latest_batch be the result and old_latest_batch be the currently mirrored value. If new_latest_batch equals old_latest_batch, finish this procedure without reporting an error.\n\nMaybe just define `old_latest_batch` to be -1 if no batch was mirrored yet.\n\n2. We should mention that the mirror checks the batch number in the signed validity window.",
       "createdAt": "2025-03-11T12:51:19Z",
-      "updatedAt": "2025-03-11T13:25:10Z",
+      "updatedAt": "2025-03-13T09:57:47Z",
+      "closedAt": "2025-03-13T09:57:47Z",
+      "comments": []
+    },
+    {
+      "number": 109,
+      "id": "I_kwDOJIBkVc6t5L0s",
+      "title": "not_after nits",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/109",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> If the CA has no criteria beyond the batch-wide expiration, it MAY set this value to infinity.\n\n\"infinity\" is not defined. Given libraries often use int64s for timestamps, it'd be inconvenient to use (1<<64)-1. What about just demanding `not_after` to be less than or equal the \"not_after\" of the batch? That's also consistent with the existing check for the `not_after` in `Proof`\n\n> Compute the batch's expiration time, as described in [Section 5.1](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#parameters). If this value is before the not_after field, abort this procedure with a bad_certificate error.\n\nWe should then also have a mirror check that the `not_after` of a a batch entry is within the validity interval of the batch it's in.",
+      "createdAt": "2025-03-13T14:52:55Z",
+      "updatedAt": "2025-03-13T14:52:55Z",
       "closedAt": null,
       "comments": []
     }
@@ -4963,24 +4986,26 @@
       "id": "PR_kwDOJIBkVc58GRCf",
       "title": "Add an explicit not_after time to the Proof",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/92",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This serves two purposes:\r\n\r\n1. It allows a subscriber to easily know when the certificate is expired, without defining a separate certificate property.\r\n\r\n2. It allows a subscriber to request a shorter expiration time than the batch would otherwise force. Fixes #83.\r\n\r\nIn looking at this, I realized that the document's organization is a bit all over the place. Maybe we should just pull the generic BikeshedCertificate parts out into their own section. But for now I'm leaving the overall structure as-is.",
       "createdAt": "2024-09-19T22:38:00Z",
-      "updatedAt": "2025-03-10T12:40:36Z",
+      "updatedAt": "2025-03-13T02:43:06Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "fb6edac3f2fbe769500e1c86a665ecec95dcc376",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "expiry",
-      "headRefOid": "9f2a9846ff25730a26f65ddd62199c8e51f33a1f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "2f19b5b5bb28fa24ef9a8aaada4c43a0e29025a1",
+      "closedAt": "2025-03-13T02:43:03Z",
+      "mergedAt": "2025-03-13T02:43:03Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "fc013fb7e878f849e6163b3f1e703ebafadfd264"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -5037,6 +5062,20 @@
           "body": "> So the phrasing around \"batch entries\" tries to talk about them as being _the_ contents of the Merkle Tree.\r\n\r\nWhat about *commitments*? Or is that too crypto-y?",
           "createdAt": "2025-03-06T20:16:53Z",
           "updatedAt": "2025-03-06T20:16:53Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> One implementation consideration (which doesn't need to be part of the spec): right now the [Key()](https://github.com/bwesterb/mtc/blob/main/mtc.go#L1285) function computes a key for an abridged assertion, which is used in various indices and by authenticating parties to request a BikeshedCertificate for a given issued assertion. I think we'll want to omit the NotAfter field from that key as it's mutable. Instead, the key should be derived from fields in the Assertion structure itself.\r\n\r\nAh yeah, another reason to have not_after be part of the Proof rather than the Assertion I guess.",
+          "createdAt": "2025-03-13T02:41:45Z",
+          "updatedAt": "2025-03-13T02:41:45Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> What about commitments? Or is that too crypto-y?\r\n\r\nI feel like \"entry\" feels more understandable than \"commitment\" to me, but I'm perhaps not up on the relevant lingo here. I was just thinking \"this is what is actually in the log\", because the log does not (necessarily) log the unhashed keys.\r\n\r\n*shrug* We can always reshuffle this later.",
+          "createdAt": "2025-03-13T02:42:59Z",
+          "updatedAt": "2025-03-13T02:42:59Z"
         }
       ],
       "reviews": [
@@ -5138,6 +5177,26 @@
           "createdAt": "2025-03-10T12:40:36Z",
           "updatedAt": "2025-03-10T12:40:36Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6fwleI",
+          "commit": {
+            "abbreviatedOid": "9f2a984"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-03-13T02:41:09Z",
+          "updatedAt": "2025-03-13T02:41:09Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Ah yeah, done.",
+              "createdAt": "2025-03-13T02:41:09Z",
+              "updatedAt": "2025-03-13T02:41:09Z"
+            }
+          ]
         }
       ]
     },
@@ -5548,6 +5607,144 @@
               "updatedAt": "2025-02-18T18:29:42Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 108,
+      "id": "PR_kwDOJIBkVc6Ob1_C",
+      "title": "Fix mirroring procedure issues in #107",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/108",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #107",
+      "createdAt": "2025-03-13T02:50:52Z",
+      "updatedAt": "2025-03-13T09:57:49Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "fc013fb7e878f849e6163b3f1e703ebafadfd264",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "fix-107",
+      "headRefOid": "9a9a9a8e6a9b6dc6f1afb7ea7c9820d481c37f1d",
+      "closedAt": "2025-03-13T09:57:46Z",
+      "mergedAt": "2025-03-13T09:57:46Z",
+      "mergedBy": "bwesterb",
+      "mergeCommit": {
+        "oid": "05d47379ac539ba3284198e79b843819b66b3388"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6fwr1k",
+          "commit": {
+            "abbreviatedOid": "9a9a9a8"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-03-13T02:52:36Z",
+          "updatedAt": "2025-03-13T02:52:36Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "I noticed that this procedure is written as if you construct the ValidityWindow you expect rather than fetching it. I kept that but depending on how the HTTP format shakes out, maybe that'll change.\r\n\r\n(Also I'm getting convinced that maybe we should just chain the hashes together. It makes describing signatures more straightforward because you don't need to sign over the whole window, just the last hash. Though we still need to talk about validity windows because clients need to receive the whole list of hashes.)",
+              "createdAt": "2025-03-13T02:52:36Z",
+              "updatedAt": "2025-03-13T02:52:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6f0HuW",
+          "commit": {
+            "abbreviatedOid": "9a9a9a8"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-03-13T09:57:26Z",
+          "updatedAt": "2025-03-13T09:57:26Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 110,
+      "id": "PR_kwDOJIBkVc6OjQwe",
+      "title": "Downgrade hash agility to a NOTE",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/110",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft suggests hash functions other than SHA-256 might be used for the Merkle tree, but doesn't specify how. I think the intention is to signal to the reader that there's room for adding this agility in the future, so say so in an author note.",
+      "createdAt": "2025-03-13T17:11:31Z",
+      "updatedAt": "2025-03-15T05:45:01Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "05d47379ac539ba3284198e79b843819b66b3388",
+      "headRepository": "cjpatton/merkle-tree-certs",
+      "headRefName": "edit-1-unfunded-agility",
+      "headRefOid": "4b78eb9a37668791c9fcb628c8463622f57a15b0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Oh this is slightly interesting. Arguably, by what's in the draft right now, we actually have all the hash agility mechanisms we need. The hash is one of the parameters of the CA. If the relying party knows the CA, it's assumed to know all the CA parameters, which includes the the hash. So based on what's in the document _right now_, the only way we assume SHA-256 is just we vaguely hint that people should do that.\r\n\r\nBut this is kind of cheating because we said how to represent a trust anchor for relying parties. Once we do that, we'll need to start baking in the hash or adding an enum field with only one defined integer, or whatever. So... I think probably the thing to do is to get that done and then write whatever makes sense based on what we do there.",
+          "createdAt": "2025-03-15T05:45:01Z",
+          "updatedAt": "2025-03-15T05:45:01Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 111,
+      "id": "PR_kwDOJIBkVc6OvV1x",
+      "title": "Add a missing \".\"",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/111",
+      "state": "MERGED",
+      "author": "cjpatton",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-14T23:17:52Z",
+      "updatedAt": "2025-03-15T05:20:26Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "05d47379ac539ba3284198e79b843819b66b3388",
+      "headRepository": "cjpatton/merkle-tree-certs",
+      "headRefName": "edit-2",
+      "headRefOid": "79869bfec5b85bab831d13943234e8c37ebcb201",
+      "closedAt": "2025-03-15T05:20:26Z",
+      "mergedAt": "2025-03-15T05:20:26Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e5b778aaa2d704afb5e9e821a04ec8172bea5182"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6gLg9e",
+          "commit": {
+            "abbreviatedOid": "79869bf"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-03-15T05:20:10Z",
+          "updatedAt": "2025-03-15T05:20:10Z",
+          "comments": []
         }
       ]
     }
