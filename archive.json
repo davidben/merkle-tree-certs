@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-16T02:00:45.224446+00:00",
+  "timestamp": "2025-03-18T01:55:13.064596+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -5684,7 +5684,7 @@
       "labels": [],
       "body": "The draft suggests hash functions other than SHA-256 might be used for the Merkle tree, but doesn't specify how. I think the intention is to signal to the reader that there's room for adding this agility in the future, so say so in an author note.",
       "createdAt": "2025-03-13T17:11:31Z",
-      "updatedAt": "2025-03-15T05:45:01Z",
+      "updatedAt": "2025-03-18T00:05:31Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "05d47379ac539ba3284198e79b843819b66b3388",
@@ -5702,6 +5702,34 @@
           "body": "Oh this is slightly interesting. Arguably, by what's in the draft right now, we actually have all the hash agility mechanisms we need. The hash is one of the parameters of the CA. If the relying party knows the CA, it's assumed to know all the CA parameters, which includes the the hash. So based on what's in the document _right now_, the only way we assume SHA-256 is just we vaguely hint that people should do that.\r\n\r\nBut this is kind of cheating because we said how to represent a trust anchor for relying parties. Once we do that, we'll need to start baking in the hash or adding an enum field with only one defined integer, or whatever. So... I think probably the thing to do is to get that done and then write whatever makes sense based on what we do there.",
           "createdAt": "2025-03-15T05:45:01Z",
           "updatedAt": "2025-03-15T05:45:01Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "SGTM. Another thing we might need to worry about is the output size of the hash, which is hard-coded to 32 in a lot of places. I don't think this will matter much in practice though, so we could explicitly restrict the set of hash functions with which MTCs are compatible.",
+          "createdAt": "2025-03-17T14:19:20Z",
+          "updatedAt": "2025-03-17T14:19:20Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Hmm that *should* all be parameterized now, unless I'm missing something. The idea was that the structures would all be specific to your hash because you would never usefully parse, say, an inclusion proof without prior knowledge of the CA parameters and thus hash size.",
+          "createdAt": "2025-03-17T16:17:04Z",
+          "updatedAt": "2025-03-17T16:17:04Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The only thing that stuck out to me was: \r\n```\r\n    uint8 label[32] = \"Merkle Tree Crts ValidityWindow\\0\";\r\n```\r\nI'm not sure if you picked 32 because you wanted this to match the ouptput size of SHA256. But I don't think it really matters :)",
+          "createdAt": "2025-03-17T17:22:35Z",
+          "updatedAt": "2025-03-17T17:22:35Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Oh hah! I think that was just a coincidence. :-D",
+          "createdAt": "2025-03-18T00:05:30Z",
+          "updatedAt": "2025-03-18T00:05:30Z"
         }
       ],
       "reviews": []
