@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-30T02:04:24.188717+00:00",
+  "timestamp": "2025-04-03T01:56:48.789414+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1949,9 +1949,17 @@
       "labels": [],
       "body": "> If the CA has no criteria beyond the batch-wide expiration, it MAY set this value to infinity.\n\n\"infinity\" is not defined. Given libraries often use int64s for timestamps, it'd be inconvenient to use (1<<64)-1. What about just demanding `not_after` to be less than or equal the \"not_after\" of the batch? That's also consistent with the existing check for the `not_after` in `Proof`\n\n> Compute the batch's expiration time, as described in [Section 5.1](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#parameters). If this value is before the not_after field, abort this procedure with a bad_certificate error.\n\nWe should then also have a mirror check that the `not_after` of a a batch entry is within the validity interval of the batch it's in.",
       "createdAt": "2025-03-13T14:52:55Z",
-      "updatedAt": "2025-03-13T14:52:55Z",
+      "updatedAt": "2025-04-01T17:15:03Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> \"infinity\" is not defined. Given libraries often use int64s for timestamps, it'd be inconvenient to use (1<<64)-1. What about just demanding not_after to be less than or equal the \"not_after\" of the batch? That's also consistent with the existing check for the not_after in Proof\n\nYeah, I figure your implementation can pick whatever max value it likes. Usual spec rules of \"do something that matches the output, you don't need to implement this exactly\".\n\n> We should then also have a mirror check that the not_after of a a batch entry is within the validity interval of the batch it's in.\n\nAh yeah, may as well. I don't think it strictly matters in that it's safe to have invalid things in a batch, as long as relying parties consistently reject it. It's no different than having, say, a syntax error somewhere in the assertion. But it's also very cheap for mirrors to refuse to re-sign it.",
+          "createdAt": "2025-04-01T17:15:01Z",
+          "updatedAt": "2025-04-01T17:15:01Z"
+        }
+      ]
     }
   ],
   "pulls": [
