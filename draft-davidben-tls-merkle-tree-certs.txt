@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 16 September 2025                              B. E. Westerbaan
+Expires: 21 November 2025                               B. E. Westerbaan
                                                               Cloudflare
-                                                           15 March 2025
+                                                             20 May 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 September 2025.
+   This Internet-Draft will expire on 21 November 2025.
 
 Copyright Notice
 
@@ -955,8 +955,8 @@ Table of Contents
 
    These three estimates correspond to batch sizes of, respectively,
    around 2,000,000, around 20,000,000, and 257,000.  The corresponding
-   path lengths will be 20, 24, and 17, given proof sizes of,
-   respectively, 640 bytes, 768 bytes, and 544 bytes.
+   path lengths will be 21, 25, and 18, given proof sizes of,
+   respectively, 672 bytes, 800 bytes, and 576 bytes.
 
    For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for
    batch sizes up to 2^33 (8,589,934,592) certificates.
@@ -1839,11 +1839,11 @@ Table of Contents
 15.1.  Normative References
 
    [I-D.ietf-tls-trust-anchor-ids]
-              Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
+              Beck, R., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-ietf-tls-trust-anchor-ids-00, 25 February
-              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              tls-trust-anchor-ids-00>.
+              Draft, draft-ietf-tls-trust-anchor-ids-01, 14 May 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+              trust-anchor-ids-01>.
 
    [POSIX]    "IEEE Standard for Information Technology--Portable
               Operating System Interface (POSIX(TM)) Base
