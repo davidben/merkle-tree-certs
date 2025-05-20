@@ -719,7 +719,7 @@ Merkle Tree proofs scale logarithmically in the batch size. {{rolling-renewal}} 
 
 Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, {{LetsEncrypt}} reported around 330,000,000 active subscribers for a single CA. {{MerkleTown}} reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from {{MerkleTown}} represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.
 
-These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding `path` lengths will be 20, 24, and 17, given proof sizes of, respectively, 640 bytes, 768 bytes, and 544 bytes.
+These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding `path` lengths will be 21, 25, and 18, given proof sizes of, respectively, 672 bytes, 800 bytes, and 576 bytes.
 
 For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.
 
