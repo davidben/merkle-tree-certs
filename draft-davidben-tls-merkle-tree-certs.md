@@ -179,6 +179,13 @@ informative:
     - name: Henry Faltin Våge
     - org: University of Bergen
 
+  STH-Discipline:
+    title: STH Discipline & Security Considerations
+    target: https://mailarchive.ietf.org/arch/msg/trans/Zm4NqyRc7LDsOtV56EchBIT9r4c/
+    date: 2017-03-03
+    author:
+    - name: Richard Barnes
+
 
 --- abstract
 
@@ -1258,6 +1265,8 @@ This is a bit cleaner to parse, but the negotiation is more complex.
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.
 
 The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
+
+The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
 # Change log
 {:numbered="false"}
