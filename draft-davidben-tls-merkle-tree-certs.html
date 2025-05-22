@@ -1727,7 +1727,7 @@ struct {
 <dt id="section-5.1-2.3">
 <code>issuer_id</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.4">
-            <p id="section-5.1-2.4.1">A trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) that identifies the CA. See <a href="#identifying" class="auto internal xref">Section 5.2</a> for details.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.4.1">A trust anchor ID (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) that identifies the CA. See <a href="#identifying" class="auto internal xref">Section 5.2</a> for details.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-2.5">
@@ -1774,8 +1774,8 @@ struct {
         <h3 id="name-identifying-cas-and-batches">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-identifying-cas-and-batches" class="section-name selfRef">Identifying CAs and Batches</a>
         </h3>
-<p id="section-5.2-1">A Merkle Tree CA's <code>issuer_id</code> is a trust anchor identifier, defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a <code>batch_id</code>. It is determined by appending the batch number, as an OID component, to the CA's <code>issuer_id</code>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">A Merkle Tree CA's <code>issuer_id</code> is a trust anchor ID, defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. However, unlike an X.509 CA, the entire OID arc rooted at the ID is associated with the CA. OIDs under this arc are used to identify batches below.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">An individual batch from a Merkle Tree CA also has an associated trust anchor ID, called a <code>batch_id</code>. It is determined by appending the batch number, as an OID component, to the CA's <code>issuer_id</code>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">For example, a Merkle Tree CA may have an <code>issuer_id</code> of <code>32473.1</code>, in the ASCII representation.
 The batch with batch number 42 would then have a <code>batch_id</code> of <code>32473.1.42</code>.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
@@ -1909,14 +1909,14 @@ struct {
 <pre>
 struct {
     uint8 distinguisher = 0;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     uint8 level;
 } HashEmptyInput;
 
 struct {
     uint8 distinguisher = 1;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     uint8 level;
     HashValue left;
@@ -1925,13 +1925,13 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     BatchEntry entry;
 } HashLeafInput;
 </pre><a href="#section-5.6.1-6" class="pilcrow">¶</a>
 </div>
-<p id="section-5.6.1-7">In these inputs, the <code>batch_id</code> is set to the batch-specific trust anchor identifier, i.e. the <code>issuer_id</code> with the batch number appended as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.
+<p id="section-5.6.1-7">In these inputs, the <code>batch_id</code> is set to the batch-specific trust anchor ID, i.e. the <code>issuer_id</code> with the batch number appended as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.
 The remaining fields, such as <code>index</code>, are set to inputs of the function.<a href="#section-5.6.1-7" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-8">Tree levels are computed iteratively as follows:<a href="#section-5.6.1-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-5.6.1-9">
@@ -2025,7 +2025,7 @@ struct {
 <pre>
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    TrustAnchorIdentifier issuer_id;
+    TrustAnchorID issuer_id;
     ValidityWindow window;
 } LabeledValidityWindow;
 </pre><a href="#section-5.6.2-7" class="pilcrow">¶</a>
@@ -2046,12 +2046,12 @@ struct {
 <div class="alignLeft art-text artwork" id="section-5.6.3-3">
 <pre>
 /* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
-opaque TrustAnchorIdentifier&lt;1..2^8-1&gt;;
+opaque TrustAnchorID&lt;1..2^8-1&gt;;
 
 uint64 Timestamp;
 
 struct {
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorID trust_anchor;
     Timestamp not_after;
     opaque proof_data&lt;0..2^16-1&gt;;
 } Proof;
@@ -2062,7 +2062,7 @@ struct {
 } BikeshedCertificate;
 </pre><a href="#section-5.6.3-3" class="pilcrow">¶</a>
 </div>
-<p id="section-5.6.3-4">A proof's <code>trust_anchor</code> field is a trust anchor identifier (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer.
+<p id="section-5.6.3-4">A proof's <code>trust_anchor</code> field is a trust anchor ID (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-4.1" class="relref">Section 4.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), which determines the proof's type and issuer.
 It is analogous to an X.509 trust anchor's subject name.
 When the issuer is a Merkle Tree CA, the <code>trust_anchor</code> is a batch's <code>batch_id</code>, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>.<a href="#section-5.6.3-4" class="pilcrow">¶</a></p>
 <p id="section-5.6.3-5">A proof's <code>not_after</code> field is a POSIX timestamp (see <a href="#time" class="auto internal xref">Section 2.1</a>) describing the time after which the proof is no longer valid.<a href="#section-5.6.3-5" class="pilcrow">¶</a></p>
@@ -2521,11 +2521,11 @@ struct {
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-certificate-negotiation" class="section-name selfRef">Certificate Negotiation</a>
         </h3>
 <p id="section-10.3-1">Merkle Tree certificates will only be accepted in up-to-date relying parties, and require a negotiation mechanism to use. Merkle Tree certificate implementations SHOULD use the <code>trust_anchors</code> extension <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> as described below:<a href="#section-10.3-1" class="pilcrow">¶</a></p>
-<p id="section-10.3-2">For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in <a href="#relying-parties" class="auto internal xref">Section 6.1</a>. The trust anchor's identifier is the batch identifier, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>. Future mechanisms using the BikeshedCertificate format (see <a href="#proofs" class="auto internal xref">Section 5.6.3</a>) MUST similarly define how relying parties determine trust anchor identifiers.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
+<p id="section-10.3-2">For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in <a href="#relying-parties" class="auto internal xref">Section 6.1</a>. The trust anchor's ID is the batch ID, as described in <a href="#identifying" class="auto internal xref">Section 5.2</a>. Future mechanisms using the BikeshedCertificate format (see <a href="#proofs" class="auto internal xref">Section 5.6.3</a>) MUST similarly define how relying parties determine trust anchor IDs.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
 <p id="section-10.3-3">As even a single validity window results in <code>validity_window_size</code> trust anchors, sending all trust anchors in the <code>trust_anchors</code> extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and the DNS hint described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
 <p id="section-10.3-4">[[TODO: We could reduce the reliance on DNS by adding https://github.com/davidben/tls-trust-expressions/issues/62, either in this draft or the main trust anchor IDs draft.]]<a href="#section-10.3-4" class="pilcrow">¶</a></p>
 <p id="section-10.3-5">The authenticating party's list of candidate certification paths (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.3" class="relref">Section 3.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the authenticating party's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>).<a href="#section-10.3-5" class="pilcrow">¶</a></p>
-<p id="section-10.3-6">For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor identifier is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_identifier</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
+<p id="section-10.3-6">For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor ID is the <code>trust_anchor</code> field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the <code>trust_anchor_id</code> property.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
 <p id="section-10.3-7">The authenticating party then selects certificates as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see <a href="#tls-certificate-type" class="auto internal xref">Section 10.2</a>) into the selection criteria for BikeshedCertificate-based credentials.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <p id="section-10.3-8">[[TODO: Certificate type negotiation doesn't work right for client certificates. See <a href="#cert-type-problems" class="auto internal xref">Appendix B</a>]]<a href="#section-10.3-8" class="pilcrow">¶</a></p>
 </section>
@@ -2904,8 +2904,12 @@ struct {
 <span class="refAuthor">Ghedini, A.</span> and <span class="refAuthor">V. Vasiliev</span>, <span class="refTitle">"TLS Certificate Compression"</span>, <span class="seriesInfo">RFC 8879</span>, <span class="seriesInfo">DOI 10.17487/RFC8879</span>, <time datetime="2020-12" class="refDate">December 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8879">https://www.rfc-editor.org/rfc/rfc8879</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SharedFactors">[SharedFactors]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Våge, H. F.</span> and <span class="refAuthor">University of Bergen</span>, <span class="refTitle">"Finding shared RSA factors in the Certificate Transparency logs"</span>, <time datetime="2022-05-13" class="refDate">13 May 2022</time>, <span>&lt;<a href="https://bora.uib.no/bora-xmlui/bitstream/handle/11250/3001128/Masters_thesis__for_University_of_Bergen.pdf">https://bora.uib.no/bora-xmlui/bitstream/handle/11250/3001128/Masters_thesis__for_University_of_Bergen.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="STH-Discipline">[STH-Discipline]</dt>
+      <dd>
+<span class="refAuthor">Barnes, R.</span>, <span class="refTitle">"STH Discipline &amp; Security Considerations"</span>, <time datetime="2017-03-03" class="refDate">3 March 2017</time>, <span>&lt;<a href="https://mailarchive.ietf.org/arch/msg/trans/Zm4NqyRc7LDsOtV56EchBIT9r4c/">https://mailarchive.ietf.org/arch/msg/trans/Zm4NqyRc7LDsOtV56EchBIT9r4c/</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -3061,6 +3065,7 @@ struct {
       </h2>
 <p id="appendix-C-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication and X.509. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <p id="appendix-C-2">The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
+<p id="appendix-C-3">The idea to mint tree heads infrequently was originally described by Richard Barnes in <span>[<a href="#STH-Discipline" class="cite xref">STH-Discipline</a>]</span>. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="change-log">

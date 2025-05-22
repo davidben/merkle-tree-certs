@@ -498,7 +498,7 @@ Table of Contents
    hash:  A cryptographic hash function.  In this document, the hash
       function is always SHA-256 [SHS], but others may be defined.
 
-   issuer_id:  A trust anchor identifier (see Section 3 of
+   issuer_id:  A trust anchor ID (see Section 3 of
       [I-D.ietf-tls-trust-anchor-ids]) that identifies the CA.  See
       Section 5.2 for details.
 
@@ -566,15 +566,14 @@ Table of Contents
 
 5.2.  Identifying CAs and Batches
 
-   A Merkle Tree CA's issuer_id is a trust anchor identifier, defined in
+   A Merkle Tree CA's issuer_id is a trust anchor ID, defined in
    Section 3 of [I-D.ietf-tls-trust-anchor-ids].  However, unlike an
-   X.509 CA, the entire OID arc rooted at the identifier is associated
-   with the CA.  OIDs under this arc are used to identify batches below.
+   X.509 CA, the entire OID arc rooted at the ID is associated with the
+   CA.  OIDs under this arc are used to identify batches below.
 
    An individual batch from a Merkle Tree CA also has an associated
-   trust anchor identifier, called a batch_id.  It is determined by
-   appending the batch number, as an OID component, to the CA's
-   issuer_id.
+   trust anchor ID, called a batch_id.  It is determined by appending
+   the batch number, as an OID component, to the CA's issuer_id.
 
    For example, a Merkle Tree CA may have an issuer_id of 32473.1, in
    the ASCII representation.  The batch with batch number 42 would then
@@ -715,14 +714,14 @@ Table of Contents
 
    struct {
        uint8 distinguisher = 0;
-       TrustAnchorIdentifier batch_id;
+       TrustAnchorID batch_id;
        uint64 index;
        uint8 level;
    } HashEmptyInput;
 
    struct {
        uint8 distinguisher = 1;
-       TrustAnchorIdentifier batch_id;
+       TrustAnchorID batch_id;
        uint64 index;
        uint8 level;
        HashValue left;
@@ -731,15 +730,15 @@ Table of Contents
 
    struct {
        uint8 distinguisher = 2;
-       TrustAnchorIdentifier batch_id;
+       TrustAnchorID batch_id;
        uint64 index;
        BatchEntry entry;
    } HashLeafInput;
 
    In these inputs, the batch_id is set to the batch-specific trust
-   anchor identifier, i.e. the issuer_id with the batch number appended
-   as described in Section 5.2.  The remaining fields, such as index,
-   are set to inputs of the function.
+   anchor ID, i.e. the issuer_id with the batch number appended as
+   described in Section 5.2.  The remaining fields, such as index, are
+   set to inputs of the function.
 
    Tree levels are computed iteratively as follows:
 
@@ -819,7 +818,7 @@ Table of Contents
 
    struct {
        uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-       TrustAnchorIdentifier issuer_id;
+       TrustAnchorID issuer_id;
        ValidityWindow window;
    } LabeledValidityWindow;
 
@@ -859,12 +858,12 @@ Table of Contents
    tree head.  The structures are defined below:
 
    /* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
-   opaque TrustAnchorIdentifier<1..2^8-1>;
+   opaque TrustAnchorID<1..2^8-1>;
 
    uint64 Timestamp;
 
    struct {
-       TrustAnchorIdentifier trust_anchor;
+       TrustAnchorID trust_anchor;
        Timestamp not_after;
        opaque proof_data<0..2^16-1>;
    } Proof;
@@ -874,8 +873,8 @@ Table of Contents
        Proof proof;
    } BikeshedCertificate;
 
-   A proof's trust_anchor field is a trust anchor identifier (see
-   Section 3 of [I-D.ietf-tls-trust-anchor-ids] and Section 4.1 of
+   A proof's trust_anchor field is a trust anchor ID (see Section 3 of
+   [I-D.ietf-tls-trust-anchor-ids] and Section 4.1 of
    [I-D.ietf-tls-trust-anchor-ids]), which determines the proof's type
    and issuer.  It is analogous to an X.509 trust anchor's subject name.
    When the issuer is a Merkle Tree CA, the trust_anchor is a batch's
@@ -1464,10 +1463,10 @@ Table of Contents
 
    For each Merkle Tree CA trusted by the relying party, the batches in
    the validity window each determine a trust anchor, as described in
-   Section 6.1.  The trust anchor's identifier is the batch identifier,
-   as described in Section 5.2.  Future mechanisms using the
-   BikeshedCertificate format (see Section 5.6.3) MUST similarly define
-   how relying parties determine trust anchor identifiers.
+   Section 6.1.  The trust anchor's ID is the batch ID, as described in
+   Section 5.2.  Future mechanisms using the BikeshedCertificate format
+   (see Section 5.6.3) MUST similarly define how relying parties
+   determine trust anchor IDs.
 
    As even a single validity window results in validity_window_size
    trust anchors, sending all trust anchors in the trust_anchors
@@ -1489,12 +1488,12 @@ Table of Contents
    (see Section 3.1 of [I-D.ietf-tls-trust-anchor-ids]).
 
    For each of the authenticating party's BikeshedCertificate
-   credentials, the corresponding trust anchor identifier is the
-   trust_anchor field in the BikeshedCertificate structure.  This
-   differs from X.509 credentials, which require an out-of-band value in
-   the CertificatePropertyList.  It is an error for a
-   BikeshedCertificate credential's CertificatePropertyList to contain
-   the trust_anchor_identifier property.
+   credentials, the corresponding trust anchor ID is the trust_anchor
+   field in the BikeshedCertificate structure.  This differs from X.509
+   credentials, which require an out-of-band value in the
+   CertificatePropertyList.  It is an error for a BikeshedCertificate
+   credential's CertificatePropertyList to contain the trust_anchor_id
+   property.
 
    The authenticating party then selects certificates as described in
    Section 4.2 of [I-D.ietf-tls-trust-anchor-ids].  In doing so, it
@@ -2038,6 +2037,11 @@ Table of Contents
               xmlui/bitstream/handle/11250/3001128/
               Masters_thesis__for_University_of_Bergen.pdf>.
 
+   [STH-Discipline]
+              Barnes, R., "STH Discipline & Security Considerations", 3
+              March 2017, <https://mailarchive.ietf.org/arch/msg/trans/
+              Zm4NqyRc7LDsOtV56EchBIT9r4c/>.
+
 Appendix A.  Examples
 
    [[TODO: These examples need to be updated.]]
@@ -2197,6 +2201,11 @@ Acknowledgements
    discussions and insights which led to this document.  We wish to
    thank Mia Celeste in particular, whose implementation of an earlier
    draft revealed several pitfalls.
+
+   The idea to mint tree heads infrequently was originally described by
+   Richard Barnes in [STH-Discipline].  The size optimization in Merkle
+   Tree Certificates is an application of this idea to the certificate
+   itself.
 
 Change log
 
