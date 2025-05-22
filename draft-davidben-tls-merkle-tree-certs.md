@@ -1220,13 +1220,13 @@ A more corresponding TLS 1.3 negotiation would be to defer the client certificat
 
 Two possible design sketches:
 
-### Indicate in First CertificateEntry
+## Indicate in First CertificateEntry
 
 We can have the authenticating party indicate the certificate type in an extension of the first CertificateEntry. One challenge is the extensions come after the certificate, so the relying party must seek to the `extensions` field independent of the certificate type. Thus all certificate types must be updated to use a consistent `opaque cert_data<0..2^24>` syntax, with any type-specific structures embedded inside.
 
 RawPublicKey and X509 already meet this requirement. OpenPGP and Bikeshed need an extra length prefix.
 
-### Change Certificate Syntax
+## Change Certificate Syntax
 
 Alternatively, we can negotiate an extension that changes the syntax to Certificate to:
 
