@@ -5,9 +5,9 @@
 Transport Layer Security                                     D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 21 November 2025                               B. E. Westerbaan
+Expires: 23 November 2025                               B. E. Westerbaan
                                                               Cloudflare
-                                                             20 May 2025
+                                                             22 May 2025
 
 
                     Merkle Tree Certificates for TLS
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 November 2025.
+   This Internet-Draft will expire on 23 November 2025.
 
 Copyright Notice
 
@@ -131,7 +131,7 @@ Table of Contents
      A.1.  (Abridged)Assertions
    Appendix B.  TLS Certificate Type Negotiation Challenges
      B.1.  Indicate in First CertificateEntry
-       B.1.1.  Change Certificate Syntax
+     B.2.  Change Certificate Syntax
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -2151,7 +2151,7 @@ B.1.  Indicate in First CertificateEntry
    RawPublicKey and X509 already meet this requirement.  OpenPGP and
    Bikeshed need an extra length prefix.
 
-B.1.1.  Change Certificate Syntax
+B.2.  Change Certificate Syntax
 
    Alternatively, we can negotiate an extension that changes the syntax
    to Certificate to:
