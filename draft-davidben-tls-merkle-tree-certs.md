@@ -420,7 +420,7 @@ A Merkle Tree certification authority is defined by the following values:
 : A cryptographic hash function. In this document, the hash function is always SHA-256 {{SHS}}, but others may be defined.
 
 `issuer_id`:
-: A trust anchor identifier (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
+: A trust anchor ID (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}) that identifies the CA. See {{identifying}} for details.
 
 `public_key`:
 : The public half of a signing key. For convenience, we use TLS' format, and represent the public key as a `TLSSubjectInfo`, see {{tls-subject-info}}. The corresponding private key, `private_key`, is known only to the CA.
@@ -451,9 +451,9 @@ To prevent cross-protocol attacks, the key used in a Merkle Tree CA MUST be uniq
 
 ## Identifying CAs and Batches {#identifying}
 
-A Merkle Tree CA's `issuer_id` is a trust anchor identifier, defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the identifier is associated with the CA. OIDs under this arc are used to identify batches below.
+A Merkle Tree CA's `issuer_id` is a trust anchor ID, defined in {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}. However, unlike an X.509 CA, the entire OID arc rooted at the ID is associated with the CA. OIDs under this arc are used to identify batches below.
 
-An individual batch from a Merkle Tree CA also has an associated trust anchor identifier, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.
+An individual batch from a Merkle Tree CA also has an associated trust anchor ID, called a `batch_id`. It is determined by appending the batch number, as an OID component, to the CA's `issuer_id`.
 
 For example, a Merkle Tree CA may have an `issuer_id` of `32473.1`, in the ASCII representation.
 The batch with batch number 42 would then have a `batch_id` of `32473.1.42`.
@@ -549,14 +549,14 @@ Let `entries` be the resulting batch entries and `n` be the number of elements. 
 ~~~
 struct {
     uint8 distinguisher = 0;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     uint8 level;
 } HashEmptyInput;
 
 struct {
     uint8 distinguisher = 1;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     uint8 level;
     HashValue left;
@@ -565,13 +565,13 @@ struct {
 
 struct {
     uint8 distinguisher = 2;
-    TrustAnchorIdentifier batch_id;
+    TrustAnchorID batch_id;
     uint64 index;
     BatchEntry entry;
 } HashLeafInput;
 ~~~
 
-In these inputs, the `batch_id` is set to the batch-specific trust anchor identifier, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
+In these inputs, the `batch_id` is set to the batch-specific trust anchor ID, i.e. the `issuer_id` with the batch number appended as described in {{identifying}}.
 The remaining fields, such as `index`, are set to inputs of the function.
 
 Tree levels are computed iteratively as follows:
@@ -632,7 +632,7 @@ After the CA builds the Merkle Tree for a batch, it constructs the ValidityWindo
 ~~~
 struct {
     uint8 label[32] = "Merkle Tree Crts ValidityWindow\0";
-    TrustAnchorIdentifier issuer_id;
+    TrustAnchorID issuer_id;
     ValidityWindow window;
 } LabeledValidityWindow;
 ~~~
@@ -653,12 +653,12 @@ For each entry in the tree, the CA constructs a BikeshedCertificate structure co
 
 ~~~
 /* See Section 4.1 of draft-ietf-tls-trust-anchor-ids */
-opaque TrustAnchorIdentifier<1..2^8-1>;
+opaque TrustAnchorID<1..2^8-1>;
 
 uint64 Timestamp;
 
 struct {
-    TrustAnchorIdentifier trust_anchor;
+    TrustAnchorID trust_anchor;
     Timestamp not_after;
     opaque proof_data<0..2^16-1>;
 } Proof;
@@ -669,7 +669,7 @@ struct {
 } BikeshedCertificate;
 ~~~
 
-A proof's `trust_anchor` field is a trust anchor identifier (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
+A proof's `trust_anchor` field is a trust anchor ID (see {{Section 3 of !I-D.ietf-tls-trust-anchor-ids}} and {{Section 4.1 of !I-D.ietf-tls-trust-anchor-ids}}), which determines the proof's type and issuer.
 It is analogous to an X.509 trust anchor's subject name.
 When the issuer is a Merkle Tree CA, the `trust_anchor` is a batch's `batch_id`, as described in {{identifying}}.
 
@@ -993,7 +993,7 @@ If this certificate type is used for either the client or server certificate, th
 
 Merkle Tree certificates will only be accepted in up-to-date relying parties, and require a negotiation mechanism to use. Merkle Tree certificate implementations SHOULD use the `trust_anchors` extension {{!I-D.ietf-tls-trust-anchor-ids}} as described below:
 
-For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in {{relying-parties}}. The trust anchor's identifier is the batch identifier, as described in {{identifying}}. Future mechanisms using the BikeshedCertificate format (see {{proofs}}) MUST similarly define how relying parties determine trust anchor identifiers.
+For each Merkle Tree CA trusted by the relying party, the batches in the validity window each determine a trust anchor, as described in {{relying-parties}}. The trust anchor's ID is the batch ID, as described in {{identifying}}. Future mechanisms using the BikeshedCertificate format (see {{proofs}}) MUST similarly define how relying parties determine trust anchor IDs.
 
 As even a single validity window results in `validity_window_size` trust anchors, sending all trust anchors in the `trust_anchors` extension would be prohitively large in most cases. Instead, relying parties SHOULD use the retry mechanism described in {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}} and the DNS hint described in {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}.
 
@@ -1001,7 +1001,7 @@ As even a single validity window results in `validity_window_size` trust anchors
 
 The authenticating party's list of candidate certification paths (see {{Section 3.3 of !I-D.ietf-tls-trust-anchor-ids}}) is extended to carry both X.509 and BikeshedCertificate credentials. The two types of credentials MAY appear in any relative preference order, based on the authenticating party's policies. Like an X.509 credential, a BikeshedCertificate credential also has a CertificatePropertyList (see {{Section 3.1 of !I-D.ietf-tls-trust-anchor-ids}}).
 
-For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor identifier is the `trust_anchor` field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the `trust_anchor_identifier` property.
+For each of the authenticating party's BikeshedCertificate credentials, the corresponding trust anchor ID is the `trust_anchor` field in the BikeshedCertificate structure. This differs from X.509 credentials, which require an out-of-band value in the CertificatePropertyList. It is an error for a BikeshedCertificate credential's CertificatePropertyList to contain the `trust_anchor_id` property.
 
 The authenticating party then selects certificates as described in {{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}}. In doing so, it SHOULD incorporate trust anchor negotiation and certificate type negotiation (see {{tls-certificate-type}}) into the selection criteria for BikeshedCertificate-based credentials.
 
