@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-22T01:59:58.725380+00:00",
+  "timestamp": "2025-05-22T02:05:27.040310+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1966,15 +1966,15 @@
       "id": "I_kwDOJIBkVc6zX107",
       "title": "Size estimates are off by 1",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/112",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "I think my size estimates were off by 1? Looks like I rounded log2 down, but it should have been rounded up.\nhttps://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#name-size-estimates",
       "createdAt": "2025-04-21T21:50:59Z",
-      "updatedAt": "2025-04-21T21:50:59Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-20T20:46:37Z",
+      "closedAt": "2025-05-20T20:46:37Z",
       "comments": []
     }
   ],
