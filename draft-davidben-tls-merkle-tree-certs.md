@@ -185,7 +185,7 @@ informative:
     date: 2017-03-03
     author:
     - name: Richard Barnes
-
+...
 
 --- abstract
 
