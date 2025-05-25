@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-22T02:05:27.040310+00:00",
+  "timestamp": "2025-05-25T02:20:06.845412+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -584,15 +584,15 @@
       "id": "I_kwDOJIBkVc5h8eVK",
       "title": "Mention canonical STHs in acknowledgements or so",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/19",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "@bifurcation reminded me at IETF that this draft shares a lot of properties with the canonical STHs proposal. We should mention it in acknowledgements\u2014apologies, that was not an intentional omission! I suspect it was just so long ago that we just forgot the original inspiration that schemes of that flavor. \ud83d\ude43",
       "createdAt": "2023-03-28T05:46:27Z",
-      "updatedAt": "2023-03-28T19:00:52Z",
-      "closedAt": null,
+      "updatedAt": "2025-05-22T21:23:21Z",
+      "closedAt": "2025-05-22T21:22:29Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -614,6 +614,13 @@
           "body": "No, thanks so much for bringing it up! STH discipline should definitely be mentioned in the doc as prior art / inspiration. Using MTCs as an optimization with a separate fallback is what allows us to use the concept at the core of STH discipline and extend it without falling into the same catch 22.",
           "createdAt": "2023-03-28T19:00:52Z",
           "updatedAt": "2023-03-28T19:00:52Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Whoops, lost track of this in the midst of the... less productive drama... but I finally dug up your original email and cited it in 3e3b0a91ea72465ae9eb40881c0c7b77c6834a6f",
+          "createdAt": "2025-05-22T21:23:20Z",
+          "updatedAt": "2025-05-22T21:23:20Z"
         }
       ]
     },
