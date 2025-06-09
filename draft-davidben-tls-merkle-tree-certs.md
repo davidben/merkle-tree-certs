@@ -728,7 +728,7 @@ Some organizations have published statistics which can estimate batch sizes for 
 
 These three estimates correspond to batch sizes of, respectively, around 3,300,000, around 12,500,000, and 444,000. The corresponding `path` lengths will be 22, 24, and 19, given proof sizes of, respectively, 704 bytes, 768 bytes, and 608 bytes.
 
-For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.
+For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^32 (4,294,967,296) certificates.
 
 # Using Certificates {#using}
 
