@@ -20,12 +20,12 @@
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.0
+    lxml 5.3.1
     platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.3
-    setuptools 70.3.0
+    setuptools 80.9.0
     wcwidth 0.2.13
 -->
 <link href="draft-davidben-tls-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
@@ -1045,11 +1045,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates for TLS</td>
-<td class="right">May 2025</td>
+<td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 24 November 2025</td>
+<td class="center">Expires 11 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05-23" class="published">23 May 2025</time>
+<time datetime="2025-06-09" class="published">9 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-11-24">24 November 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-11">11 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1125,7 +1125,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2142,8 +2142,8 @@ tree head is never included.<a href="#section-5.6.3-9.2.1" class="pilcrow">¶</a
 <a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-size-estimates" class="section-name selfRef">Size Estimates</a>
         </h3>
 <p id="section-5.7-1">Merkle Tree proofs scale logarithmically in the batch size. <a href="#rolling-renewal" class="auto internal xref">Section 11.2</a> recommends authenticating parties renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be <code>subscriber_count * 2 / validity_window_size</code>, where <code>subscriber_count</code> is a CA's active subscriber count. The recommended parameters in <a href="#parameters" class="auto internal xref">Section 5.1</a> give an average of <code>subscriber_count / 168</code>.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
-<p id="section-5.7-2">Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, <span>[<a href="#LetsEncrypt" class="cite xref">LetsEncrypt</a>]</span> reported around 330,000,000 active subscribers for a single CA. <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.<a href="#section-5.7-2" class="pilcrow">¶</a></p>
-<p id="section-5.7-3">These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding <code>path</code> lengths will be 21, 25, and 18, given proof sizes of, respectively, 672 bytes, 800 bytes, and 576 bytes.<a href="#section-5.7-3" class="pilcrow">¶</a></p>
+<p id="section-5.7-2">Some organizations have published statistics which can estimate batch sizes for the Web PKI. On June 9th, 2025, <span>[<a href="#LetsEncrypt" class="cite xref">LetsEncrypt</a>]</span> reported around 558,000,000 active certificates for a single CA. <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> reported around 2,100,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 444,000 per hour. Note the numbers from <span>[<a href="#MerkleTown" class="cite xref">MerkleTown</a>]</span> represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.<a href="#section-5.7-2" class="pilcrow">¶</a></p>
+<p id="section-5.7-3">These three estimates correspond to batch sizes of, respectively, around 3,300,000, around 12,500,000, and 444,000. The corresponding <code>path</code> lengths will be 22, 24, and 19, given proof sizes of, respectively, 704 bytes, 768 bytes, and 608 bytes.<a href="#section-5.7-3" class="pilcrow">¶</a></p>
 <p id="section-5.7-4">For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.<a href="#section-5.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
