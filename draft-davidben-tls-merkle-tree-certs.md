@@ -724,9 +724,9 @@ For each entry in the tree, the CA assembles a BikeshedCertificate structure and
 
 Merkle Tree proofs scale logarithmically in the batch size. {{rolling-renewal}} recommends authenticating parties renew halfway through the previous certificate's lifetime. Batch sizes will thus, on average, be `subscriber_count * 2 / validity_window_size`, where `subscriber_count` is a CA's active subscriber count. The recommended parameters in {{parameters}} give an average of `subscriber_count / 168`.
 
-Some organizations have published statistics which can estimate batch sizes for the Web PKI. On March 7th, 2023, {{LetsEncrypt}} reported around 330,000,000 active subscribers for a single CA. {{MerkleTown}} reported around 3,800,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 257,000 per hour. Note the numbers from {{MerkleTown}} represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.
+Some organizations have published statistics which can estimate batch sizes for the Web PKI. On June 9th, 2025, {{LetsEncrypt}} reported around 558,000,000 active certificates for a single CA. {{MerkleTown}} reported around 2,100,000,000 unexpired certificates in Certificate Transparency logs, and an issuance rate of around 444,000 per hour. Note the numbers from {{MerkleTown}} represent, respectively, all Web PKI CAs combined and issuance rates for longer-lived certificates and may not be representative of a Merkle Tree certificate deployment.
 
-These three estimates correspond to batch sizes of, respectively, around 2,000,000, around 20,000,000, and 257,000. The corresponding `path` lengths will be 21, 25, and 18, given proof sizes of, respectively, 672 bytes, 800 bytes, and 576 bytes.
+These three estimates correspond to batch sizes of, respectively, around 3,300,000, around 12,500,000, and 444,000. The corresponding `path` lengths will be 22, 24, and 19, given proof sizes of, respectively, 704 bytes, 768 bytes, and 608 bytes.
 
 For larger batch sizes, 32 hashes, or 1024 bytes, is sufficient for batch sizes up to 2^33 (8,589,934,592) certificates.
 
