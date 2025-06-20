@@ -915,21 +915,23 @@ In order to accept certificates from a Merkle Tree CA, a relying party MUST be c
 
 When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6.1.3 of !RFC5280}}) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:
 
+1. Check that the TBSCertificate's `signature` field is `id-mtc-proof` with omitted parameters. If either check fails, abort this process and fail verification.
+
 1. Let `index` be the certificate's serial number. Check that `start <= index < end`, and that `[start, end)` describes a subtree per {{definition-of-a-subtree}}. If either check fails, abort this process and fail verification.
 
-2. If `index` is contained in one of the relying party's revoked ranges ({{revocation-by-index}}), abort this process and fail verification.
+1. If `index` is contained in one of the relying party's revoked ranges ({{revocation-by-index}}), abort this process and fail verification.
 
-3. Construct a TBSCertificateLogEntry as follows:
+1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
-   2. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
+   1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
-4. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry.
+1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry.
 
-4. Evaluate `inclusion_proof` against the MerkleTreeCertEntry to compute the expected subtree hash
+1. Evaluate `inclusion_proof` against the MerkleTreeCertEntry to compute the expected subtree hash
 
-5. If the subtree is a trusted subtree ({{trusted-subtrees}}), check that the hash matches. Return success if it matches and failure if it does not.
+1. If the subtree is a trusted subtree ({{trusted-subtrees}}), check that the hash matches. Return success if it matches and failure if it does not.
 
-6. Otherwise, check that `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}.
+1. Otherwise, check that `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -1146,6 +1148,36 @@ If a relying party trusts an issuance log, but the issuance log contains an unre
 If a monitor observes an entry with unknown type, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.
 
 This situation is analogous to the addition of a new X.509 extension. When relying parties add support for log entry types or new X.509 extensions, they SHOULD coordinate with monitors to ensure the transparency ecosystem is able to monitor the new formats.
+
+### Certificate Malleability
+
+An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.4.2 of ?RFC8446}}. A given value's DER encoding is unique, so after signature verification, a DER-based protocol can assume the DER-encoded TBSCertificate is not malleable and uniquely identifies the certificate information.
+
+While signature verification process in {{verifying-certificate-signatures}} transforms the DER-encoded TBSCertificate bytes slightly, it still authenticates the value enough to preserve this non-malleability. In particular, per {{Section 4.1.1.3 of ?RFC5280}}, X.509 signatures are computed over the DER-encoded TBSCertificate, and there is a unique valid DER encoding for every abstract TBSCertificate structure. Thus, malleability concerns reduce to malleability of the TBSCertificate value:
+
+* The `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields are copied from the TBSCertificate to the TBSCertificateLogEntry unmodified, so they are directly authenticated by the inclusion proof.
+
+* `serialNumber` is omitted from TBSCertificateLogEntry, but its value determines the inclusion proof index, which authenticates it.
+
+* The redundant `signature` field in TBSCertificate is omitted from TBSCertificateLogEntry, but {{verifying-certificate-signatures}} checks for an exact value, so no other values are possible.
+
+* `subjectPublicKeyInfo` is hashed as `subjectPublicKeyInfoHash` in TBSCertificateLogEntry. Provided the underlying hash function is collision-resistant, no other values are possible for a given log entry.
+
+Although {{Section 4.1.3 of ?RFC5280}} prescribes a DER-based signature verification process, some non-conforming X.509 implementations use a BER {{X.690}} parser instead of DER and then, instead of verifying the DER encoding, verify the signature over the BER bytes. BER encoding is not unique, so a non-malleable TBSCertificate value is not sufficient for a non-malleable encoding. These non-conforming implementations MUST do the following when verifying a Merkle Tree Certificate:
+
+* When parsing the outermost TBSCertificate SEQUENCE tag and length, reparse with a conforming DER parser.
+
+* When copying the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields, either reparse with a conforming DER parser, or copy over the observed BER encodings.
+
+* Reparse the `serialNumber` field with a conforming DER parser.
+
+* Reparse the `signature` field with a conforming DER parser. Equivalently, check for an exact match for the expected, DER-encoded value.
+
+* When hashing `subjectPublicKeyInfo`, either reparse with a conforming DER parser, or hash the observed BER encoding.
+
+{{log-entries}} requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable switch to a DER parser due to compatibility concerns, Merkle Tree Certificates is new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.
+
+The above only ensures the TBSCertificate portion is non-mallable. In Merkle Tree Certificates, similar to ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.
 
 # IANA Considerations
 
