@@ -2139,9 +2139,9 @@ Table of Contents
    Although Section 4.1.3 of [RFC5280] prescribes a DER-based signature
    verification process, some non-conforming X.509 implementations use a
    BER [X.690] parser instead of DER and then, instead of verifying the
-   DER encoding, verify the signature over the BER bytes.  BER encoding
-   is not unique, so a non-malleable TBSCertificate value is not
-   sufficient for a non-malleable encoding.  These non-conforming
+   DER encoding, verify the signature over the BER encoding.  BER
+   encoding is not unique, so a non-malleable TBSCertificate value is
+   not sufficient for a non-malleable encoding.  These non-conforming
    implementations MUST do the following when verifying a Merkle Tree
    Certificate:
 
