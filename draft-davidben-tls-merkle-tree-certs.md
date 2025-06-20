@@ -399,7 +399,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 
 The following procedure can be used to verify a subtree consistency proof.
 
-Given a subtree `[start, end)` of tree `n`, a consistency proof `proof`, a subtree hash `node_hash` and a root hash `root_hash`:
+Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a consistency proof `proof`, a subtree hash `node_hash`, and a root hash `root_hash`:
 
 1. If `end` is `n`, run the following:
    1. Set `fn` to `start` and `sn` to `end - 1`.
