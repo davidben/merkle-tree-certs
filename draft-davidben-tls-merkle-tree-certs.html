@@ -1325,6 +1325,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5">
                 <p id="section-toc.1-1.12.2.5.1"><a href="#section-12.5" class="auto internal xref">12.5</a>.  <a href="#name-new-log-entry-types" class="internal xref">New Log Entry Types</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.5.2.1">
+                    <p id="section-toc.1-1.12.2.5.2.1.1"><a href="#section-12.5.1" class="auto internal xref">12.5.1</a>.  <a href="#name-certificate-malleability" class="internal xref">Certificate Malleability</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -2946,33 +2951,36 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-7.2-1">When verifying the signature on an X.509 certificate (Step (a)(1) of <span><a href="https://rfc-editor.org/rfc/rfc5280#section-6.1.3" class="relref">Section 6.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.2-2">
 <li id="section-7.2-2.1">
-            <p id="section-7.2-2.1.1">Let <code>index</code> be the certificate's serial number. Check that <code>start &lt;= index &lt; end</code>, and that <code>[start, end)</code> describes a subtree per <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-mtc-proof</code> with omitted parameters. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1">If <code>index</code> is contained in one of the relying party's revoked ranges (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.2.1">Let <code>index</code> be the certificate's serial number. Check that <code>start &lt;= index &lt; end</code>, and that <code>[start, end)</code> describes a subtree per <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.2-2.3.2">
-<li id="section-7.2-2.3.2.1">
-                <p id="section-7.2-2.3.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.3.1">If <code>index</code> is contained in one of the relying party's revoked ranges (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.2-2.3.2.2">
-                <p id="section-7.2-2.3.2.2.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-2.4">
+            <p id="section-7.2-2.4.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.2-2.4.2">
+<li id="section-7.2-2.4.2.1">
+                <p id="section-7.2-2.4.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.4.2.2">
+                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
-          <li id="section-7.2-2.4">
-            <p id="section-7.2-2.4.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry.<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
-</li>
           <li id="section-7.2-2.5">
-            <p id="section-7.2-2.5.1">Evaluate <code>inclusion_proof</code> against the MerkleTreeCertEntry to compute the expected subtree hash<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.5.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.6">
-            <p id="section-7.2-2.6.1">If the subtree is a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>), check that the hash matches. Return success if it matches and failure if it does not.<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.6.1">Evaluate <code>inclusion_proof</code> against the MerkleTreeCertEntry to compute the expected subtree hash<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.7">
-            <p id="section-7.2-2.7.1">Otherwise, check that <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.7.1">If the subtree is a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>), check that the hash matches. Return success if it matches and failure if it does not.<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.8">
+            <p id="section-7.2-2.8.1">Otherwise, check that <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-7.2-3">This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
@@ -3222,6 +3230,49 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-12.5-4">If a relying party trusts an issuance log, but the issuance log contains an unrecognized entry, the entry will not cause it to accept an unexpected certificate. In <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different <code>type</code> value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.<a href="#section-12.5-4" class="pilcrow">¶</a></p>
 <p id="section-12.5-5">If a monitor observes an entry with unknown type, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.<a href="#section-12.5-5" class="pilcrow">¶</a></p>
 <p id="section-12.5-6">This situation is analogous to the addition of a new X.509 extension. When relying parties add support for log entry types or new X.509 extensions, they SHOULD coordinate with monitors to ensure the transparency ecosystem is able to monitor the new formats.<a href="#section-12.5-6" class="pilcrow">¶</a></p>
+<div id="certificate-malleability">
+<section id="section-12.5.1">
+          <h4 id="name-certificate-malleability">
+<a href="#section-12.5.1" class="section-number selfRef">12.5.1. </a><a href="#name-certificate-malleability" class="section-name selfRef">Certificate Malleability</a>
+          </h4>
+<p id="section-12.5.1-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. A given value's DER encoding is unique, so after signature verification, a DER-based protocol can assume the DER-encoded TBSCertificate is not malleable and uniquely identifies the certificate information.<a href="#section-12.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-12.5.1-2">While signature verification process in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> transforms the DER-encoded TBSCertificate bytes slightly, it still authenticates the value enough to preserve this non-malleability. In particular, per <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, X.509 signatures are computed over the DER-encoded TBSCertificate, and there is a unique valid DER encoding for every abstract TBSCertificate structure. Thus, malleability concerns reduce to malleability of the TBSCertificate value:<a href="#section-12.5.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.5.1-3.1">
+              <p id="section-12.5.1-3.1.1">The <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields are copied from the TBSCertificate to the TBSCertificateLogEntry unmodified, so they are directly authenticated by the inclusion proof.<a href="#section-12.5.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-3.2">
+              <p id="section-12.5.1-3.2.1"><code>serialNumber</code> is omitted from TBSCertificateLogEntry, but its value determines the inclusion proof index, which authenticates it.<a href="#section-12.5.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-3.3">
+              <p id="section-12.5.1-3.3.1">The redundant <code>signature</code> field in TBSCertificate is omitted from TBSCertificateLogEntry, but <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> checks for an exact value, so no other values are possible.<a href="#section-12.5.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-3.4">
+              <p id="section-12.5.1-3.4.1"><code>subjectPublicKeyInfo</code> is hashed as <code>subjectPublicKeyInfoHash</code> in TBSCertificateLogEntry. Provided the underlying hash function is collision-resistant, no other values are possible for a given log entry.<a href="#section-12.5.1-3.4.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-12.5.1-4">Although <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.3" class="relref">Section 4.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> prescribes a DER-based signature verification process, some non-conforming X.509 implementations use a BER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> parser instead of DER and then, instead of verifying the DER encoding, verify the signature over the BER bytes. BER encoding is not unique, so a non-malleable TBSCertificate value is not sufficient for a non-malleable encoding. These non-conforming implementations MUST do the following when verifying a Merkle Tree Certificate:<a href="#section-12.5.1-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-12.5.1-5.1">
+              <p id="section-12.5.1-5.1.1">When parsing the outermost TBSCertificate SEQUENCE tag and length, reparse with a conforming DER parser.<a href="#section-12.5.1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-5.2">
+              <p id="section-12.5.1-5.2.1">When copying the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields, either reparse with a conforming DER parser, or copy over the observed BER encodings.<a href="#section-12.5.1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-5.3">
+              <p id="section-12.5.1-5.3.1">Reparse the <code>serialNumber</code> field with a conforming DER parser.<a href="#section-12.5.1-5.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-5.4">
+              <p id="section-12.5.1-5.4.1">Reparse the <code>signature</code> field with a conforming DER parser. Equivalently, check for an exact match for the expected, DER-encoded value.<a href="#section-12.5.1-5.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-12.5.1-5.5">
+              <p id="section-12.5.1-5.5.1">When hashing <code>subjectPublicKeyInfo</code>, either reparse with a conforming DER parser, or hash the observed BER encoding.<a href="#section-12.5.1-5.5.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-12.5.1-6"><a href="#log-entries" class="auto internal xref">Section 5.3</a> requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable switch to a DER parser due to compatibility concerns, Merkle Tree Certificates is new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.<a href="#section-12.5.1-6" class="pilcrow">¶</a></p>
+<p id="section-12.5.1-7">The above only ensures the TBSCertificate portion is non-mallable. In Merkle Tree Certificates, similar to ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.<a href="#section-12.5.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 </section>
