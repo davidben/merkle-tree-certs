@@ -1025,6 +1025,8 @@ One possibility is to say ACME servers can update the contents of the certificat
 
 ## Operational Costs
 
+### Certification Authority Costs
+
 While Merkle Tree certificates expects CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from {{?RFC6962}} or {{?RFC9162}}:
 
 {{publishing-logs}} does not constrain the API to the one defined in {{?RFC6962}} or {{?RFC9162}}. If the PKI uses a tile-based protocol, such as {{TLOG-TILES}}, the issuance log benefits from the improved caching properties of such designs.
@@ -1039,15 +1041,17 @@ Log pruning ({{log-pruning}}) allows a long-lived log to serve only the more rec
 
 Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in {{log-availability}}.
 
+### Cosigner Costs
+
 The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as {{TLOG-WITNESS}}, requires very little state and can be run with low cost.
 
-A mirroring cosigner, such as {{TLOG-MIRROR}}, performs comparable roles as CT logs, but several of the above cost-saving properties also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.
+A mirroring cosigner, such as {{TLOG-MIRROR}}, performs comparable roles as CT logs, but several of the cost-saving properties in {{certification-authority-costs}} also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.
 
-Merkle Tree certificates also reduces monitoring costs compared to CT:
+### Monitor Costs
 
 In a CT-based PKI, every log carries a potentially distinct subset of active certificates, so monitors must check the contents of every CT log. At the same time, certificates are commonly synchronized between CT logs. As a result, a monitor will typically download each certificate multiple times, once for every log. In Merkle Tree Certificates, each entry appears in exactly one log. A relying party might require a log to be covered by a quorum of mirrors, but each mirror is cryptographically verified to serve the same contents. Once a monitor has obtained some entry from one mirror, it does not need to download it from the others.
 
-In addition to downloading each entry only once, the entries themselves are smaller, as discussed above.
+In addition to downloading each entry only once, the entries themselves are smaller, as discussed in {{certification-authority-costs}}.
 
 ## Choosing Cosigners
 
