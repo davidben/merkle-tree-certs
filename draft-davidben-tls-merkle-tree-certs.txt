@@ -2136,11 +2136,12 @@ Table of Contents
    encoded TBSCertificate.  After signature verification, applications
    can assume the DER-encoded TBSCertificate is not malleable.
 
-   While signature verification process in Section 7.2 first transforms
-   the TBSCertificate into a TBSCertificateLogEntry, it preserves this
-   non-malleability.  There is a unique valid DER encoding for every
-   abstract TBSCertificate structure, so malleability of the DER-encoded
-   TBSCertificate reduces to malleability of the TBSCertificate value:
+   While the signature verification process in Section 7.2 first
+   transforms the TBSCertificate into a TBSCertificateLogEntry, it
+   preserves this non-malleability.  There is a unique valid DER
+   encoding for every abstract TBSCertificate structure, so malleability
+   of the DER-encoded TBSCertificate reduces to malleability of the
+   TBSCertificate value:
 
    *  The version, issuer, validity, subject, issuerUniqueID,
       subjectUniqueID, and extensions fields are copied from the
@@ -2189,12 +2190,12 @@ Table of Contents
    Section 5.3 requires that the TBSCertificateLogEntry in a
    MerkleTreeCertEntry be DER-encoded, so applying a stricter parser
    will be compatible with conforming CAs.  While these existing non-
-   conforming implementations may be unable switch to a DER parser due
-   to compatibility concerns, Merkle Tree Certificates is new, so there
-   is no existing deployment of malformed BER-encoded
+   conforming implementations may be unable to switch to a DER parser
+   due to compatibility concerns, Merkle Tree Certificates is new, so
+   there is no existing deployment of malformed BER-encoded
    TBSCertificateLogEntry structures.
 
-   The above only ensures the TBSCertificate portion is non-mallable.
+   The above only ensures the TBSCertificate portion is non-malleable.
    In Merkle Tree Certificates, similar to ECDSA X.509 signature, the
    signature value is malleable.  Multiple MTCProof structures may prove
    a single TBSCertificate structure.  Additionally, in all X.509-based
