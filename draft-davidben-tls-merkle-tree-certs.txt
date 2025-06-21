@@ -245,8 +245,8 @@ Table of Contents
       to the authenticating party, after performing some validation
       process on the certificate contents.
 
-   Relying party:  The party whom the authenticating party presents its
-      identity to.  In TLS, this is the side receiving the Certificate
+   Relying party:  The party to whom the authenticating party presents
+      its identity.  In TLS, this is the side receiving the Certificate
       and CertificateVerify message.
 
    Monitor:  Parties who watch logs for certificates of interest,
@@ -1411,7 +1411,7 @@ Table of Contents
    sufficient set of signatures to meet relying party requirements.
 
    If a new landmark checkpoint is allocated every hour, signatureless
-   certificate sutrees will span around 4,400,000 certificates, leading
+   certificate subtrees will span around 4,400,000 certificates, leading
    to 23 hashes in the inclusion proof, giving an inclusion proof size
    of 736 bytes, with no signatures.  This is significantly smaller than
    a single ML-DSA-44 signature, 2,420 bytes, and almost ten times
@@ -2643,7 +2643,7 @@ Since draft-davidben-tls-merkle-tree-certs-04
 
 Since draft-davidben-tls-merkle-tree-certs-05
 
-   *  Add some discussion on malleabiltiy
+   *  Add some discussion on malleability
 
    *  Discuss the monitoring impacts of the responsibility shift from CA
       with log quorum to CA+log with mirror quorum

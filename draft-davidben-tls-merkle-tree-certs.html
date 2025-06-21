@@ -1465,7 +1465,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <dd class="break"></dd>
 <dt id="section-2.1-2.5">Relying party:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-2.6">
-            <p id="section-2.1-2.6.1">The party whom the authenticating party presents its identity to. In TLS, this is the side receiving the Certificate and CertificateVerify message.<a href="#section-2.1-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-2.6.1">The party to whom the authenticating party presents its identity. In TLS, this is the side receiving the Certificate and CertificateVerify message.<a href="#section-2.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-2.7">Monitor:</dt>
@@ -2919,7 +2919,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-6.4-4">The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
 <p id="section-6.4-5">Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
-<p id="section-6.4-6">If a new landmark checkpoint is allocated every hour, signatureless certificate sutrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4-6">If a new landmark checkpoint is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
 <p id="section-6.4-7">The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.<a href="#section-6.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3739,7 +3739,7 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
         </h3>
 <ul class="normal">
 <li class="normal" id="appendix-D.6-1.1">
-            <p id="appendix-D.6-1.1.1">Add some discussion on malleabiltiy<a href="#appendix-D.6-1.1.1" class="pilcrow">¶</a></p>
+            <p id="appendix-D.6-1.1.1">Add some discussion on malleability<a href="#appendix-D.6-1.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-D.6-1.2">
             <p id="appendix-D.6-1.2.1">Discuss the monitoring impacts of the responsibility shift from CA with log quorum to CA+log with mirror quorum<a href="#appendix-D.6-1.2.1" class="pilcrow">¶</a></p>
