@@ -1347,3 +1347,10 @@ In draft-04, each tree head is independent. In draft-05, each landmark checkpoin
 In draft-04, the independent tree heads were easily prunable. In draft-05, we define how to prune a Merkle tree.
 
 In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark checkpoints can be combined with inclusion proofs and witness signatures for fast issuance. This is essentially an STH and inclusion proof in CT.
+
+## Since draft-davidben-tls-merkle-tree-certs-05
+{:numbered="false"}
+
+- Add some discussion on malleabiltiy
+
+- Discuss the monitoring impacts of the responsibility shift from CA with log quorum to CA+log with mirror quorum
