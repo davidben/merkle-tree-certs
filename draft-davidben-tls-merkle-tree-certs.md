@@ -1173,7 +1173,7 @@ While the signature verification process in {{verifying-certificate-signatures}}
 
 * `subjectPublicKeyInfo` is hashed as `subjectPublicKeyInfoHash` in TBSCertificateLogEntry. Provided the underlying hash function is collision-resistant, no other values are possible for a given log entry.
 
-Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of DER and then, instead of computing the canonical DER encoding per {{Section 4.1.1.3 of ?RFC5280}}, verify the signature over the particular BER encoding received. Those implementations can still assume the received BER-encoded TBSCertificate is not malleable. However, as BER encoding is not unique, this breaks the above assumptions. To preserve non-malleability, these non-conforming implementations MUST do the following when verifying a Merkle Tree Certificate:
+Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of DER and then, instead of computing the canonical DER encoding per {{Section 4.1.1.3 of ?RFC5280}}, verify the signature over the particular BER encoding received. Those implementations may still assume the received BER-encoded TBSCertificate is not malleable. However, as BER encoding is not unique, this breaks the above assumptions in Merkle Tree Certificates. To preserve non-malleability, these non-conforming implementations MUST do the following when verifying a Merkle Tree Certificate:
 
 * When parsing the outermost TBSCertificate SEQUENCE tag and length, reparse with a conforming DER parser.
 
