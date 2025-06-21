@@ -233,7 +233,7 @@ Certification authority (CA):
 : The service that issues certificates to the authenticating party, after performing some validation process on the certificate contents.
 
 Relying party:
-: The party whom the authenticating party presents its identity to. In TLS, this is the side receiving the Certificate and CertificateVerify message.
+: The party to whom the authenticating party presents its identity. In TLS, this is the side receiving the Certificate and CertificateVerify message.
 
 Monitor:
 : Parties who watch logs for certificates of interest, analogous to the role in {{Section 8.2 of ?RFC9162}}.
@@ -891,7 +891,7 @@ The current issuance rate across the Web PKI may not necessarily be representati
 
 Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
 
-If a new landmark checkpoint is allocated every hour, signatureless certificate sutrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
+If a new landmark checkpoint is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
 The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.
 
@@ -1351,6 +1351,6 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 ## Since draft-davidben-tls-merkle-tree-certs-05
 {:numbered="false"}
 
-- Add some discussion on malleabiltiy
+- Add some discussion on malleability
 
 - Discuss the monitoring impacts of the responsibility shift from CA with log quorum to CA+log with mirror quorum
