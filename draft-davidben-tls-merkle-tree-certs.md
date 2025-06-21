@@ -1043,6 +1043,12 @@ The costs of cosigners vary by cosigner role. A consistency-checking cosigner, s
 
 A mirroring cosigner, such as {{TLOG-MIRROR}}, performs comparable roles as CT logs, but several of the above cost-saving properties also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.
 
+Merkle Tree certificates also reduces monitoring costs compared to CT:
+
+In a CT-based PKI, every log carries a potentially distinct subset of active certificates, so monitors must check the contents of every CT log. At the same time, certificates are commonly synchronized between CT logs. As a result, a monitor will typically download each certificate multiple times, once for every log. In Merkle Tree Certificates, each entry appears in exactly one log. A relying party might require a log to be covered by a quorum of mirrors, but each mirror is cryptographically verified to serve the same contents. Once a monitor has obtained some entry from one mirror, it does not need to download it from the others.
+
+In addition to downloading each entry only once, the entries themselves are smaller, as discussed above.
+
 ## Choosing Cosigners
 
 In selecting trusted cosigners and cosigner requirements ({{trusted-cosigners}}), relying parties navigate a number of trade-offs:
