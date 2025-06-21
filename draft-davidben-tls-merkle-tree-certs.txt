@@ -144,6 +144,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-02
      Since draft-davidben-tls-merkle-tree-certs-03
      Since draft-davidben-tls-merkle-tree-certs-04
+     Since draft-davidben-tls-merkle-tree-certs-05
    Authors' Addresses
 
 1.  Introduction
@@ -2639,6 +2640,13 @@ Since draft-davidben-tls-merkle-tree-certs-04
    non-landmark checkpoints can be combined with inclusion proofs and
    witness signatures for fast issuance.  This is essentially an STH and
    inclusion proof in CT.
+
+Since draft-davidben-tls-merkle-tree-certs-05
+
+   *  Add some discussion on malleabiltiy
+
+   *  Discuss the monitoring impacts of the responsibility shift from CA
+      with log quorum to CA+log with mirror quorum
 
 Authors' Addresses
 
