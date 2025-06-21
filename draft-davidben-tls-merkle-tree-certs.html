@@ -1051,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 22 December 2025</td>
+<td class="center">Expires 23 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-20" class="published">20 June 2025</time>
+<time datetime="2025-06-21" class="published">21 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-22">22 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-23">23 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1130,7 +1130,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 23 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1290,6 +1290,17 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
                 <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-operational-costs" class="internal xref">Operational Costs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1.2.1">
+                    <p id="section-toc.1-1.10.2.1.2.1.1"><a href="#section-10.1.1" class="auto internal xref">10.1.1</a>.  <a href="#name-certification-authority-cost" class="internal xref">Certification Authority Costs</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1.2.2">
+                    <p id="section-toc.1-1.10.2.1.2.2.1"><a href="#section-10.1.2" class="auto internal xref">10.1.2</a>.  <a href="#name-cosigner-costs" class="internal xref">Cosigner Costs</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1.2.3">
+                    <p id="section-toc.1-1.10.2.1.2.3.1"><a href="#section-10.1.3" class="auto internal xref">10.1.3</a>.  <a href="#name-monitor-costs" class="internal xref">Monitor Costs</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
                 <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-choosing-cosigners" class="internal xref">Choosing Cosigners</a></p>
@@ -3096,15 +3107,38 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-operational-costs">
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-operational-costs" class="section-name selfRef">Operational Costs</a>
         </h3>
-<p id="section-10.1-1">While Merkle Tree certificates expects CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
-<p id="section-10.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.6</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
-<p id="section-10.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. The costs are thus expected to scale with the CA's own operations.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
-<p id="section-10.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1-4" class="pilcrow">¶</a></p>
-<p id="section-10.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
-<p id="section-10.1-6">Log pruning (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.<a href="#section-10.1-6" class="pilcrow">¶</a></p>
-<p id="section-10.1-7">Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-10.1-7" class="pilcrow">¶</a></p>
-<p id="section-10.1-8">The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, requires very little state and can be run with low cost.<a href="#section-10.1-8" class="pilcrow">¶</a></p>
-<p id="section-10.1-9">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs comparable roles as CT logs, but several of the above cost-saving properties also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.<a href="#section-10.1-9" class="pilcrow">¶</a></p>
+<div id="certification-authority-costs">
+<section id="section-10.1.1">
+          <h4 id="name-certification-authority-cost">
+<a href="#section-10.1.1" class="section-number selfRef">10.1.1. </a><a href="#name-certification-authority-cost" class="section-name selfRef">Certification Authority Costs</a>
+          </h4>
+<p id="section-10.1.1-1">While Merkle Tree certificates expects CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.6</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. The costs are thus expected to scale with the CA's own operations.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1.1-4" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1.1-5" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-6">Log pruning (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.<a href="#section-10.1.1-6" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-7">Mirrors of the log can also reduce CA bandwidth costs, because monitors can fetch data from mirrors instead of CAs directly. In PKIs that deploy mirrors as part of cosigner policies, relying parties could set few availability requirements on CAs, as described in <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-10.1.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cosigner-costs">
+<section id="section-10.1.2">
+          <h4 id="name-cosigner-costs">
+<a href="#section-10.1.2" class="section-number selfRef">10.1.2. </a><a href="#name-cosigner-costs" class="section-name selfRef">Cosigner Costs</a>
+          </h4>
+<p id="section-10.1.2-1">The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, requires very little state and can be run with low cost.<a href="#section-10.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-10.1.2-2">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs comparable roles as CT logs, but several of the cost-saving properties in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a> also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.<a href="#section-10.1.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="monitor-costs">
+<section id="section-10.1.3">
+          <h4 id="name-monitor-costs">
+<a href="#section-10.1.3" class="section-number selfRef">10.1.3. </a><a href="#name-monitor-costs" class="section-name selfRef">Monitor Costs</a>
+          </h4>
+<p id="section-10.1.3-1">In a CT-based PKI, every log carries a potentially distinct subset of active certificates, so monitors must check the contents of every CT log. At the same time, certificates are commonly synchronized between CT logs. As a result, a monitor will typically download each certificate multiple times, once for every log. In Merkle Tree Certificates, each entry appears in exactly one log. A relying party might require a log to be covered by a quorum of mirrors, but each mirror is cryptographically verified to serve the same contents. Once a monitor has obtained some entry from one mirror, it does not need to download it from the others.<a href="#section-10.1.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.1.3-2">In addition to downloading each entry only once, the entries themselves are smaller, as discussed in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a>.<a href="#section-10.1.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="choosing-cosigners">
