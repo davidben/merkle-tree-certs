@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-25T02:20:06.845412+00:00",
+  "timestamp": "2025-06-22T02:24:23.566141+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -79,15 +79,15 @@
       "id": "I_kwDOJIBkVc5gql1x",
       "title": "How long must long-expired batches be served",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/2",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "As currently written, neither CAs nor the transparency service are allowed to stop serving long-outdated batches. Should we relax this? Some nuisances:\r\n\r\n* Storage windows should be much larger than validity windows, to allow for RP clock skew\r\n* If the CA's storage window is smaller than the TS's storage window, it is possible that a transparency service will fail to log something if it's really, _really_ behind. That said, it would need to be behind by more than the CA's storage window and if that's, say, a year, that's probably fine.\r\n* A bigger issue is that if the TS spins up after the CA does, it can't bootstrap itself with data before the CA's storage window (unless it pulls it from another mirror)",
       "createdAt": "2023-03-13T15:55:05Z",
-      "updatedAt": "2023-06-05T12:11:59Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:05:26Z",
+      "closedAt": "2025-06-21T14:05:26Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -102,6 +102,13 @@
           "body": "> For the common case, where the roots are side-loaded to the RP, the transparency service can also side-load an approximate time. The latest batch you got is an estimate of the time!\r\n\r\nYup! Though I think we should still ponder clock skew because the RP's clock may get off after this update and then fail to take new updates.\r\n\r\nAlso I think a CA's recent history, even if the cert has since been expired, is still relevant in the limit for monitoring it. After all, transparency is inherently a post-facto thing. It takes time for a logged certificate to be observed by someone. Though, yeah, maybe we don't need a whole year's worth? I dunno. It's also really the TS's history that matters, provided the TS doesn't get too behind.\r\n\r\n> If a transparency service is that much behind, then it can't perform its main function: allowing clients to authenticate.\r\n\r\nWell, it has a few functions:\r\n* Allowing RPs to accept assertions\r\n* Providing a public view of all assertions the CA has made\r\n* Maintaining the invariant that RPs only accept assertions that have been mirrored\r\n\r\nBut you're right that a TS that's so far behind isn't doing anything. It's still meeting the primary invariant, but the system's effectively down at that point. :-)\r\n\r\nAnd perhaps a bigger point is that, support the TS is down for a bit and loses some entries because they were past the CA's storage window. If zero TS instances ever saw it, while it's unfortunate to lose a view of CA misbehavior, we know that no RP ever accepted it at any point in time, so it's not a *huge* deal.\r\n\r\n> (Transparency service is perhaps not the best name.)\r\n\r\nOriginally called it \"update service\" to kinda reflect what I expect to be the most common deployment pattern, but transparency service seemed a better generalization, especially in some of the other deployment models where it's a bunch of services together. But not attached to the name.\r\n\r\n> I want to try running this as easy as possible, so at the moment I'd lean towards a storage window of 4 weeks.\r\n\r\nYeah, I think you've convinced me that, at least for the CA, it's both useful and not particularly harmful to have a short storage window. Though the language around the TS and the HTTP interface overall would need to account for it. And we probably formally need to allow the TS to have holes in this \"TS went offline and got more than 4 weeks behind\" state.",
           "createdAt": "2023-03-19T02:40:57Z",
           "updatedAt": "2023-03-19T02:40:57Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis; we added pruning to tlog.",
+          "createdAt": "2025-06-21T14:05:26Z",
+          "updatedAt": "2025-06-21T14:05:26Z"
         }
       ]
     },
@@ -110,15 +117,15 @@
       "id": "I_kwDOJIBkVc5g61sf",
       "title": "merkle_tree_sha256 TrustAnchors mean different things in different contexts",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "In the context of a BikeshedCertificate, (issuer, 1000) means this certificate is part of batch 1000 in the specified CA.\r\n\r\nIn the context of trust anchor negotiation (the RP's trust anchor list, the list of aliases), it refers to a whole window. That is, if window_size is 100, sending (issuer, 1000) means you are advertising (issuer, 901) through (issuer, 1000).\r\n\r\nThis works out, but it's a little weird. Maybe we should just allocate two different ProofType codepoints, with the second one referring to the whole window?",
       "createdAt": "2023-03-15T18:21:16Z",
-      "updatedAt": "2023-03-31T11:54:56Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:07:28Z",
+      "closedAt": "2025-06-21T14:07:28Z",
       "comments": [
         {
           "author": "davidben",
@@ -147,6 +154,13 @@
           "body": "Really all this is an artifact of me, at the very last minute, switching from begrudgingly conceding that the subscriber has to know something about the structure of `merkle_tree_sha256` TrustAnchors (this 1000 implies 900..1000 property) to, at the least minute, realizing you can model this with the CA handling you a pile of aliases and then scribbling that in without thinking about it too hard! :-D\r\n\r\nBut it's pretty annoying that the CA has to list out hundreds of aliases, so maybe we actually should have some notion of versioned things in the generic structure anyway...",
           "createdAt": "2023-03-31T11:54:34Z",
           "updatedAt": "2023-03-31T11:54:56Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "This ended up becoming out-of-date with trust anchor IDs, though some variation of these design question still lives on in https://github.com/tlswg/tls-trust-anchor-ids/issues/62",
+          "createdAt": "2025-06-21T14:07:28Z",
+          "updatedAt": "2025-06-21T14:07:28Z"
         }
       ]
     },
@@ -245,15 +259,15 @@
       "id": "I_kwDOJIBkVc5hOLvI",
       "title": "Should TLS CertificateType incorporate SubjectType?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Right now we have one TLS CertificateType value, `bikeshed`, for all of BikeshedCertificate. This is good for treating ProofType opaquely, but it also negotiates all SubjectTypes at once.\r\n\r\nThe SubjectType for TLS is implicitly `tls`, so that works out. But suppose we needed to define something like. If we build a TLS out of a different key type (e.g. KEMTLS), it'll want a different SubjectType. Or maybe we just decide we need to define `tls2` for some reason.\r\n\r\nSomething like KEMTLS might its own negotiation story anyway, so this may be fine. Something like `tls2` would need its own signaling extension. Perhaps we should just rename it to `bikeshed_tls` which is BikeshedCertificate + SubjectType = tls. And then other SubjectTypes intended for use with TLS just get their own corresponding CertificateType values.",
       "createdAt": "2023-03-19T20:35:49Z",
-      "updatedAt": "2023-06-12T13:17:02Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:08:00Z",
+      "closedAt": "2025-06-21T14:08:00Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -275,6 +289,13 @@
           "body": "I read a bit further and these are my very, very rough thoughts. I may be missing the mark here, but I'm still sharing them because if wrong I still hope that the way I misread things can be instructive \ud83d\ude04  \r\n\r\nSkimming the draft, I am getting the impression that it does indeed seem that the CertifiateType and SubjectType are currently very related, and it seems unlikely that the same certificate may be used for different purposes (which I guess is already sort of the case with certificates because they specify EKUs?). The suggestion in the text to just add new certificate types to TLS if that becomes necessary (i.e., `bikeshed_tls2`) seems very reasonable. \r\n\r\nIn terms of implementing that in TLS, I would expect that this might also be easier; I imagine that a new `SubjectType` requires branching of the certificate handling anyway, so branching on `CertificateType` might be just as easy?",
           "createdAt": "2023-06-12T13:17:02Z",
           "updatedAt": "2023-06-12T13:17:02Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Moot with Photosynthesis since we've tabled BikeshedCertificate for now.",
+          "createdAt": "2025-06-21T14:08:00Z",
+          "updatedAt": "2025-06-21T14:08:00Z"
         }
       ]
     },
@@ -283,15 +304,15 @@
       "id": "I_kwDOJIBkVc5hTEdD",
       "title": "Should the RP advertise TrustAnchor exclusions on top of TrustAnchor sets?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "https://github.com/davidben/merkle-tree-certs/issues/3 discusses how the negotiation scheme really believes in sets of TrustAnchors. That is, the BikeshedCertificate is identified by a TrustAnchor, say (issuer, 950), but the RP sends a single value that means (issuer, 901..1000).\r\n\r\nSuppose some batch, (issuer, 975) went wrong. Because our sets have fixed width, we have to wait for the certificate lifetime to pass (i.e. the bad batch falls off the validity window) before RPs can accept anything from the CA again. Because even if the TS can tell the RP \"trust (issuer, 901...1000) but skip (issuer, 975)\", the RP can't tell the subscriber this. Over-advertising in the ClientHello risks the subscriber picking the bad batch.\r\n\r\nTwo answers for this:\r\n* Just advertise it anyway. The CA knows it messed up, so it's the CA's responsibility to get all the subscribers to renew and dump the old proof (e.g. with ACME ARI)\r\n* We have some way to list exclusions\r\n\r\nThe second could be interesting. What if we could send an exclusion list somehow? Either an explicit list of TrustAnchors, or some sort of hashing scheme. Structures, like CRLlite's Bloom filter cascade or perfect hashing describe a subset of a finite universe of inputs. If we can make that compact enough, that might be useful...\r\n\r\nIn particular, in a more traditional PKI mechanism, that would allow RPs to advertise supersets like \"CCADB/2023-03-20\" and then exclude the entries in there they don't trust.\r\n\r\nAlso, consider a distrust. Let's say I currently trust \"roots-v1\" which contains a bunch of CAs, {CA1, CA2, CA3, ...}, but now I need to distrust CA1. I can mint \"roots-v2\", but until the subscribers all get new alias lists from ACME, they won't understand it. The existing subscribers on CA2, CA3, etc., only know about \"roots-v1\". But if I advertise \"roots-v1\", the existing subscribers on CA1 will mistakenly believe their proof is still okay.",
       "createdAt": "2023-03-20T15:46:46Z",
-      "updatedAt": "2023-06-14T12:01:43Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:08:34Z",
+      "closedAt": "2025-06-21T14:08:34Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -313,6 +334,13 @@
           "body": "Just realised: a non-canonical assertion (not sorted) is a good reason to exclude a batch, but not reject the whole CA. #31 ",
           "createdAt": "2023-06-14T12:01:43Z",
           "updatedAt": "2023-06-14T12:01:43Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Moot with trust anchor IDs.",
+          "createdAt": "2025-06-21T14:08:34Z",
+          "updatedAt": "2025-06-21T14:08:34Z"
         }
       ]
     },
@@ -321,31 +349,39 @@
       "id": "I_kwDOJIBkVc5hbOlT",
       "title": "Feature Request: Support for IP ranges",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/9",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bemasc",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Analogous to DNS wildcards, it would be helpful to support IP range claims like `192.0.2.0/24`.",
       "createdAt": "2023-03-21T18:54:29Z",
-      "updatedAt": "2023-03-21T18:54:29Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:09:32Z",
+      "closedAt": "2025-06-21T14:09:32Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing since we ended up tabling BikeshedCertificate with Photosynthesis. X.509 can't express this either (and has loads of other problems), but no longer in scope for now.",
+          "createdAt": "2025-06-21T14:09:32Z",
+          "updatedAt": "2025-06-21T14:09:32Z"
+        }
+      ]
     },
     {
       "number": 10,
       "id": "I_kwDOJIBkVc5hbvK1",
       "title": "Question: SubjectType, Intermediate CAs, and cross-signing",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/10",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bemasc",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "It seems like right now, there is only one SubjectType (\"tls\").  Since Intermediate CAs (ICAs) are not signing TLS keyshares, this seems to mean that ICAs are not (yet) supported.  I don't know that ICAs are important per se, but cross-signing has been an important way for new CAs to gain trust, and has the effect of making them ICAs from the point of view of pre-existing clients.\r\n\r\nIs there a plan here to support ICAs?  If so, I think it will be important to specify name constraints from the beginning.  (Adding constraints as an extension didn't work last time...)\r\n\r\nRelated brainstorm: it would be helpful to have a clear way for one CA to manage multiple independent signature streams.  That way, I can put my ICA/cross-signs into a very low-throughput stream that generates very small inclusion proofs, separate from my high-volume end-entity stream that generates larger proofs.",
       "createdAt": "2023-03-21T20:42:55Z",
-      "updatedAt": "2023-03-21T23:05:58Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:10:04Z",
+      "closedAt": "2025-06-21T14:10:04Z",
       "comments": [
         {
           "author": "davidben",
@@ -353,6 +389,13 @@
           "body": "I don't think ICAs makes sense for specifically the Merkle Tree ProofType. The Merkle Tree ProofType already presumes an updated RP. Particularly in a world of giant PQ signatures, there's no point in doing that on the Subscriber <-> RP flow. Just push the new CA to the RP.\r\n\r\nThe document doesn't define other ProofTypes, but, for unupdated RPs, one could imagine defining a signature-based ProofType that looks more like X.509. In that case, yeah, I agree delegation makes sense. (Although large signatures shift the tradeoffs between delegations vs. RP updates a bit.)\r\n\r\nBut since X.509 path-building has been a disaster, I don't think that should be done with SubjectType and chaining. Rather, the chain of delegations and signatures should be embedded into `proof_data` directly. From the perspective of the subscriber, the whole chain is an atomic unit.\r\n\r\nAnd, yeah, definitely agreed that will require working through a whole lot of details, including constraints. I... have some thoughts on this, but have not yet put them together into anything coherent, so just started with the Merkle Tree idea. \ud83d\ude04 ",
           "createdAt": "2023-03-21T22:55:14Z",
           "updatedAt": "2023-03-21T23:05:58Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing since we ended up tabling BikeshedCertificate with Photosynthesis.",
+          "createdAt": "2025-06-21T14:10:04Z",
+          "updatedAt": "2025-06-21T14:10:04Z"
         }
       ]
     },
@@ -377,15 +420,15 @@
       "id": "I_kwDOJIBkVc5hitIy",
       "title": "Flesh out HTTP interface",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/12",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Filing this to capture the TODO left in the doc",
       "createdAt": "2023-03-22T20:58:20Z",
-      "updatedAt": "2023-06-05T12:00:07Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:10:19Z",
+      "closedAt": "2025-06-21T14:10:19Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -393,6 +436,13 @@
           "body": "> [[TODO: This section hasn't been written yet. For now, this is just an informal sketch. The real text will need to define request/response formats more precisely, with MIME types, etc. ]]\r\n\r\n> [[TODO: If we have the window endpoint, do we still need to separate \"info\" and \"assertions\"?]]\r\n\r\n",
           "createdAt": "2023-06-05T12:00:07Z",
           "updatedAt": "2023-06-05T12:00:07Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Moot with Photosynthesis. tlog gives us an HTTP API.",
+          "createdAt": "2025-06-21T14:10:19Z",
+          "updatedAt": "2025-06-21T14:10:19Z"
         }
       ]
     },
@@ -408,7 +458,7 @@
       "labels": [],
       "body": "Filing this to capture TODO in the doc",
       "createdAt": "2023-03-22T20:58:34Z",
-      "updatedAt": "2025-02-12T20:06:54Z",
+      "updatedAt": "2025-06-21T14:12:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -424,6 +474,13 @@
           "body": "From work elsewhere, it sounds like we're now leaning towards separate orders for separate issuances, with a [profile](https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/) per flavor of issuance, and some other general layer directing the client to make multiple orders. If so, that would suggest that this draft's ACME integration should just be about the one ACME order, and potentially be as minimal as defining a MIME type for BikeshedCertificate.\n\nI dunno if it's worth bothering with a way for requests to signal ahead of time they'll able to handle BikeshedCertificate (if you wait until fetching the cert, we'll waste an issuance), or just continue to leave this to \"we assume the human configuring things has made sure everything is compatible\".",
           "createdAt": "2025-02-12T20:06:52Z",
           "updatedAt": "2025-02-12T20:06:52Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Photosynthesis update: still think profile sets make sense for other uses, but for specifically full vs signatureless certificates in the new formulation, probably actually want the same order because it's one issuance event. Maybe a Retry-After or something on the certificate URL or multiple certificate URLs.",
+          "createdAt": "2025-06-21T14:12:03Z",
+          "updatedAt": "2025-06-21T14:12:03Z"
         }
       ]
     },
@@ -432,15 +489,15 @@
       "id": "I_kwDOJIBkVc5hveoS",
       "title": "BikeshedCertificate is a placeholder name",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/15",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Obviously we'll need to rename this at some point...",
       "createdAt": "2023-03-24T18:10:40Z",
-      "updatedAt": "2023-06-14T12:06:48Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:12:33Z",
+      "closedAt": "2025-06-21T14:12:33Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -448,6 +505,13 @@
           "body": "Related: we need a name for the parts of the proposal that are not Merkle Tree specific.",
           "createdAt": "2023-06-14T12:06:47Z",
           "updatedAt": "2023-06-14T12:06:47Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Honestly, BikeshedCertificate as a name has rather grown on me, but we ended up tabling those improvements for now.",
+          "createdAt": "2025-06-21T14:12:33Z",
+          "updatedAt": "2025-06-21T14:12:33Z"
         }
       ]
     },
@@ -456,15 +520,15 @@
       "id": "I_kwDOJIBkVc5hvfAa",
       "title": "Editorial: Perhaps define certificate format earlier?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/16",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Assertions are defined up in section 4, but the corresponding certificate format is buried in 5.4.3. It is a convenient place to put it chronologically in the story, but it's kinda weird to have a core type be buried in there. Maybe we should move parts of that up to be next to Assertions.",
       "createdAt": "2023-03-24T18:12:05Z",
-      "updatedAt": "2023-03-26T02:45:22Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:12:44Z",
+      "closedAt": "2025-06-21T14:12:44Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -472,6 +536,13 @@
           "body": "Repetition is also an option. We could write \"later we will define a BikeshedCertificate as\".",
           "createdAt": "2023-03-26T02:45:21Z",
           "updatedAt": "2023-03-26T02:45:21Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Moot with Photosynthesis.",
+          "createdAt": "2025-06-21T14:12:44Z",
+          "updatedAt": "2025-06-21T14:12:44Z"
         }
       ]
     },
@@ -525,15 +596,15 @@
       "id": "I_kwDOJIBkVc5hzIKX",
       "title": "Resolve client certificate type negotiation issues",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/18",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "See https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-00.html#name-certificate-type-negotiatio",
       "createdAt": "2023-03-26T06:39:28Z",
-      "updatedAt": "2023-09-02T16:17:21Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:13:42Z",
+      "closedAt": "2025-06-21T14:13:42Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -576,6 +647,13 @@
           "body": "Ohh, is the idea that putting it in the end allows the receiver to figure out which format you've got, by seeing if there's trailing data? I figured, if we change the format, we'd do it a la RFC 8879 and allocate a new type. But whether there's appetite for that when we could just make the parser a little screwier with an extension, I dunno.",
           "createdAt": "2023-09-02T16:17:09Z",
           "updatedAt": "2023-09-02T16:17:21Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Still an issue in TLS, but no longer a blocker for this work.",
+          "createdAt": "2025-06-21T14:13:42Z",
+          "updatedAt": "2025-06-21T14:13:42Z"
         }
       ]
     },
@@ -652,7 +730,7 @@
       "labels": [],
       "body": "We do leave the exact RP <-> TS protocol out of scope, so that it can slot into existing RP update protocols, but it's probably worth calling out a couple things here:\r\n\r\n- The RP doesn't contact the TS on each TLS connection, only periodically and out-of-band\r\n- There's no reason for the RP to tell the TS anything about TLS connections. The RP just says \"give me the latest thing\" and the TS passes it along\r\n\r\nSo the only information passed along is \"I exist\", same as any other periodic update protocol.",
       "createdAt": "2023-04-06T00:10:20Z",
-      "updatedAt": "2023-04-06T04:59:54Z",
+      "updatedAt": "2025-06-21T14:14:41Z",
       "closedAt": null,
       "comments": [
         {
@@ -661,6 +739,13 @@
           "body": "It's more than I exist: it's I'm online.",
           "createdAt": "2023-04-06T04:59:54Z",
           "updatedAt": "2023-04-06T04:59:54Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: TS is now the application-specific update process that's not really covered here, but might still be worth some text here.",
+          "createdAt": "2025-06-21T14:14:41Z",
+          "updatedAt": "2025-06-21T14:14:41Z"
         }
       ]
     },
@@ -676,7 +761,7 @@
       "labels": [],
       "body": "When a CA issues an assertion, it could provide evidence for it. For instance, a (list of) serialised dnssec proof(s) for a ACME dns-01 challenge or CAA record, if that was used. Most validations are http-01 for which no proof can be produced, except perhaps a signature of an independent multi-path DCV service, if that becomes a thing. Is evidence of assertions in scope? I suppose not for an initial version.",
       "createdAt": "2023-04-06T13:53:29Z",
-      "updatedAt": "2025-01-23T13:45:05Z",
+      "updatedAt": "2025-06-21T14:16:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -685,6 +770,13 @@
           "body": "Another application is in the initial testing phase, where some MTCAs might want to back a MTCert with an X509 cert.\n\nA basic generic type is simple enough.\n\n```\nenum {\n dnssec(0),\n x509(1),\n (2^16-1)\n} EvidenceType\n\nstruct {\n    EvidenceType evidence_type;\n    opaque evidence_info<0..2^24-1>; // or 2^16-1?\n} Evidence;\n```\n\nFor `x509`,  `evidence_info` could be a CT `X509ChainEntry`.\n\n(Maybe *supplement* is better name than *evidence*, but let's not mince words just yet.)\n\nThe question is where to put it. We'd want to have it available to transparency services, but not serve it in the certificate.\n\n1. Add a `Evidence evidence<0..2^24-1>` to AbridgedAssertion and `opaque evidence_hash[hash.length]` to Assertion. We should rename `AbridgedAssertion` then, as it's not merely an abridged version of an `Assertion`.\n2. If we only intend this for initial testing, we can add an `opaque X509ChainEntry<0..2^64-1>` in a `shadow_assertions` file next to `abrdged-assertions`.\n3. A mix is a separate `evidence` file, and `evidence_hash` in (abridged)assertion.",
           "createdAt": "2025-01-23T13:45:04Z",
           "updatedAt": "2025-01-23T13:45:04Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: lots of things have changed, the general problem space still applies. Dunno if we specifically want it in this doc. (Initial testing phase is probably transitory enough to not need to be in this spec.)",
+          "createdAt": "2025-06-21T14:16:26Z",
+          "updatedAt": "2025-06-21T14:16:26Z"
         }
       ]
     },
@@ -693,15 +785,15 @@
       "id": "I_kwDOJIBkVc5iy14i",
       "title": "TA negotiation useful for draft-kampanakis-tls-scas / draft-jackson-tls-cert-abridge",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/24",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The trust anchor negotiation, and the to-be-written mechanism of provisioning TLS servers with opaque TA->proof blobs, we propose would be useful for [draft-kampanakis-tls-scas](https://datatracker.ietf.org/doc/draft-kampanakis-tls-scas-latest/) as well. We could allocate a `chainless-x509-cert` trust anchor type, whose identifiers would be something akin `ccadb-20230406`, with as proof a X509 certificate whose intermediates are included in ccadb at that date. The ACME client could check CCADB for the intermediates, and if they're included, the chainless trust anchor.",
       "createdAt": "2023-04-06T14:06:28Z",
-      "updatedAt": "2023-06-05T12:43:25Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:17:12Z",
+      "closedAt": "2025-06-21T14:17:12Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -709,6 +801,13 @@
           "body": "Same for [draft-jack son-tls-cert-abridge](https://github.com/dennisjackson/draft-jackson-tls-cert-abridge).",
           "createdAt": "2023-06-05T12:43:25Z",
           "updatedAt": "2023-06-05T12:43:25Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: trust anchor negotiation got moved into its own spec, and application to such use cases are underway",
+          "createdAt": "2025-06-21T14:17:12Z",
+          "updatedAt": "2025-06-21T14:17:12Z"
         }
       ]
     },
@@ -717,15 +816,15 @@
       "id": "I_kwDOJIBkVc5jI0i6",
       "title": "Subscriber-level delegation",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/25",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "(Filing this mostly to capture vague thoughts. Yet another angle in this vast design space.)\r\n\r\nOver in #10 (CC @bemasc), I asserted that we didn't need delegation in Merkle Tree certificates because they don't make sense when you assume an up-to-date RP anyway.\r\n\r\nTalking with folks at IETF, someone  (I forget who... was it you, @bwesterb?) brought up that a subscriber might want to do delegation. E.g. the CA checks you're authoritative `*.example.com`, but the subscriber wants to mint credentials on demand for `abcdef.example.com`.\r\n\r\nI think the way to think about that apparent contradiction is that _CA-level_ delegation doesn't make sense with up-to-date RPs, but _subscriber-level_ delegation can still make sense. That said, the tradeoffs for such delegation are harsher in a PQ world with large signatures. So I suspect this use case will be much less applicable in the future. But perhaps there are deployments where it's still worth the extra signature.\r\n\r\nSupposing that's the case and we want to support it, one answer is to go back to a generic chaining mechanism like X.509, but another answer is to separate the two, a la TLS delegated credentials. I kinda like the latter, actually. As an RP, we already think the two cases have very different requirements. Existing CA policies often distinguish cross-signs from technically-constrained CAs. If we want to capture that, one model would be basically TLS DCs, where we have a `tls_delegated_credential_signer` (or whatever) SubjectType and some place to inject the DC. Possibly amended to allow refining the name set in the DC, I dunno.",
       "createdAt": "2023-04-11T21:40:46Z",
-      "updatedAt": "2023-04-12T08:47:18Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:17:50Z",
+      "closedAt": "2025-06-21T14:17:50Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -733,6 +832,13 @@
           "body": "> I forget who... was it you, @bwesterb?\r\n\r\nIt might've been @galadran? Anyway, I do agree.",
           "createdAt": "2023-04-12T08:47:18Z",
           "updatedAt": "2023-04-12T08:47:18Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: X.509 is still quite deficient in this space, but we've tabled BikeshedCertificate for now.",
+          "createdAt": "2025-06-21T14:17:50Z",
+          "updatedAt": "2025-06-21T14:17:50Z"
         }
       ]
     },
@@ -748,7 +854,7 @@
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2023-05-10T12:30:17Z",
+      "updatedAt": "2025-06-21T14:18:16Z",
       "closedAt": null,
       "comments": [
         {
@@ -757,6 +863,13 @@
           "body": "I do not think we should cover all this in the draft, but it's a good exercise.\r\n\r\n1. **Bitflip in assertion** at CA. Say an assertion is published for `gnogle.com` instead of `google.com`. This should be counted as a misissuance, and detecting these is one of the reasons for CT. I'd say it's out of scope to decide what should happen next: that's a policy matter of the root programs/RPs.\r\n2. **Bitflip when computing authentication path** at CA. The subscriber will get a certificate that simply doesn't validate. The ACME client can check the certificate before installing it. This will be caught early on without lasting impact.\r\n3. **Bitflip when signing a Window** at CA. This one is trickier. On the one hand, when checking the signed window, the TS see that the batch tree heads do not match. They could simply ignore that particular window. However, the situation would be similar to when a CA tries to split the world view. I guess we will need to be tough on this one too. It's not impossible to avoid for the CA: before publishing the signed window, the CA should check whether it verifies to detect any bit flip.\r\n6. **Bitflip when serving assertions** at CA. This is related to the previous. A bit flip might make the CA serve the wrong assertion. I think we can be more lenient here. If the TS fetches the assertions a second time, it'll probably get the correct values and the window signature will validate.\r\n7. **Bitflip when serving a Window** at CA. If the bit flip is in the signature, we can be lenient. It's important that the signed message is explicit: if we would not have included the tree heads in the signed window, then we couldn't be lenient here. If the bit flip is in one of the tree head, we can also be lenient: the signature will not validate and thus we know it's not part of a split world view attack.\r\n\r\nThere must be more cases I'm missing here.",
           "createdAt": "2023-05-10T12:29:49Z",
           "updatedAt": "2023-05-10T12:30:17Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Leaving this open to track adding some text about how to recover from policy violations",
+          "createdAt": "2025-06-21T14:18:16Z",
+          "updatedAt": "2025-06-21T14:18:16Z"
         }
       ]
     },
@@ -803,15 +916,15 @@
       "id": "I_kwDOJIBkVc5npZ-_",
       "title": "Should the signing payload include 64 spaces in front?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/30",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Feedback from Ilari Liusvaara on the list:\r\n\r\n> - I think LabeledWindow should add 64 spaces in front, so it\r\n>  reuses the TLS 1.3 signature format.\r\n>\r\n>  This reduces risks of cross-protocol attack if the key gets\r\n>  reused anyway (despite there being MUST NOT requirement).\r\n\r\nI'm slightly torn on this, though I don't feel very strongly either way. (Past Davids have gone both directions on this.)\r\n\r\nOn one hand, it costs very little and reduces cross-protocol attacks with TLS 1.2 if you reuse keys. Even though we explicitly told you not to reuse those keys.\r\n\r\nOn the other hand, it only reduces attacks with TLS 1.2, and this key was already explicitly not meant to be a TLS key. Where do such things end? Should every new protocol forever guard against potential reuse with TLS 1.2, even when it (like this one) was not designed to be used with TLS? Should we guard against reuse with other protocols too? Context string constructions aren't standard (hash-to-curve does a suffix instead of a prefix), so the real defense is key separation. Maybe we should _finally_ just get better at key separation.",
       "createdAt": "2023-06-02T22:39:26Z",
-      "updatedAt": "2023-06-05T10:16:05Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:19:31Z",
+      "closedAt": "2025-06-21T14:19:31Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -819,6 +932,13 @@
           "body": "I think it's good practice to add some context, which we already do, so that we can use the Merkle CA's key to sign other things besides the window. This also helps against accidental cross-protocol attacks. (Unfortunately we all haven't agreed on the standard way to do this. It'd be nice if every signature scheme would have a context string as input, but that's a separate discussion.)\r\n\r\nI don't think it's worthwhile to add the 64 spaces in front, if we mandate separate keys. We wouldn't just have to deal with TLS, but every other protocol where the same key can be used as well.",
           "createdAt": "2023-06-05T10:16:05Z",
           "updatedAt": "2023-06-05T10:16:05Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: I... guess this actually does still apply because we have a signature construction. Though yeah I also think we shouldn't bother with the 64 spaces. There is no legitimate reason to use the same key between TLS and a MTC CA.",
+          "createdAt": "2025-06-21T14:19:31Z",
+          "updatedAt": "2025-06-21T14:19:31Z"
         }
       ]
     },
@@ -827,15 +947,15 @@
       "id": "I_kwDOJIBkVc5npdLL",
       "title": "Canonicalize claim structures further and think about multiplicity",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/31",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Feedback from Ilari Liusvaara on the list:\r\n\r\n>  I don't see rule for how claims are sorted within each type,\r\n>  only how different types are sorted.\r\n\r\nand:\r\n\r\n> - If each claim was in its own Claim, then one could maybe even\r\n>  shorten [the length prefix] to 8 bits. Similarly, one could merge ipv4/ipv6 and\r\n>  dns/dns_wildcard.\r\n>\r\n>  This could also simplify sorting: Sort by type, lexicographic\r\n>  sort by claim contents.\r\n\r\nMoving the multiplicity up a layer avoids every ClaimType defining it itself, and reuses some length prefixes given how the TLS presentation language works, though it means a non-multiplicative Claim would need extra logic to reject duplicates. Is that a problem?\r\n\r\nOne way or another, I am a fan of canonicalizing the order more strongly, just for the sake of having only one way to encode it. Though how we canonicalize may be interesting... if DNS names are pre-sorted in hierarchical order, evaluating name constraints efficiently becomes a lot easier.",
       "createdAt": "2023-06-02T22:56:08Z",
-      "updatedAt": "2023-06-28T12:34:50Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:19:59Z",
+      "closedAt": "2025-06-21T14:19:59Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -843,6 +963,13 @@
           "body": "I agree, let's make sure there is one canonical presentation.\r\n\r\nTwo other points.\r\n\r\nI. `-00` reads:\r\n> Each Claim structure in an Assertion's claims field MUST have a unique `claim_type`\r\n\r\n<del>That can be read as that each Assertion can have at most one claim of a given type.</del>\r\n\r\n<ins>Update:</ins> ... which is exactly the point; I didn't read carefully and misunderstood where the multiplicity happens. I like where the multiplicity happens now.\r\n\r\nII. What about non-canonical assertions? `-00` reads:\r\n\r\n> Structures violating this constraint MUST be rejected.\r\n\r\nWe should be more specific. If a CA published a non-canonical assertion, a TS should reject the whole batch. The reason is, that it's not unlikely that relying parties' implementation will not properly check for canonicity.\r\n",
           "createdAt": "2023-06-14T11:59:08Z",
           "updatedAt": "2023-06-28T12:34:50Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: X.509 is itself completely deficient here but we've tabled BikeshedCertificate for now.",
+          "createdAt": "2025-06-21T14:19:59Z",
+          "updatedAt": "2025-06-21T14:19:59Z"
         }
       ]
     },
@@ -869,32 +996,48 @@
       "id": "I_kwDOJIBkVc5nzu6G",
       "title": "Should claims include ports?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/35",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> [[TODO: For now, the claims below just transcribe the X.509 GeneralName structure. Should these be origins instead? For HTTPS, it's a pity to not capture the scheme and port. We do mandate ALPN in {{tls-certificate-type}}, so cross-protocol attacks are mitigated, but it's unfortunate that subscribers cannot properly separate their HTTPS vs FTPS keys, or their port 443 vs port 444 keys. One option here is to have HTTPS claims instead, and then other protocols can have FTPS claims, etc.]]",
       "createdAt": "2023-06-05T11:55:14Z",
-      "updatedAt": "2023-06-05T11:55:24Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:20:36Z",
+      "closedAt": "2025-06-21T14:20:36Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: X.509 is totally deficient in this regard, but we've tabled BikedCertificate for now",
+          "createdAt": "2025-06-21T14:20:36Z",
+          "updatedAt": "2025-06-21T14:20:36Z"
+        }
+      ]
     },
     {
       "number": 36,
       "id": "I_kwDOJIBkVc5nzvXU",
       "title": "Multiple signing keys?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/36",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> [[TODO: The signing key case is interesting. A CA could actually maintain a single stream of Merkle Trees, but then sign everything with multiple keys to support rotation. The CA -> Subscriber -> RP flow does not depend on the signature, only the CA -> Transparency Service -> RP flow. The document is not currently arranged to capture this, but it probably should be. We probably need to decouple the signing half and the Merkle Tree half slightly.]]",
       "createdAt": "2023-06-05T11:56:36Z",
-      "updatedAt": "2023-06-05T11:56:36Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:20:54Z",
+      "closedAt": "2025-06-21T14:20:53Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Actually, we added this as part of Photosynthesis after all.",
+          "createdAt": "2025-06-21T14:20:54Z",
+          "updatedAt": "2025-06-21T14:20:54Z"
+        }
+      ]
     },
     {
       "number": 37,
@@ -908,7 +1051,7 @@
       "labels": [],
       "body": "> [[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest window and skip the intervening batches? The intervening batches are guaranteed to have been expired]] ",
       "createdAt": "2023-06-05T11:58:59Z",
-      "updatedAt": "2023-06-05T14:15:27Z",
+      "updatedAt": "2025-06-21T14:22:16Z",
       "closedAt": null,
       "comments": [
         {
@@ -917,6 +1060,13 @@
           "body": "I suspect the is the same as #2, or at least can be. Unless we want to have both a storage window and allow gaps within the storage window, but that's probably a bit much.\r\n\r\nIf we say the mirrors can't have gaps, then this equivalent to saying that if you fail to update for a whole storage window, you can just start from scratch and only catch up to whatever range you're expected to maintain in the steady state. Basically as if you were starting over as a new mirror.",
           "createdAt": "2023-06-05T14:15:26Z",
           "updatedAt": "2023-06-05T14:15:26Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: details of the mirror is (for now) moved from this draft into the tlog ecosystem. Leaving this open just because https://github.com/davidben/C2SP/blob/tlog-mirror/tlog-mirror.md doesn't _quite yet_ support this. But once the tlog-mirror branch is merged with https://github.com/C2SP/C2SP/pull/138, I think we'll have all the pieces to do this.",
+          "createdAt": "2025-06-21T14:22:16Z",
+          "updatedAt": "2025-06-21T14:22:16Z"
         }
       ]
     },
@@ -925,15 +1075,15 @@
       "id": "I_kwDOJIBkVc5nzyT8",
       "title": "Should TLSSubjectInfo have an extension list?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/38",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-06-05T12:02:28Z",
-      "updatedAt": "2023-06-15T11:05:58Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:05:51Z",
+      "closedAt": "2025-06-21T14:05:51Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -955,6 +1105,13 @@
           "body": "> The one (very, very speculative) use case I keep tossing around my head is a downgrade protection scheme.\r\n\r\nThat's a very good idea. I think we should include that by default. #54 \r\n\r\n",
           "createdAt": "2023-06-15T11:05:58Z",
           "updatedAt": "2023-06-15T11:05:58Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis; we ended up doing an X.509-based spelling with all the horrors that entails.",
+          "createdAt": "2025-06-21T14:05:51Z",
+          "updatedAt": "2025-06-21T14:05:51Z"
         }
       ]
     },
@@ -963,16 +1120,24 @@
       "id": "I_kwDOJIBkVc5nzy8R",
       "title": "Include new post-quantum TLS signature schemes",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/39",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> [[TODO: If other schemes get defined before this document is done, add them here. After that, it's on the other schemes to do it.]]",
       "createdAt": "2023-06-05T12:03:40Z",
-      "updatedAt": "2023-06-05T12:03:40Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:22:54Z",
+      "closedAt": "2025-06-21T14:22:54Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Moot / out of scope now that we've tabled BikeshedCertificate for now",
+          "createdAt": "2025-06-21T14:22:54Z",
+          "updatedAt": "2025-06-21T14:22:54Z"
+        }
+      ]
     },
     {
       "number": 40,
@@ -1010,7 +1175,7 @@
       "labels": [],
       "body": "> [[TODO: Is it worth defining an API for Merkle Tree CAs to publish a revocation list? That would allow automatically populating CRLite and CRLSets. Maybe that's a separate document.]] ",
       "createdAt": "2023-06-05T12:08:06Z",
-      "updatedAt": "2024-07-26T14:53:46Z",
+      "updatedAt": "2025-06-21T14:23:41Z",
       "closedAt": null,
       "comments": [
         {
@@ -1068,6 +1233,13 @@
           "body": "Encoding the full list of 512,652 Let's Encrypt revocations (out of 382,584,264 ) requires 1.14MB using CRLite. With Rice coding it requires 707.3kB. Using Huffman codes for the bitlength, it's 706.5kB. The information theoretic lower bound is 703.9kB.",
           "createdAt": "2024-07-26T14:53:45Z",
           "updatedAt": "2024-07-26T14:53:45Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: I suspect there's not a whole lot to do here, but probably applies equally to both formulations, so leaving open for now",
+          "createdAt": "2025-06-21T14:23:32Z",
+          "updatedAt": "2025-06-21T14:23:41Z"
         }
       ]
     },
@@ -1083,24 +1255,32 @@
       "labels": [],
       "body": "",
       "createdAt": "2023-06-05T12:08:24Z",
-      "updatedAt": "2023-06-05T12:08:24Z",
+      "updatedAt": "2025-06-21T14:24:01Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: IANA considerations still has a big TODO on it, so leaving open.",
+          "createdAt": "2025-06-21T14:24:01Z",
+          "updatedAt": "2025-06-21T14:24:01Z"
+        }
+      ]
     },
     {
       "number": 45,
       "id": "I_kwDOJIBkVc5n_bNf",
       "title": "Is it worthwhile to reduce reliance on collision resistance from our hash?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/45",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "There has always been a significant gap between (chosen prefix) collision and (second) preimage attacks on hashes. It would be neat if we do not have to assume (chosen prefix) collision resistance of our hash to prevent certain classes of attacks. I'd say it's a nice-to-have, but not a must.\r\n\r\nIncomplete list of changes:\r\n\r\n1. For each batch, the CA generates a 16 byte randomizer `R` which is used as input to `Hash`{`Assertion`,`Node`,`Empty`}. We can either put the randomizer in the proof (in the bikeshed certificate) or pass it along in the signed window.",
       "createdAt": "2023-06-06T22:04:02Z",
-      "updatedAt": "2023-06-09T12:59:25Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:24:52Z",
+      "closedAt": "2025-06-21T14:24:52Z",
       "comments": [
         {
           "author": "davidben",
@@ -1115,6 +1295,13 @@
           "body": "Yes, you're right: even with the CA-provided randomiser, we would still rely on *collision resistance* to prevent the CA from providing two world views. Indeed, if we'd truncate hashes to 16 bytes, then with 2^64 work, a CA could find two different batches with the same root hash.\r\n\r\nI guess we couldn't get rid of that without significant modifications (see #48). Still I think it might be worthwhile to reduce reliance of collision resistance.",
           "createdAt": "2023-06-09T12:59:25Z",
           "updatedAt": "2023-06-09T12:59:25Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: eh, I guess we've decided to just import a CT/tlog-style tree structure. Probably can close this.",
+          "createdAt": "2025-06-21T14:24:52Z",
+          "updatedAt": "2025-06-21T14:24:52Z"
         }
       ]
     },
@@ -1130,9 +1317,17 @@
       "labels": [],
       "body": "We might be able to get away with 16 byte hashes, by complicating the design significantly. I do not think that this  is worthwhile for the first version, but I'll write the thoughts down in this issue for future reference.\r\n\r\nIf we truncate hashes to 16 bytes, then a CA (even with the CA chosen randomiser #45) can find two different batches with the same root in 2^64 work. This allows the CA to issue certificates for assertions that escape transparency.\r\n\r\nWe can prevent this, if the CA does not control the randomiser, and only learns it after having committed to the batch.\r\n\r\nThis can be done as follows. We have two CAs. The seconds mirrors the first with an offset, so batch `n` in the first is mirrored in batch `n+offset` of the second. The first uses 32 byte hashes, and the second truncates to 16 bytes. The second uses as randomiser, public randomness that's not known before say `n+grace` where `0 < grace \u2264 offset`. For this a post-quantum version of [drand](https://drand.love) could do.\r\n\r\nBefore a TS would trust the truncated mirror, it must:\r\n\r\n1. Fetch the `n`th batch from the original before `n+grace`. This is essential, because if the first CA can delay publication of the batch until `n+grace`, it can cheat in collusion with the mirror.\r\n2. Check whether assertions of the mirror matches the original.\r\n3. Compute the root of the mirror with the correct public randomness.\r\n\r\nThe mirror could be run by a TS.\r\n\r\nThis proposal will be much harder to run, as CAs wouldn't be allowed to issue batches late, and monitors need to watch closely for late issuance.",
       "createdAt": "2023-06-09T12:59:04Z",
-      "updatedAt": "2023-06-14T11:36:56Z",
+      "updatedAt": "2025-06-21T14:27:55Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Hmm. I guess, like #45, this is much less likely to happen now that we're getting our tree structure from elsewhere. I dunno, being able to halve the hashes would have been quite nice, but it does seem to be have been kind of a pain, even in the pre-Photosynthesis picture. :-/\n\nI think we can probably close this? I dunno, thoughts?",
+          "createdAt": "2025-06-21T14:27:55Z",
+          "updatedAt": "2025-06-21T14:27:55Z"
+        }
+      ]
     },
     {
       "number": 53,
@@ -1146,24 +1341,32 @@
       "labels": [],
       "body": "Where should we add some [GREASE](https://datatracker.ietf.org/doc/rfc8701/)?\r\n\r\n1. We should clearly GREASE `proof_type` so that TA negotiation does not ossify.\r\n2. SubjectType is not negotiated separately, so no GREASE is required, cf #7 \r\n3. RPs must ignore unknown claims in an assertion, so it seems to be a good candidate for grease. However, do we really have flexibility in claims to begin with? For instance, suppose we do not support IP ranges (#9) in the first version, but add it later on. How would the server know it can send an assertion with a range?\r\n4. If we add extensions to TLSSubjectInfo #38, we should GREASE them. \r\n",
       "createdAt": "2023-06-14T13:29:45Z",
-      "updatedAt": "2023-06-14T13:29:45Z",
+      "updatedAt": "2025-06-21T14:28:34Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: most of the above is moot now, though I guess one candidate for GREASE is to stick in dummy cosignatures and make sure RPs tolerate it.",
+          "createdAt": "2025-06-21T14:28:34Z",
+          "updatedAt": "2025-06-21T14:28:34Z"
+        }
+      ]
     },
     {
       "number": 54,
       "id": "I_kwDOJIBkVc5o0dEM",
       "title": "Weak TLS handshake signature downgrade protection for PQ migration",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/54",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "TLS 1.3 has broken key exchange downgrade protection: if client and server both support (but not prefer) a broken curve, then they will still safely negotiate the preferred curve. (This does assume the other primitives, notably the handshake signature, are not broken.) This is [not the case for TLS 1.2](https://ieeexplore.ieee.org/document/8406612).\r\n\r\nTLS 1.3 doesn't have such downgrade protection for its handshake signature schemes: a MitM can always downgrade to a broken handshake signature scheme that both client and server support.\r\n\r\nFor the migration to post-quantum cryptography, it's desirable to also be able to support broken handshake signature schemes (for lagging clients), while still having downgrade protection. MTC offers an opportunity to fix this (with the big caveat that the plain X.509+CT fallback still allows the downgrade attack.)\r\n\r\nIn #38 David proposes to add a non-critical extension to TLSSubjectInfo with a weak signature scheme, that signals (which?) stronger signature schemes are supported. A client which signalled to prefer those, but didn't get them served by the server (because of a MitM) can then abort. This works, because the authentication of assertions in MTC is post-quantum secure. (Well, actually only if the MTC CA signing keys is post-quantum.)\r\n\r\nI think we should include support for this out of the box.\r\n\r\nPerhaps simply adding\r\n\r\n```\r\n    SignatureScheme other<0..2^8-1>;\r\n```\r\n\r\nto TLSSubjectInfo.",
       "createdAt": "2023-06-15T11:04:19Z",
-      "updatedAt": "2023-06-21T15:44:12Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:30:34Z",
+      "closedAt": "2025-06-21T14:30:34Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -1199,6 +1402,13 @@
           "body": "> How does the client authenticate the batches it receives?\r\n\r\nFor the case of a browser, we assume a secure update mechanism that we leave out of scope. (Browser vendor's update servers could use pinned public keys overriding MTC.)  There still is a transparency issue though: how do we detect misbehaving browser vendors #58.\r\n",
           "createdAt": "2023-06-21T15:44:05Z",
           "updatedAt": "2023-06-21T15:44:12Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: I think this is, if not moot, orthogonal to MTCs now that we're just importing X.509. Though we could, separately, go define the \"other keys\" extension if that's the path PQC ends up taking.",
+          "createdAt": "2025-06-21T14:30:34Z",
+          "updatedAt": "2025-06-21T14:30:34Z"
         }
       ]
     },
@@ -1216,24 +1426,32 @@
       "labels": [],
       "body": "Cover:\r\n\r\n- Hash contextualisation, cf #32 \r\n- Where collision resistance is really used #45 ",
       "createdAt": "2023-06-19T22:08:55Z",
-      "updatedAt": "2023-06-19T22:08:55Z",
+      "updatedAt": "2025-06-21T14:32:49Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: security considerations mentions depending on collision-resistance. Is there more stuff we should do here with a CT-like tree?",
+          "createdAt": "2025-06-21T14:32:49Z",
+          "updatedAt": "2025-06-21T14:32:49Z"
+        }
+      ]
     },
     {
       "number": 58,
       "id": "I_kwDOJIBkVc5pX_ty",
       "title": "Browser vendor transparency and relation with binary transparency",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/58",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "In the browser use case, the RP fully trusts the browser vendor, which could send forged roots.\r\n\r\nWe could have the browser vendor send the MTC CA signatures, but a nefarious browser could patch that out, if there is no binary transparency on the browser update mechanism.\r\n\r\nThere could be a more elegant transparency design.\r\n\r\nIs this in scope, or should we group this with binary transparency?",
       "createdAt": "2023-06-21T15:43:18Z",
-      "updatedAt": "2023-06-23T02:31:24Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:33:23Z",
+      "closedAt": "2025-06-21T14:33:23Z",
       "comments": [
         {
           "author": "davidben",
@@ -1241,6 +1459,13 @@
           "body": "I think this is probably out of scope. That's not to say it isn't a worthwhile problem to solve, just that I can't imagine solutions for this class of problem (binary transparency, etc.) that would interact with the MTC component. They seem truly orthogonal. Or did you have something in mind?",
           "createdAt": "2023-06-23T02:31:24Z",
           "updatedAt": "2023-06-23T02:31:24Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: think this is moot now?",
+          "createdAt": "2025-06-21T14:33:23Z",
+          "updatedAt": "2025-06-21T14:33:23Z"
         }
       ]
     },
@@ -1249,16 +1474,24 @@
       "id": "I_kwDOJIBkVc5qgPmu",
       "title": "Pinky promises",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/61",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Somewhat similar to Signed Certificate Timestamps (SCTs) in Certificate Transparency, an MTC CA could sign an assertion before it's published, promising to include it. Dissimilar to CT, we'd want to MTC CA to also commit to the index within the batch.\r\n\r\nThis doesn't require direct sequencing if we allow empty assertions within batches.  Indeed: the MTC CA could divvy out intervals of consecutive indicies within the coming batch to different signers. Those signers could assign assertions as required without hassle of synchronisation (until they run out).\r\n\r\nThese post-quantum promises would be relatively big using a general purpose post-quantum signature scheme. In the case of MTC, we could make them relatively small by using stateful hash-based signatures where the index of the final tree matches the index of the promised point of inclusion within the batch. Using a stateful hash-based signature with two levels of subtrees: one for the batches and one for the promises within the batch, we're looking at about a 1.3kB signature with n=16, w=256.\r\n\r\nThe hard problem is how to ensure these pinky promises are kept.",
       "createdAt": "2023-07-03T21:35:33Z",
-      "updatedAt": "2023-07-03T21:35:33Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:33:50Z",
+      "closedAt": "2025-06-21T14:33:50Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Think this is moot now. We have an integrated fast issuance flow.",
+          "createdAt": "2025-06-21T14:33:50Z",
+          "updatedAt": "2025-06-21T14:33:50Z"
+        }
+      ]
     },
     {
       "number": 65,
@@ -1368,7 +1601,7 @@
       "id": "I_kwDOJIBkVc5ziL2a",
       "title": "Double length prefix in Claim",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/75",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -1377,8 +1610,8 @@
       ],
       "body": "A Claim is defined as\r\n\r\n```\r\nstruct {\r\n    ClaimType claim_type;\r\n    opaque claim_info<0..2^16-1>;\r\n} Claim;\r\n```\r\n\r\nFor claim_type=`dns`, the `claim_info` is to be interpreted as a `DNSNameList`, which is defined as\r\n\r\n```\r\nopaque DNSName<1..255>;\r\n\r\nstruct {\r\n    DNSName dns_names<1..2^16-1>;\r\n} DNSNameList;\r\n```\r\n\r\nThus a DNS claim for `example.com` is:\r\n\r\n```\r\n0000 000f 000d 000b 6578616d706c652e636f6d\r\n```\r\n\r\nThe first uint16 is the type. The second is the length prefix for `claim_info`. The third is the length prefix for `dns_names`.\r\n\r\nWhen writing a parser it's clear that there is a superfluous prefix in the specification. It's not that easy to express leaving it out without adding new notation to the TLS presentation language. Perhaps it's fine to leave it like this.\r\n",
       "createdAt": "2023-10-11T17:37:02Z",
-      "updatedAt": "2023-10-13T10:33:56Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:34:28Z",
+      "closedAt": "2025-06-21T14:34:27Z",
       "comments": [
         {
           "author": "davidben",
@@ -1386,13 +1619,20 @@
           "body": "Yeah, the TLS presentation language tends to result in double prefixes like this. Not thrilled with it, but at least on the TLS side, folks seem to mostly just live with it.",
           "createdAt": "2023-10-11T17:51:39Z",
           "updatedAt": "2023-10-11T17:51:39Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Think this is moot now. I mean, X.509 is *even more* inefficient, but so it goes. Maybe we can revive BikeshedCertificate later.",
+          "createdAt": "2025-06-21T14:34:27Z",
+          "updatedAt": "2025-06-21T14:34:27Z"
         }
       ]
     },
     {
       "number": 76,
       "id": "I_kwDOJIBkVc5zo8QX",
-      "title": "AbridgedAssertion does not contain SignatureScheme",
+      "title": "subjectPublicKeyInfoHash hides the public key algorithm",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/76",
       "state": "OPEN",
       "author": "bwesterb",
@@ -1401,7 +1641,7 @@
       "labels": [],
       "body": "Is this an issue?\r\n\r\nWe could instead define AbridgedAssertion as\r\n\r\n```\r\nstruct {\r\n    SubjectType subject_type;\r\n    opaque abridged_subject_info<0..2^16-1>;\r\n    Claim claims<0..2^16-1>;\r\n} AbridgedAssertion;\r\n\r\nstruct {\r\n    SignatureScheme signature;\r\n    opaque public_key_hash[hash.length];\r\n} AbridgedTLSSubjectInfo\r\n```\r\n\r\nwhere obviously `abridged_subject_info` has to be `AbridgedTLSSubjectInfo` in case of subject_type=`tls`.",
       "createdAt": "2023-10-12T14:22:21Z",
-      "updatedAt": "2023-10-12T14:28:28Z",
+      "updatedAt": "2025-06-21T14:36:35Z",
       "closedAt": null,
       "comments": [
         {
@@ -1410,6 +1650,13 @@
           "body": "I guess the tradeoff is we avoid redacting things we don't need, but now the verification process needs to know about TLS.\r\n\r\nI don't think redacting it is a *problem* per se, though I also don't know how much weight to put on this separation. My intuition is the separation is useful but dunno how it'll shake out.",
           "createdAt": "2023-10-12T14:28:28Z",
           "updatedAt": "2023-10-12T14:28:28Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: Actually this is still a design question with Photosynthesis, whether we hash the whole SPKI or just the SPK part. The SubjectType opacity design consideration is now gone though.\n\nI dunno, SPKI hashes are used in other systems and I dunno how much I care about revealing the key type, but also it's pretty cheap to if people care. \ud83e\udd37  Will just leave this open.",
+          "createdAt": "2025-06-21T14:36:12Z",
+          "updatedAt": "2025-06-21T14:36:12Z"
         }
       ]
     },
@@ -1418,15 +1665,15 @@
       "id": "I_kwDOJIBkVc5z__0d",
       "title": "Hash is constrained by TrustAnchor and ProofType",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/79",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Recall\r\n\r\n```\r\nstruct {\r\n    opaque issuer_id<1..32>;\r\n    uint32 batch_number;\r\n} MerkleTreeTrustAnchor;\r\n\r\nstruct {\r\n    TrustAnchor trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} Proof;\r\n```\r\nOne of the Merkle tree CA parameters is `hash`, which is implied by the TrustAnchor. But the hash is also implied by the ProofType:\r\n\r\n```\r\nenum { merkle_tree_sha256(0), (2^16-1) } ProofType;\r\n\r\nstruct {\r\n    ProofType proof_type;\r\n    opaque trust_anchor_data<0..2^8-1>;\r\n} TrustAnchor;\r\n```\r\n\r\n(As an aside: `TrustAnchorType` would be a reasonable alternate name for `ProofType`.)\r\n\r\nI do not see the advantage of fixing the hash with the ProofType. We do write:\r\n\r\n```\r\nopaque HashValueSHA256[32];\r\n\r\nstruct {\r\n    uint64 index;\r\n    HashValueSHA256 path<0..2^16-1>;\r\n} MerkleTreeProofSHA256;\r\n```\r\n\r\nBut we could have just as well have written\r\n\r\n```\r\nopaque HashValue[hash.len];\r\n\r\nstruct {\r\n    uint64 index;\r\n    HashValue path<0..2^16-1>;\r\n} MerkleTreeProof;\r\n```\r\n\r\nNote that we do not need to include the hash in the ProofType for negotiation. Indeed: the RP trusts certain anchors whose hashes are fixed \u2014 there is no situation where the subscriber would send a proof from a trusted anchor whose hash is not supported.",
       "createdAt": "2023-10-16T21:47:08Z",
-      "updatedAt": "2024-07-26T06:46:00Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:37:32Z",
+      "closedAt": "2025-06-21T14:37:32Z",
       "comments": [
         {
           "author": "davidben",
@@ -1455,6 +1702,13 @@
           "body": "I'm starting to suspect ProofType will be gone after I've finished up #80, but we'll see. We can still have it if we really want, but with TrustAnchors replaced with undecorated OIDs, there won't be a natural excuse to wire it in.",
           "createdAt": "2024-07-26T06:45:59Z",
           "updatedAt": "2024-07-26T06:45:59Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: ProofType was already gone after #80, and I think we've now thoroughly settled on the hash being implicit from the log ID, so I think we can close this. (Also, come on, the hash is always SHA-256.)",
+          "createdAt": "2025-06-21T14:37:32Z",
+          "updatedAt": "2025-06-21T14:37:32Z"
         }
       ]
     },
@@ -1587,15 +1841,15 @@
       "id": "I_kwDOJIBkVc5_eXYW",
       "title": "Make the hashes in a batch depend on the previous batch, to make split worldviews persist",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/84",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "If an MTC CA and TS conspire, the CA could have a different list of assertions for the same batch, which the TS can pass to a specific client. Assuming the client checks the validity window signature and consistency of previously seen roots, the CA will  also have to sign a dozen of extra validity windows for the lifetime of that batch, and the TS has to make sure the client gets those too.\r\n\r\nThere is a chance this deception gets uncovered: if the client checks the authentication path of an assertion in the honest batch, they'll get the wrong root.\r\n\r\nIt would be better if this deception would break all future honest assertions from the CA. This can be done as follows.\r\n\r\nFor each batch, the CA publishes (in say the validity window) a random 32 byte **randomiser**.\r\nFor each batch, we define the **key** as H( randomiser || root-of-previous-batch ).\r\nIn computing the Merkle tree, we include the key of the batch in every hash.\r\nIn the Merkle Tree proof, we include the key of the batch.\r\n\r\n(The randomiser isn't required for the issue at hand, but is motivated by #57 to reduce the security assumptions on the hash.)\r\n\r\nCame up in conversation with @dennisjackson.\r\n",
       "createdAt": "2024-02-16T13:49:34Z",
-      "updatedAt": "2024-02-17T19:19:43Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:37:51Z",
+      "closedAt": "2025-06-21T14:37:51Z",
       "comments": [
         {
           "author": "davidben",
@@ -1610,6 +1864,13 @@
           "body": "> I thought, in other discussions, you thought it was a _good_ thing that the system was a bit less fragile when it came to bit flips because only that one batch gets burned? \ud83d\ude1b\r\n\r\nGood portion of the bit flips can't be ignored anyway. The [PoC](https://github.com/bwesterb/mtc) computed each new batch twice and only proceeds if they match, so I'm not too worried about bit flips.\r\n \r\n>  Given the TS is expected to be the software vendor's _update service_, that seems broadly fine here.\r\n\r\nYes, I agree it's not that much of a big deal.\r\n\r\n> If I'm understanding the proposal correctly, the proposal is just to chain all the trees together. And then, to validate this, we rely on per-client state to validate that all their updates chain together?\r\n\r\nWhat I imagined is that the TS just passes the signed validity window to the client, and the client only checks that. I incorrectly thought that would be enough to break all future authentication paths for a split world view: the client will only notice if it gets an honest authentication path from the corrupted batch or the one afterwards. Oops! Off the cuff: we can get the intended behaviour by not hashing in just the previous root, but `H( previous root || H( second-to-previous root || H (third-to-previous root || ...)...)` and including  `H( first root not in window || H(second root not in window || ... ` in the signed validity window. \r\n\r\n> But that means that clients, and indeed every log mirror, cannot safely skip a batch, or they turn off this check.\r\n\r\nIf the client skips a batch, then the job of the attacker is only marginally easier: still they have to prevent the client from seeing any honest valid authentication path in the window the client did see. So I don't think it's required for clients to keep track of every batch.\r\n\r\n> If you're offline for a while and then wake up, you won't be satisfied with a static push.\r\n\r\nRequiring clients to trace back the whole history, is of course, not practical, and I don't think we need to.\r\n\r\n \r\n> Whether _that's_ worth it, I'm not sure.\r\n\r\nDefinitely not.\r\n\r\n",
           "createdAt": "2024-02-17T19:19:42Z",
           "updatedAt": "2024-02-17T19:19:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: it's now one big tree so we can close this.",
+          "createdAt": "2025-06-21T14:37:51Z",
+          "updatedAt": "2025-06-21T14:37:51Z"
         }
       ]
     },
@@ -1649,16 +1910,24 @@
       "labels": [],
       "body": "The tls-server-end-point channel binding is ridiculous. You actually have to break apart the X.509 signature algorithm to compute it:\r\nhttps://www.rfc-editor.org/rfc/rfc5929.html#section-4.1\r\n\r\nThere's an obvious hash from the choice of hash in MTCs, but we don't want the subscriber to have to break apart the ProofType. Thus I suggest that the hash for BikeshedCertificate is SHA-256. SHA-256 is _fine_. If we really want to cycle that hash, define a new channel binding. I started sketching out a CertificatePropertyList design, but doing that is a waste of time.\r\n\r\nThere's also a domain separation problem. The hash should have included the certificate type... we could patch this if we want, relying on X.509 certificates always starting with 0x30.",
       "createdAt": "2024-07-26T05:56:51Z",
-      "updatedAt": "2024-07-26T05:57:00Z",
+      "updatedAt": "2025-06-21T14:41:08Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: I guess this actually still needs to be defined. The signatureAlgorithm no longer implies a hash. The log ID does, but it may be tricky for generic code to parse that out.\n\nSo I still would say \"it's SHA-256, please move on with life\". The bigger question is do we want to make the hash cover the whole Certificate or just the TBSCertificate. Malleability isn't a direct concern, but what is a concern is being able to punch out cosigners during negotiation. I could easily imagine APIs causing some issues here if code outside the TLS stack computes this.",
+          "createdAt": "2025-06-21T14:41:08Z",
+          "updatedAt": "2025-06-21T14:41:08Z"
+        }
+      ]
     },
     {
       "number": 88,
       "id": "I_kwDOJIBkVc6SPX42",
       "title": "Multi-proof certificates",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/88",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
@@ -1667,8 +1936,8 @@
       ],
       "body": "(Not a fully-baked idea, just exploring the design space a bit.)\r\n\r\nShould we support something like multi-proof certificates? The idea would be that the certificate looks something like:\r\n\r\n```\r\nstruct {\r\n    TrustAnchorIdentifier trust_anchor;\r\n    opaque proof_data<0..2^16-1>;\r\n} Proof;\r\n\r\nstruct {\r\n    Assertion assertion;\r\n    Proof proofs<0..2^16>;\r\n} Certificate;\r\n```\r\n\r\nThen pair with something like https://github.com/davidben/tls-trust-expressions/issues/54 so that the server has a bunch of proofs available and the client can ask for some subset of them.\r\n\r\nThings we could model this way:\r\n* Signature-like proofs where you expect multiple independent entities to attest to it\r\n* Something X.509 + CT-like where you have one signature from a domain validating entity and some signatures from logging entities\r\n* MTCs with optional signatures over the tree head when the client isn't up-to-date\r\n\r\nThis also enables somewhat more compact representations on the subscriber. The assertion will contain a big PQ key and this way you just need the one blob in memory. Or if different clients' requests overlap, you only need to keep one copy of each individual component around.\r\n\r\nOne subtlety: if one proof depends on another proof, this structure flattens it and loses the information. That would need to be sufficiently encoded into the trust anchor identifiers and/or different credentials that you get a good combination.",
       "createdAt": "2024-08-07T13:34:42Z",
-      "updatedAt": "2024-08-11T17:58:43Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:42:10Z",
+      "closedAt": "2025-06-21T14:42:10Z",
       "comments": [
         {
           "author": "davidben",
@@ -1704,6 +1973,13 @@
           "body": "For a design like that, I think that's where ACME servers and CAs and whatnot come in. Their role is already to keep up with client requirements and get servers the thing they need.\r\n\r\nTLS servers fetching things on demand is an interesting idea but seems much harder to get to from where we are. Servers, quite reasonably, have a lot of reasons to not want to be directed to connect to arbitrary other servers.",
           "createdAt": "2024-08-11T17:58:42Z",
           "updatedAt": "2024-08-11T17:58:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: I feel so sad closing this because the possibility of this was one of the things I was most excited about with BikeshedCertificate. We _kind of_ did this with cosigners but they all are joined at the hip with a shared inclusion proof. Ah well.",
+          "createdAt": "2025-06-21T14:42:10Z",
+          "updatedAt": "2025-06-21T14:42:10Z"
         }
       ]
     },
@@ -1719,7 +1995,7 @@
       "labels": [],
       "body": "# Summary of MTC Fallback Estimates\r\nWe aim to estimate the probability of triggering the fallback to another PKI mechanism when Merkle Tree Certificates are deployed widely. We estimate the fallback probabilities from the server side by monitoring historic certificate data, checking for incorrect configurations and potential attacks that risk the client becoming out of sync.\r\n\r\n## Estimation Method\r\n\r\nWe queried all certificates since 2022-1-1 from 75 of the top 100 domains on [Radar](https://radar.cloudflare.com/domains). We will call them _top domains_. \r\nIn addition, we have queried certificates since 2022-1-1 for domains with a siphash ending in 0000. We call those domains _random domains_. Note that the statistics for those domains may have a large rate of false positives for the fallback estimations, as certificates for `random-domain.tld` are in the sample, but certificates for `www.random-domain.tld` are not. Therefore, our estimates are a rather loose upper bound, but we believe them to be useful nonetheless. \r\n\r\n## Fallback triggers\r\n\r\nWe have identified the following triggers for fallbacks so far: \r\n1. *New domains*: A new domain needs time to propagate its new tree heads. Visitors to the new domain immediately trigger the fallback mechanism until they have received the correct tree head. Since domains are not visited uniformly, a new domain may experience low traffic and therefore not trigger the fallback often. \r\n2. *Expired Certificates*: An expired certificate immediately triggers a fallback. Looking at historic data, this is the most likely fallback trigger, however, expiring certificates are a configuration problem that would be eliminated by the widespread use of MTC certificates. \r\n3. *Changes between Certification Authorities*: A change between CA authorities may indicate a movement of the domain. Looking at data where the CA did not change, we found that most renewals happen 14, 30 and 90 days before a certificate expires. Using this data, we distinguish between two cases by monitoring the _overlap_ between the certificates: \r\n    1. If the overlap is 14, 30 or 90 days (+-24 hours), we assume the change in CA is planned. \r\n    2. Otherwise, we assume the change is not planned and needs to happen immediately, e.g., due to an unplanned mitigation of the domain. This would trigger a fallback. 34% of switches of a CA would be in this edge case.  \r\n    3. Before assuming a fallback in case 3.2., we check if have another certificate for the same CA that overlaps the current certificate for >= 1s. If so, we assume again that the change was planned and we do not need the fallback. \r\n\r\n## Probability of Fallbacks \r\n\r\n| Fallback Trigger                          | Top Domains, relative | Top Domains, over 2.5 years |   Random Domains | Random Domains, over 2.5 years |\r\n| ----------------------------------------- | --------------------- | --------------------------- | ---------------- | ------------------------------ |\r\n| new domain (daily)\t                    | 0     %   | \t0     %| 0.07 %|  \t0.07 %|  \r\n| validity gaps * (over 2.5 years)  \t    | 0     %   | \t0.003 %| 0.01 %| \t3.03 %|\r\n| Irregular Domain Move (over 2.5 years)\t| 0.004 %   | \t1.1   %| 0.01 %| \t3.3  %|\r\n| Overall\t                                | 0.004 %   | \t1.1   %| 0.09 %| \t3.4  %|\r\n\r\n\r\nThe table above provides the absolute probability of triggering a fallback over 2.5 years and the relative probability, assuming it takes three days for the relying party synchronize with the correct tree heads. \r\n\r\nWe warmly welcome further possible fallback triggers. ",
       "createdAt": "2024-08-26T14:33:02Z",
-      "updatedAt": "2024-08-29T18:19:29Z",
+      "updatedAt": "2025-06-21T14:42:27Z",
       "closedAt": null,
       "comments": [
         {
@@ -1749,6 +2025,13 @@
           "body": "Ah, yes. Incorrectness actually doesn\u2019t matter for this analysis; you\u2019re right. It\u2019s a situation where having _some_ other certificate would be helpful if it were able to be negotiated but not actually useful when measuring expected MTC fallback behavior. \r\n\r\nRe: client staleness, we looked at whether this could be inferred from existing metrics but I don\u2019t think we have a great way to measure this directly today. We could likely add the relevant metrics in a A/B test but that would have to wait for prototyping and experimental rollout to gather. \r\n",
           "createdAt": "2024-08-29T14:30:14Z",
           "updatedAt": "2024-08-29T14:30:14Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: fallback estimates still relevant",
+          "createdAt": "2025-06-21T14:42:27Z",
+          "updatedAt": "2025-06-21T14:42:27Z"
         }
       ]
     },
@@ -1780,9 +2063,17 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-10-18T18:33:05Z",
-      "updatedAt": "2024-10-18T18:33:05Z",
+      "updatedAt": "2025-06-21T14:42:45Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: still applicable to new formulation",
+          "createdAt": "2025-06-21T14:42:45Z",
+          "updatedAt": "2025-06-21T14:42:45Z"
+        }
+      ]
     },
     {
       "number": 97,
@@ -1796,9 +2087,17 @@
       "labels": [],
       "body": "Operating systems often ship a list of trusted certificates in a well-known location. The [go source code](https://go.dev/src/crypto/x509/root_linux.go) is a nice place for an overview of where Linux stores its trusted roots. It might be nice to recommend a file structure as part of the RFC as well.\r\n\r\n## Relying Party\r\nI propose the following structure for a relying party, mainly inspired by Debian/Ubuntu:\r\n\r\n```text\r\netc\r\n\u2514\u2500 ssl\r\n    \u2514\u2500 mtc\r\n        \u2514\u2500 <issuer_id>\r\n            \u251c\u2500 ca-params\r\n            \u251c\u2500 validity-window\r\n            \u2514\u2500 signature\r\n```\r\n\r\nI think the prefix of the storage location may be different per distribution. For example, `etc/ssl/mtc` for Debian and `/etc/pki/tls/mtc` for Fedora/RHEL. What is more interesting is the structure thereafter.\r\n\r\nEach CA would live in its own subdirectory with the Issuer ID (i.e., TAI/OID) as the directory name. This directory contains the CA parameters, the root hashes of the validity window, and optionally the signature over the validity window. The CA parameters would be the following binary representation:\r\n\r\n```text\r\nstruct {\r\n    TrustAnchorIdentifier   issuer;\r\n    SignatureScheme         signature_scheme;\r\n    opaque                  public_key<1..2^16-1>;\r\n    ProofType               proof_type;\r\n    uint64                  start_time;\r\n    uint64                  batch_duration;\r\n    uint64                  lifetime;\r\n    uint32                  validity_window_size;\r\n    uint64                  storage_window_size;\r\n    opaque                  http_server<1..2^16-1>;\r\n}\r\n```\r\n\r\nThe validity window would contain the batch number and all currently valid root hashes, like defined in the draft already:\r\n```text\r\nstruct {\r\n    uint32      batch_number;\r\n    TreeHead    tree_heads[validity_window_size*hash.length];\r\n} ValidityWindow;\r\n```\r\nThe signature seems optional to me. If the relying party trusts its trust services, there might not be a need to sync them as well.\r\nThis would also save quite some bandwidth, depending on how often an RP gets updated and how many CAs exist.\r\n\r\nThat is also the reason I would like to have the signature and validity window separate, as it simplifies the update service to fetch only the missing tree heads and optionally the signature.\r\n\r\nFor the CA parameters, I am not sure if all information is actually required on the RP side. At the same time, the size is not very important here, as it would get updated only occasionally. Mainly, either the validity window size or lifetime might be left out, and the HTTP server location of the CA might be irrelevant as updates should get fetched from the transparency services. \r\n\r\n## Authenticating Party\r\nFor the authenticating party, a common structure does not seem as relevant; still, it might be nice to recommend one:\r\n\r\nI propose to store the certificates the server can choose from as `<batch_number>.mtc` in separate files and reuse the same format as for the RP for the CA parameters. To my understanding, the CA parameters are only required to know when a certificate becomes invalid, but keeping the other information in the struct allows reusing a parser that was written for the RP.\r\nThe private key is necessary to authenticate the handshake. It may be stored somewhere else as well.\r\n\r\n```text\r\n<some directory>\r\n\u2514\u2500 <issuer_id>\r\n    \u251c\u2500 0.mtc\r\n    \u251c\u2500 240.mtc\r\n    \u251c\u2500 ca-params\r\n    \u2514\u2500 private-key.pem\r\n```\r\n\r\nAny comments on the proposed structure, as well as the need to include this as a recommendation, are welcome.",
       "createdAt": "2024-10-30T11:29:49Z",
-      "updatedAt": "2024-11-14T10:11:57Z",
+      "updatedAt": "2025-06-21T14:43:30Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: structure is slightly different, but overall topic is still relevant to new formulation",
+          "createdAt": "2025-06-21T14:43:30Z",
+          "updatedAt": "2025-06-21T14:43:30Z"
+        }
+      ]
     },
     {
       "number": 99,
@@ -1823,15 +2122,15 @@
       "id": "I_kwDOJIBkVc6pOqcV",
       "title": "Give mirrors signing keys too?",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/101",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "After the clarifying refactor in https://github.com/davidben/merkle-tree-certs/issues/99, and along the way to defining the actual formats, it might make sense for mirrors to have signing keys?\n\nThis does make the story for signed windows a little complicated, and now mirrors need to also have ways to identify themselves. (Probably borrow the same OIDs.)",
       "createdAt": "2025-02-07T22:17:38Z",
-      "updatedAt": "2025-02-17T12:01:19Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:43:57Z",
+      "closedAt": "2025-06-21T14:43:57Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -1839,6 +2138,13 @@
           "body": "There are a few related questions. Do we want to allow the CA to publish cosignatures on the new window? In that case the mirror can act as a witness. Also, don't we want to tackle the update transparency #58 issue more head-on?",
           "createdAt": "2025-02-17T12:01:18Z",
           "updatedAt": "2025-02-17T12:01:18Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: this is mostly outsourced to the tlog ecosystem, but also we did this! tlog has cosigners.",
+          "createdAt": "2025-06-21T14:43:57Z",
+          "updatedAt": "2025-06-21T14:43:57Z"
         }
       ]
     },
@@ -1847,16 +2153,24 @@
       "id": "I_kwDOJIBkVc6qIljT",
       "title": "CA publishes signed tree head over tree of batch tree heads instead of signed validity window",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/103",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "lukevalenta",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "This idea is mentioned in #84 in the context of allowing RPs who have been offline for a while to catch up:\n> Now, we could optimize this by using a tree structure, rather than a linear structure. Then consistency proofs are smaller and this is starting to look a lot more like vanilla CT, with all the operational challenges that entailed. The update process is still complex, but at least allows an arbitrarily out-of-date client to catch up.\n\nTo expand on this a bit, the basic idea is that the CA maintains their append-only log of batch tree heads as a Merkle tree, and publishes an [STH](https://datatracker.ietf.org/doc/html/rfc6962#section-3.5) over that tree instead of a signed validity window over only the latest batches. The only additional storage requirement for the CA is that they must maintain the right-most edge of the tree in order to append new batches to it. (As an added benefit, if a CA has been offline for a while they can skip generating validity window signatures for no-longer-valid batches. If I understand correctly, currently a CA has to publish [one signature per batch tree head](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#section-5.4-4.2.1).)\n\nWhen mirrors retrieve the CA state, they do the same thing as before, and make sure they can reconstruct all batch tree heads and the final STH from what the CA publishes. Mirrors can additionally publish the log as [static tiles](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md#merkle-tree) to make it easy for clients to construct consistency and inclusion proofs.\n\nAs discussed in #84, RPs that have been offline for a while can get a succinct Merkle tree consistency proof from the mirror to catch up, instead of needing to retrieve all batch tree heads and validity windows between `old_latest_batch` and `new_latest_batch`.\n\nMonitors can also easily get a consistency proof to ensure that any long-expired batches they retrieve from a mirror are consistent with the latest STH from the mirror.\n\nAside from the the above, there are some additional benefits if the STHs are put in [tlog-checkpoint](https://github.com/C2SP/C2SP/blob/main/tlog-checkpoint.md) format (like in [static-ct](https://github.com/C2SP/C2SP/blob/main/static-ct-api.md)). This format makes it easy for mirrors to append signatures to checkpoints (#101).\n\nDepending on the RP's transparency policy, the tlog-checkpoint format also allows for interoperability with [tlog-witness](https://github.com/C2SP/C2SP/blob/main/tlog-witness.md) networks for lightweight split view protection. Witnesses keep minimal state per CA, and can add their signature to the latest checkpoint after confirming consistency with their previous latest checkpoint. (See https://blog.transparency.dev/can-i-get-a-witness-network for more context on witness networks.)",
       "createdAt": "2025-02-14T17:42:39Z",
-      "updatedAt": "2025-02-18T14:43:59Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:44:12Z",
+      "closedAt": "2025-06-21T14:44:12Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: moot with the single tree formulation",
+          "createdAt": "2025-06-21T14:44:12Z",
+          "updatedAt": "2025-06-21T14:44:12Z"
+        }
+      ]
     },
     {
       "number": 104,
@@ -1870,9 +2184,17 @@
       "labels": [],
       "body": "At the moment we have hourly batches with 14 day lifetimes. Those numbers are easy to think about. In practice we might want to tweak them.\n\n**Lifetime.** In the current CA/B baseline requirements, CAs are allowed to forego supporting revocation if their certificates are *short lived*. The latter is defined as less than 7 days. (Strictly speaking it's 10 days now, but that's the transitional value.) I think it makes sense to align here and use 7 days as the default lifetime.\n\n**Batch duration**. Although we don't have good data yet, I think it's safe to say that we can't expect RPs to pull new roots hourly. A batch duration of 6 hours might make more sense.",
       "createdAt": "2025-02-21T14:21:35Z",
-      "updatedAt": "2025-02-21T14:21:35Z",
+      "updatedAt": "2025-06-21T14:44:35Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: still applicable to new formulation",
+          "createdAt": "2025-06-21T14:44:35Z",
+          "updatedAt": "2025-06-21T14:44:35Z"
+        }
+      ]
     },
     {
       "number": 105,
@@ -1917,16 +2239,24 @@
       "id": "I_kwDOJIBkVc6s7r7t",
       "title": "Move non-MTC-specific BikeshedCertificate definition up with Assertions",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/106",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "In putting together #92, I noticed that BikeshedCertificate is presented kinda weirdly. The format is buried deep in the instructions for how to run a CA. Maybe we should pull that up with Assertions.",
       "createdAt": "2025-03-06T20:09:52Z",
-      "updatedAt": "2025-03-06T20:09:52Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-21T14:44:58Z",
+      "closedAt": "2025-06-21T14:44:58Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: moot now that we've tabled BikeshedCertificate :-(",
+          "createdAt": "2025-06-21T14:44:58Z",
+          "updatedAt": "2025-06-21T14:44:58Z"
+        }
+      ]
     },
     {
       "number": 107,
@@ -1949,15 +2279,15 @@
       "id": "I_kwDOJIBkVc6t5L0s",
       "title": "not_after nits",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/109",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> If the CA has no criteria beyond the batch-wide expiration, it MAY set this value to infinity.\n\n\"infinity\" is not defined. Given libraries often use int64s for timestamps, it'd be inconvenient to use (1<<64)-1. What about just demanding `not_after` to be less than or equal the \"not_after\" of the batch? That's also consistent with the existing check for the `not_after` in `Proof`\n\n> Compute the batch's expiration time, as described in [Section 5.1](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#parameters). If this value is before the not_after field, abort this procedure with a bad_certificate error.\n\nWe should then also have a mirror check that the `not_after` of a a batch entry is within the validity interval of the batch it's in.",
       "createdAt": "2025-03-13T14:52:55Z",
-      "updatedAt": "2025-04-01T17:15:03Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-21T14:45:13Z",
+      "closedAt": "2025-06-21T14:45:13Z",
       "comments": [
         {
           "author": "davidben",
@@ -1965,6 +2295,13 @@
           "body": "> \"infinity\" is not defined. Given libraries often use int64s for timestamps, it'd be inconvenient to use (1<<64)-1. What about just demanding not_after to be less than or equal the \"not_after\" of the batch? That's also consistent with the existing check for the not_after in Proof\n\nYeah, I figure your implementation can pick whatever max value it likes. Usual spec rules of \"do something that matches the output, you don't need to implement this exactly\".\n\n> We should then also have a mirror check that the not_after of a a batch entry is within the validity interval of the batch it's in.\n\nAh yeah, may as well. I don't think it strictly matters in that it's safe to have invalid things in a batch, as long as relying parties consistently reject it. It's no different than having, say, a syntax error somewhere in the assertion. But it's also very cheap for mirrors to refuse to re-sign it.",
           "createdAt": "2025-04-01T17:15:01Z",
           "updatedAt": "2025-04-01T17:15:01Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Post-Photosynthesis triage: moot now that we've tabled BikeshedCertificate :-(",
+          "createdAt": "2025-06-21T14:45:13Z",
+          "updatedAt": "2025-06-21T14:45:13Z"
         }
       ]
     },
@@ -3000,21 +3337,21 @@
       "id": "PR_kwDOJIBkVc5ShLKl",
       "title": "Add storage window ",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/46",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "It is tempting to add a new state so that an \"issued\" batch can move\r\ninto, say, \"oblivion\" (\"expired\" would be confusing.) That would however\r\ndistract from the core logic.\r\n\r\nWe still require CAs to maintain a list of all batches and its\r\nassertions, but don't require them to expose them after the storage\r\nwindow. I think that's ok.\r\n\r\nGH https://github.com/davidben/merkle-tree-certs/issues/2\r\n\r\n(Note: forked from #44)",
       "createdAt": "2023-06-08T13:05:37Z",
-      "updatedAt": "2023-10-15T10:20:39Z",
+      "updatedAt": "2025-06-21T14:02:36Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "issue-2",
       "headRefOid": "1a98733c5161b66817250e12b5dfa85f482a5a34",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:02:36Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -3025,6 +3362,13 @@
           "body": "Rebased.",
           "createdAt": "2023-10-15T10:20:38Z",
           "updatedAt": "2023-10-15T10:20:38Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this since it's now moot with photosynthesis.",
+          "createdAt": "2025-06-21T14:02:36Z",
+          "updatedAt": "2025-06-21T14:02:36Z"
         }
       ],
       "reviews": [
@@ -3571,25 +3915,40 @@
       "id": "PR_kwDOJIBkVc5SybMI",
       "title": "Add a preliminary section in dealing with bitflips",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/51",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "See #26",
       "createdAt": "2023-06-12T15:36:38Z",
-      "updatedAt": "2023-09-11T12:11:31Z",
+      "updatedAt": "2025-06-21T14:46:00Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "a93a321f5ca4deee7bc7b19c4b6eefdf1f0dc38a",
       "headRepository": "bwesterb/merkle-tree-certs",
       "headRefName": "issue-26",
       "headRefOid": "117e048581f55055a5eebd18849902837d7a4e24",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:46:00Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "PR itself no longer applies with Photosynthesis, but we might perhaps include a discussion about how to recover from policy violations.",
+          "createdAt": "2025-06-21T14:03:58Z",
+          "updatedAt": "2025-06-21T14:03:58Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Oh I guess we have both this and https://github.com/davidben/merkle-tree-certs/issues/26. I guess we can close the PR and use the issue to track the extra text.",
+          "createdAt": "2025-06-21T14:46:00Z",
+          "updatedAt": "2025-06-21T14:46:00Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc5YR_2Q",
@@ -3802,21 +4161,21 @@
       "id": "PR_kwDOJIBkVc5Tc57g",
       "title": "Add batch randomizer and elaborate on the security requirements from the hash",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/57",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Cf #45 #55\r\n\r\nThis does add 16 bytes to each proof. Is it worth it? Perhaps something to discuss in the working group.",
       "createdAt": "2023-06-20T15:27:28Z",
-      "updatedAt": "2023-10-15T10:20:49Z",
+      "updatedAt": "2025-06-21T14:04:26Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "issue-45",
       "headRefOid": "c5f6eef9548cadb41368517841514cf1c57b6a4a",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:04:25Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -3827,6 +4186,13 @@
           "body": "Rebased.",
           "createdAt": "2023-10-15T10:20:49Z",
           "updatedAt": "2023-10-15T10:20:49Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis since we're now just using tlog for the tree construction.",
+          "createdAt": "2025-06-21T14:04:25Z",
+          "updatedAt": "2025-06-21T14:04:25Z"
         }
       ],
       "reviews": []
@@ -3836,21 +4202,21 @@
       "id": "PR_kwDOJIBkVc5TpSbJ",
       "title": "Start fleshing out HTTP interface",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/59",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "See #12.\r\n\r\nI tried to keep it as simple as possible.\r\n\r\nNeeds to be updated after we add the storage window. #46 \r\nSignatures are defined in #50 \r\nNeeds to be updated after merging #46, #57 and #49\r\n",
       "createdAt": "2023-06-22T11:13:29Z",
-      "updatedAt": "2025-02-18T19:30:50Z",
+      "updatedAt": "2025-06-21T14:04:39Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "issue-12",
       "headRefOid": "d9f661c78ffdbb66952f2fc805d9ddf7a5c9a3f6",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:04:38Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -3861,6 +4227,13 @@
           "body": "Rebased.",
           "createdAt": "2023-10-15T10:33:48Z",
           "updatedAt": "2023-10-15T10:33:48Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis since we're now just using tlog for the HTTP interface.",
+          "createdAt": "2025-06-21T14:04:38Z",
+          "updatedAt": "2025-06-21T14:04:38Z"
         }
       ],
       "reviews": [
@@ -3933,25 +4306,33 @@
       "id": "PR_kwDOJIBkVc5UnPMS",
       "title": "Specify canonical representation for assertions",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/62",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "GH #31",
       "createdAt": "2023-07-04T12:26:59Z",
-      "updatedAt": "2023-07-12T23:03:04Z",
+      "updatedAt": "2025-06-21T14:04:49Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "261ba2367eee7279d5e8a83eb1bc790a63cee719",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "issue-31",
       "headRefOid": "3986ef0b73aeaf90a405ef356b000b5646631572",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:04:49Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis.",
+          "createdAt": "2025-06-21T14:04:49Z",
+          "updatedAt": "2025-06-21T14:04:49Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc5aK1bP",
@@ -4364,21 +4745,21 @@
       "id": "PR_kwDOJIBkVc5cua1j",
       "title": "Split subject_info into ~ and abridged_subject_info",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/77",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "GH #76",
       "createdAt": "2023-10-13T10:33:24Z",
-      "updatedAt": "2024-09-19T12:17:09Z",
+      "updatedAt": "2025-06-21T14:04:57Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "17c42e02fae7062dfe358915735717fdda1f3738",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "issue-76",
       "headRefOid": "634c9780a1757c0536e1d67ddca9d6a788753115",
-      "closedAt": null,
+      "closedAt": "2025-06-21T14:04:56Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -4431,6 +4812,13 @@
           "body": "@bwesterb and @davidben did you have the chance to develop an opinion on whether this PR will likely be merged? [bwesterb/mtc](https://github.com/bwesterb/mtc) currently implements this PR, and I wonder if I should follow this for [my implementation](https://github.com/pohlm01/mtc-verifier).",
           "createdAt": "2024-09-19T09:13:09Z",
           "updatedAt": "2024-09-19T09:31:09Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing this with Photosynthesis.",
+          "createdAt": "2025-06-21T14:04:56Z",
+          "updatedAt": "2025-06-21T14:04:56Z"
         }
       ],
       "reviews": [
