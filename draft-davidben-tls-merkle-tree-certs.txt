@@ -127,7 +127,7 @@ Table of Contents
      12.3.  Public Key Hashes
      12.4.  Non-Repudiation
      12.5.  New Log Entry Types
-       12.5.1.  Certificate Malleability
+     12.6.  Certificate Malleability
    13. IANA Considerations
    14. References
      14.1.  Normative References
@@ -2131,7 +2131,7 @@ Table of Contents
    extensions, they SHOULD coordinate with monitors to ensure the
    transparency ecosystem is able to monitor the new formats.
 
-12.5.1.  Certificate Malleability
+12.6.  Certificate Malleability
 
    An ASN.1 structure like X.509’s Certificate is an abstract data type
    that is independent of its serialization.  There are multiple
