@@ -664,9 +664,10 @@ Table of Contents
    Merkle Tree is updated to be computed over the new sequence.
 
    A snapshot of the log is known as a _checkpoint_. A checkpoint is
-   identified by its _tree size_, or the number of elements in the log
-   at the time.  Its contents can be described by the Merkle Tree Hash
-   (Section 2.1.1 of [RFC9162]) of entries zero through tree_size - 1.
+   identified by its _tree size_, that is the number of elements
+   comitted to the log at the time.  Its contents can be described by
+   the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
+   through tree_size - 1.
 
    Cosigners (Section 5.4) sign assertions about the state of the
    issuance log.  A Merkle Tree CA operates a combination of an issuance
