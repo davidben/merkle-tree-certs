@@ -1163,7 +1163,7 @@ If a monitor observes an entry with unknown type, it may not be able to determin
 
 This situation is analogous to the addition of a new X.509 extension. When relying parties add support for log entry types or new X.509 extensions, they SHOULD coordinate with monitors to ensure the transparency ecosystem is able to monitor the new formats.
 
-### Certificate Malleability
+## Certificate Malleability
 
 An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER {{X.690}}, such as {{Section 4.4.2 of ?RFC8446}}. This aligns with {{Section 4.1.1.3 of ?RFC5280}}, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.
 
