@@ -521,7 +521,7 @@ An issuance log describes an append-only sequence of *entries* ({{log-entries}})
 
 Issuance logs have an interface for the log operator, i.e. the CA, to add entries. Unlike {{?RFC6962}} and {{?RFC9162}}, this interface is not publicly accessible. The log only contains entries which the log operator themselves has chosen to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
-A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, or the number of elements in the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements comitted to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
 Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and one or more CA cosigners ({{certification-authority-cosigners}}) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
 
