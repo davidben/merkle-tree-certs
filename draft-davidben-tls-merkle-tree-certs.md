@@ -1019,7 +1019,7 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in {{full-certificates}}.
 
-The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After {{Section 10.2.3 of !RFC9110}} header estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in {{signatureless-certificates}} and serves it from the alternate URL.
+The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After ({{Section 10.2.3 of !RFC9110}}) header estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in {{signatureless-certificates}} and serves it from the alternate URL.
 
 ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
 
