@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-22T02:24:23.566141+00:00",
+  "timestamp": "2025-07-03T02:10:21.861536+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2320,6 +2320,37 @@
       "updatedAt": "2025-05-20T20:46:37Z",
       "closedAt": "2025-05-20T20:46:37Z",
       "comments": []
+    },
+    {
+      "number": 116,
+      "id": "I_kwDOJIBkVc6-Vr_8",
+      "title": "TBSCertificateLogEntry semantics",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/116",
+      "state": "CLOSED",
+      "author": "winstonDeGreef",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The structure of `TBSCertificateLogEntry` is defined as:\n\n```\nTBSCertificateLogEntry  ::=  SEQUENCE  {\n      version             [0]  EXPLICIT Version DEFAULT v1,\n      issuer                   Name,\n      validity                 Validity,\n      subject                  Name,\n      subjectPublicKeyInfoHash OCTET STRING,\n      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,\n      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,\n      extensions          [3]  EXPLICIT Extensions OPTIONAL }\n```\n\nThis seems to largely copy semantics from the definition of  [`TBSCertificate` from rfc5280](https://www.rfc-editor.org/rfc/rfc5280#page-116)\n```\nTBSCertificate  ::=  SEQUENCE  {\n     version         [0]  Version DEFAULT v1,\n     serialNumber         CertificateSerialNumber,\n     signature            AlgorithmIdentifier,\n     issuer               Name,\n     validity             Validity,\n     subject              Name,\n     subjectPublicKeyInfo SubjectPublicKeyInfo,\n     issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,\n                          -- If present, version MUST be v2 or v3\n     subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,\n                          -- If present, version MUST be v2 or v3\n     extensions      [3]  Extensions OPTIONAL\n                          -- If present, version MUST be v3 --  }\n```\n\nPresumably this is to make it easier produce and parse this new structure using existing code, but shouldn't the default version than be v3 (2). Or perhaps v1 (2).\n\n[4.1.2.1 of rfc5280](https://www.rfc-editor.org/rfc/rfc5280#section-4.1.2.2) says:\n> This field describes the version of the encoded certificate.  When\n> extensions are used, as expected in this profile, version MUST be 3\n> (value is 2).  If no extensions are present, but a UniqueIdentifier\n> is present, the version SHOULD be 2 (value is 1); however, the\n> version MAY be 3.  If only basic fields are present, the version\n> SHOULD be 1 (the value is omitted from the certificate as the default\n> value); however, the version MAY be 2 or 3.\n\nPresumably existing code will only be able to parse extensions if version has value 2?\n",
+      "createdAt": "2025-07-01T17:58:02Z",
+      "updatedAt": "2025-07-01T18:46:00Z",
+      "closedAt": "2025-07-01T18:00:44Z",
+      "comments": [
+        {
+          "author": "winstonDeGreef",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Ok nevermind I got confused. Default v1 makes sense, that's just how its supposed to be encoded!",
+          "createdAt": "2025-07-01T18:00:44Z",
+          "updatedAt": "2025-07-01T18:00:44Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah yeah, @bwesterb had a similar comment. Honestly, I think it'd be very reasonable for us to say \"this is only for X.509v3\" and just omit the field entirely. That would shave 5 bytes off every entry. X.509 v1 and v2 are gone in PKIX. v4 will never happen and, if it ever does, we can always define a new entry type.\n\nThe flip side, however, is that we are, at the end of the day, going to receive an X.509 certificate on the wire, and have to verify a TBSCertificate against the log entry. To avoid accidentally breaking folks' assumptions, I think it's important for every byte of the TBSCertificate to be authenticated. See the malleability discussion [here](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#name-certificate-malleability).\n\nThat means for every field, we _either_ need to authenticate it directly (most naturally by just copying it over), or mandate that the receivers check its value such that it's totally constrained. I opted to default to the former just because it seemed easier. (But we could also go the other way if we want. We could take out `version`, take out `issuer` (you know the name of the log), and take out the two unique ID fields (no one uses them). Or we could keep things in but DEFAULT them to something sensible. But then you need to contend with folks not enforcing the expected DEFAULT value in one direction or another.\n\n\ud83e\udd37",
+          "createdAt": "2025-07-01T18:46:00Z",
+          "updatedAt": "2025-07-01T18:46:00Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -6194,6 +6225,142 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 113,
+      "id": "PR_kwDOJIBkVc6czxh1",
+      "title": "clarify size of log",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/113",
+      "state": "MERGED",
+      "author": "winstonDeGreef",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Size is ambiguous, as it could refer to both to the amount of certs in the log, or the aggregated storage size of said certs.",
+      "createdAt": "2025-07-01T04:29:24Z",
+      "updatedAt": "2025-07-01T13:02:02Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "185ea400d41104c6605534e6003629861cecf514",
+      "headRepository": "winstonDeGreef/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "737da29b43fe3fc14c274085148b05806832d44f",
+      "closedAt": "2025-07-01T13:02:02Z",
+      "mergedAt": "2025-07-01T13:02:02Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "77afb46026ce00764312ce17ae142dd7ea298895"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Thanks!",
+          "createdAt": "2025-07-01T13:01:31Z",
+          "updatedAt": "2025-07-01T13:01:31Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6xWDd2",
+          "commit": {
+            "abbreviatedOid": "737da29"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-01T13:01:16Z",
+          "updatedAt": "2025-07-01T13:01:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 114,
+      "id": "PR_kwDOJIBkVc6c8K35",
+      "title": "clarify definition of tree size in section 5 (in the text before 5.1)",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/114",
+      "state": "MERGED",
+      "author": "winstonDeGreef",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Considering the document is considering to include a way to trim the start of the tree, \"the number of elements in the log\" is not obviously the same as the amount of certificates committed.  Therefore phrasing this as \"the amount of certificates committed\" is preferable.",
+      "createdAt": "2025-07-01T16:26:34Z",
+      "updatedAt": "2025-07-01T16:47:03Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "77afb46026ce00764312ce17ae142dd7ea298895",
+      "headRepository": "winstonDeGreef/merkle-tree-certs",
+      "headRefName": "patch-2",
+      "headRefOid": "88763505c26df8fd7673e99f42ac04de9cedfca3",
+      "closedAt": "2025-07-01T16:47:03Z",
+      "mergedAt": "2025-07-01T16:47:03Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "4ba6887191fb224191bac003588d81cbfd5542ae"
+      },
+      "comments": [
+        {
+          "author": "winstonDeGreef",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "just noticed that log truncation has already been included in the draft.",
+          "createdAt": "2025-07-01T16:28:02Z",
+          "updatedAt": "2025-07-01T16:28:02Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6xZUye",
+          "commit": {
+            "abbreviatedOid": "8876350"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Ah good call. The pruning/truncation operation is _really_ just a property of the resources served, rather than the tree structure, but it's at best a little confusing, so being explicit is good. Thanks!",
+          "createdAt": "2025-07-01T16:46:51Z",
+          "updatedAt": "2025-07-01T16:46:51Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 115,
+      "id": "PR_kwDOJIBkVc6c8hsk",
+      "title": "OIDs in readable form",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/115",
+      "state": "MERGED",
+      "author": "winstonDeGreef",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Not sure if this is the preferred way to present OIDs. I think it is.",
+      "createdAt": "2025-07-01T17:04:55Z",
+      "updatedAt": "2025-07-01T18:30:20Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4ba6887191fb224191bac003588d81cbfd5542ae",
+      "headRepository": "winstonDeGreef/merkle-tree-certs",
+      "headRefName": "patch-4",
+      "headRefOid": "ce137a8922bee3237881d98733baf69954a224ed",
+      "closedAt": "2025-07-01T18:29:50Z",
+      "mergedAt": "2025-07-01T18:29:50Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ce137a8922bee3237881d98733baf69954a224ed"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Thanks! Merged with a fix to line wrap it, otherwise some of the renderings will go haywire. :-)",
+          "createdAt": "2025-07-01T18:30:20Z",
+          "updatedAt": "2025-07-01T18:30:20Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
