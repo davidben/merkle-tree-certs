@@ -5,12 +5,12 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 2 January 2026                                 B. E. Westerbaan
+Expires: 4 January 2026                                 B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             1 July 2025
+                                                             3 July 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 January 2026.
+   This Internet-Draft will expire on 4 January 2026.
 
 Copyright Notice
 
@@ -1701,33 +1701,38 @@ Table of Contents
 
 9.  ACME Extensions
 
-   [[TODO: This section hasn't been written yet.  Instead, what follows
-   is an informal discussion. #13 ]]
+   This section describes how to issue Merkle Tree certificates using
+   ACME [RFC8555].
 
-   Section 6 of [I-D.ietf-tls-trust-anchor-ids] defines how to get trust
-   anchor ID metadata for a certificate.
+   When downloading the certificate (Section 7.4.2 of [RFC8555]), ACME
+   clients supporting Merkle Tree certificates SHOULD send "application/
+   pem-certificate-chain-with-properties" in their Accept header
+   (Section 12.5.1 of [RFC9110]).  ACME servers issuing Merkle Tree
+   certificates SHOULD then respond with that content type and include
+   trust anchor ID information as described in Section 6 of
+   [I-D.ietf-tls-trust-anchor-ids].  Section 8 decribes the trust anchor
+   ID assignments for full and signatureless certificates.
 
-   Beyond that, the full certificate is, from the ACME perspective, the
-   same as a regular X.509 certificate and does not require any new
-   extensions.  The main challenge is how to send the signatureless
-   certificate afterwards.
+   When processing an order for a Merkle Tree certificate, the ACME
+   server moves the order to the "valid" state once the corresponding
+   entry is sequenced in the issuance log.  The order's certificate URL
+   then serves the full certificate, constructed as described in
+   Section 6.2.
 
-   As full and signatureless certificates are two proofs for the same
-   issuance event, it is natural to use the same order object, so the
-   ACME server does not need to correlate the two.
+   The full certificate response SHOULD additionally carry a alternate
+   URL for the signatureless certificate, as described Section 7.4.2 of
+   [RFC8555].  Before the signatureless certificate is available, the
+   alternate URL SHOULD return a HTTP 503 (Service Unavailable)
+   response, with a Retry-After header (Section 10.2.3 of [RFC9110])
+   estimating when the certificate will become available.  Once the next
+   landmark checkpoint is allocated, the ACME server constructs a
+   signatureless certificate, as described in Section 6.3 and serves it
+   from the alternate URL.
 
-   We could reuse the alternate certificate chains mechanism in
-   Section 7.4.2 of [RFC8555] and download both certificates as
-   alternates of each other.  However, the full certificate is available
-   immediately and the signatureless certificate will not be available
-   for an hour.
-
-   One possibility is to say ACME servers can update the contents of the
-   certificate URL and hand you back a "better" version of the same set
-   of certificates.  This could be signaled with a Retry-After header to
-   tell the client the resource may be updated again later.  Or we could
-   extend the order object with a second certificate URL and keep that
-   one in the "processing" state until later.
+   ACME clients supporting Merkle Tree certificates SHOULD support
+   fetching alternate chains.  If an alternate chain returns an HTTP 503
+   with a Retry-After header, as described above, the client SHOULD
+   retry the request at the specified time.
 
 10.  Deployment Considerations
 
@@ -2279,6 +2284,11 @@ Table of Contents
               (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
               <https://www.rfc-editor.org/rfc/rfc8555>.
 
+   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Semantics", STD 97, RFC 9110,
+              DOI 10.17487/RFC9110, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9110>.
+
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
@@ -2353,11 +2363,6 @@ Table of Contents
               Considerations for Internet Protocols", RFC 6973,
               DOI 10.17487/RFC6973, July 2013,
               <https://www.rfc-editor.org/rfc/rfc6973>.
-
-   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
-              Ed., "HTTP Semantics", STD 97, RFC 9110,
-              DOI 10.17487/RFC9110, June 2022,
-              <https://www.rfc-editor.org/rfc/rfc9110>.
 
    [SCTNotAfter]
               Adrian, D., "How to distrust a CA without any certificate
@@ -2546,11 +2551,11 @@ Acknowledgements
    Transparency.  The authors would like to thank all those who have
    contributed over the history of these protocols.
 
-   The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper,
-   Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily Stark for many
-   valuable discussions and insights which led to this document.  We
-   wish to thank Mia Celeste in particular, whose implementation of an
-   earlier draft revealed several pitfalls.
+   The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable,
+   Nick Harper, Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily
+   Stark for many valuable discussions and insights which led to this
+   document.  We wish to thank Mia Celeste in particular, whose
+   implementation of an earlier draft revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
