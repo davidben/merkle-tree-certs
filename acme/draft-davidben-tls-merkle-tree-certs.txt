@@ -1723,7 +1723,7 @@ Table of Contents
    URL for the signatureless certificate, as described Section 7.4.2 of
    [RFC8555].  Before the signatureless certificate is available, the
    alternate URL SHOULD return a HTTP 503 (Service Unavailable)
-   response, with a Retry-After Section 10.2.3 of [RFC9110] header
+   response, with a Retry-After (Section 10.2.3 of [RFC9110]) header
    estimating when the certificate will become available.  Once the next
    landmark checkpoint is allocated, the ACME server constructs a
    signatureless certificate, as described in Section 6.3 and serves it
