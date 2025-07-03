@@ -1013,17 +1013,15 @@ Authenticating parties SHOULD preferentially use signatureless certificates over
 
 # ACME Extensions
 
-[[TODO: This section hasn't been written yet. Instead, what follows is an informal discussion. #13 ]]
+This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-{{Section 6 of !I-D.ietf-tls-trust-anchor-ids}} defines how to get trust anchor ID metadata for a certificate.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for full and signatureless certificates.
 
-Beyond that, the full certificate is, from the ACME perspective, the same as a regular X.509 certificate and does not require any new extensions. The main challenge is how to send the signatureless certificate afterwards.
+When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in {{full-certificates}}.
 
-As full and signatureless certificates are two proofs for the same issuance event, it is natural to use the same order object, so the ACME server does not need to correlate the two.
+The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in {{signatureless-certificates}} and serves it from the alternate URL.
 
-We could reuse the alternate certificate chains mechanism in {{Section 7.4.2 of !RFC8555}} and download both certificates as alternates of each other. However, the full certificate is available immediately and the signatureless certificate will not be available for an hour.
-
-One possibility is to say ACME servers can update the contents of the certificate URL and hand you back a "better" version of the same set of certificates. This could be signaled with a Retry-After header to tell the client the resource may be updated again later. Or we could extend the order object with a second certificate URL and keep that one in the "processing" state until later.
+ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
 
 # Deployment Considerations
 
@@ -1281,7 +1279,7 @@ Publicly-exposed subtree cosigning endpoints MAY mitigate DoS in a variety of te
 
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.
 
-The authors additionally thank Bob Beck, Ryan Dickson, Nick Harper, Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
+The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable, Nick Harper, Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
 
 The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
