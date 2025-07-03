@@ -1015,7 +1015,7 @@ Authenticating parties SHOULD preferentially use signatureless certificates over
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-To communicate trust anchor IDs for use with TLS (see {{use-in-tls}}), ACME servers SHOULD send the "application/pem-certificate-chain-with-properties" content type, as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. ACME clients supporting Merkle Tree certificates SHOULD implement this extension.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept ({{Section 12.5.1 of !RFC9110}}) header. ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for full and signatureless certificates.
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in {{full-certificates}}.
 
