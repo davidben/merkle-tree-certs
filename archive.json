@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-03T02:10:21.861536+00:00",
+  "timestamp": "2025-07-06T02:25:10.389218+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -6361,6 +6361,75 @@
         }
       ],
       "reviews": []
+    },
+    {
+      "number": 117,
+      "id": "PR_kwDOJIBkVc6dTnV9",
+      "title": "Pick a concrete construction for ACME",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/117",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Based on discussions with @aarongable (this look good?)",
+      "createdAt": "2025-07-03T17:17:35Z",
+      "updatedAt": "2025-07-03T22:11:55Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "11ceae830477812d7462dd5c73490f8771e5994d",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "acme",
+      "headRefOid": "aae783ccd5d9561ec4226de98763e5075feac3df",
+      "closedAt": "2025-07-03T22:11:51Z",
+      "mergedAt": "2025-07-03T22:11:51Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f9cbbfdd922f6148f85e2f93dcef2ec55898aac1"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6x3GuD",
+          "commit": {
+            "abbreviatedOid": "a7dfae6"
+          },
+          "author": "aarongable",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-03T17:26:15Z",
+          "updatedAt": "2025-07-03T17:26:15Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "nit: I think this paragraph could be more explicit -- clients which support merkle tree certificates should include \"application/pem-certificate-chain-with-properties\" in their Accept header, and servers which provide trust anchor IDs should honor that Accept header and send that content type when they see it.\r\n\r\nEverything else below LGTM!",
+              "createdAt": "2025-07-03T17:26:15Z",
+              "updatedAt": "2025-07-03T17:26:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc6x6QvW",
+          "commit": {
+            "abbreviatedOid": "a7dfae6"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-03T22:09:08Z",
+          "updatedAt": "2025-07-03T22:09:08Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Done!",
+              "createdAt": "2025-07-03T22:09:08Z",
+              "updatedAt": "2025-07-03T22:09:09Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
