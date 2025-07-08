@@ -154,14 +154,13 @@ informative:
     author:
       org: C2SP
 
-  # TODO: Replace this with C2SP link when there is one, and update the author
-  # list to C2SP.
+  # TODO: Replace this with https://c2sp.org/tlog-mirror once the PR is merged.
   TLOG-MIRROR:
     title: Transparency Log Mirrors (DRAFT)
-    target: https://github.com/davidben/C2SP/blob/tlog-mirror/tlog-mirror.md
+    target: https://github.com/C2SP/C2SP/pull/140
     date: June 2025
     author:
-      name: David Benjamin
+      org: C2SP
 
   # TODO: Remove these when the "Extensions to Tiled Transparency Logs" section is removed.
   TLOG-CHECKPOINT:
