@@ -5,12 +5,12 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 4 January 2026                                 B. E. Westerbaan
+Expires: 9 January 2026                                 B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             3 July 2025
+                                                             8 July 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 January 2026.
+   This Internet-Draft will expire on 9 January 2026.
 
 Copyright Notice
 
@@ -2237,8 +2237,8 @@ Table of Contents
    [I-D.draft-ietf-lamps-x509-alg-none]
               Benjamin, D., "Unsigned X.509 Certificates", Work in
               Progress, Internet-Draft, draft-ietf-lamps-x509-alg-none-
-              07, 11 June 2025, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-lamps-x509-alg-none-07>.
+              08, 7 July 2025, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-lamps-x509-alg-none-08>.
 
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, R., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
@@ -2389,9 +2389,8 @@ Table of Contents
               <https://c2sp.org/tlog-checkpoint>.
 
    [TLOG-MIRROR]
-              Benjamin, D., "Transparency Log Mirrors (DRAFT)", June
-              2025, <https://github.com/davidben/C2SP/blob/tlog-mirror/
-              tlog-mirror.md>.
+              C2SP, "Transparency Log Mirrors (DRAFT)", June 2025,
+              <https://github.com/C2SP/C2SP/pull/140>.
 
    [TLOG-TILES]
               C2SP, "Tiled Transparency Logs", June 2025,
