@@ -2657,6 +2657,8 @@ Since draft-davidben-tls-merkle-tree-certs-05
    *  Discuss the monitoring impacts of the responsibility shift from CA
       with log quorum to CA+log with mirror quorum
 
+   *  Sketch out a more concrete initial ACME extension
+
 Authors' Addresses
 
    David Benjamin
