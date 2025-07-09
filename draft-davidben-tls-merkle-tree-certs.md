@@ -518,7 +518,7 @@ This section defines the structure of an *issuance log*.
 
 An issuance log describes an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
 
-Issuance logs have an interface for the log operator, i.e. the CA, to add entries. Unlike {{?RFC6962}} and {{?RFC9162}}, this interface is not publicly accessible. The log only contains entries which the log operator themselves has chosen to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
+Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements comitted to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
