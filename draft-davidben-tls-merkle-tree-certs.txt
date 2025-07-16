@@ -5,12 +5,12 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 10 January 2026                                B. E. Westerbaan
+Expires: 17 January 2026                                B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                             9 July 2025
+                                                            16 July 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 January 2026.
+   This Internet-Draft will expire on 17 January 2026.
 
 Copyright Notice
 
@@ -2388,8 +2388,8 @@ Table of Contents
               <https://c2sp.org/tlog-checkpoint>.
 
    [TLOG-MIRROR]
-              C2SP, "Transparency Log Mirrors (DRAFT)", June 2025,
-              <https://github.com/C2SP/C2SP/pull/140>.
+              C2SP, "Transparency Log Mirrors", July 2025,
+              <https://c2sp.org/tlog-mirror>.
 
    [TLOG-TILES]
               C2SP, "Tiled Transparency Logs", June 2025,
