@@ -154,11 +154,10 @@ informative:
     author:
       org: C2SP
 
-  # TODO: Replace this with https://c2sp.org/tlog-mirror once the PR is merged.
   TLOG-MIRROR:
-    title: Transparency Log Mirrors (DRAFT)
-    target: https://github.com/C2SP/C2SP/pull/140
-    date: June 2025
+    title: Transparency Log Mirrors
+    target: https://c2sp.org/tlog-mirror
+    date: July 2025
     author:
       org: C2SP
 
