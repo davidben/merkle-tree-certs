@@ -5,12 +5,12 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                D. O'Brien
 Intended status: Experimental                                 Google LLC
-Expires: 17 January 2026                                B. E. Westerbaan
+Expires: 7 February 2026                                B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            16 July 2025
+                                                           6 August 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 January 2026.
+   This Internet-Draft will expire on 7 February 2026.
 
 Copyright Notice
 
@@ -384,7 +384,7 @@ Table of Contents
 4.1.  Definition of a Subtree
 
    Given an ordered list of n inputs, D_n = {d[0], d[1], ..., d[n-1]},
-   Section 2.1.1 of [RFC9612] defines the Merkle Tree via the Merkle
+   Section 2.1.1 of [RFC9162] defines the Merkle Tree via the Merkle
    Tree Hash MTH(D_n).
 
    A _subtree_ of this Merkle Tree is defined by two integers, start and
@@ -2240,7 +2240,7 @@ Table of Contents
               draft-ietf-lamps-x509-alg-none-08>.
 
    [I-D.ietf-tls-trust-anchor-ids]
-              Beck, R., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
+              Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
               Draft, draft-ietf-tls-trust-anchor-ids-01, 14 May 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
@@ -2291,12 +2291,6 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
-
-   [RFC9612]  Mirsky, G., Tantsura, J., Varlashkin, I., and M. Chen,
-              "Bidirectional Forwarding Detection (BFD) Reverse Path for
-              MPLS Label Switched Paths (LSPs)", RFC 9612,
-              DOI 10.17487/RFC9612, July 2024,
-              <https://www.rfc-editor.org/rfc/rfc9612>.
 
    [SHS]      "Secure hash standard", National Institute of Standards
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
