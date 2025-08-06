@@ -1356,3 +1356,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Discuss the monitoring impacts of the responsibility shift from CA with log quorum to CA+log with mirror quorum
 
 - Sketch out a more concrete initial ACME extension
+
+## Since draft-davidben-tls-merkle-tree-certs-06
+{:numbered="false"}
+
+- Fix mistyped reference
