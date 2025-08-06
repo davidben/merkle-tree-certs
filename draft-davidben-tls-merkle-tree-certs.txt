@@ -145,6 +145,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-03
      Since draft-davidben-tls-merkle-tree-certs-04
      Since draft-davidben-tls-merkle-tree-certs-05
+     Since draft-davidben-tls-merkle-tree-certs-06
    Authors' Addresses
 
 1.  Introduction
@@ -2651,6 +2652,10 @@ Since draft-davidben-tls-merkle-tree-certs-05
       with log quorum to CA+log with mirror quorum
 
    *  Sketch out a more concrete initial ACME extension
+
+Since draft-davidben-tls-merkle-tree-certs-06
+
+   *  Fix mistyped reference
 
 Authors' Addresses
 
