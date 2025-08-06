@@ -317,7 +317,7 @@ This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} b
 
 ## Definition of a Subtree
 
-Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Section 2.1.1 of !RFC9612}} defines the Merkle Tree via the Merkle Tree Hash `MTH(D_n)`.
+Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Section 2.1.1 of !RFC9162}} defines the Merkle Tree via the Merkle Tree Hash `MTH(D_n)`.
 
 A *subtree* of this Merkle Tree is defined by two integers, `start` and `end`, such that:
 
