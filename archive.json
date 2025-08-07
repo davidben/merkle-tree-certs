@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-06T02:25:10.389218+00:00",
+  "timestamp": "2025-08-07T02:27:45.039550+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -6428,6 +6428,48 @@
               "updatedAt": "2025-07-03T22:09:09Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 118,
+      "id": "PR_kwDOJIBkVc6iT8H4",
+      "title": "Fix rfc reference",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/118",
+      "state": "MERGED",
+      "author": "mcpherrinm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I noticed an incorrect RFC number here, which appears to be a typo",
+      "createdAt": "2025-08-06T05:59:33Z",
+      "updatedAt": "2025-08-06T09:09:36Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "916ce9e390e002cec55580b8da8f941a088249c8",
+      "headRepository": "mcpherrinm/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "4a1ca95030ab689d11e15a8ca8c47f4f398a2ede",
+      "closedAt": "2025-08-06T09:09:36Z",
+      "mergedAt": "2025-08-06T09:09:36Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0dfb5695daaa48b2a04eb65640d27a3c65804dd0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc64RQ_Y",
+          "commit": {
+            "abbreviatedOid": "4a1ca95"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Ahahaha whoops. Thanks!",
+          "createdAt": "2025-08-06T09:09:28Z",
+          "updatedAt": "2025-08-06T09:09:28Z",
+          "comments": []
         }
       ]
     }
