@@ -3,14 +3,15 @@
 
 
 Network Working Group                                        D. Benjamin
-Internet-Draft                                                D. O'Brien
-Intended status: Experimental                                 Google LLC
-Expires: 7 February 2026                                B. E. Westerbaan
+Internet-Draft                                                Google LLC
+Intended status: Experimental                                 D. O'Brien
+Expires: 8 February 2026                                                
+                                                        B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           6 August 2025
+                                                           7 August 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 February 2026.
+   This Internet-Draft will expire on 8 February 2026.
 
 Copyright Notice
 
@@ -2665,8 +2666,7 @@ Authors' Addresses
 
 
    Devon O'Brien
-   Google LLC
-   Email: asymmetric@google.com
+   Email: devon.obrien@gmail.com
 
 
    Bas Westerbaan
