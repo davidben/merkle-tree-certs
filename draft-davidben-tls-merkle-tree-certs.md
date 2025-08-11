@@ -321,7 +321,7 @@ Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Sectio
 A *subtree* of this Merkle Tree is defined by two integers, `start` and `end`, such that:
 
 *  `0 <= start < end <= n`
-* If `k` is the largest power of 2 that is greater than or equal to `end - start`, `start` must be a multiple of `k`
+* If `k` is the largest power of 2 that is less than or equal to `end - start`, `start` must be a multiple of `k`
 
 Note that, if `start` is zero, the second condition is always true.
 
