@@ -321,13 +321,13 @@ Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Sectio
 A *subtree* of this Merkle Tree is defined by two integers, `start` and `end`, such that:
 
 *  `0 <= start < end <= n`
-* If `k` is the largest power of 2 that is less than or equal to `end - start`, `start` must be a multiple of `k`
+* If `s` is the smallest power of two that is greater than or equal to `end - start`, `start` must be a multiple of `s`
 
 Note that, if `start` is zero, the second condition is always true.
 
 A subtree is itself a Merkle Tree, defined by `MTH(D[start:end])`. In the context of a single Merkle Tree, the subtree defined by `start` and `end` is denoted by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
 
-The *size* of the subtree is `end - start`. If the subtree's size is a power of 2, it is said to be *full*, otherwise it is said to be *partial*.
+The *size* of the subtree is `end - start`. If the subtree's size is a power of two, it is said to be *full*, otherwise it is said to be *partial*.
 
 If a subtree is full, then it is directly contained in the tree of hash operations in `MTH(D_n)` for `n >= end`.
 
@@ -410,7 +410,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
    5. Check `sn` is 0 and `r` is `root_hash`. If either is not equal, fail the proof verification. If all are equal, accept the proof.
 2. Otherwise, run the following:
    1. If `proof` is an empty array, stop and fail verification.
-   2. If `end - start` is an exact power of 2, prepend `node_hash` to the `proof` array.
+   2. If `end - start` is an exact power of two, prepend `node_hash` to the `proof` array.
    3. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
    4. Right-shift `fn`, `sn`, and `tn` equally until `LSB(sn)` is not set or `fn = sn`.
    5. Set both `fr` and `sr` to the first value in the `proof` array.
