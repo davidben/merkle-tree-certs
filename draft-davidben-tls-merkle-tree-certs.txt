@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 12 February 2026                                               
+Expires: 13 February 2026                                               
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          11 August 2025
+                                                          12 August 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 February 2026.
+   This Internet-Draft will expire on 13 February 2026.
 
 Copyright Notice
 
@@ -394,8 +394,8 @@ Table of Contents
 
    *  0 <= start < end <= n
 
-   *  If k is the largest power of 2 that is greater than or equal to
-      end - start, start must be a multiple of k
+   *  If s is the smallest power of two that is greater than or equal to
+      end - start, start must be a multiple of s
 
    Note that, if start is zero, the second condition is always true.
 
@@ -405,7 +405,7 @@ Table of Contents
    entries whose indices are in that half-open interval.
 
    The _size_ of the subtree is end - start.  If the subtree's size is a
-   power of 2, it is said to be _full_, otherwise it is said to be
+   power of two, it is said to be _full_, otherwise it is said to be
    _partial_.
 
    If a subtree is full, then it is directly contained in the tree of
@@ -514,7 +514,7 @@ Table of Contents
 
        1.  If proof is an empty array, stop and fail verification.
 
-       2.  If end - start is an exact power of 2, prepend node_hash to
+       2.  If end - start is an exact power of two, prepend node_hash to
            the proof array.
 
        3.  Set fn to start, sn to end - 1, and tn to n - 1.
