@@ -12,7 +12,7 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 * Each log entry contains an entire certificate, with public key and signature. Post-quantum overhead is multiplied across every entry, increasing the costs to log operators and the rest of the transparency ecosystem.
 
-* Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the latency of the TLS handshake.
+* Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
 
 The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance. This enables techniques where signature costs can be amortized over multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
 
@@ -20,13 +20,13 @@ The Working Group will initially put down roots and define the mechanisms needed
 
 1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified.
 
-2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and publicly monitorable.
+2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable.
 
-3. How the certificate constructions may be provisioned with ACME and used in TLS.
+3. How the certificate constructions may be provisioned with ACME (RFC 8555) and used in TLS.
 
-As part of this work, the Working Group may extend X.509, e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
+As part of this work, the Working Group may extend the RFC 5280 profile of X.509, e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
 
-Though not the initial focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve upon the status quo, such as auditing, monitoring, or revocation. If concrete, feasible improvements are identified, the Working Group may recharter to seed new, secondary deliverables that build on its initial work.
+Though not the initial focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve upon the status quo, such as auditing, monitoring, or revocation. If feasible concrete improvements are identified, the Working Group may recharter to seed secondary deliverables that build on its initial work.
 
 In evaluating decisions and design tradeoffs, the Working Group will consider security, privacy, transparency, performance, and deployment properties, aiming to comparably meet the needs of today's applications that use CT-based PKIs with TLS. The Working Group may consider how these mechanisms may apply to other PKIs or non-interactive protocols, but these will not be the primary use case and may ultimately have different requirements or limitations.
 
