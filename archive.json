@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-10T02:31:34.503585+00:00",
+  "timestamp": "2025-08-12T02:09:07.747492+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -6514,6 +6514,73 @@
           "createdAt": "2025-08-07T16:24:52Z",
           "updatedAt": "2025-08-07T16:24:52Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 120,
+      "id": "PR_kwDOJIBkVc6jISOk",
+      "title": "Fix typo in definition of k for subtree proofs",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/120",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-08-11T20:39:06Z",
+      "updatedAt": "2025-08-12T00:40:54Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "1dac3dab0c7000815be761d56a1a10c4276b5f0a",
+      "headRepository": "lukevalenta/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "8cef491504d25a8f7dcd195f2a7339ff7c19bcbf",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc65Qad1",
+          "commit": {
+            "abbreviatedOid": "407db51"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-11T23:51:58Z",
+          "updatedAt": "2025-08-11T23:51:58Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Hmm. I think greater is correct, unless I'm confused? `[2, 5)` is not a valid subtree because it makes this tree:\r\n\r\n```\r\n  /\\\r\n /\\ |\r\n2 3 4\r\n```\r\n\r\nBut then `[0, 5)` looks like this, which doesn't contain that tree:\r\n\r\n```\r\n     /\\\r\n    /  \\\r\n   /\\   |\r\n  /  \\  |\r\n /\\  /\\ |\r\n0 1 2 3 4\r\n```\r\n\r\nSo if the subtree has size 3, we need start to be 4-aligned, not just 2-aligned.\r\n\r\nBut in that case \"largest power of 2\" should be \"smallest power of 2\".",
+              "createdAt": "2025-08-11T23:51:58Z",
+              "updatedAt": "2025-08-11T23:51:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65QnuS",
+          "commit": {
+            "abbreviatedOid": "407db51"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-12T00:31:10Z",
+          "updatedAt": "2025-08-12T00:31:10Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Ah yes, you're right--thanks for the catch and the counterexample! I agree the correct version is \"If `k` is the smallest power of 2 that is greater than or equal to `end - start`, `start` must be a multiple of `k`\", since for any size subtree we want the start index to be aligned with the next-greatest power of two.\r\n\r\nI got confused since [RFC9162](https://datatracker.ietf.org/doc/html/rfc9162#section-2.1.1) and [the subtree consistency proof section](https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-06.html#section-4.3.1) say \"let k be the largest power of two smaller than n\", but we're dealing with a different `k` here--that `k` is for a split index, but the `k` here is a restriction on the subtree start index. Maybe we pick a new letter like `s` for \"start\"?",
+              "createdAt": "2025-08-12T00:31:10Z",
+              "updatedAt": "2025-08-12T00:31:10Z"
+            }
+          ]
         }
       ]
     }
