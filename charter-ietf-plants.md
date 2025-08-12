@@ -4,19 +4,30 @@ This is a draft charter for a new IETF working group. The working group does not
 
 ## PKI, Logs, And Tree Signatures (PLANTS)
 
-The goal of the PLANTS Working Group is to mitigate the costs of large post-quantum signatures on PKIs with Certificate Transparency (RFC 6962 and RFC 9162), as used in interactive protocols like TLS (RFC 8446).
+The goal of the PLANTS Working Group is to trim the costs of large post-quantum signatures on PKIs with Certificate Transparency (CT; RFC 6962 and RFC 9162), when used in interactive protocols like TLS (RFC 8446).
 
-In such protocols today, X.509 certificates demonstrate to the relying party that some trusted certification authority (CA) has associated a public key with some application identifier (e.g., a DNS name). Certificate Transparency then provides public auditing, with log artifacts that demonstrate to the relying party the certificate is visible to monitors in some public log.
+Today, such applications apply two separate systems: a certification authority (CA) signs individual bindings between public keys and application identifiers (e.g. a DNS name), returning an X.509 certificate. CT logs then log entire certificates, returning signed certificate timestamps. The outputs of these two steps are presented to the relying party.
 
-Large post-quantum signatures and keys add significant costs to these protocols:
+Large post-quantum signatures and keys will add significant costs in two ways:
 
-* Each log entry contains a public key and signature. This added size to every log entry increases log operator costs, as well as costs to others in the transparency ecosystem.
-* Certificates and log artifacts carry signatures from the CA and a quorum of logs. The added size increases latency to the TLS handshake.
+* Each log entry contains an entire certificate, with public key and signature. Post-quantum overhead is multiplied across every entry, increasing the costs to log operators and the rest of the transparency ecosystem.
 
-The PLANTS Working Group will prune these costs by defining a new certificate and transparent log construction, with comparable security, privacy, and transparency properties to the status quo. In doing so, the Working Group may extend X.509 (e.g. new extensions or signature algorithms). As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow.
+* Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the latency of the TLS handshake.
 
-Overgrowth in signature overhead additionally impacts the use of the keys in the protocol (e.g. the TLS CertificateVerify message). These components can be cultivated separately from the PKI and are not in scope for this Working Group.
+The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance. This enables techniques where signature costs can be amortized over multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
 
-The PLANTS Working Group will additionally define how authenticating parties can provision its certificates with ACME, and how to use its certificates in TLS. As needed, the Working Group may define extensions to ACME and TLS to achieve this. It is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
+The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
 
-Though not the primary focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve over the status quo, such as monitoring and revocation, in the course of its work. If concrete, feasible improvements are identified, the Working Group may recharter to seed new, secondary deliverables.
+1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified.
+
+2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and publicly monitorable.
+
+3. How the certificate constructions may be provisioned with ACME and used in TLS.
+
+As part of this work, the Working Group may extend X.509, e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
+
+Though not the initial focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve upon the status quo, such as auditing, monitoring, or revocation. If concrete, feasible improvements are identified, the Working Group may recharter to seed new, secondary deliverables that build on its initial work.
+
+In evaluating decisions and design tradeoffs, the Working Group will consider security, privacy, transparency, performance, and deployment properties, aiming to comparably meet the needs of today's applications that use CT-based PKIs with TLS. The Working Group may consider how these mechanisms may apply to other PKIs or non-interactive protocols, but these will not be the primary use case and may ultimately have different requirements or limitations.
+
+The PLANTS Working Group's scope is to explore mechanisms for CAs and transparency ecosystems to certify key/identifier bindings in a publicly monitorable way. Alternate trust models and changes to how TLS uses the end-entity key are not in scope for the Working Group.
