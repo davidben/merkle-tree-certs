@@ -8,7 +8,7 @@ The goal of the PLANTS Working Group is to trim the costs of large post-quantum 
 
 Today, such applications apply two separate systems: a certification authority (CA) signs individual bindings between public keys and application identifiers (e.g. a DNS name), returning an X.509 certificate. CT logs then log entire certificates, returning signed certificate timestamps. The outputs of these two steps are presented to the relying party.
 
-Large post-quantum signatures and keys will add significant costs in two ways:
+Overhead from post-quantum signatures and keys will add significant costs in two ways:
 
 * Each log entry contains an entire certificate, with public key and signature. Post-quantum overhead is multiplied across every entry, increasing the costs to log operators and the rest of the transparency ecosystem.
 
