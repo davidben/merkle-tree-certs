@@ -24,7 +24,7 @@ The Working Group will initially put down roots and define the mechanisms needed
 
 3. How the certificate constructions may be provisioned with ACME and used in TLS.
 
-As part of this work, the Working Group may extend X.509, e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
+As part of this work, the Working Group may extend PKIX (RFC5280), e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
 
 Though not the initial focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve upon the status quo, such as auditing, monitoring, or revocation. If concrete, feasible improvements are identified, the Working Group may recharter to seed new, secondary deliverables that build on its initial work.
 
