@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-12T02:09:07.747492+00:00",
+  "timestamp": "2025-08-14T02:11:45.219381+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -6522,24 +6522,26 @@
       "id": "PR_kwDOJIBkVc6jISOk",
       "title": "Fix typo in definition of k for subtree proofs",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/120",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "lukevalenta",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-08-11T20:39:06Z",
-      "updatedAt": "2025-08-12T00:40:54Z",
+      "updatedAt": "2025-08-12T02:31:07Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "1dac3dab0c7000815be761d56a1a10c4276b5f0a",
       "headRepository": "lukevalenta/merkle-tree-certs",
       "headRefName": "patch-1",
       "headRefOid": "8cef491504d25a8f7dcd195f2a7339ff7c19bcbf",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-08-12T02:31:07Z",
+      "mergedAt": "2025-08-12T02:31:07Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5d40b6b0ed3625856730585ad98766674b592ab4"
+      },
       "comments": [],
       "reviews": [
         {
@@ -6579,6 +6581,393 @@
               "body": "Ah yes, you're right--thanks for the catch and the counterexample! I agree the correct version is \"If `k` is the smallest power of 2 that is greater than or equal to `end - start`, `start` must be a multiple of `k`\", since for any size subtree we want the start index to be aligned with the next-greatest power of two.\r\n\r\nI got confused since [RFC9162](https://datatracker.ietf.org/doc/html/rfc9162#section-2.1.1) and [the subtree consistency proof section](https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-06.html#section-4.3.1) say \"let k be the largest power of two smaller than n\", but we're dealing with a different `k` here--that `k` is for a split index, but the `k` here is a restriction on the subtree start index. Maybe we pick a new letter like `s` for \"start\"?",
               "createdAt": "2025-08-12T00:31:10Z",
               "updatedAt": "2025-08-12T00:31:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65Rba-",
+          "commit": {
+            "abbreviatedOid": "8cef491"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-12T02:30:57Z",
+          "updatedAt": "2025-08-12T02:30:57Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 121,
+      "id": "PR_kwDOJIBkVc6jXWCj",
+      "title": "Copy-edit of draft charter",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/121",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Incorporate minor edits from my own copy-level review of the document.",
+      "createdAt": "2025-08-12T22:30:31Z",
+      "updatedAt": "2025-08-13T16:48:25Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3af30e859a586106cb27912b7fd6369d743c799c",
+      "headRepository": "aarongable/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "b001b10943a9f743e16d491172f135e5e5de1357",
+      "closedAt": "2025-08-13T16:48:24Z",
+      "mergedAt": "2025-08-13T16:48:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5306f88e6643ba7646355850fdeafe119f579305"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc65jfBP",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-12T22:31:25Z",
+          "updatedAt": "2025-08-12T22:33:42Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Reasoning: some people may read \"latency\" and assume the primary issue is that some PQ algorithms have longer signature verification times. The reality is that the latency is both from that _and_ from transmitting the bytes on the wire. Acknowledge both to avoid future confusion.",
+              "createdAt": "2025-08-12T22:31:25Z",
+              "updatedAt": "2025-08-12T22:33:42Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "Reasoning: saying \"externally\" allows this point to apply even to private PKIs, which may want the log to be auditable from within their own infrastructure (i.e. outside the CA but inside the org's intranet) but not exposed to the public internet.",
+              "createdAt": "2025-08-12T22:32:24Z",
+              "updatedAt": "2025-08-12T22:33:42Z"
+            },
+            {
+              "originalPosition": 17,
+              "body": "Reasoning: For consistency with other documents that were cited by number above.",
+              "createdAt": "2025-08-12T22:32:46Z",
+              "updatedAt": "2025-08-12T22:33:42Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "Reasoning: because X.509 isn't maintained by the IETF, but RFC 5280 is.",
+              "createdAt": "2025-08-12T22:33:16Z",
+              "updatedAt": "2025-08-12T22:33:42Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "Reasoning: just to reduce the number of commas in the sentence, to ease reading.",
+              "createdAt": "2025-08-12T22:33:40Z",
+              "updatedAt": "2025-08-12T22:33:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65juuI",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-12T22:55:48Z",
+          "updatedAt": "2025-08-12T22:55:48Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "PQ schemes don't necessarily have longer verification times. Typically ML-DSA-44 is faster than P-256 for instance.",
+              "createdAt": "2025-08-12T22:55:48Z",
+              "updatedAt": "2025-08-12T22:55:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65jxBt",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-12T22:58:21Z",
+          "updatedAt": "2025-08-12T22:58:21Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65kGAU",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-12T23:25:18Z",
+          "updatedAt": "2025-08-12T23:25:18Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Ah hmm, I'm very unclear on the right semantics here. Is defining a new extension or sigalg extending the RFC 5280 profile? RFC 8410 doesn't update RFC 5280 or anything. It just defines a new sigalg that could be used with any X.509-based-system, RFC 5280 or otherwise.\r\n\r\nI guess there's an ambiguity whether \"extending RFC 5280\" means defining new stuff one can use with RFC 5280, or update some of the text in the RFC 5280 profile. I was mostly thinking the former, though I suppose we might end up needing to do that. x509-alg-none needed to update some of it.\r\n\r\nIn that same vein, extending X.509 could mean defining new stuff one can use with X.509, or overriding X.509's text, or bumping the version number and all. We definitely shouldn't do that last one; at that point, there's no benefit in keeping continuity with X.509.\r\n\r\nFor some reason \"extending the ... profile of ....\" reads more to me like updating the profile itself, while \"extending ...\" could be read as either.\r\n\r\nWe could say \"the WG may define new X.509 extensions and signature algorithms\" but then we need to enumerate all the extension points. I looked at the old CURDLE and LAMPS charters and they all say PKIX, so perhaps that's the way around this. I wonder if we should be saying PKIX instead of X.509 in general or something...",
+              "createdAt": "2025-08-12T23:25:18Z",
+              "updatedAt": "2025-08-12T23:25:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65uVfv",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T13:04:02Z",
+          "updatedAt": "2025-08-13T13:04:02Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Perhaps simply:\r\n\r\n```suggestion\r\nAs part of this work, the Working Group may extend PKIX (RFC 5280), e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.\r\n```",
+              "createdAt": "2025-08-13T13:04:02Z",
+              "updatedAt": "2025-08-13T13:04:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65wHbs",
+          "commit": {
+            "abbreviatedOid": "10f5b12"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T14:51:02Z",
+          "updatedAt": "2025-08-13T14:51:02Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Agreed, and I think that strengthens the argument for making this change",
+              "createdAt": "2025-08-13T14:51:02Z",
+              "updatedAt": "2025-08-13T14:51:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65x2XR",
+          "commit": {
+            "abbreviatedOid": "b001b10"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-13T16:48:13Z",
+          "updatedAt": "2025-08-13T16:48:13Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 122,
+      "id": "PR_kwDOJIBkVc6jhSKX",
+      "title": "X509 is not a specification we own",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/122",
+      "state": "CLOSED",
+      "author": "mcr",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "X.509 is not even what we use, it's RFC5280.\r\nThe ITU-T should get *NO* credit here. They have never helped.",
+      "createdAt": "2025-08-13T16:26:49Z",
+      "updatedAt": "2025-08-13T16:49:20Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3af30e859a586106cb27912b7fd6369d743c799c",
+      "headRepository": "mcr/merkle-tree-certs",
+      "headRefName": "patch-2",
+      "headRefOid": "51e4df26f507f84a9b45bfd11ebce9a9002e22a1",
+      "closedAt": "2025-08-13T16:49:19Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Thanks! @aarongable beat you to it in https://github.com/davidben/merkle-tree-certs/pull/121, so closing this as already applied. :-)",
+          "createdAt": "2025-08-13T16:49:19Z",
+          "updatedAt": "2025-08-13T16:49:19Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc65xqpj",
+          "commit": {
+            "abbreviatedOid": "51e4df2"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-13T16:40:56Z",
+          "updatedAt": "2025-08-13T16:40:56Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 123,
+      "id": "PR_kwDOJIBkVc6jhTJK",
+      "title": "reword goals",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/123",
+      "state": "OPEN",
+      "author": "mcr",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-08-13T16:28:31Z",
+      "updatedAt": "2025-08-13T21:26:28Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "3af30e859a586106cb27912b7fd6369d743c799c",
+      "headRepository": "mcr/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "f0cf37afa1c9c17c64ad70872e858fdf360b61dc",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc65xpVL",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T16:40:04Z",
+          "updatedAt": "2025-08-13T16:40:04Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "This \"tradeoff\" doesn't type-check for me, do you perhaps mean trading transparency against performance? Or did you mean \"rethink division of tasks between certificate authorities and transparency logs\"?",
+              "createdAt": "2025-08-13T16:40:04Z",
+              "updatedAt": "2025-08-13T16:40:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65xp3f",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T16:40:23Z",
+          "updatedAt": "2025-08-13T16:40:23Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Are any IKEv2 peers enforcing transparency?",
+              "createdAt": "2025-08-13T16:40:23Z",
+              "updatedAt": "2025-08-13T16:40:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65ydUc",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "mcr",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T17:17:49Z",
+          "updatedAt": "2025-08-13T17:17:49Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "okay, so maybe some words are missing here.\r\ncertificates cost bytes and CPU.\r\ntransparency logs cost bytes and CPU.\r\nQuantum-safe algorithms change the values, and thus the tradeoffs.\r\n",
+              "createdAt": "2025-08-13T17:17:49Z",
+              "updatedAt": "2025-08-13T17:17:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc65yfbF",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "mcr",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T17:21:06Z",
+          "updatedAt": "2025-08-13T17:21:07Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "> Are any IKEv2 peers enforcing transparency?\r\n\r\nNot today.  Many think that's a bug.  \r\nThey are \"private\" PKIs, and CT cost too much, required a third party, and there are usually cheaper ways to kill clients.  But, CRLs do exist and also OCSP, and they have all the problems.\r\n\r\n",
+              "createdAt": "2025-08-13T17:21:07Z",
+              "updatedAt": "2025-08-13T17:21:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc651TGy",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T21:24:50Z",
+          "updatedAt": "2025-08-13T21:24:50Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Hmm. I am quite wary of the WG taking on too broad and open-ended of a scope.\r\n\r\nIt's certainly good to make things reusable. While, I don't know much about IKEv2, it does seem plausible that any solution here would also apply to IKEv2. And indeed I wrote \"interactive protocols\" to try to capture the property of TLS that matters here. (I.e. room to build a negotiation story. The signatureless certificates optimization really wants the authenticating party to tailor the certificate to the relying party, e.g. with trust anchor negotiation. By contrast, something like offline encryption needs to send a payload that works for all recipients at once, making most size optimizations moot.)\r\n\r\nAt the same time, I think if we try to solve all of PKI all at once, we won't get anywhere. Different applications *do* ultimately have different needs. Trying to address them in the abstract won't help the WG make decisions. In TLS, we have a lot to fall onto to guide our decisions: real world deployments of CT today, and work around certificate negotiation.\r\n\r\nI think progress would be best served to focus on that, while keeping an eye towards generality. Then when the IKEv2 community is ready to think about what transparent PKIs mean for them, they'll have something concrete to look at and hopefully apply.",
+              "createdAt": "2025-08-13T21:24:50Z",
+              "updatedAt": "2025-08-13T21:24:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc651T2p",
+          "commit": {
+            "abbreviatedOid": "f0cf37a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-13T21:26:28Z",
+          "updatedAt": "2025-08-13T21:26:28Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "And if the IKEv2 community is ready to build out a transparent PKI while this work is ongoing, there's nothing stopping the WG from discussing other use cases then. But I don't think the charter should commit us to doing something for IKEv2 prematurely.",
+              "createdAt": "2025-08-13T21:26:28Z",
+              "updatedAt": "2025-08-13T21:26:28Z"
             }
           ]
         }
