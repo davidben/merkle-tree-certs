@@ -1202,14 +1202,6 @@ TODO: Add an ASN.1 module. Leaving a placeholder as a reminder.
 
 [[TODO: This section is expected to be removed. It is sketched here purely for illustrative purposes, until the features are defined somewhere else, e.g. in the upstream tlog documents.]]
 
-## Pruning a Tiled Transparency Log
-
-https://github.com/C2SP/C2SP/pull/138 describes how to support pruning in tlogs but, as of writing, is not part of {{TLOG-TILES}} yet.
-
-{{TLOG-MIRROR}} is also updated to add a minimum index parameter to each mirror and apply the above changes to its monitoring interface. The first step of the recommended update procedure in {{TLOG-MIRROR}} is updated to say, "Let `mirror_size` be the tree size of the mirror checkpoint, or the mirror's minimum index if the mirror has not copied the log yet."
-
-A mirror MAY use the origin log's current minimum index to initialize its starting minimum index, but it is not required to reflect subsequent pruning. A mirror MAY initialize its minimum index to some higher value than the origin, if it does not intend to log some entries. It MAY initialize its minimum index to a lower value, if the pruned resources are available from some other source, e.g., another mirror.
-
 ## Subtree Signed Note Format
 
 A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. Trust anchor IDs can be converted into log origins and cosigner names by concatenating the ASCII string `oid/1.3.6.1.4.1.` and the ASCII representation of the trust anchor ID. For example, the checkpoint origin for a log named `32473.1` would be `oid/1.3.6.1.4.1.32473.1`.
