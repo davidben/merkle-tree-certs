@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 14 February 2026                                               
+Expires: 16 February 2026                                               
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          13 August 2025
+                                                          15 August 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 February 2026.
+   This Internet-Draft will expire on 16 February 2026.
 
 Copyright Notice
 
@@ -135,9 +135,8 @@ Table of Contents
      14.2.  Informative References
    Appendix A.  ASN.1 Module
    Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
-     B.1.  Pruning a Tiled Transparency Log
-     B.2.  Subtree Signed Note Format
-     B.3.  Requesting Subtree Signatures
+     B.1.  Subtree Signed Note Format
+     B.2.  Requesting Subtree Signatures
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -1211,7 +1210,7 @@ Table of Contents
        from external cosigners to meet relying party requirements
        (Section 7.3).
 
-   5.  The CA requests subtree cosignatures (Appendix B.3) from the
+   5.  The CA requests subtree cosignatures (Appendix B.2) from the
        cosigners above.
 
    6.  For each certificate in the interval, the CA constructs
@@ -2405,27 +2404,7 @@ Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
    purely for illustrative purposes, until the features are defined
    somewhere else, e.g. in the upstream tlog documents.]]
 
-B.1.  Pruning a Tiled Transparency Log
-
-   https://github.com/C2SP/C2SP/pull/138 describes how to support
-   pruning in tlogs but, as of writing, is not part of [TLOG-TILES] yet.
-
-   [TLOG-MIRROR] is also updated to add a minimum index parameter to
-   each mirror and apply the above changes to its monitoring interface.
-   The first step of the recommended update procedure in [TLOG-MIRROR]
-   is updated to say, "Let mirror_size be the tree size of the mirror
-   checkpoint, or the mirror's minimum index if the mirror has not
-   copied the log yet."
-
-   A mirror MAY use the origin log's current minimum index to initialize
-   its starting minimum index, but it is not required to reflect
-   subsequent pruning.  A mirror MAY initialize its minimum index to
-   some higher value than the origin, if it does not intend to log some
-   entries.  It MAY initialize its minimum index to a lower value, if
-   the pruned resources are available from some other source, e.g.,
-   another mirror.
-
-B.2.  Subtree Signed Note Format
+B.1.  Subtree Signed Note Format
 
    A subtree, with signatures, can be represented as a signed note
    [SIGNED-NOTE].  Trust anchor IDs can be converted into log origins
@@ -2458,7 +2437,7 @@ B.2.  Subtree Signed Note Format
    The only difference between the two forms is the implicit
    transformation from the signed note text to the MTCSubtree structure.
 
-B.3.  Requesting Subtree Signatures
+B.2.  Requesting Subtree Signatures
 
    This section defines the sign-subtree cosigner HTTP endpoint for
    clients to obtain subtree signatures from non-CA cosigners, such as
@@ -2477,7 +2456,7 @@ B.3.  Requesting Subtree Signatures
    is the submission prefix.  The client's request body MUST be a
    sequence of:
 
-   *  The requested subtree as a signed note (Appendix B.2), with zero
+   *  The requested subtree as a signed note (Appendix B.1), with zero
       or more signatures.  The endpoint MAY require signatures from the
       CA as a DoS mitigation, as described below.
 
