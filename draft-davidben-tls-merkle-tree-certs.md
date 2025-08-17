@@ -544,7 +544,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     mechanisms(5) pkix(7) rdna(TBD1) TBD2}
 ~~~
 
-[[TODO: Fill in TBD1 from the PKIX rdna arc in {{!I-D.draft-ietf-lamps-x509-alg-none}}, once allocated.]]
+[[TODO: Fill in TBD1 from the PKIX rdna arc in {{!I-D.ietf-lamps-x509-alg-none}}, once allocated.]]
 
 The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named `32473.1` would be represented in syntax of {{?RFC4514}} as:
 
