@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 16 February 2026                                               
+Expires: 18 February 2026                                               
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          15 August 2025
+                                                          17 August 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 February 2026.
+   This Internet-Draft will expire on 18 February 2026.
 
 Copyright Notice
 
@@ -708,7 +708,7 @@ Table of Contents
        mechanisms(5) pkix(7) rdna(TBD1) TBD2}
 
    [[TODO: Fill in TBD1 from the PKIX rdna arc in
-   [I-D.draft-ietf-lamps-x509-alg-none], once allocated.]]
+   [I-D.ietf-lamps-x509-alg-none], once allocated.]]
 
    The attribute's value is a RELATIVE-OID containing the trust anchor
    ID's ASN.1 representation.  For example, the distinguished name for a
@@ -2234,7 +2234,7 @@ Table of Contents
               DOI 10.6028/nist.fips.204, August 2024,
               <https://doi.org/10.6028/nist.fips.204>.
 
-   [I-D.draft-ietf-lamps-x509-alg-none]
+   [I-D.ietf-lamps-x509-alg-none]
               Benjamin, D., "Unsigned X.509 Certificates", Work in
               Progress, Internet-Draft, draft-ietf-lamps-x509-alg-none-
               08, 7 July 2025, <https://datatracker.ietf.org/doc/html/
