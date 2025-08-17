@@ -2740,7 +2740,7 @@ Since draft-davidben-tls-merkle-tree-certs-06
 
    *  Fix mistyped reference
 
-   *  Removed no unnecessary placeholder text
+   *  Removed now unnecessary placeholder text
 
    *  First draft at IANA registration and ASN.1 module
 
