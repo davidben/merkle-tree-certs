@@ -51,6 +51,9 @@ normative:
     seriesinfo:
       ISO/IEC 8824-1:2021
 
+  # For the ASN.1 module
+  RFC5912:
+
 informative:
   CHROME-CT:
     title: Chrome Certificate Transparency Policy
@@ -1190,13 +1193,90 @@ The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tr
 
 # IANA Considerations
 
-TODO: Fill this in.
+## Module Identifier
+
+IANA is requested to add the following entry in the "SMI Security for PKIX Module Identifier" registry {{?RFC7299}}:
+
+| Decimal | Description     | References |
+|---------|-----------------|------------|
+| TBD     | id-mod-mtc-2025 | [this-RFC] |
+
+## Algorithm
+
+IANA is requested to add the following entry to the "SMI Security for PKIX Algorithms" registry {{?RFC7299}}:
+
+| Decimal | Description     | References |
+|---------|-----------------|------------|
+| TBD     | id-alg-mtcProof | [this-RFC] |
+
+## Relative Distinguished Name Attribute
+
+IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry {{?I-D.ietf-lamps-x509-alg-none}}:
+
+| Decimal | Description           | References |
+|---------|-----------------------|------------|
+| TBD     | id-rdna-trustAnchorID | [this-RFC] |
 
 --- back
 
 # ASN.1 Module
 
-TODO: Add an ASN.1 module. Leaving a placeholder as a reminder.
+~~~
+MerkleTreeCertificates
+  { iso(1) identified-organization(3) dod(6) internet(1)
+    security(5) mechanisms(5) pkix(7) id-mod(0)
+    id-mod-mtc-2025(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+  SIGNATURE-ALGORITHM
+  FROM AlgorithmInformation-2009  -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-algorithmInformation-02(58) }
+  ATTRIBUTE
+  FROM PKIX-CommonTypes-2009 -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkixCommon-02(57) } ;
+  TrustAnchorID
+  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-trustAnchorIDs-2025(TBD) }
+
+TBSCertificateLogEntry  ::=  SEQUENCE  {
+      version             [0]  EXPLICIT Version DEFAULT v1,
+      issuer                   Name,
+      validity                 Validity,
+      subject                  Name,
+      subjectPublicKeyInfoHash OCTET STRING,
+      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
+      extensions          [3]  EXPLICIT Extensions OPTIONAL }
+
+id-alg-mtcProof OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) algorithms(6) TBD}
+
+sa-mtcProof SIGNATURE-ALGORITHM ::= {
+   IDENTIFIER id-alg-mtcProof
+   PARAMS ARE absent
+}
+
+id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+
+at-trustAnchorID ATTRIBUTE ::= {
+   TYPE TrustAnchorID
+   IDENTIFIED BY id-rdna-trustAnchorID
+}
+
+END
+~~~
 
 # Extensions to Tiled Transparency Logs (To Be Removed)
 
@@ -1352,3 +1432,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Fix mistyped reference
+
+- Removed now unnecessary placeholder text
+
+- First draft at IANA registration and ASN.1 module
