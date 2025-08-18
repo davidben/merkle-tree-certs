@@ -453,7 +453,7 @@ Not all `[start, end)` intervals of a Merkle tree are valid subtrees. This secti
 
    6. Return the subtrees `[left_start, mid)` and `[mid, end)`.
 
-When the procedure returns a single subtree, the subtree is `[start, end)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:
+When the procedure returns a single subtree, the subtree is `[start, start+1)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:
 
 * `left.end = right.start`. That is, the two subtrees cover adjacent intervals.
 * `left.start <= start` and `end = right.end`. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before `start` left, but not after `end`.
