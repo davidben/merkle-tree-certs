@@ -348,14 +348,14 @@ A subtree `[start, end)` can be efficiently proven to be consistent with the ful
 
 The subtree consistency proof, `SUBTREE_PROOF(start, end, D_n)` is defined similarly to {{Section 2.1.4.1 of !RFC9162}}, in terms of a helper function that tracks whether the subtree hash is known:
 
-~~~
+~~~pseudocode
 SUBTREE_PROOF(start, end, D_n) =
     SUBTREE_SUBPROOF(start, end, D_n, true)
 ~~~
 
 If `start = 0` and `end = n`, the subtree is the root:
 
-~~~
+~~~pseudocode
 SUBTREE_SUBPROOF(0, n, D_n, true) = {}
 SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
 ~~~
@@ -364,34 +364,34 @@ Otherwise, `n > 1`. Let `k` be the largest power of two smaller than `n`. The co
 
 * If `end <= k`, the subtree is on the left of `k`. The proof proves consistency with the left child and includes the right child:
 
-  ~~~
+  ~~~pseudocode
   SUBTREE_SUBPROOF(start, end, D_n, b) =
       SUBTREE_SUBPROOF(start, end, D[0:k], b) : MTH(D[k:n])
   ~~~
 
 * If `k <= start`, the subtree is on the right of `k`. The proof proves consistency with the right child and includes the left child.
 
-  ~~~
+  ~~~pseudocode
   SUBTREE_SUBPROOF(start, end, D_n, b) =
       SUBTREE_SUBPROOF(start - k, end - k, D[k:n], b) : MTH(D[0:k])
   ~~~
 
 * Otherwise, `start < k < end`, which implies `start = 0`. The proof proves consistency with the right child and includes the left child.
 
-  ~~~
+  ~~~pseudocode
   SUBTREE_SUBPROOF(0, end, D_n, b) =
       SUBTREE_SUBPROOF(0, end - k, D[k:n], false) : MTH(D[0:k])
   ~~~
 
 When `start` is zero, this computes a Merkle consistency proof:
 
-~~~
+~~~pseudocode
 SUBTREE_PROOF(0, end, D_n) = PROOF(end, D_n)
 ~~~
 
 When `end = start + 1`, this computes a Merkle inclusion proof:
 
-~~~
+~~~pseudocode
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 ~~~
 
@@ -432,7 +432,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 Not all `[start, end)` intervals of a Merkle tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following Python procedure:
 
-~~~py
+~~~python
 def find_subtrees(start, end):
     """ Returns a list of one or two subtrees that efficiently
     cover [start, end). """
@@ -541,7 +541,7 @@ Each issuance log is identified by a *log ID*, which is a trust anchor ID {{!I-D
 
 An issuance log's log ID determines an X.509 distinguished name ({{Section 4.1.2.4 of !RFC5280}}). The distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type `id-rdna-trustAnchorID`, defined below:
 
-~~~
+~~~asn.1
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) rdna(TBD1) TBD2}
@@ -561,7 +561,7 @@ For initial experimentation, early implementations of this design will use the O
 
 Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.
 
-~~~
+~~~tls-presentation
 struct {} Empty;
 
 enum {
@@ -582,7 +582,7 @@ When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume th
 
 `tbs_cert_entry_data` contains the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below:
 
-~~~
+~~~asn.1
 TBSCertificateLogEntry  ::=  SEQUENCE  {
       version             [0]  EXPLICIT Version DEFAULT v1,
       issuer                   Name,
@@ -614,7 +614,7 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 A cosigner computes a cosignature for a subtree in some log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
-~~~
+~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
 /* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
@@ -784,7 +784,7 @@ The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. I
 
 The TBSCertificate's `signature` and the Certificate's `signatureAlgorithm` MUST contain an AlgorithmIdentifier whose `algorithm` is id-alg-mtcProof, defined below, and whose `parameters` is omitted.
 
-~~~
+~~~asn.1
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) TBD}
@@ -794,7 +794,7 @@ For initial experimentation, early implementations of this design will use the O
 
 The `signatureValue` contains an MTCProof structure, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
-~~~
+~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
 struct {
@@ -1221,7 +1221,7 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 
 # ASN.1 Module
 
-~~~
+~~~asn.1
 MerkleTreeCertificates
   { iso(1) identified-organization(3) dod(6) internet(1)
     security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -1294,13 +1294,13 @@ The note body is a sequence of the following lines, each terminated by a newline
 
 Each note signature has a key name of the cosigner name. The signature's key ID is computed using the reserved signature type in {{SIGNED-NOTE}}, and a fixed string, as follows:
 
-~~~
+~~~pseudocode
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 ~~~
 
 A subtree whose `start` is zero can also be represented as a checkpoint {{TLOG-CHECKPOINT}}. A corresponding subtree signature can be represented as a note signature using a key ID computed as follows:
 
-~~~
+~~~pseudocode
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-checkpoint/v1")[:4]
 ~~~
 
