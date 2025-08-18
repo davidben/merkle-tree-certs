@@ -467,7 +467,7 @@ def find_subtrees(start, end):
     """ Returns a list of one or two subtrees that efficiently
     cover [start, end). """
     assert start < end
-    if end - start < 2:
+    if end - start == 1:
         return [(start, end),]
     last = end - 1
     # Find where start and last's tree paths diverge. The two
