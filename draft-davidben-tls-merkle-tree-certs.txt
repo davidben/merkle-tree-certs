@@ -556,13 +556,64 @@ Table of Contents
    Not all [start, end) intervals of a Merkle tree are valid subtrees.
    This section describes how, for any start < end, to determine up to
    two subtrees that efficiently cover the interval.  The subtrees are
-   determined by the following Python procedure:
+   determined by the following procedure:
+
+   1.  If end - start is one, return a single subtree, [start, end).
+
+   2.  Otherwise, run the following to return a pair of subtrees:
+
+       1.  Let last be end - 1, the last index in [start, end).
+
+       2.  Let split be the bit index of the most significant bit where
+           start and last differ.  Bits are numbered from the least
+           significant bit, starting at zero. split is the height at
+           which start and last's paths in the tree diverge.
+
+       3.  Let mid be last with the least significant split bits set to
+           zero. mid is the leftmost leaf node in the above divergence
+           point's right branch.
+
+       4.  Within the least significant split bits of left, let b be the
+           bit index of the most significant bit with value zero, if
+           any:
+
+           1.  If there is such a bit, let left_split be b + 1.
+
+           2.  Otherwise, let left_split be zero.
+
+           left_split is the height of the lowest common ancestor of the
+           nodes in [start, mid).
+
+       5.  Let left_start be start with the least significant left_split
+           bits set to zero. left_start is the above lowest common
+           ancestor's leftmost leaf node.
+
+       6.  Return the subtrees [left_start, mid) and [mid, end).
+
+   When the procedure returns a single subtree, the subtree is [start,
+   start+1).  When it returns two subtrees, left and right, the subtrees
+   satisfy the following properties:
+
+   *  left.end = right.start.  That is, the two subtrees cover adjacent
+      intervals.
+
+   *  left.start <= start and end = right.end.  That is, the two
+      subtrees together cover the entire target interval, possibly with
+      some extra entries before start left, but not after end.
+
+   *  left.end - left.start < 2 * (end - start) and right.end -
+      right.start <= end - start.  That is, the two subtrees efficiently
+      cover the interval.
+
+   *  left is full, while right may be partial.
+
+   The following Python code implements this procedure:
 
    def find_subtrees(start, end):
        """ Returns a list of one or two subtrees that efficiently
        cover [start, end). """
        assert start < end
-       if end - start < 2:
+       if end - start == 1:
            return [(start, end),]
        last = end - 1
        # Find where start and last's tree paths diverge. The two
@@ -573,27 +624,8 @@ Table of Contents
        # Maximize the left endpoint. This is just before start's
        # path leaves the right edge of its new subtree.
        left_split = (~start & mask).bit_length()
-       left = start & ~((1 << left_split) - 1)
-       return [(left, mid), (mid, end)]
-
-   [[TODO: Write this up in prose too.]]
-
-   When the procedure returns a single subtree, the subtree is [start,
-   end).  When it returns two subtrees, left and right, the subtrees
-   satisfy the following properties:
-
-   1.  left.end = right.start.  That is, the two subtrees cover adjacent
-       intervals.
-
-   2.  left.start <= start and end = right.end.  That is, the two
-       subtrees together cover the entire target interval, possibly with
-       some extra entries before start left, but not after end.
-
-   3.  left.end - left.start < 2 * (end - start) and right.end -
-       right.start <= end - start.  That is, the two subtrees
-       efficiently cover the interval.
-
-   4.  left is full, while right may be partial.
+       left_start = start & ~((1 << left_split) - 1)
+       return [(left_start, mid), (mid, end)]
 
    Figure 1 shows the subtrees which cover [5, 13) in a Merkle Tree of
    13 elements.  The two subtrees selected are [4, 8) and [8, 13).  Note
@@ -2743,6 +2775,8 @@ Since draft-davidben-tls-merkle-tree-certs-06
    *  Removed now unnecessary placeholder text
 
    *  First draft at IANA registration and ASN.1 module
+
+   *  Added a prose version of the procedure to select subtrees
 
 Authors' Addresses
 
