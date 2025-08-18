@@ -1051,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 18 February 2026</td>
+<td class="center">Expires 19 February 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-08-17" class="published">17 August 2025</time>
+<time datetime="2025-08-18" class="published">18 August 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-02-18">18 February 2026</time></dd>
+<dd class="expires"><time datetime="2026-02-19">19 February 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1129,7 +1129,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1343,6 +1343,17 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
             <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-module-identifier" class="internal xref">Module Identifier</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-algorithm" class="internal xref">Algorithm</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
+                <p id="section-toc.1-1.13.2.3.1"><a href="#section-13.3" class="auto internal xref">13.3</a>.  <a href="#name-relative-distinguished-name" class="internal xref">Relative Distinguished Name Attribute</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
             <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
@@ -3319,7 +3330,81 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
       <h2 id="name-iana-considerations">
 <a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-13-1">TODO: Fill this in.<a href="#section-13-1" class="pilcrow">¶</a></p>
+<div id="module-identifier">
+<section id="section-13.1">
+        <h3 id="name-module-identifier">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-module-identifier" class="section-name selfRef">Module Identifier</a>
+        </h3>
+<p id="section-13.1-1">IANA is requested to add the following entry in the "SMI Security for PKIX Module Identifier" registry <span>[<a href="#RFC7299" class="cite xref">RFC7299</a>]</span>:<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Decimal</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">References</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">TBD</td>
+              <td class="text-left" rowspan="1" colspan="1">id-mod-mtc-2025</td>
+              <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="algorithm">
+<section id="section-13.2">
+        <h3 id="name-algorithm">
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-algorithm" class="section-name selfRef">Algorithm</a>
+        </h3>
+<p id="section-13.2-1">IANA is requested to add the following entry to the "SMI Security for PKIX Algorithms" registry <span>[<a href="#RFC7299" class="cite xref">RFC7299</a>]</span>:<a href="#section-13.2-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Decimal</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">References</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">TBD</td>
+              <td class="text-left" rowspan="1" colspan="1">id-alg-mtcProof</td>
+              <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="relative-distinguished-name-attribute">
+<section id="section-13.3">
+        <h3 id="name-relative-distinguished-name">
+<a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-relative-distinguished-name" class="section-name selfRef">Relative Distinguished Name Attribute</a>
+        </h3>
+<p id="section-13.3-1">IANA is requested to add the following entry to the "SMI Security for PKIX Relative Distinguished Name Attribute" registry <span>[<a href="#I-D.ietf-lamps-x509-alg-none" class="cite xref">I-D.ietf-lamps-x509-alg-none</a>]</span>:<a href="#section-13.3-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-3">
+          <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Decimal</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">References</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">TBD</td>
+              <td class="text-left" rowspan="1" colspan="1">id-rdna-trustAnchorID</td>
+              <td class="text-left" rowspan="1" colspan="1">[this-RFC]</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
 </section>
 </div>
 <div id="sec-combined-references">
@@ -3364,6 +3449,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <dt id="RFC5280">[RFC5280]</dt>
         <dd>
 <span class="refAuthor">Cooper, D.</span>, <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Farrell, S.</span>, <span class="refAuthor">Boeyen, S.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5280">https://www.rfc-editor.org/rfc/rfc5280</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5912">[RFC5912]</dt>
+        <dd>
+<span class="refAuthor">Hoffman, P.</span> and <span class="refAuthor">J. Schaad</span>, <span class="refTitle">"New ASN.1 Modules for the Public Key Infrastructure Using X.509 (PKIX)"</span>, <span class="seriesInfo">RFC 5912</span>, <span class="seriesInfo">DOI 10.17487/RFC5912</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5912">https://www.rfc-editor.org/rfc/rfc5912</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8032">[RFC8032]</dt>
         <dd>
@@ -3454,6 +3543,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <dd>
 <span class="refAuthor">Cooper, A.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Aboba, B.</span>, <span class="refAuthor">Peterson, J.</span>, <span class="refAuthor">Morris, J.</span>, <span class="refAuthor">Hansen, M.</span>, and <span class="refAuthor">R. Smith</span>, <span class="refTitle">"Privacy Considerations for Internet Protocols"</span>, <span class="seriesInfo">RFC 6973</span>, <span class="seriesInfo">DOI 10.17487/RFC6973</span>, <time datetime="2013-07" class="refDate">July 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6973">https://www.rfc-editor.org/rfc/rfc6973</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC7299">[RFC7299]</dt>
+        <dd>
+<span class="refAuthor">Housley, R.</span>, <span class="refTitle">"Object Identifier Registry for the PKIX Working Group"</span>, <span class="seriesInfo">RFC 7299</span>, <span class="seriesInfo">DOI 10.17487/RFC7299</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7299">https://www.rfc-editor.org/rfc/rfc7299</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="SCTNotAfter">[SCTNotAfter]</dt>
         <dd>
 <span class="refAuthor">Adrian, D.</span>, <span class="refTitle">"How to distrust a CA without any certificate errors"</span>, <time datetime="2025-03" class="refDate">March 2025</time>, <span>&lt;<a href="https://dadrian.io/blog/posts/sct-not-after/">https://dadrian.io/blog/posts/sct-not-after/</a>&gt;</span>. </dd>
@@ -3496,7 +3589,64 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
       <h2 id="name-asn1-module">
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-asn1-module" class="section-name selfRef">ASN.1 Module</a>
       </h2>
-<p id="appendix-A-1">TODO: Add an ASN.1 module. Leaving a placeholder as a reminder.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-1">
+<pre>
+MerkleTreeCertificates
+  { iso(1) identified-organization(3) dod(6) internet(1)
+    security(5) mechanisms(5) pkix(7) id-mod(0)
+    id-mod-mtc-2025(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+  SIGNATURE-ALGORITHM
+  FROM AlgorithmInformation-2009  -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-algorithmInformation-02(58) }
+  ATTRIBUTE
+  FROM PKIX-CommonTypes-2009 -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkixCommon-02(57) } ;
+  TrustAnchorID
+  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-trustAnchorIDs-2025(TBD) }
+
+TBSCertificateLogEntry  ::=  SEQUENCE  {
+      version             [0]  EXPLICIT Version DEFAULT v1,
+      issuer                   Name,
+      validity                 Validity,
+      subject                  Name,
+      subjectPublicKeyInfoHash OCTET STRING,
+      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
+      extensions          [3]  EXPLICIT Extensions OPTIONAL }
+
+id-alg-mtcProof OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) algorithms(6) TBD}
+
+sa-mtcProof SIGNATURE-ALGORITHM ::= {
+   IDENTIFIER id-alg-mtcProof
+   PARAMS ARE absent
+}
+
+id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5)
+    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+
+at-trustAnchorID ATTRIBUTE ::= {
+   TYPE TrustAnchorID
+   IDENTIFIED BY id-rdna-trustAnchorID
+}
+
+END
+</pre><a href="#appendix-A-1" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="extensions-to-tiled-transparency-logs-to-be-removed">
@@ -3744,6 +3894,12 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
 <ul class="normal">
 <li class="normal" id="appendix-D.7-1.1">
             <p id="appendix-D.7-1.1.1">Fix mistyped reference<a href="#appendix-D.7-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.2">
+            <p id="appendix-D.7-1.2.1">Removed now unnecessary placeholder text<a href="#appendix-D.7-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.3">
+            <p id="appendix-D.7-1.3.1">First draft at IANA registration and ASN.1 module<a href="#appendix-D.7-1.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
