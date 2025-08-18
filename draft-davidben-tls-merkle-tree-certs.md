@@ -430,7 +430,37 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 ## Arbitrary Intervals
 
-Not all `[start, end)` intervals of a Merkle tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following Python procedure:
+Not all `[start, end)` intervals of a Merkle tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:
+
+1. If `end - start` is one, return a single subtree, `[start, end)`.
+
+2. Otherwise, run the following to return a pair of subtrees:
+
+   1. Let `last` be `end - 1`, the last index in `[start, end)`.
+
+   2. Let `split` be the bit index of the most significant bit where `start` and `last` differ. Bits are numbered from the least significant bit, starting at zero. `split` is the height at which `start` and `last`'s paths in the tree diverge.
+
+   3. Let `mid` be `last` with the least significant `split` bits set to zero. `mid` is the leftmost leaf node in the above divergence point's right branch.
+
+   4. Within the least significant `split` bits of `left`, let `b` be the bit index of the most significant bit with value zero, if any:
+
+      1. If there is such a bit, let `left_split` be `b + 1`.
+      2. Otherwise, let `left_split` be zero.
+
+      `left_split` is the height of the lowest common ancestor of the nodes in `[start, mid)`.
+
+   5. Let `left_start` be `start` with the least significant `left_split` bits set to zero. `left_start` is the above lowest common ancestor's leftmost leaf node.
+
+   6. Return the subtrees `[left_start, mid)` and `[mid, end)`.
+
+When the procedure returns a single subtree, the subtree is `[start, end)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:
+
+* `left.end = right.start`. That is, the two subtrees cover adjacent intervals.
+* `left.start <= start` and `end = right.end`. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before `start` left, but not after `end`.
+* `left.end - left.start < 2 * (end - start)` and `right.end - right.start <= end - start`. That is, the two subtrees efficiently cover the interval.
+* `left` is full, while `right` may be partial.
+
+The following Python code implements this procedure:
 
 ~~~python
 def find_subtrees(start, end):
@@ -448,18 +478,9 @@ def find_subtrees(start, end):
     # Maximize the left endpoint. This is just before start's
     # path leaves the right edge of its new subtree.
     left_split = (~start & mask).bit_length()
-    left = start & ~((1 << left_split) - 1)
-    return [(left, mid), (mid, end)]
+    left_start = start & ~((1 << left_split) - 1)
+    return [(left_start, mid), (mid, end)]
 ~~~
-
-[[TODO: Write this up in prose too.]]
-
-When the procedure returns a single subtree, the subtree is `[start, end)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:
-
-1. `left.end = right.start`. That is, the two subtrees cover adjacent intervals.
-2. `left.start <= start` and `end = right.end`. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before `start` left, but not after `end`.
-3. `left.end - left.start < 2 * (end - start)` and `right.end - right.start <= end - start`. That is, the two subtrees efficiently cover the interval.
-4. `left` is full, while `right` may be partial.
 
 {{fig-subtree-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
 
@@ -1436,3 +1457,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Removed now unnecessary placeholder text
 
 - First draft at IANA registration and ASN.1 module
+
+- Added a prose version of the procedure to select subtrees
