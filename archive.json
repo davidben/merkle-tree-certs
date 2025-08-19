@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-14T02:11:45.219381+00:00",
+  "timestamp": "2025-08-19T02:04:35.524010+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -1044,15 +1044,15 @@
       "id": "I_kwDOJIBkVc5nzwlR",
       "title": "Downtime lenience",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/37",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "> [[TODO: If the mirror gets far behind, if the CA just stops publishing for a while, it may suddenly have to catch up on many batches. Should we allow the mirror to catch up to the latest window and skip the intervening batches? The intervening batches are guaranteed to have been expired]] ",
       "createdAt": "2023-06-05T11:58:59Z",
-      "updatedAt": "2025-06-21T14:22:16Z",
-      "closedAt": null,
+      "updatedAt": "2025-08-17T16:40:03Z",
+      "closedAt": "2025-08-17T16:40:03Z",
       "comments": [
         {
           "author": "davidben",
@@ -1067,6 +1067,13 @@
           "body": "Post-Photosynthesis triage: details of the mirror is (for now) moved from this draft into the tlog ecosystem. Leaving this open just because https://github.com/davidben/C2SP/blob/tlog-mirror/tlog-mirror.md doesn't _quite yet_ support this. But once the tlog-mirror branch is merged with https://github.com/C2SP/C2SP/pull/138, I think we'll have all the pieces to do this.",
           "createdAt": "2025-06-21T14:22:16Z",
           "updatedAt": "2025-06-21T14:22:16Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "tlog-mirror now talks about pruning so I think we can close this.",
+          "createdAt": "2025-08-17T16:40:03Z",
+          "updatedAt": "2025-08-17T16:40:03Z"
         }
       ]
     },
@@ -1248,15 +1255,15 @@
       "id": "I_kwDOJIBkVc5nz1P_",
       "title": "IANA considerations",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/42",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-06-05T12:08:24Z",
-      "updatedAt": "2025-06-21T14:24:01Z",
-      "closedAt": null,
+      "updatedAt": "2025-08-18T13:58:00Z",
+      "closedAt": "2025-08-18T13:58:00Z",
       "comments": [
         {
           "author": "davidben",
@@ -6968,6 +6975,123 @@
               "body": "And if the IKEv2 community is ready to build out a transparent PKI while this work is ongoing, there's nothing stopping the WG from discussing other use cases then. But I don't think the charter should commit us to doing something for IKEv2 prematurely.",
               "createdAt": "2025-08-13T21:26:28Z",
               "updatedAt": "2025-08-13T21:26:28Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 124,
+      "id": "PR_kwDOJIBkVc6j_w61",
+      "title": "Add a first pass at IANA considerations and ASN.1 module",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/124",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "I'm sure I've gotten the ASN.1 module wrong, but here goes.\r\n\r\nCloses #42",
+      "createdAt": "2025-08-17T17:06:15Z",
+      "updatedAt": "2025-08-18T13:58:03Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "70aa11a0c098067bc42addbf48c5761bef2f9194",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "iana-asn1",
+      "headRefOid": "5289affed6aa3b9d91d7daba7f83e36ebefd2a9a",
+      "closedAt": "2025-08-18T13:58:00Z",
+      "mergedAt": "2025-08-18T13:58:00Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "66079aff6e7cb5b77021915ac12617789e2fc664"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc66bj9Z",
+          "commit": {
+            "abbreviatedOid": "5289aff"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Yeah, not sure this is correct either, but we could ask LAMPS.",
+          "createdAt": "2025-08-18T10:26:51Z",
+          "updatedAt": "2025-08-18T10:27:14Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 125,
+      "id": "PR_kwDOJIBkVc6kIyE4",
+      "title": "Program in English as well as Python",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/125",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This adds a prose version of the \"Arbitrary Intervals\" procedure. The Python one is clearer I think, but IETF does like to program in English.\r\n\r\nI've renamed `left` to `left_start` in some places so we don't have two things called `left`.\r\n\r\n(Also adding @lukevalenta who I cannot set as reviewer yet because apparently I forgot to add you to the repo! \ud83d\ude33)",
+      "createdAt": "2025-08-18T15:52:06Z",
+      "updatedAt": "2025-08-18T19:26:22Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "173975226a67d4a867e3ffb6c9939b2f97f66b14",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "nodes-english",
+      "headRefOid": "f54e299b199295f785a9e25dc8667da926ad5e29",
+      "closedAt": "2025-08-18T19:26:18Z",
+      "mergedAt": "2025-08-18T19:26:18Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a25c85e9ae58b245f143b77a07b42944a0542af8"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc66hGoa",
+          "commit": {
+            "abbreviatedOid": "7d388d7"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Looks good! Just two minor suggestions.",
+          "createdAt": "2025-08-18T17:17:08Z",
+          "updatedAt": "2025-08-18T17:24:50Z",
+          "comments": [
+            {
+              "originalPosition": 35,
+              "body": "It won't let me comment on the code below since it's not part of the diff, but maybe swap `end - start < 2` with `end - start == 1` to match the English text above and to be more precise?",
+              "createdAt": "2025-08-18T17:17:09Z",
+              "updatedAt": "2025-08-18T17:24:50Z"
+            },
+            {
+              "originalPosition": 28,
+              "body": "This just clarifies that size of the single subtree is always one.\r\n```suggestion\r\nWhen the procedure returns a single subtree, the subtree is `[start, start+1)`. When it returns two subtrees, `left` and `right`, the subtrees satisfy the following properties:\r\n```",
+              "createdAt": "2025-08-18T17:23:41Z",
+              "updatedAt": "2025-08-18T17:25:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc66ifYr",
+          "commit": {
+            "abbreviatedOid": "7d388d7"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-18T19:25:56Z",
+          "updatedAt": "2025-08-18T19:25:56Z",
+          "comments": [
+            {
+              "originalPosition": 35,
+              "body": "Ah yeah, done.",
+              "createdAt": "2025-08-18T19:25:56Z",
+              "updatedAt": "2025-08-18T19:25:56Z"
             }
           ]
         }
