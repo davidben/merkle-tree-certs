@@ -1353,7 +1353,7 @@ Table of Contents
    time_between_landmarks interval, and then appending the latest
    checkpoint tree size to the sequence, once per interval.  If the
    latest checkpoint tree size is already a landmark, the interval is
-   skipped. max_landmarks can then be set to floor(max_cert_lifetime /
+   skipped. max_landmarks can then be set to ceil(max_cert_lifetime /
    time_between_landmarks) + 1, where max_cert_lifetime is the CA's
    maximum certificate lifetime.  Allocations do not need to be precise,
    as long as max_landmarks is accurate.
