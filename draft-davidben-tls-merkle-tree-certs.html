@@ -1051,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 19 February 2026</td>
+<td class="center">Expires 22 February 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-08-18" class="published">18 August 2025</time>
+<time datetime="2025-08-21" class="published">21 August 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-02-19">19 February 2026</time></dd>
+<dd class="expires"><time datetime="2026-02-22">22 February 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1129,7 +1129,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1246,7 +1246,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-signatureless-certificates" class="internal xref">Signatureless Certificates</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmark-checkpoints" class="internal xref">Landmark Checkpoints</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmarks" class="internal xref">Landmarks</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
                     <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-constructing-signatureless-" class="internal xref">Constructing Signatureless Certificates</a></p>
@@ -1524,14 +1524,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
             <p id="section-2.1-4.12.1">A signature from either the CA or other cosigner, over some checkpoint or subtree.<a href="#section-2.1-4.12.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.1-4.13">Landmark checkpoint:</dt>
+<dt id="section-2.1-4.13">Landmark:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.14">
-            <p id="section-2.1-4.14.1">One of an infrequent subset of checkpoints that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.14.1">One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.15">Landmark subtree:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.16">
-            <p id="section-2.1-4.16.1">A subtree determined by a landmark checkpoint. Landmark subtrees are common points of reference between relying parties and signatureless certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.16.1">A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and signatureless certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.17">Full certificate:</dt>
@@ -1587,10 +1587,10 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <p id="section-3-8">This same issuance process also produces a <em>signatureless certificate</em>. This is an optional optimized certificate that avoids any cosignatures:<a href="#section-3-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3-9">
 <li id="section-3-9.1">
-          <p id="section-3-9.1.1">Periodically, the CA's most recent checkpoint is designated as a <em>landmark checkpoint</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and signatureless certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.1.1">Periodically, the tree size of the CA's most recent checkpoint is designated as a <em>landmark</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and signatureless certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.2">
-          <p id="section-3-9.2.1">Once some landmark checkpoint includes the TBSCertificate, the signatureless certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.2.1">Once some landmark includes the TBSCertificate, the signatureless certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-9.2.2.1">
               <p id="section-3-9.2.2.1.1">The TBSCertificate being certified<a href="#section-3-9.2.2.1.1" class="pilcrow">¶</a></p>
@@ -2882,47 +2882,47 @@ struct {
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-signatureless-certificates" class="section-name selfRef">Signatureless Certificates</a>
         </h3>
 <p id="section-6.3-1">A <em>signatureless certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Signatureless certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding full certificate alongside any signatureless certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<div id="landmark-checkpoints">
+<div id="landmarks">
 <section id="section-6.3.1">
-          <h4 id="name-landmark-checkpoints">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmark-checkpoints" class="section-name selfRef">Landmark Checkpoints</a>
+          <h4 id="name-landmarks">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmarks" class="section-name selfRef">Landmarks</a>
           </h4>
-<p id="section-6.3.1-1">A signatureless certificate is constructed based on a <em>landmark checkpoint sequence</em>, which is a sequence of <em>landmark checkpoints</em>. Landmark checkpoints are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmark checkpoints SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark checkpoint sequences to exist per CA. Landmark checkpoints are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">A landmark checkpoint sequence has the following fixed parameters:<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-1">A signatureless certificate is constructed based on a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">A landmark sequence has the following fixed parameters:<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-3.1">
-              <p id="section-6.3.1-3.1.1"><code>base_id</code>: An OID arc for trust anchor IDs of individual landmark checkpoints<a href="#section-6.3.1-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.1.1"><code>base_id</code>: An OID arc for trust anchor IDs of individual landmarks<a href="#section-6.3.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.2">
-              <p id="section-6.3.1-3.2.1"><code>max_checkpoints</code>: A positive integer, describing the maximum number of landmark checkpoints that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.2.1"><code>max_landmarks</code>: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.3">
-              <p id="section-6.3.1-3.3.1"><code>checkpoint_url</code>: Some URL to fetch the current list of landmark checkpoints<a href="#section-6.3.1-3.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.3.1"><code>landmark_url</code>: Some URL to fetch the current list of landmarks<a href="#section-6.3.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.3.1-4">Landmark checkpoints are numbered consecutively from zero. Each landmark checkpoint has a trust anchor ID, determined by appending the checkpoint number to <code>base_id</code>. For example, the trust anchor ID for landmark checkpoint 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-5">Each landmark checkpoint specifies a tree size. The first landmark checkpoint, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-6">Landmark checkpoints determine <em>landmark subtrees</em>: for each landmark checkpoint, other than number zero, let <code>tree_size</code> be the checkpoint's tree size and <code>prev_tree_size</code> be that of the previous landmark checkpoint. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-7">The most recent <code>max_checkpoints</code> landmark checkpoints are said to be <em>active</em>. Landmark checkpoints MUST be allocated such that, at any given time, only active landmark checkpoints contain unexpired certificates. The active landmark subtrees are those determined by the active landmark checkpoints. There are at most <code>2 * max_checkpoints</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-8">If landmark checkpoints are allocated incorrectly (e.g. past checkpoints change, or <code>max_checkpoints</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-9">It is RECOMMENDED that checkpoints be allocated by picking some <code>time_between_checkpoints</code> interval, and then appending the latest checkpoint to the sequence, once per interval. If the latest checkpoint is already a landmark checkpoint, the interval is skipped. <code>max_checkpoints</code> can then be set to <code>ceil(max_cert_lifetime / time_between_checkpoints)</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as <code>max_checkpoints</code> is accurate.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-10">Relying parties will locally retain up to <code>2 * max_checkpoints</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_checkpoints</code> should be set to balance the delay between landmark checkpoints and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark checkpoint every hour, will have a <code>max_checkpoints</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-10" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-11"><code>checkpoint_url</code> MUST serve a resource with <code>Content-Type: text/plain; charset=utf-8</code> and the following lines. Each line MUST be terminated by a newline character (U+000A):<a href="#section-6.3.1-11" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to <code>base_id</code>. For example, the trust anchor ID for landmark 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-5">Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-6">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-7">The most recent <code>max_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-8">If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-9">It is RECOMMENDED that landmarks be allocated by picking some <code>time_between_landmarks</code> interval, and then appending the latest checkpoint tree size (although any size less or equal to the latest checkpoint tree size is valid) to the sequence, once per interval. If the latest checkpoint tree size is already a landmark, the interval is skipped. <code>max_landmarks</code> can then be set to <code>ceil(max_cert_lifetime / time_between_landmarks)</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as <code>max_landmarks</code> is accurate.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-10">Relying parties will locally retain up to <code>2 * max_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_landmarks</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-10" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-11"><code>landmark_url</code> MUST serve a resource with <code>Content-Type: text/plain; charset=utf-8</code> and the following lines. Each line MUST be terminated by a newline character (U+000A):<a href="#section-6.3.1-11" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-12.1">
-              <p id="section-6.3.1-12.1.1">Two space-separated non-negative decimal integers: <code>&lt;last_checkpoint&gt; &lt;num_active_checkpoints&gt;</code>.
+              <p id="section-6.3.1-12.1.1">Two space-separated non-negative decimal integers: <code>&lt;last_landmark&gt; &lt;num_active_landmarks&gt;</code>.
 This line MUST satisfy the following, otherwise it is invalid:<a href="#section-6.3.1-12.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-12.1.2.1">
-                  <p id="section-6.3.1-12.1.2.1.1"><code>num_active_checkpoints &lt;= max_checkpoints</code><a href="#section-6.3.1-12.1.2.1.1" class="pilcrow">¶</a></p>
+                  <p id="section-6.3.1-12.1.2.1.1"><code>num_active_landmarks &lt;= max_landmarks</code><a href="#section-6.3.1-12.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-6.3.1-12.1.2.2">
-                  <p id="section-6.3.1-12.1.2.2.1"><code>num_active_checkpoints &lt;= last_checkpoint</code><a href="#section-6.3.1-12.1.2.2.1" class="pilcrow">¶</a></p>
+                  <p id="section-6.3.1-12.1.2.2.1"><code>num_active_landmarks &lt;= last_landmark</code><a href="#section-6.3.1-12.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
             <li class="normal" id="section-6.3.1-12.2">
-              <p id="section-6.3.1-12.2.1"><code>num_active_checkpoints + 1</code> lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to <code>num_active_checkpoints</code>, line <code>i</code> contains the tree size for checkpoint <code>last_checkpoint - i</code>. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.<a href="#section-6.3.1-12.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-12.2.1"><code>num_active_landmarks + 1</code> lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.<a href="#section-6.3.1-12.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -2932,19 +2932,19 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
           <h4 id="name-constructing-signatureless-">
 <a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-constructing-signatureless-" class="section-name selfRef">Constructing Signatureless Certificates</a>
           </h4>
-<p id="section-6.3.2-1">Given a TBSCertificateLogEntry in the issuance log and a landmark checkpoint sequence, a signatureless certificate is constructed as follows:<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-1">Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a signatureless certificate is constructed as follows:<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.3.2-2">
 <li id="section-6.3.2-2.1">
-              <p id="section-6.3.2-2.1.1">Wait for the first landmark checkpoint to be allocated that contains the entry.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.1.1">Wait for the first landmark to be allocated that contains the entry.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.2">
-              <p id="section-6.3.2-2.2.1">Determine the landmark checkpoint's landmark subtrees and select the one that contains the entry.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.2.1">Determine the landmark's subtrees and select the one that contains the entry.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.3">
               <p id="section-6.3.2-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>) using the selected subtree and no signatures.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-3">Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark checkpoint. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark checkpoint may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-3">Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2969,7 +2969,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-6.4-4">The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
 <p id="section-6.4-5">Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
-<p id="section-6.4-6">If a new landmark checkpoint is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4-6">If a new landmark is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
 <p id="section-6.4-7">The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.<a href="#section-6.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3057,7 +3057,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </h3>
 <p id="section-7.3-1">A relying party's cosigner policy determines the sets of cosigners that must sign a view of the issuance log before it is trusted.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
 <p id="section-7.3-2">This document does not prescribe a particular policy, but gives general guidance. Relying parties MAY implement policies other than those described below, and MAY incorporate cosigners acting in roles not described in this document.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.3-3">In picking trusted cosigners, relying party SHOULD ensure the following security properties:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-3">In picking trusted cosigners, the relying party SHOULD ensure the following security properties:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-7.3-4">
           <dt id="section-7.3-4.1">Authenticity:</dt>
           <dd style="margin-left: 1.5em" id="section-7.3-4.2">
@@ -3083,12 +3083,12 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmark-checkpoints" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates (<a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates (<a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.4</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <p id="section-7.4-3">This criteria can be checked given:<a href="#section-7.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-4.1">
-            <p id="section-7.4-4.1.1">Some <em>reference checkpoint</em> that contains the latest landmark checkpoint<a href="#section-7.4-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.4-4.1.1">Some <em>reference checkpoint</em> that contains the latest landmark<a href="#section-7.4-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.4-4.2">
             <p id="section-7.4-4.2.1">For each cosigner, either:<a href="#section-7.4-4.2.1" class="pilcrow">¶</a></p>
@@ -3107,7 +3107,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-7.4-5">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <p id="section-7.4-6">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-6" class="pilcrow">¶</a></p>
-<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmark checkpoints may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revocation-by-index">
@@ -3132,8 +3132,8 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-8-2">A full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">A full certificate MAY be used without signals about what the relying party trusts. As with other choices of default certificates, an authenticating party that does so assumes that the relying party trusts the issuing CA, e.g. because the CA is relatively ubiquitous among the relying parties that it supports.<a href="#section-8-4" class="pilcrow">¶</a></p>
-<p id="section-8-5">A signatureless certificate has a trust anchor ID of the corresponding landmark checkpoint, as described in <a href="#landmark-checkpoints" class="auto internal xref">Section 6.3.1</a>. This can be configured in the authenticating party via out-of-band information, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmark checkpoints SHOULD be configured to support those checkpoints' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.<a href="#section-8-5" class="pilcrow">¶</a></p>
-<p id="section-8-6">[[TODO: We can do slightly better. If the relying party supports checkpoint 42, it can be assumed to also support checkpoint 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]<a href="#section-8-6" class="pilcrow">¶</a></p>
+<p id="section-8-5">A signatureless certificate has a trust anchor ID of the corresponding landmark, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. This can be configured in the authenticating party via out-of-band information, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD be configured to support those landmarks' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-6">[[TODO: We can do slightly better. If the relying party supports landmark 42, it can be assumed to also support landmark 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]<a href="#section-8-6" class="pilcrow">¶</a></p>
 <p id="section-8-7">Authenticating parties SHOULD preferentially use signatureless certificates over full certificates, when both are supported by the relying party. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. A signatureless certificate SHOULD NOT be used without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees predistributed.<a href="#section-8-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3145,7 +3145,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
 <p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for full and signatureless certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in <a href="#full-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-4">The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a signatureless certificate, as described in <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3226,7 +3226,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-certificate-renewal">
 <a href="#section-10.4" class="section-number selfRef">10.4. </a><a href="#name-certificate-renewal" class="section-name selfRef">Certificate Renewal</a>
         </h3>
-<p id="section-10.4-1">When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark checkpoint is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
+<p id="section-10.4-1">When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
 <p id="section-10.4-2">To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate some time before the previous Merkle Tree certificate expires. Renewing around 75% into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.<a href="#section-10.4-2" class="pilcrow">¶</a></p>
 <p id="section-10.4-3">The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-10.4-3" class="pilcrow">¶</a></p>
 <p id="section-10.4-4">If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a full certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new signatureless certificate is available and relying parties are updated.<a href="#section-10.4-4" class="pilcrow">¶</a></p>
@@ -3941,6 +3941,9 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-D.7-1.4">
             <p id="appendix-D.7-1.4.1">Added a prose version of the procedure to select subtrees<a href="#appendix-D.7-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.5">
+            <p id="appendix-D.7-1.5.1">Rename 'landmarks checkpoint' to 'landmarks'<a href="#appendix-D.7-1.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
