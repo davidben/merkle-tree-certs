@@ -1468,3 +1468,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Added a prose version of the procedure to select subtrees
 
 - Rename 'landmarks checkpoint' to 'landmarks'
+
+- Clarify and fix an off-by-one error in recommended landmark allocation scheme
