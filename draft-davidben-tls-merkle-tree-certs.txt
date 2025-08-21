@@ -102,7 +102,8 @@ Table of Contents
      6.2.  Full Certificates
      6.3.  Signatureless Certificates
        6.3.1.  Landmarks
-       6.3.2.  Constructing Signatureless Certificates
+       6.3.2.  Allocating Landmarks
+       6.3.3.  Constructing Signatureless Certificates
      6.4.  Size Estimates
    7.  Relying Parties
      7.1.  Trust Anchors
@@ -1345,18 +1346,11 @@ Table of Contents
    landmark subtrees are predistributed to the relying party as trusted
    subtrees, as described in Section 7.4.
 
-   If landmarks are allocated incorrectly (e.g. past landmarks change,
-   or max_landmarks is inaccurate), there are no security consequences,
-   but some older certificates may fail to validate.
-
-   It is RECOMMENDED that landmarks be allocated by picking some
-   time_between_landmarks interval, and then appending the latest
-   checkpoint tree size to the sequence, once per interval.  If the
-   latest checkpoint tree size is already a landmark, the interval is
-   skipped. max_landmarks can then be set to ceil(max_cert_lifetime /
-   time_between_landmarks), where max_cert_lifetime is the CA's maximum
-   certificate lifetime.  Allocations do not need to be precise, as long
-   as max_landmarks is accurate.
+   It is RECOMMENDED that landmarks be allocated following the procedure
+   described in Section 6.3.2.  If landmarks are allocated incorrectly
+   (e.g. past landmarks change, or max_landmarks is inaccurate), there
+   are no security consequences, but some older certificates may fail to
+   validate.
 
    Relying parties will locally retain up to 2 * max_landmarks hashes
    (Section 7.4) per CA, so max_landmarks should be set to balance the
@@ -1384,7 +1378,25 @@ Table of Contents
       landmark last_landmark - i.  The integers MUST be monotonically
       decreasing and lower or equal to the log's latest tree size.
 
-6.3.2.  Constructing Signatureless Certificates
+6.3.2.  Allocating Landmarks
+
+   It is RECOMMENDED that landmarks be allocated using the following
+   procedure:
+
+   1.  Select some time_between_landmarks duration.  Define a series of
+       consecutive, non-overlapping time intervals, each of duration
+       time_between_landmarks.
+
+   2.  At most once per time interval, append the latest checkpoint tree
+       size to the landmark sequence if it is greater than the last
+       landmark's tree size.
+
+   To ensure that only active landmarks contain unexpired certificates,
+   set max_landmarks to ceil(max_cert_lifetime / time_between_landmarks)
+   + 1, where max_cert_lifetime is the CA's maximum certificate
+   lifetime.
+
+6.3.3.  Constructing Signatureless Certificates
 
    Given a TBSCertificateLogEntry in the issuance log and a landmark
    sequence, a signatureless certificate is constructed as follows:
