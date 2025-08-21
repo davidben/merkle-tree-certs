@@ -264,11 +264,11 @@ Consistency proof:
 Cosignature:
 : A signature from either the CA or other cosigner, over some checkpoint or subtree.
 
-Landmark checkpoint:
-: One of an infrequent subset of checkpoints that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.
+Landmark:
+: One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.
 
 Landmark subtree:
-: A subtree determined by a landmark checkpoint. Landmark subtrees are common points of reference between relying parties and signatureless certificates.
+: A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and signatureless certificates.
 
 Full certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
@@ -302,9 +302,9 @@ A *full certificate* contains:
 
 This same issuance process also produces a *signatureless certificate*. This is an optional optimized certificate that avoids any cosignatures:
 
-1. Periodically, the CA's most recent checkpoint is designated as a *landmark checkpoint*. This determines *landmark subtrees*, which are common points of reference between relying parties and signatureless certificates.
+1. Periodically, the tree size of the CA's most recent checkpoint is designated as a *landmark*. This determines *landmark subtrees*, which are common points of reference between relying parties and signatureless certificates.
 
-2. Once some landmark checkpoint includes the TBSCertificate, the signatureless certificate is constructed with:
+2. Once some landmark includes the TBSCertificate, the signatureless certificate is constructed with:
 
    * The TBSCertificate being certified
    * An inclusion proof from the TBSCertificate to a landmark subtree
@@ -860,47 +860,47 @@ This document does not place any requirements on how frequently this job runs. M
 
 A *signatureless certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Signatureless certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding full certificate alongside any signatureless certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC8446}}.
 
-### Landmark Checkpoints
+### Landmarks
 
-A signatureless certificate is constructed based on a *landmark checkpoint sequence*, which is a sequence of *landmark checkpoints*. Landmark checkpoints are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmark checkpoints SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark checkpoint sequences to exist per CA. Landmark checkpoints are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.
+A signatureless certificate is constructed based on a *landmark sequence*, which is a sequence of *landmarks*. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.
 
-A landmark checkpoint sequence has the following fixed parameters:
+A landmark sequence has the following fixed parameters:
 
-* `base_id`: An OID arc for trust anchor IDs of individual landmark checkpoints
-* `max_checkpoints`: A positive integer, describing the maximum number of landmark checkpoints that may contain unexpired certificates at any time
-* `checkpoint_url`: Some URL to fetch the current list of landmark checkpoints
+* `base_id`: An OID arc for trust anchor IDs of individual landmarks
+* `max_landmarks`: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time
+* `landmark_url`: Some URL to fetch the current list of landmarks
 
-Landmark checkpoints are numbered consecutively from zero. Each landmark checkpoint has a trust anchor ID, determined by appending the checkpoint number to `base_id`. For example, the trust anchor ID for landmark checkpoint 42 of a sequence with `base_id` of `32473.1` would be `32473.1.42`.
+Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to `base_id`. For example, the trust anchor ID for landmark 42 of a sequence with `base_id` of `32473.1` would be `32473.1.42`.
 
-Each landmark checkpoint specifies a tree size. The first landmark checkpoint, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.
+Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.
 
-Landmark checkpoints determine *landmark subtrees*: for each landmark checkpoint, other than number zero, let `tree_size` be the checkpoint's tree size and `prev_tree_size` be that of the previous landmark checkpoint. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree.
+Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree.
 
-The most recent `max_checkpoints` landmark checkpoints are said to be *active*. Landmark checkpoints MUST be allocated such that, at any given time, only active landmark checkpoints contain unexpired certificates. The active landmark subtrees are those determined by the active landmark checkpoints. There are at most `2 * max_checkpoints` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
+The most recent `max_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
-If landmark checkpoints are allocated incorrectly (e.g. past checkpoints change, or `max_checkpoints` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
+If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
 
-It is RECOMMENDED that checkpoints be allocated by picking some `time_between_checkpoints` interval, and then appending the latest checkpoint to the sequence, once per interval. If the latest checkpoint is already a landmark checkpoint, the interval is skipped. `max_checkpoints` can then be set to `ceil(max_cert_lifetime / time_between_checkpoints)`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as `max_checkpoints` is accurate.
+It is RECOMMENDED that landmarks be allocated by picking some `time_between_landmarks` interval, and then appending the latest checkpoint tree size (although any size less or equal to the latest checkpoint tree size is valid) to the sequence, once per interval. If the latest checkpoint tree size is already a landmark, the interval is skipped. `max_landmarks` can then be set to `ceil(max_cert_lifetime / time_between_landmarks)`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as `max_landmarks` is accurate.
 
-Relying parties will locally retain up to `2 * max_checkpoints` hashes ({{trusted-subtrees}}) per CA, so `max_checkpoints` should be set to balance the delay between landmark checkpoints and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark checkpoint every hour, will have a `max_checkpoints` of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.
+Relying parties will locally retain up to `2 * max_landmarks` hashes ({{trusted-subtrees}}) per CA, so `max_landmarks` should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a `max_landmarks` of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.
 
-`checkpoint_url` MUST serve a resource with `Content-Type: text/plain; charset=utf-8` and the following lines. Each line MUST be terminated by a newline character (U+000A):
+`landmark_url` MUST serve a resource with `Content-Type: text/plain; charset=utf-8` and the following lines. Each line MUST be terminated by a newline character (U+000A):
 
-* Two space-separated non-negative decimal integers: `<last_checkpoint> <num_active_checkpoints>`.
+* Two space-separated non-negative decimal integers: `<last_landmark> <num_active_landmarks>`.
   This line MUST satisfy the following, otherwise it is invalid:
-  * `num_active_checkpoints <= max_checkpoints`
-  * `num_active_checkpoints <= last_checkpoint`
-* `num_active_checkpoints + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_checkpoints`, line `i` contains the tree size for checkpoint `last_checkpoint - i`. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.
+  * `num_active_landmarks <= max_landmarks`
+  * `num_active_landmarks <= last_landmark`
+* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.
 
 ### Constructing Signatureless Certificates
 
-Given a TBSCertificateLogEntry in the issuance log and a landmark checkpoint sequence, a signatureless certificate is constructed as follows:
+Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a signatureless certificate is constructed as follows:
 
-1. Wait for the first landmark checkpoint to be allocated that contains the entry.
-2. Determine the landmark checkpoint's landmark subtrees and select the one that contains the entry.
+1. Wait for the first landmark to be allocated that contains the entry.
+2. Determine the landmark's subtrees and select the one that contains the entry.
 3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
-Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark checkpoint. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark checkpoint may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
 
 ## Size Estimates
 
@@ -916,7 +916,7 @@ The current issuance rate across the Web PKI may not necessarily be representati
 
 Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
 
-If a new landmark checkpoint is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
+If a new landmark is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
 The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.
 
@@ -966,7 +966,7 @@ A relying party's cosigner policy determines the sets of cosigners that must sig
 
 This document does not prescribe a particular policy, but gives general guidance. Relying parties MAY implement policies other than those described below, and MAY incorporate cosigners acting in roles not described in this document.
 
-In picking trusted cosigners, relying party SHOULD ensure the following security properties:
+In picking trusted cosigners, the relying party SHOULD ensure the following security properties:
 
 Authenticity:
 : The relying party only accepts entries certified by the CA
@@ -988,13 +988,13 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in {{landmark-checkpoints}}. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates ({{signatureless-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in {{landmarks}}. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates ({{signatureless-certificates}}) constructed against those subtrees.
 
 Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
 
 This criteria can be checked given:
 
-* Some *reference checkpoint* that contains the latest landmark checkpoint
+* Some *reference checkpoint* that contains the latest landmark
 * For each cosigner, either:
   * A cosignature on the reference checkpoint
   * A cosigned checkpoint containing the referenced checkpoint and a valid Merkle consistency proof ({{Section 2.1.4 of !RFC9162}}) between the two
@@ -1004,7 +1004,7 @@ This criteria can be checked given:
 
 This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.
 
-The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmark checkpoints may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
 
 ## Revocation by Index
 
@@ -1026,9 +1026,9 @@ A full certificate has a trust anchor ID of the corresponding log ID ({{log-ids}
 
 A full certificate MAY be used without signals about what the relying party trusts. As with other choices of default certificates, an authenticating party that does so assumes that the relying party trusts the issuing CA, e.g. because the CA is relatively ubiquitous among the relying parties that it supports.
 
-A signatureless certificate has a trust anchor ID of the corresponding landmark checkpoint, as described in {{landmark-checkpoints}}. This can be configured in the authenticating party via out-of-band information, as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmark checkpoints SHOULD be configured to support those checkpoints' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.
+A signatureless certificate has a trust anchor ID of the corresponding landmark, as described in {{landmarks}}. This can be configured in the authenticating party via out-of-band information, as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD be configured to support those landmarks' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.
 
-[[TODO: We can do slightly better. If the relying party supports checkpoint 42, it can be assumed to also support checkpoint 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]
+[[TODO: We can do slightly better. If the relying party supports landmark 42, it can be assumed to also support landmark 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]
 
 Authenticating parties SHOULD preferentially use signatureless certificates over full certificates, when both are supported by the relying party. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. A signatureless certificate SHOULD NOT be used without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees predistributed.
 
@@ -1040,7 +1040,7 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in {{full-certificates}}.
 
-The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in {{signatureless-certificates}} and serves it from the alternate URL.
+The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a signatureless certificate, as described in {{signatureless-certificates}} and serves it from the alternate URL.
 
 ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
 
@@ -1110,7 +1110,7 @@ In each of these cases, availability failures can be mitigated by revoking the u
 
 ## Certificate Renewal
 
-When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark checkpoint is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.
+When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.
 
 To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate some time before the previous Merkle Tree certificate expires. Renewing around 75% into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.
 
@@ -1459,3 +1459,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - First draft at IANA registration and ASN.1 module
 
 - Added a prose version of the procedure to select subtrees
+
+- Rename 'landmarks checkpoint' to 'landmarks'
