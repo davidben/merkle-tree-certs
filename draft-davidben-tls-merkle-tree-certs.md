@@ -878,9 +878,7 @@ Landmarks determine *landmark subtrees*: for each landmark, other than number ze
 
 The most recent `max_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
-If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
-
-It is RECOMMENDED that landmarks be allocated by picking some `time_between_landmarks` interval, and then appending the latest checkpoint tree size to the sequence, once per interval. If the latest checkpoint tree size is already a landmark, the interval is skipped. `max_landmarks` can then be set to `ceil(max_cert_lifetime / time_between_landmarks)`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as `max_landmarks` is accurate.
+It is RECOMMENDED that landmarks be allocated following the procedure described in {{allocating-landmarks}}. If landmarks are allocated incorrectly (e.g. past landmarks change, or `max_landmarks` is inaccurate), there are no security consequences, but some older certificates may fail to validate.
 
 Relying parties will locally retain up to `2 * max_landmarks` hashes ({{trusted-subtrees}}) per CA, so `max_landmarks` should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a `max_landmarks` of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.
 
@@ -891,6 +889,15 @@ Relying parties will locally retain up to `2 * max_landmarks` hashes ({{trusted-
   * `num_active_landmarks <= max_landmarks`
   * `num_active_landmarks <= last_landmark`
 * `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.
+
+### Allocating Landmarks
+
+It is RECOMMENDED that landmarks be allocated using the following procedure:
+
+1. Select some `time_between_landmarks` duration. Define a series of consecutive, non-overlapping time intervals, each of duration `time_between_landmarks`.
+2. At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.
+
+To ensure that only active landmarks contain unexpired certificates, set `max_landmarks` to `ceil(max_cert_lifetime / time_between_landmarks) + 1`, where `max_cert_lifetime` is the CA's maximum certificate lifetime.
 
 ### Constructing Signatureless Certificates
 
