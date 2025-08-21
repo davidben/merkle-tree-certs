@@ -1347,7 +1347,10 @@ Table of Contents
    subtrees, as described in Section 7.4.
 
    It is RECOMMENDED that landmarks be allocated following the procedure
-   described in Section 6.3.2.
+   described in Section 6.3.2.  If landmarks are allocated incorrectly
+   (e.g. past landmarks change, or max_landmarks is inaccurate), there
+   are no security consequences, but some older certificates may fail to
+   validate.
 
    Relying parties will locally retain up to 2 * max_landmarks hashes
    (Section 7.4) per CA, so max_landmarks should be set to balance the
@@ -1377,15 +1380,12 @@ Table of Contents
 
 6.3.2.  Allocating Landmarks
 
-   If landmarks are allocated incorrectly (e.g. past landmarks change,
-   or max_landmarks is inaccurate), there are no security consequences,
-   but some older certificates may fail to validate.
-
    It is RECOMMENDED that landmarks be allocated using the following
    procedure:
 
-   1.  Define a series of fixed time intervals relative to the POSIX
-       epoch [RFC9636], each with some time_between_landmarks duration.
+   1.  Select some time_between_landmarks duration.  Define a series of
+       consecutive, non-overlapping time intervals, each of duration
+       time_between_landmarks.
 
    2.  At most once per time interval, append the latest checkpoint tree
        size to the landmark sequence if it is greater than the last
@@ -2370,11 +2370,6 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
-
-   [RFC9636]  Olson, A., Eggert, P., and K. Murchison, "The Time Zone
-              Information Format (TZif)", RFC 9636,
-              DOI 10.17487/RFC9636, October 2024,
-              <https://www.rfc-editor.org/rfc/rfc9636>.
 
    [SHS]      "Secure hash standard", National Institute of Standards
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
