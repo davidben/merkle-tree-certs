@@ -382,7 +382,7 @@ Signatureless certificates are constructed and used as follows. {{fig-signaturel
 
 3. In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.
 
-4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate.
+4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate. The authenticating party may also select between several signatureless certificates, as described in {{certificate-renewal}}.
 
 # Subtrees
 
