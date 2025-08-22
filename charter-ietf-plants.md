@@ -16,7 +16,7 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
 
-1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified. The data stored in the log will be minimized to support cost-effective operation and monitoring.
+1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified. The log will be structured to support direct, cost-effective monitoring for mis-issuances by individual subscribers.
 
 2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable. Certificate constructions will reduce, to the greatest degree feasible and without impacting security, the number of signatures that a relying party needs to receive.
 
