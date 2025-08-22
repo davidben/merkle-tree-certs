@@ -278,29 +278,100 @@ Signatureless certificate:
 
 # Overview
 
-Merkle Tree certificate issuance begins as in a typical CA: The CA receives an issuance request, e.g. over ACME {{?RFC8555}}, and validates it, e.g. with ACME challenges. From there, the issuance process differs.
+In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates inverts this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.
 
-1. The CA operates an *issuance log* ({{issuance-logs}}), which is an append-only Merkle Tree ({{Section 2.1 of !RFC9162}}). Unlike a CT log, this log only contains entries added by the CA.
+~~~aasvg
++-- Certificate Authority -----+    +--  Authenticating Party ----+
+|                              |    |                             |
+|  2. Validate request     <---+----+--  1. Request certificate   |
+|       |                      |    |                             |
+|       |                      |    |                             |
+|       V                      |    |                             |
+|                              |    |                             |
+|  3. Add to issuance log      |    |                             |
+|       +---[ CA cosign ]      |    |                             |
+|      / \                 ----+----+->  5. Download certificates |
+|     /   \                    |    |                             |
+|    /     \                   |    |          *  tbscert         |
+|   +-------+                  |    |      = = =  inclusion proof |
+|    * * * *  tbscert entries  |    |     [ CA ]  cosignatures    |
+|                              |    | [ mirror ]                  |
++------------------------------+    +-----------------------------+
+           /   |   \
+          /    |    \    4. Submit log to cosigners
+         V     V     V      for cosignatures
 
-2. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
++-- Mirrors, other cosigners --+    +-- Monitors -----------------+
+|                              |    |                             |
+|       +---[ CA cosign ]      +-+  |                             |
+|      / \  [ mirror cosign ]  | |  |                             |
+|     /   \                    | |  |                             |
+|    /     \                 <-+-+--+--  6. Monitor CA operation  |
+|   +-------+                  | |  |                             |
+|    * * * *                   | |  +-----------------------------+
++-+----------------------------+ |
+  |  ...quorum of cosigners...   |
+  +------------------------------+
+~~~
+{: #fig-issuance-overview title="A diagram of the issuance architecture, detailed below"}
 
-3. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
+Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depicts this process.
 
-4. The CA additionally signs *subtrees* ({{subtrees}}) that together contain certificates added since the last checkpoint ({{arbitrary-intervals}}). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
+1. The authenticating party requests a certificate, e.g. over ACME {{?RFC8555}}
 
-These signatures prove to relying parties that the CA has issued the certificate.
+2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.
 
-A relying party may require additional proof of the proper operation of the issuance log by third parties, like CT logs provide additional transparency. Instead of presenting certificates to transparency logs, CAs present their log state to *cosigners*. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.
+3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this log only contains entries added by the CA:
 
-A signature from either the CA or a cosigner is known as a *cosignature*. A combination of cosignatures from sufficient trusted parties proves both that the CA has issued the certificate, and that the issuance satisfies any additional relying party transparency requirements.
+   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
 
-A *full certificate* contains:
+   2. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
 
-* The TBSCertificate being certified
-* An inclusion proof from the TBSCertificate to some subtree
-* Sufficient cosignatures to meet the relying party's requirements
+   3. The CA additionally signs *subtrees* ({{subtrees}}) that together contain certificates added since the last checkpoint ({{arbitrary-intervals}}). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
 
-This same issuance process also produces a *signatureless certificate*. This is an optional optimized certificate that avoids any cosignatures:
+4. The CA submits the new log state to *cosigners*. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.
+
+5. The CA now has enough information to construct a certificate and give it to the authenticating party. A certificate contains:
+
+   * The TBSCertificate being certified
+   * An inclusion proof from the TBSCertificate to some subtree
+   * Cosignatures from the CA and cosigners on the subtree
+
+6. As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.
+
+A certificate with cosignatures is known as a *full certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.
+
+This same issuance process also produces a *signatureless certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable with up-to-date relying parties.
+
+~~~aasvg
++-- Certificate Authority -------+
+|                                |  +-- Update Channel --+
+|    /\                          |  |                    |
+|   /  \  1. Allocate landmarks -+--+----------------+   |
+|  +----+                  |     |  |                |   |
++--------------------------+-----+  +----------------+---+
+                           |                         |
+    2. Make signatureless  |          3. Distribute  |
+       cert from landmark  |              landmarks  |
+                           V                         |
++-- Authenticating Party --------+                   |
+|                                |                   |
+| signatureless cert             |                   V
+|   tbscert                      |  +-- Up-to-date RP -----+
+|   inclusion proof to landmark -+->| landmark hashes      |
+|                                |  | trusted cosigners    |
+|                                |  +----------------------+
+| full cert                      |
+|   tbscert                      |  +-- Unupdated RP ------+
+|   inclusion proof              |  | (stale or no hashes) |
+|   cosignatures     ------------+->| trusted cosigners    |
+|                                |  +----------------------+
++--------------------------------+
+                     4. Select certificate by RP
+~~~
+{: #fig-signatureless-overview title="A diagram of signatureless certificates construction and usage, detailed below"}
+
+Signatureless certificates are constructed and used as follows. {{fig-signatureless-overview}} depicts this process.
 
 1. Periodically, the tree size of the CA's most recent checkpoint is designated as a *landmark*. This determines *landmark subtrees*, which are common points of reference between relying parties and signatureless certificates.
 
@@ -311,7 +382,7 @@ This same issuance process also produces a *signatureless certificate*. This is 
 
 3. In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.
 
-4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate.
+4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate. The authenticating party may also select between several signatureless certificates, as described in {{certificate-renewal}}.
 
 # Subtrees
 
@@ -1470,3 +1541,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Rename 'landmarks checkpoint' to 'landmarks'
 
 - Clarify and fix an off-by-one error in recommended landmark allocation scheme
+
+- Add some diagrams to the Overview section
