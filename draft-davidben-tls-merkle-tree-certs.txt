@@ -428,8 +428,8 @@ Table of Contents
    +--------------------------------+
                         4. Select certificate by RP
 
-       Figure 2: A diagram of signatureless certificates construction
-                         and usage, detailed below
+     Figure 2: A diagram of signatureless certificate construction and
+                           usage, detailed below
 
    Signatureless certificates are constructed and used as follows.
    Figure 2 depicts this process.
