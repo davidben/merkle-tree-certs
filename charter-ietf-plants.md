@@ -18,7 +18,7 @@ The PLANTS Working Group will define a mechanism that integrates log constructio
 
 The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
 
-1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified.
+1. An externally monitorable transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified.
 
 2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable.
 
