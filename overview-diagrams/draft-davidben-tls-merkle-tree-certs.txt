@@ -399,8 +399,9 @@ Table of Contents
 
    This same issuance process also produces a _signatureless
    certificate_. This is an optional, optimized certificate that avoids
-   cosignatures.  Signatureless certificates are available after a short
-   period of time and usable with up-to-date relying parties.
+   all cosignatures, including the CA signature.  Signatureless
+   certificates are available after a short period of time and usable
+   with up-to-date relying parties.
 
    +-- Certificate Authority -------+
    |                                |  +-- Update Channel --+
