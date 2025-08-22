@@ -455,7 +455,9 @@ Table of Contents
    4.  During the application protocol, such as TLS [RFC8446], if the
        relying party already supports the landmark subtree, the
        authenticating party can present the signatureless certificate.
-       Otherwise, it presents a full certificate.
+       Otherwise, it presents a full certificate.  The authenticating
+       party may also select between several signatureless certificates,
+       as described in Section 10.4.
 
 4.  Subtrees
 
