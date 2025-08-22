@@ -31,3 +31,5 @@ Though not the initial focus, the PLANTS Working Group may consider other proper
 In evaluating decisions and design tradeoffs, the Working Group will consider security, privacy, transparency, performance, and deployment properties, aiming to comparably meet the needs of today's applications that use CT-based PKIs with TLS. In particular the WG will deliver a design that can ensure that a misbehavior by a single party cannot compromise transparency for relying parties. The Working Group may consider how these mechanisms may apply to other PKIs or non-interactive protocols, but these will not be the primary use case and may ultimately have different requirements or limitations.
 
 The PLANTS Working Group's scope is to explore mechanisms for CAs and transparency ecosystems to certify key/identifier bindings in a publicly monitorable way. Alternate trust models and changes to how TLS uses the end-entity key are not in scope for the Working Group.
+
+The Working Group will not submit specifications for publication to the IESG before demonstrating two interoperable implementations.
