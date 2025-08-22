@@ -14,13 +14,11 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 * Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
 
-The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance. This enables techniques where signature costs can be amortized over multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
-
 The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
 
-1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified.
+1. A transparency log structure, maintained by a CA, containing the key/identifier bindings that the CA has certified. The data stored in the log will be minimized to support cost-effective operation and monitoring.
 
-2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable.
+2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable. Certificate constructions will reduce, to the greatest degree feasible and without impacting security, the number of signatures that a relying party needs to receive.
 
 3. How the certificate constructions may be provisioned with ACME (RFC 8555) and used in TLS.
 
