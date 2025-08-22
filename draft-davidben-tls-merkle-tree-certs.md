@@ -335,7 +335,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
    * The TBSCertificate being certified
    * An inclusion proof from the TBSCertificate to some subtree
-   * Cosignatures from the CA and cosigners
+   * Cosignatures from the CA and cosigners on the subtree
 
 6. As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.
 
