@@ -369,7 +369,7 @@ This same issuance process also produces a *signatureless certificate*. This is 
 +--------------------------------+
                      4. Select certificate by RP
 ~~~
-{: #fig-signatureless-overview title="A diagram of signatureless certificates construction and usage, detailed below"}
+{: #fig-signatureless-overview title="A diagram of signatureless certificate construction and usage, detailed below"}
 
 Signatureless certificates are constructed and used as follows. {{fig-signatureless-overview}} depicts this process.
 
