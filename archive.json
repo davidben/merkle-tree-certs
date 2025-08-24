@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-19T02:04:35.524010+00:00",
+  "timestamp": "2025-08-24T02:19:00.475344+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -47,6 +47,11 @@
       "name": "wontfix",
       "description": "This will not be worked on",
       "color": "ffffff"
+    },
+    {
+      "name": "charter",
+      "description": "",
+      "color": "0D813E"
     }
   ],
   "issues": [
@@ -2356,6 +2361,30 @@
           "body": "Ah yeah, @bwesterb had a similar comment. Honestly, I think it'd be very reasonable for us to say \"this is only for X.509v3\" and just omit the field entirely. That would shave 5 bytes off every entry. X.509 v1 and v2 are gone in PKIX. v4 will never happen and, if it ever does, we can always define a new entry type.\n\nThe flip side, however, is that we are, at the end of the day, going to receive an X.509 certificate on the wire, and have to verify a TBSCertificate against the log entry. To avoid accidentally breaking folks' assumptions, I think it's important for every byte of the TBSCertificate to be authenticated. See the malleability discussion [here](https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html#name-certificate-malleability).\n\nThat means for every field, we _either_ need to authenticate it directly (most naturally by just copying it over), or mandate that the receivers check its value such that it's totally constrained. I opted to default to the former just because it seemed easier. (But we could also go the other way if we want. We could take out `version`, take out `issuer` (you know the name of the log), and take out the two unique ID fields (no one uses them). Or we could keep things in but DEFAULT them to something sensible. But then you need to contend with folks not enforcing the expected DEFAULT value in one direction or another.\n\n\ud83e\udd37",
           "createdAt": "2025-07-01T18:46:00Z",
           "updatedAt": "2025-07-01T18:46:00Z"
+        }
+      ]
+    },
+    {
+      "number": 128,
+      "id": "I_kwDOJIBkVc7HPF1Y",
+      "title": "Fix off-by-one in landmark count",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/128",
+      "state": "CLOSED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Filing this so we don't forget:\n\nThe recommended landmark allocation scheme doesn't *totally* work. Since the cron job is allowed to be a little late, it's possible that we have (let's suppose we have daily landmarks and 4-day cert lifetimes, just so the math is easier)...\n\n1. Day 1, 23:59 (cron job was late)\n2. Day 2, 00:00\n3. Day 3, 00:00\n4. Day 4, 00:00\n5. Day 5, 00:00\n\nAt day 5, 00:01, the landmarks are 2-5. The subtrees are defined by periods in between landmarks, so a certificate issued on day 1, 12:00 will not be included. However, 4 days ago was day 1, 00:01, so that certificate is not yet expired.\n\nI think the right formulation is ceiling + 1?",
+      "createdAt": "2025-08-21T17:32:25Z",
+      "updatedAt": "2025-08-21T20:54:32Z",
+      "closedAt": "2025-08-21T20:54:32Z",
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah hmm, I think this is actually because two ways to allocate a landmark every (say) day and we were ambiguous:\n\n1. Run a cron job every day and allocate a landmark. Your cron job is allowed to be a little late, skipped (i.e. defer to the next cron job), but not early\n2. Every time you allocate a landmark, schedule a job to allocate the next landmark. Your job is allowed to be late, but not early.\n\nScheme (1) implies there is at most one landmark for every 00:00 to 23:59:59 period.\nScheme (2) implies the gap between landmarks is at least 1 day.\n\nI think the off-by-one comes from scheme (1) and scheme (2) probably does not need the +1. My intuition is that (1) is easier to implement so we probably recommend that one? Though either is fine.",
+          "createdAt": "2025-08-21T17:42:02Z",
+          "updatedAt": "2025-08-21T17:42:02Z"
         }
       ]
     }
@@ -6842,10 +6871,12 @@
       "author": "mcr",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "charter"
+      ],
       "body": "",
       "createdAt": "2025-08-13T16:28:31Z",
-      "updatedAt": "2025-08-13T21:26:28Z",
+      "updatedAt": "2025-08-22T10:13:27Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "3af30e859a586106cb27912b7fd6369d743c799c",
@@ -7094,6 +7125,989 @@
               "updatedAt": "2025-08-18T19:25:56Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 126,
+      "id": "PR_kwDOJIBkVc6kud31",
+      "title": "Rename 'landmark checkpoints' to 'landmarks'",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/126",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\"Landmarks\" serve a different role than \"checkpoints\", so rename to reflect that.  In tlog-tiles/static-ct-api, \"checkpoints\" are signed tree heads/root hashes to summarize the state of the tree. \"Landmarks\", on the other hand, represent tree sizes (not even tree heads) and trust anchor IDs and are used for coordination amongst parties in the ecosystem.  (As a bonus, \"landmark sequence\" is less of a mouthful than \"landmark checkpoint sequence\").\r\n\r\nClarify that landmarks don't necessarily need to be aligned with checkpoint tree sizes, and technically could be allocated at any tree sizes less or equal to the latest checkpoint tree size (although not sure why you'd do this).\r\n\r\nAlso clarify that unexpired entries don't necessarily need to be covered by a landmark subtree, as they can be between the last landmark subtree and the log's latest checkpoint.",
+      "createdAt": "2025-08-21T16:44:56Z",
+      "updatedAt": "2025-08-21T17:15:58Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a25c85e9ae58b245f143b77a07b42944a0542af8",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/rename-landmark",
+      "headRefOid": "469de38f6e2f26eac0364816f601c3f4a4579ba0",
+      "closedAt": "2025-08-21T17:08:44Z",
+      "mergedAt": "2025-08-21T17:08:44Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "cd78d43bbd7e873b47acc34a5ba64b36e37df9b2"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67QQGH",
+          "commit": {
+            "abbreviatedOid": "469de38"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-21T17:08:40Z",
+          "updatedAt": "2025-08-21T17:08:40Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67QSgD",
+          "commit": {
+            "abbreviatedOid": "469de38"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T17:10:46Z",
+          "updatedAt": "2025-08-21T17:10:46Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Hmm, I guess the parenthetical isn't *quite* true. You can't go so far back that they're no longer monotonic.\r\n\r\nMaybe we should just delete the parenthetical? It's the recommended process, so we don't need to describe all possible schemes. Thoughts?",
+              "createdAt": "2025-08-21T17:10:46Z",
+              "updatedAt": "2025-08-21T17:10:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67QWrw",
+          "commit": {
+            "abbreviatedOid": "469de38"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T17:14:36Z",
+          "updatedAt": "2025-08-21T17:14:36Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Fair! I was going back and forth about whether or not to add the parenthetical, so happy to remove it.",
+              "createdAt": "2025-08-21T17:14:36Z",
+              "updatedAt": "2025-08-21T17:14:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67QYDF",
+          "commit": {
+            "abbreviatedOid": "469de38"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T17:15:58Z",
+          "updatedAt": "2025-08-21T17:15:58Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Oh whoops already merged. I'll make another PR \ud83d\udc4d ",
+              "createdAt": "2025-08-21T17:15:58Z",
+              "updatedAt": "2025-08-21T17:15:59Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 127,
+      "id": "PR_kwDOJIBkVc6ku1Y7",
+      "title": "Remove parenthetical about landmark tree sizes",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/127",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-08-21T17:18:23Z",
+      "updatedAt": "2025-08-21T20:56:14Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "cd78d43bbd7e873b47acc34a5ba64b36e37df9b2",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/landmark-parenthetical",
+      "headRefOid": "5d8586a83da39f3e298b156e6e96c7307bf65d38",
+      "closedAt": "2025-08-21T17:33:04Z",
+      "mergedAt": "2025-08-21T17:33:04Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "28a18921bfff40c2debbf41a99a01a87792ef900"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67QnMU",
+          "commit": {
+            "abbreviatedOid": "5d8586a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-21T17:32:58Z",
+          "updatedAt": "2025-08-21T17:32:58Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 129,
+      "id": "PR_kwDOJIBkVc6ku_ix",
+      "title": "Use ceil+1 instead of ceil to calculate max_landmarks",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/129",
+      "state": "CLOSED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "With the current ceil calculation, it's possible that unexpired entries could be present in a subtree that is marked inactive. Let's say we break up time into landmark intervals and allow one landmark to be added per interval. Then, say we have the following parameters:\r\n\r\n```\r\ntime_between_landmarks: 100\r\nmax_cert_lifetime: 290\r\n```\r\n\r\nwhich determines `max_landmarks = ceil(290/100) = 3`.\r\n\r\nWe could have the following landmark intervals:\r\n\r\n```\r\n[0, 100), [100, 200), [200, 300), [300, 400)\r\n```\r\n\r\nwith corresponding landmarks issued at times\r\n\r\n```\r\n90, 110, 210, 310\r\n```\r\n\r\nThen, say we have an entry issued at time `50` which expires at time `50 + 290 = 340`. It will be included in the landmark at time `90`, but that landmark will be marked inactive when the `310` landmark is added. Thus, the cert will not be unexpired but not covered by an active landmark for the interval `[310, 340)`.\r\n\r\nSetting max_landmarks to `ceil(290/100)+1 = 4` instead ensures that we keep the `90` landmark around until at least time `400`.",
+      "createdAt": "2025-08-21T17:34:18Z",
+      "updatedAt": "2025-08-21T20:56:01Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "28a18921bfff40c2debbf41a99a01a87792ef900",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/floor",
+      "headRefOid": "7b606833b934081b5b86f7feb414fc93739ec7a1",
+      "closedAt": "2025-08-21T20:56:01Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh whoops, it should be ceil+1 not floor+1",
+          "createdAt": "2025-08-21T17:38:11Z",
+          "updatedAt": "2025-08-21T17:38:11Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 130,
+      "id": "PR_kwDOJIBkVc6kwLDp",
+      "title": "Add section for allocating landmarks, fixes #128",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/130",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "Define a recommended procedure for allocating landmarks based on fixed time intervals relative to the POSIX epoch.",
+      "createdAt": "2025-08-21T19:44:15Z",
+      "updatedAt": "2025-08-21T20:54:40Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "28a18921bfff40c2debbf41a99a01a87792ef900",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/allocating-landmarks",
+      "headRefOid": "a99d05c56b226c4119debca857d6be601ab553c2",
+      "closedAt": "2025-08-21T20:54:31Z",
+      "mergedAt": "2025-08-21T20:54:31Z",
+      "mergedBy": "lukevalenta",
+      "mergeCommit": {
+        "oid": "6b183adf7aab145af4acb49fb611a759f11655fd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67SDSm",
+          "commit": {
+            "abbreviatedOid": "4e41ac0"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T19:48:30Z",
+          "updatedAt": "2025-08-21T19:48:30Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "You're allowed to _check_ multiple times if a new landmark can be appended, as long as you only actually append once per time interval. Should we spell that out more here or is it clear enough?\r\n\r\nThis is relevant, for example, if when you first check within an interval the tree size hasn't changed, but then it later _does_ grow. If you only check once you will just skip that landmark interval, but if you check multiple times you could still allocate a landmark within the interval.\r\n",
+              "createdAt": "2025-08-21T19:48:30Z",
+              "updatedAt": "2025-08-21T20:07:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67SVqw",
+          "commit": {
+            "abbreviatedOid": "4e41ac0"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-21T20:13:16Z",
+          "updatedAt": "2025-08-21T20:24:34Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "I would maybe suggest keeping this at line 880. Perhaps even merging it into the same paragraph as 881. Since this is text that applies to all allocation schemes and not just the recommended one.",
+              "createdAt": "2025-08-21T20:13:16Z",
+              "updatedAt": "2025-08-21T20:24:34Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "Perhaps s/fixed/consecutive/? We already get fixed width from the duration, but we haven't actually said they're consecutive. (Although I guess introducing the variable late makes it a little unclear?)\r\n\r\n(Does the POSIX epoch actually do anything here? We're not actually using the representation in the spec, just the intervals.)\r\n\r\nPerhaps:\r\n\r\n> Select some `time_between_landmarks` duration. Define a series of consecutive, non-overlapping time intervals, each of duration `time_between_landmarks`.\r\n\r\nBlissfully ignoring leap seconds of course. :-)",
+              "createdAt": "2025-08-21T20:19:40Z",
+              "updatedAt": "2025-08-21T20:24:34Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "I spent a few minutes trying to find a pithy description of this and failed. No preference. Realistically this won't ever make a difference, and it's merely RECOMMENDED so you're allowed to deviate if you want.",
+              "createdAt": "2025-08-21T20:23:26Z",
+              "updatedAt": "2025-08-21T20:24:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67Sr4D",
+          "commit": {
+            "abbreviatedOid": "4e41ac0"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T20:50:17Z",
+          "updatedAt": "2025-08-21T20:50:17Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Good call \ud83d\udc4d ",
+              "createdAt": "2025-08-21T20:50:17Z",
+              "updatedAt": "2025-08-21T20:50:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67Ss2B",
+          "commit": {
+            "abbreviatedOid": "4e41ac0"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-21T20:52:01Z",
+          "updatedAt": "2025-08-21T20:52:01Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "I like it.",
+              "createdAt": "2025-08-21T20:52:01Z",
+              "updatedAt": "2025-08-21T20:52:01Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 131,
+      "id": "PR_kwDOJIBkVc6kxeC1",
+      "title": "Add some diagrams to the Overview section",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/131",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Maybe this will be more understandable?\r\n\r\n(Suggest fetching the branch and rendering it to see the diagrams in the HTML output, not just ASCII art.)",
+      "createdAt": "2025-08-21T22:13:16Z",
+      "updatedAt": "2025-08-22T19:01:50Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "overview-diagrams",
+      "headRefOid": "d98f2c6cc092819876b96769010791539c2ba124",
+      "closedAt": "2025-08-22T19:01:48Z",
+      "mergedAt": "2025-08-22T19:01:48Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "2ecd6e28b4744527c52fcf353a5978323eccad4a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67Ykbo",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T09:25:19Z",
+          "updatedAt": "2025-08-22T09:25:19Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "\"[...] avoid cosignatories\"\r\n\r\nMaybe add \"(including the CA signature)\".",
+              "createdAt": "2025-08-22T09:25:19Z",
+              "updatedAt": "2025-08-22T09:25:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67YlUp",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T09:26:20Z",
+          "updatedAt": "2025-08-22T09:26:21Z",
+          "comments": [
+            {
+              "originalPosition": 94,
+              "body": "Do we want to mention here that a AP will likely have two signature less certs?",
+              "createdAt": "2025-08-22T09:26:21Z",
+              "updatedAt": "2025-08-22T09:26:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67Ylse",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T09:26:45Z",
+          "updatedAt": "2025-08-22T09:26:45Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67aCI7",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T11:34:35Z",
+          "updatedAt": "2025-08-22T11:43:21Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\nIn Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates inverts this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.\r\n```\r\nNot sure I love throwing in the precertificates mention here, but I had to do a double-take since in CT the TbsCertificate+SCTs get signed again _after_ logging to produce the full certificate. Clarifying that the 'information' signed by the CA and then logged can be a pre-certificate should clear this up.",
+              "createdAt": "2025-08-22T11:34:35Z",
+              "updatedAt": "2025-08-22T11:48:02Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "```suggestion\r\n   * Cosignatures from the CA and cosigners on the subtree\r\n```",
+              "createdAt": "2025-08-22T11:37:35Z",
+              "updatedAt": "2025-08-22T11:43:21Z"
+            },
+            {
+              "originalPosition": 73,
+              "body": "```suggestion\r\nA certificate with cosignatures is known as a *full certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.\r\n```",
+              "createdAt": "2025-08-22T11:38:37Z",
+              "updatedAt": "2025-08-22T11:43:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67fPVN",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T18:58:41Z",
+          "updatedAt": "2025-08-22T18:58:41Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "Good call. Done.",
+              "createdAt": "2025-08-22T18:58:41Z",
+              "updatedAt": "2025-08-22T18:58:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67fP9_",
+          "commit": {
+            "abbreviatedOid": "0d8103b"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T18:59:34Z",
+          "updatedAt": "2025-08-22T18:59:34Z",
+          "comments": [
+            {
+              "originalPosition": 94,
+              "body": "Hmm. My feeling is it might distract a bit from the core idea.",
+              "createdAt": "2025-08-22T18:59:34Z",
+              "updatedAt": "2025-08-22T18:59:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67fQca",
+          "commit": {
+            "abbreviatedOid": "ffa4e86"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T19:00:05Z",
+          "updatedAt": "2025-08-22T19:00:05Z",
+          "comments": [
+            {
+              "originalPosition": 94,
+              "body": "At least in the picture. Maybe I can work it into prose...",
+              "createdAt": "2025-08-22T19:00:05Z",
+              "updatedAt": "2025-08-22T19:00:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67fRfC",
+          "commit": {
+            "abbreviatedOid": "ffa4e86"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T19:01:36Z",
+          "updatedAt": "2025-08-22T19:01:36Z",
+          "comments": [
+            {
+              "originalPosition": 94,
+              "body": "Added a sentence.",
+              "createdAt": "2025-08-22T19:01:36Z",
+              "updatedAt": "2025-08-22T19:01:36Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 132,
+      "id": "PR_kwDOJIBkVc6k2s-6",
+      "title": "charter: explicit non-collusion requirement suggested by Dennis",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/132",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "See https://mailarchive.ietf.org/arch/msg/plants/4bdDJLDkQfsM7qiW5lW2PjBwKZY/",
+      "createdAt": "2025-08-22T09:59:04Z",
+      "updatedAt": "2025-08-23T13:15:12Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "dennis1",
+      "headRefOid": "4cdcced1319635f951475dbf65501f52303f0f94",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67ePOX",
+          "commit": {
+            "abbreviatedOid": "4cdcced"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T17:28:01Z",
+          "updatedAt": "2025-08-22T17:28:01Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "A nitpick:\r\n```suggestion\r\nIn evaluating decisions and design tradeoffs, the Working Group will consider security, privacy, transparency, performance, and deployment properties, aiming to comparably meet the needs of today's applications that use CT-based PKIs with TLS. In particular the WG will deliver a design that can ensure that a misbehavior by a single party cannot compromise transparency for relying parties. The Working Group may consider how these mechanisms may apply to other PKIs or non-interactive protocols, but these will not be the primary use case and may ultimately have different requirements or limitations.\r\n```\r\n\r\nReasoning:\r\n\r\nRealistically, Web PKIs are likely going to continue be evaluated by both Web Clients(TM) and long, long tail of web-adjacent clients of increasing distance to The Web(TM).\r\n\r\nOf course, as with today, there is some point at which, on a per-application basis, the application will decide it's better off using a PKI tailored to its needs than one tailored for the Web's needs. But I think it's pretty likely that, like today, there will be some clients that overlap in PKI but don't care to manage a second set of trusted parties to get transparency guarantees. (I also would like more of the long tail to enforce transparency, but there's no escaping the fact that more trusted parties => more overhead to manage them.)\r\n\r\nMTC accommodates this, and it's really not hard to accommodate this: allow clients to be configured with _just_ the CA cosigner, and no additional cosigner requirement. But that means MTC doesn't _ensure_ this property, because it allows such clients. It just makes it _possible_ to ensure this property.",
+              "createdAt": "2025-08-22T17:28:01Z",
+              "updatedAt": "2025-08-22T17:28:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67ePTp",
+          "commit": {
+            "abbreviatedOid": "4cdcced"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T17:28:08Z",
+          "updatedAt": "2025-08-22T17:28:08Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67pDPN",
+          "commit": {
+            "abbreviatedOid": "4cdcced"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-23T13:15:12Z",
+          "updatedAt": "2025-08-23T13:15:12Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 133,
+      "id": "PR_kwDOJIBkVc6k2uVV",
+      "title": "charter: slight tweak to first deliverable suggested by Dennis",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/133",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "https://mailarchive.ietf.org/arch/msg/plants/4bdDJLDkQfsM7qiW5lW2PjBwKZY/",
+      "createdAt": "2025-08-22T10:00:58Z",
+      "updatedAt": "2025-08-22T16:10:07Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "dennis2",
+      "headRefOid": "847a85270abb4b2d0a8cf808efee8ccc44ece275",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67dfcK",
+          "commit": {
+            "abbreviatedOid": "847a852"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T16:09:58Z",
+          "updatedAt": "2025-08-22T16:09:58Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "This prompts a few unanswered questions, but I think that's a good thing (i.e. let's leave them unanswered for the WG):\r\n* External to whom? I think the obvious answer is \"the public can monitor\", but private PKIs might have a more nuanced answer, so leaving that to the deployment seems solid \r\n* How is it accessed? Is it the CA that guarantees access or mirrors or both? Does the spec have an opinion on this or do we leave it to deployments?",
+              "createdAt": "2025-08-22T16:09:58Z",
+              "updatedAt": "2025-08-22T16:09:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67dfju",
+          "commit": {
+            "abbreviatedOid": "847a852"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T16:10:07Z",
+          "updatedAt": "2025-08-22T16:10:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 134,
+      "id": "PR_kwDOJIBkVc6k2xuV",
+      "title": "charter: Dennis' suggested tweak to private PKI secondary goal",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/134",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "See https://mailarchive.ietf.org/arch/msg/plants/4bdDJLDkQfsM7qiW5lW2PjBwKZY/",
+      "createdAt": "2025-08-22T10:05:41Z",
+      "updatedAt": "2025-08-22T17:19:15Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "dennis3",
+      "headRefOid": "508acb0d17f1f84fe7434298930d5b47216c98a7",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67eJyF",
+          "commit": {
+            "abbreviatedOid": "508acb0"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T17:19:11Z",
+          "updatedAt": "2025-08-22T17:19:11Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "This does lose \"may ultimately have different requirements or limitations\", which was meant to capture that, yes, it is OK if we decide that this particular shape of private PKI is not relevant. We do not have to solve everything. I suppose this is implicit from \"may\". :shrug:\r\n\r\nIt is interesting because I would argue that \"CT-based PKI\" and \"private PKI\" are not opposites. It's totally plausible that a private-PKI-as-a-service provider would offer a CT- or MTC-style log to their customer so they can say \"we're doing auth for you, but we'll let you audit what we today, using systems with the same guarantees as the Web PKI\". That's more annoying to do with CT as a bolted-on thing. But if logging is intrinsically part of CA operations, and getting cosigners is just slightly reconfiguring you're software, maybe that'd be of interest to people? (I'm just spitballing here. I'm not aware of anyone who is thinking of this. I just think it'd be neat.)\r\n\r\nBut that's not quite what this says. This implies that \"_today's_ [...] CT-based PKIs\" and \"private [...] PKI\" are opposites. And that's almost certainly true in practice. So... \ud83d\udc4d ",
+              "createdAt": "2025-08-22T17:19:11Z",
+              "updatedAt": "2025-08-22T17:19:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67eJ1N",
+          "commit": {
+            "abbreviatedOid": "508acb0"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T17:19:15Z",
+          "updatedAt": "2025-08-22T17:19:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 135,
+      "id": "PR_kwDOJIBkVc6k3PkW",
+      "title": "charter: require two implementations before publication of specs",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/135",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "Suggested by Job.\r\n\r\nhttps://mailarchive.ietf.org/arch/msg/plants/J6kZUd38_OE9zO2exMnhqjgL_b0/\r\n\r\nAnd, surprisingly, BCP 9 doesn't imply this:\r\n\r\nhttps://mailarchive.ietf.org/arch/msg/plants/n3bFDuR1OD6PhQEBcU3E3run7hs/\r\n\r\nI added the stipulation that this only applies to specifications, as we can certainly publish informational RFCs before that, that don't actually specify a system or protocol.",
+      "createdAt": "2025-08-22T10:50:49Z",
+      "updatedAt": "2025-08-23T13:16:04Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "job1",
+      "headRefOid": "d7983300fab06948417961af4c49bcc431ab24ab",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67biWC",
+          "commit": {
+            "abbreviatedOid": "d798330"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T13:40:30Z",
+          "updatedAt": "2025-08-22T13:40:30Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67pDSg",
+          "commit": {
+            "abbreviatedOid": "d798330"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-23T13:16:04Z",
+          "updatedAt": "2025-08-23T13:16:04Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 136,
+      "id": "PR_kwDOJIBkVc6k6OY7",
+      "title": "Specify in each case how the wg will reduce PQ impacts",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/136",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "",
+      "createdAt": "2025-08-22T15:57:05Z",
+      "updatedAt": "2025-08-22T21:40:15Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "Bren2010/merkle-tree-certs",
+      "headRefName": "branch1",
+      "headRefOid": "516d31e130b8e69f971a441a07703a23ce765849",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67gLcn",
+          "commit": {
+            "abbreviatedOid": "516d31e"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T20:05:20Z",
+          "updatedAt": "2025-08-22T20:14:56Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "\"The greatest degree feasible\" is also too strong IMO.\r\n\r\nMaybe there is some size optimization is, I dunno, dependent on server deployment characteristics that aren't worth it.\r\nMaybe we can technically reduce the number of signatures, but it costs so large of an inclusion proof that it's actually bigger.\r\nMaybe we think we've gotten the best we can but haven't spent an extra 18 months exploring all options to be sure it is the \"greatest degree feasible\". Are we prevented from publishing?",
+              "createdAt": "2025-08-22T20:05:20Z",
+              "updatedAt": "2025-08-22T20:14:56Z"
+            },
+            {
+              "originalPosition": 9,
+              "body": "\"Minimized\" here is kinda strong. E.g. for, TBSCertificateLogEntry, we could have trimmed away some redundant fields like `version`, in exchange for requiring that the verifier profile the contents down. (Anything we don't reproduce must be profiled down to keep TBSCertificate non-malleable.)\r\n\r\nFor at least the initial version of MTC, we opted to not trim away loose change, in favor of keeping the malleability story obvious. Is that minimizing? Arguably not. Right trade-off? I dunno, but it's at least not obvious.\r\n\r\n(As for monitoring, see the discussion on the list now.)",
+              "createdAt": "2025-08-22T20:08:39Z",
+              "updatedAt": "2025-08-22T20:14:56Z"
+            },
+            {
+              "originalPosition": 4,
+              "body": "I think losing this text kinda loses the meat of the bounding box in this charter. We first wrote this to be focused on goals and got good feedback on the list that we should say *something* about what we're doing.\r\n\r\nI think the clearest descriptor of the core idea through all of this work is that we're integrating log construction into certificate issuance, such that certificates prove that name/key bindings are in the log, rather than proving entire traditional certificates are in the log. Why is that useful for size? Well, because tree signatures let you do useful batch-signing, so one signature's cost is spread over multiple entries.\r\n\r\nAnd so, in trying to both not pre-decide things for the WG, but also be clear about what we were doing, this text seemed the clearest balance.",
+              "createdAt": "2025-08-22T20:14:18Z",
+              "updatedAt": "2025-08-22T20:14:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67hlqq",
+          "commit": {
+            "abbreviatedOid": "516d31e"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T21:29:45Z",
+          "updatedAt": "2025-08-22T21:29:45Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "I agree with David. In any case, I think the new text is confusing without some context. The number of signatures the relying party needs to receive seems like it's contingent on at least two things:\r\n1. The number of cosignatures, which depends on the policy the relying party wants.\r\n2. The rate at which landmarks are minted and distributed.",
+              "createdAt": "2025-08-22T21:29:45Z",
+              "updatedAt": "2025-08-22T21:29:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67h4fc",
+          "commit": {
+            "abbreviatedOid": "516d31e"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T21:40:15Z",
+          "updatedAt": "2025-08-22T21:40:15Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "Feasible is synonymous with convenient. It does not mean you need to go to the end of the Earth. Not sure how to make it less confusing?",
+              "createdAt": "2025-08-22T21:40:15Z",
+              "updatedAt": "2025-08-22T21:40:15Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 137,
+      "id": "PR_kwDOJIBkVc6k6Oz1",
+      "title": "Support monitoring by individual subscribers",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/137",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "",
+      "createdAt": "2025-08-22T15:57:50Z",
+      "updatedAt": "2025-08-22T21:38:50Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
+      "headRepository": "Bren2010/merkle-tree-certs",
+      "headRefName": "branch2",
+      "headRefOid": "f906db13fa8a9cdc97333df155bb2e86e4129509",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67hn4-",
+          "commit": {
+            "abbreviatedOid": "f906db1"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T21:31:15Z",
+          "updatedAt": "2025-08-22T21:31:15Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "What is a subscriber? Would this be a relying party, or an auditor?",
+              "createdAt": "2025-08-22T21:31:15Z",
+              "updatedAt": "2025-08-22T21:31:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67hygy",
+          "commit": {
+            "abbreviatedOid": "f906db1"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T21:37:02Z",
+          "updatedAt": "2025-08-22T21:37:02Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Subscriber is the site operator. Relying party is the browser. I was trying to follow standard PKI terminology",
+              "createdAt": "2025-08-22T21:37:02Z",
+              "updatedAt": "2025-08-22T21:37:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc67h1we",
+          "commit": {
+            "abbreviatedOid": "f906db1"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-22T21:38:49Z",
+          "updatedAt": "2025-08-22T21:38:49Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Got it. In that case, I have no objection to this sentence. I can't however resolve the thread, not sure why :)",
+              "createdAt": "2025-08-22T21:38:49Z",
+              "updatedAt": "2025-08-22T21:38:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 138,
+      "id": "PR_kwDOJIBkVc6k7_yK",
+      "title": "charter: Use \"batch\" instead of \"amortize\"",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/138",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "Probably a bit better of a term.",
+      "createdAt": "2025-08-22T19:31:43Z",
+      "updatedAt": "2025-08-22T20:00:41Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "276bb3bc40b1ab765f17263c5fa7a9fdb0106e5a",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "charter-batching",
+      "headRefOid": "45415fd211dba1ac94e2dac7e2e265cbf2baa5d3",
+      "closedAt": "2025-08-22T20:00:39Z",
+      "mergedAt": "2025-08-22T20:00:39Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "5a9daa018a011e0aabd4a24d85abdd803c965f51"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc67fpUR",
+          "commit": {
+            "abbreviatedOid": "45415fd"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-22T19:34:31Z",
+          "updatedAt": "2025-08-22T19:34:31Z",
+          "comments": []
         }
       ]
     }
