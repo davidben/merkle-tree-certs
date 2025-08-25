@@ -207,7 +207,7 @@ This achieves the following:
 
 * After a processing delay, authenticating parties can obtain a second "signatureless" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.
 
-{{overview}} gives an overview of the system. {{subtrees}} describes a Merkle Tree primitive used by this system. {{issuance-logs}} describes the log structure. Finally, {{certificates}} and {{relying-parties}} describes how to construct and consume a Merkle Tree certificate.
+{{overview}} gives an overview of the system. {{subtrees}} describes a Merkle Tree primitive used by this system. {{issuance-logs}} describes the log structure. Finally, {{certificates}} and {{relying-parties}} describe how to construct and consume a Merkle Tree certificate.
 
 # Conventions and Definitions
 
@@ -409,7 +409,7 @@ If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end
 
 ## Subtree Inclusion Proofs
 
-Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry `index` of the subtree `[start, end)`. is a Merkle inclusion proof, as defined in {{Section 2.1.3.1 of !RFC9162}}, where `m` is `index - start` and the tree inputs are `D[start:end]`. A subtree inclusion proof can be verified with the procedure in {{Section 2.1.3.2 of !RFC9162}}, where `leaf_index` is `index - start` and `tree_size` is `end - start`.
+Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry `index` of the subtree `[start, end)` is a Merkle inclusion proof, as defined in {{Section 2.1.3.1 of !RFC9162}}, where `m` is `index - start` and the tree inputs are `D[start:end]`. A subtree inclusion proof can be verified with the procedure in {{Section 2.1.3.2 of !RFC9162}}, where `leaf_index` is `index - start` and `tree_size` is `end - start`.
 
 ## Subtree Consistency Proofs
 
@@ -478,7 +478,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
    3. Right-shift `fn` and `sn` equally until `LSB(fn)` is set or `sn` is zero.
    4. For each value `p` in the `proof` array:
       1. If `sn` is 0, then stop iteration and fail the proof verification.
-      2. Set `r` to `HASH(0x01, || p || r)`.
+      2. Set `r` to `HASH(0x01 || p || r)`.
       3. If `LSB(sn)` is not set, the right-shift `sn` until either `LSB(sn)` is set or `sn` is zero.
       4. Right-shift `sn` once more.
    5. Check `sn` is 0 and `r` is `root_hash`. If either is not equal, fail the proof verification. If all are equal, accept the proof.
