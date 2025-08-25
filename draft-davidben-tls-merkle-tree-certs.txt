@@ -217,7 +217,7 @@ Table of Contents
 
    Section 3 gives an overview of the system.  Section 4 describes a
    Merkle Tree primitive used by this system.  Section 5 describes the
-   log structure.  Finally, Section 6 and Section 7 describes how to
+   log structure.  Finally, Section 6 and Section 7 describe how to
    construct and consume a Merkle Tree certificate.
 
 2.  Conventions and Definitions
@@ -503,7 +503,7 @@ Table of Contents
 
    Subtrees are Merkle Trees, so entries can be proven to be contained
    in the subtree.  A subtree inclusion proof for entry index of the
-   subtree [start, end). is a Merkle inclusion proof, as defined in
+   subtree [start, end) is a Merkle inclusion proof, as defined in
    Section 2.1.3.1 of [RFC9162], where m is index - start and the tree
    inputs are D[start:end].  A subtree inclusion proof can be verified
    with the procedure in Section 2.1.3.2 of [RFC9162], where leaf_index
@@ -584,7 +584,7 @@ Table of Contents
            1.  If sn is 0, then stop iteration and fail the proof
                verification.
 
-           2.  Set r to HASH(0x01, || p || r).
+           2.  Set r to HASH(0x01 || p || r).
 
            3.  If LSB(sn) is not set, the right-shift sn until either
                LSB(sn) is set or sn is zero.
