@@ -1,4 +1,4 @@
-# Name: PKI, Logs, and Tree Signatures (PLANTS)
+# Name: PKI, Logs, And Tree Signatures (PLANTS)
 ## Description 
 This BoF is the result of the DISPATCH
 of [draft-davidben-tls-merkle-tree-certs](https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs/).
@@ -17,31 +17,50 @@ There is an oppurtunity to define a mechanism that integrates log construction i
 
 ## Required Details
 - Status: WG forming
-- Responsible AD: Deb Cooley
-# name <email>, name <email> (1-3 people - who are requesting and coordinating discussion for proposal) 
-- BOF proponents: Bas Westerbaan <bas@cloudflare.com>
+- Responsible AD: Deb Cooley (Security Area)
+- BOF proponents: David Benjamin <davidben@chromium.org>, Bas Westerbaan <bas@cloudflare.com>, Devon O'Brien <devon.obrien@gmail.com>
+- BOF Chairs: Tommy Pauly <tpauly@apple.com>, Russ Housley <housley@vigilsec.com>
 - Number of people expected to attend: 100
 - Length of session (1 or usually 2 hours): 2 hours
 - Conflicts (whole Areas and/or WGs)
-   - Chair Conflicts: TBD
-   - Technology Overlap: TLS, LAMPS, CFRG
+   - Chair Conflicts: lamps, TBD
+   - Technology Overlap: tls, lamps, acme, cfrg
    - Key Participant Conflict: TBD
 
 ## Information for IAB/IESG
 To allow evaluation of your proposal, please include the following items:
 
 - Any protocols or practices that already exist in this space:
+
+No standardised protocol or practice exists yet. Over the years there have
+been several proposals to address various shortcomings in the WebPKI, including,
+but not limited to, STH discipline, revocation transparency, and CTng.
+
 - Which (if any) modifications to existing protocols or practices are required:
+
+TLS, PKIX certs, ACME, CT.
+
 - Which (if any) entirely new protocols or practices are required:
+
+Probably none.
+
 - Open source projects (if any) implementing this work:
 
+https://github.com/cloudflare/azul
+https://github.com/bwesterb/mtc
+https://github.com/pohlm01/mtc-verifier
+
+# TODO should we bother listing these preliminary implementations?
+
 ## Agenda
-   - TBD
+    - Introduction, chairs (5 min)
+    - Background / context (10 min)
+    - Slots (TBD need to be scoped?)
+    - Charter / deliverable discussion (30 min)
 
 ## Links to the mailing list, draft charter if any (for WG-forming BoF), relevant Internet-Drafts, etc.
    - Mailing List: https://www.ietf.org/mailman/listinfo/plants
    - Draft charter: https://github.com/davidben/merkle-tree-certs/blob/main/charter-ietf-plants.md
    - Relevant Internet-Drafts:
      - https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs/
-     - TBD
 
