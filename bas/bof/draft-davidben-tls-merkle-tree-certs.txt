@@ -3,14 +3,15 @@
 
 
 Network Working Group                                        D. Benjamin
-Internet-Draft                                                D. O'Brien
-Intended status: Experimental                                 Google LLC
-Expires: 29 January 2026                                B. E. Westerbaan
+Internet-Draft                                                Google LLC
+Intended status: Experimental                                 D. O'Brien
+Expires: 28 February 2026                                               
+                                                        B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            28 July 2025
+                                                          27 August 2025
 
 
                         Merkle Tree Certificates
@@ -57,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 January 2026.
+   This Internet-Draft will expire on 28 February 2026.
 
 Copyright Notice
 
@@ -100,8 +101,9 @@ Table of Contents
      6.1.  Certificate Format
      6.2.  Full Certificates
      6.3.  Signatureless Certificates
-       6.3.1.  Landmark Checkpoints
-       6.3.2.  Constructing Signatureless Certificates
+       6.3.1.  Landmarks
+       6.3.2.  Allocating Landmarks
+       6.3.3.  Constructing Signatureless Certificates
      6.4.  Size Estimates
    7.  Relying Parties
      7.1.  Trust Anchors
@@ -129,14 +131,16 @@ Table of Contents
      12.5.  New Log Entry Types
      12.6.  Certificate Malleability
    13. IANA Considerations
+     13.1.  Module Identifier
+     13.2.  Algorithm
+     13.3.  Relative Distinguished Name Attribute
    14. References
      14.1.  Normative References
      14.2.  Informative References
    Appendix A.  ASN.1 Module
    Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
-     B.1.  Pruning a Tiled Transparency Log
-     B.2.  Subtree Signed Note Format
-     B.3.  Requesting Subtree Signatures
+     B.1.  Subtree Signed Note Format
+     B.2.  Requesting Subtree Signatures
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -145,6 +149,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-03
      Since draft-davidben-tls-merkle-tree-certs-04
      Since draft-davidben-tls-merkle-tree-certs-05
+     Since draft-davidben-tls-merkle-tree-certs-06
    Authors' Addresses
 
 1.  Introduction
@@ -212,7 +217,7 @@ Table of Contents
 
    Section 3 gives an overview of the system.  Section 4 describes a
    Merkle Tree primitive used by this system.  Section 5 describes the
-   log structure.  Finally, Section 6 and Section 7 describes how to
+   log structure.  Finally, Section 6 and Section 7 describe how to
    construct and consume a Merkle Tree certificate.
 
 2.  Conventions and Definitions
@@ -282,13 +287,13 @@ Table of Contents
    Cosignature:  A signature from either the CA or other cosigner, over
       some checkpoint or subtree.
 
-   Landmark checkpoint:  One of an infrequent subset of checkpoints that
-      can be used to predistribute trusted subtrees to relying parties
-      for signatureless certificates.
+   Landmark:  One of an infrequent subset of tree sizes that can be used
+      to predistribute trusted subtrees to relying parties for
+      signatureless certificates.
 
-   Landmark subtree:  A subtree determined by a landmark checkpoint.
-      Landmark subtrees are common points of reference between relying
-      parties and signatureless certificates.
+   Landmark subtree:  A subtree determined by a landmark.  Landmark
+      subtrees are common points of reference between relying parties
+      and signatureless certificates.
 
    Full certificate:  A certificate containing an inclusion proof to
       some subtree, and several cosignatures over that subtree.
@@ -298,64 +303,144 @@ Table of Contents
 
 3.  Overview
 
-   Merkle Tree certificate issuance begins as in a typical CA: The CA
-   receives an issuance request, e.g. over ACME [RFC8555], and validates
-   it, e.g. with ACME challenges.  From there, the issuance process
-   differs.
+   In Certificate Transparency, a CA first certifies information by
+   signing it, then submits the resulting certificate (or
+   precertificate) to logs for logging.  Merkle Tree Certificates
+   inverts this process: the CA certifies information by logging it,
+   then submits the log to cosigners to verify log operation.  A
+   certificate is assembled from the result and proves the information
+   is in the CA's log.
 
-   1.  The CA operates an _issuance log_ (Section 5), which is an
-       append-only Merkle Tree (Section 2.1 of [RFC9162]).  Unlike a CT
-       log, this log only contains entries added by the CA.
+   +-- Certificate Authority -----+    +--  Authenticating Party ----+
+   |                              |    |                             |
+   |  2. Validate request     <---+----+--  1. Request certificate   |
+   |       |                      |    |                             |
+   |       |                      |    |                             |
+   |       V                      |    |                             |
+   |                              |    |                             |
+   |  3. Add to issuance log      |    |                             |
+   |       +---[ CA cosign ]      |    |                             |
+   |      / \                 ----+----+->  5. Download certificates |
+   |     /   \                    |    |                             |
+   |    /     \                   |    |          *  tbscert         |
+   |   +-------+                  |    |      = = =  inclusion proof |
+   |    * * * *  tbscert entries  |    |     [ CA ]  cosignatures    |
+   |                              |    | [ mirror ]                  |
+   +------------------------------+    +-----------------------------+
+              /   |   \
+             /    |    \    4. Submit log to cosigners
+            V     V     V      for cosignatures
 
-   2.  The CA adds a TBSCertificateLogEntry (Section 5.3) to its log,
-       describing the information it is certifying.
+   +-- Mirrors, other cosigners --+    +-- Monitors -----------------+
+   |                              |    |                             |
+   |       +---[ CA cosign ]      +-+  |                             |
+   |      / \  [ mirror cosign ]  | |  |                             |
+   |     /   \                    | |  |                             |
+   |    /     \                 <-+-+--+--  6. Monitor CA operation  |
+   |   +-------+                  | |  |                             |
+   |    * * * *                   | |  +-----------------------------+
+   +-+----------------------------+ |
+     |  ...quorum of cosigners...   |
+     +------------------------------+
 
-   3.  The CA signs a _checkpoint_, which describes the current state of
-       the log.  A signed checkpoint certifies that the CA issued
-       _every_ entry in the Merkle Tree (Section 5.5).
+      Figure 1: A diagram of the issuance architecture, detailed below
 
-   4.  The CA additionally signs _subtrees_ (Section 4) that together
-       contain certificates added since the last checkpoint
-       (Section 4.4).  This is an optimization to reduce inclusion proof
-       sizes.  A signed subtree certifies that the CA has issued _every_
-       entry in the subtree.
+   Merkle Tree Certificates are issued as follows.  Figure 1 depicts
+   this process.
 
-   These signatures prove to relying parties that the CA has issued the
-   certificate.
+   1.  The authenticating party requests a certificate, e.g. over ACME
+       [RFC8555]
 
-   A relying party may require additional proof of the proper operation
-   of the issuance log by third parties, like CT logs provide additional
-   transparency.  Instead of presenting certificates to transparency
-   logs, CAs present their log state to _cosigners_. Cosigners validate
-   the log is append-only and optionally provide additional services,
-   such as mirroring its contents.  They cosign the CA's checkpoints and
-   subtrees.
+   2.  The CA validates each incoming issuance request, e.g. with ACME
+       challenges.  From there, the process differs.
 
-   A signature from either the CA or a cosigner is known as a
-   _cosignature_. A combination of cosignatures from sufficient trusted
-   parties proves both that the CA has issued the certificate, and that
-   the issuance satisfies any additional relying party transparency
-   requirements.
+   3.  The CA operates an append-only _issuance log_ (Section 5).
+       Unlike a CT log, this log only contains entries added by the CA:
 
-   A _full certificate_ contains:
+       1.  The CA adds a TBSCertificateLogEntry (Section 5.3) to its
+           log, describing the information it is certifying.
 
-   *  The TBSCertificate being certified
+       2.  The CA signs a _checkpoint_, which describes the current
+           state of the log.  A signed checkpoint certifies that the CA
+           issued _every_ entry in the Merkle Tree (Section 5.5).
 
-   *  An inclusion proof from the TBSCertificate to some subtree
+       3.  The CA additionally signs _subtrees_ (Section 4) that
+           together contain certificates added since the last checkpoint
+           (Section 4.4).  This is an optimization to reduce inclusion
+           proof sizes.  A signed subtree certifies that the CA has
+           issued _every_ entry in the subtree.
 
-   *  Sufficient cosignatures to meet the relying party's requirements
+   4.  The CA submits the new log state to _cosigners_. Cosigners
+       validate the log is append-only and optionally provide additional
+       services, such as mirroring its contents.  They cosign the CA's
+       checkpoints and subtrees.
+
+   5.  The CA now has enough information to construct a certificate and
+       give it to the authenticating party.  A certificate contains:
+
+       *  The TBSCertificate being certified
+
+       *  An inclusion proof from the TBSCertificate to some subtree
+
+       *  Cosignatures from the CA and cosigners on the subtree
+
+   6.  As in Certificate Transparency, monitors observe the issuance log
+       to ensure the CA is operated correctly.
+
+   A certificate with cosignatures is known as a _full certificate_.
+   Analogous to X.509 trust anchors and trusted CT logs, relying parties
+   are configured with trusted cosigners (Section 7.3) that allow them
+   to accept Merkle Tree certificates.  The inclusion proof proves the
+   TBSCertificate is part of some subtree, and cosignatures from trusted
+   cosigners prove the subtree was certified by the CA and available to
+   monitors.  Where CT logs entire certificates, the issuance log's
+   entries are smaller TBSCertificateLogEntry (Section 5.3) structures,
+   which do not scale with public key or signature size.
 
    This same issuance process also produces a _signatureless
-   certificate_. This is an optional optimized certificate that avoids
-   any cosignatures:
+   certificate_. This is an optional, optimized certificate that avoids
+   all cosignatures, including the CA signature.  Signatureless
+   certificates are available after a short period of time and usable
+   with up-to-date relying parties.
 
-   1.  Periodically, the CA's most recent checkpoint is designated as a
-       _landmark checkpoint_. This determines _landmark subtrees_, which
-       are common points of reference between relying parties and
+   +-- Certificate Authority -------+
+   |                                |  +-- Update Channel --+
+   |    /\                          |  |                    |
+   |   /  \  1. Allocate landmarks -+--+----------------+   |
+   |  +----+                  |     |  |                |   |
+   +--------------------------+-----+  +----------------+---+
+                              |                         |
+       2. Make signatureless  |          3. Distribute  |
+          cert from landmark  |              landmarks  |
+                              V                         |
+   +-- Authenticating Party --------+                   |
+   |                                |                   |
+   | signatureless cert             |                   V
+   |   tbscert                      |  +-- Up-to-date RP -----+
+   |   inclusion proof to landmark -+->| landmark hashes      |
+   |                                |  | trusted cosigners    |
+   |                                |  +----------------------+
+   | full cert                      |
+   |   tbscert                      |  +-- Unupdated RP ------+
+   |   inclusion proof              |  | (stale or no hashes) |
+   |   cosignatures     ------------+->| trusted cosigners    |
+   |                                |  +----------------------+
+   +--------------------------------+
+                        4. Select certificate by RP
+
+     Figure 2: A diagram of signatureless certificate construction and
+                           usage, detailed below
+
+   Signatureless certificates are constructed and used as follows.
+   Figure 2 depicts this process.
+
+   1.  Periodically, the tree size of the CA's most recent checkpoint is
+       designated as a _landmark_. This determines _landmark subtrees_,
+       which are common points of reference between relying parties and
        signatureless certificates.
 
-   2.  Once some landmark checkpoint includes the TBSCertificate, the
-       signatureless certificate is constructed with:
+   2.  Once some landmark includes the TBSCertificate, the signatureless
+       certificate is constructed with:
 
        *  The TBSCertificate being certified
 
@@ -370,7 +455,9 @@ Table of Contents
    4.  During the application protocol, such as TLS [RFC8446], if the
        relying party already supports the landmark subtree, the
        authenticating party can present the signatureless certificate.
-       Otherwise, it presents a full certificate.
+       Otherwise, it presents a full certificate.  The authenticating
+       party may also select between several signatureless certificates,
+       as described in Section 10.4.
 
 4.  Subtrees
 
@@ -384,7 +471,7 @@ Table of Contents
 4.1.  Definition of a Subtree
 
    Given an ordered list of n inputs, D_n = {d[0], d[1], ..., d[n-1]},
-   Section 2.1.1 of [RFC9612] defines the Merkle Tree via the Merkle
+   Section 2.1.1 of [RFC9162] defines the Merkle Tree via the Merkle
    Tree Hash MTH(D_n).
 
    A _subtree_ of this Merkle Tree is defined by two integers, start and
@@ -392,8 +479,8 @@ Table of Contents
 
    *  0 <= start < end <= n
 
-   *  If k is the largest power of 2 that is greater than or equal to
-      end - start, start must be a multiple of k
+   *  If s is the smallest power of two that is greater than or equal to
+      end - start, start must be a multiple of s
 
    Note that, if start is zero, the second condition is always true.
 
@@ -403,7 +490,7 @@ Table of Contents
    entries whose indices are in that half-open interval.
 
    The _size_ of the subtree is end - start.  If the subtree's size is a
-   power of 2, it is said to be _full_, otherwise it is said to be
+   power of two, it is said to be _full_, otherwise it is said to be
    _partial_.
 
    If a subtree is full, then it is directly contained in the tree of
@@ -416,7 +503,7 @@ Table of Contents
 
    Subtrees are Merkle Trees, so entries can be proven to be contained
    in the subtree.  A subtree inclusion proof for entry index of the
-   subtree [start, end). is a Merkle inclusion proof, as defined in
+   subtree [start, end) is a Merkle inclusion proof, as defined in
    Section 2.1.3.1 of [RFC9162], where m is index - start and the tree
    inputs are D[start:end].  A subtree inclusion proof can be verified
    with the procedure in Section 2.1.3.2 of [RFC9162], where leaf_index
@@ -497,7 +584,7 @@ Table of Contents
            1.  If sn is 0, then stop iteration and fail the proof
                verification.
 
-           2.  Set r to HASH(0x01, || p || r).
+           2.  Set r to HASH(0x01 || p || r).
 
            3.  If LSB(sn) is not set, the right-shift sn until either
                LSB(sn) is set or sn is zero.
@@ -512,7 +599,7 @@ Table of Contents
 
        1.  If proof is an empty array, stop and fail verification.
 
-       2.  If end - start is an exact power of 2, prepend node_hash to
+       2.  If end - start is an exact power of two, prepend node_hash to
            the proof array.
 
        3.  Set fn to start, sn to end - 1, and tn to n - 1.
@@ -552,13 +639,64 @@ Table of Contents
    Not all [start, end) intervals of a Merkle tree are valid subtrees.
    This section describes how, for any start < end, to determine up to
    two subtrees that efficiently cover the interval.  The subtrees are
-   determined by the following Python procedure:
+   determined by the following procedure:
+
+   1.  If end - start is one, return a single subtree, [start, end).
+
+   2.  Otherwise, run the following to return a pair of subtrees:
+
+       1.  Let last be end - 1, the last index in [start, end).
+
+       2.  Let split be the bit index of the most significant bit where
+           start and last differ.  Bits are numbered from the least
+           significant bit, starting at zero. split is the height at
+           which start and last's paths in the tree diverge.
+
+       3.  Let mid be last with the least significant split bits set to
+           zero. mid is the leftmost leaf node in the above divergence
+           point's right branch.
+
+       4.  Within the least significant split bits of left, let b be the
+           bit index of the most significant bit with value zero, if
+           any:
+
+           1.  If there is such a bit, let left_split be b + 1.
+
+           2.  Otherwise, let left_split be zero.
+
+           left_split is the height of the lowest common ancestor of the
+           nodes in [start, mid).
+
+       5.  Let left_start be start with the least significant left_split
+           bits set to zero. left_start is the above lowest common
+           ancestor's leftmost leaf node.
+
+       6.  Return the subtrees [left_start, mid) and [mid, end).
+
+   When the procedure returns a single subtree, the subtree is [start,
+   start+1).  When it returns two subtrees, left and right, the subtrees
+   satisfy the following properties:
+
+   *  left.end = right.start.  That is, the two subtrees cover adjacent
+      intervals.
+
+   *  left.start <= start and end = right.end.  That is, the two
+      subtrees together cover the entire target interval, possibly with
+      some extra entries before start left, but not after end.
+
+   *  left.end - left.start < 2 * (end - start) and right.end -
+      right.start <= end - start.  That is, the two subtrees efficiently
+      cover the interval.
+
+   *  left is full, while right may be partial.
+
+   The following Python code implements this procedure:
 
    def find_subtrees(start, end):
        """ Returns a list of one or two subtrees that efficiently
        cover [start, end). """
        assert start < end
-       if end - start < 2:
+       if end - start == 1:
            return [(start, end),]
        last = end - 1
        # Find where start and last's tree paths diverge. The two
@@ -569,29 +707,10 @@ Table of Contents
        # Maximize the left endpoint. This is just before start's
        # path leaves the right edge of its new subtree.
        left_split = (~start & mask).bit_length()
-       left = start & ~((1 << left_split) - 1)
-       return [(left, mid), (mid, end)]
+       left_start = start & ~((1 << left_split) - 1)
+       return [(left_start, mid), (mid, end)]
 
-   [[TODO: Write this up in prose too.]]
-
-   When the procedure returns a single subtree, the subtree is [start,
-   end).  When it returns two subtrees, left and right, the subtrees
-   satisfy the following properties:
-
-   1.  left.end = right.start.  That is, the two subtrees cover adjacent
-       intervals.
-
-   2.  left.start <= start and end = right.end.  That is, the two
-       subtrees together cover the entire target interval, possibly with
-       some extra entries before start left, but not after end.
-
-   3.  left.end - left.start < 2 * (end - start) and right.end -
-       right.start <= end - start.  That is, the two subtrees
-       efficiently cover the interval.
-
-   4.  left is full, while right may be partial.
-
-   Figure 1 shows the subtrees which cover [5, 13) in a Merkle Tree of
+   Figure 3 shows the subtrees which cover [5, 13) in a Merkle Tree of
    13 elements.  The two subtrees selected are [4, 8) and [8, 13).  Note
    that the subtrees cover a slightly larger interval than [5, 13).
 
@@ -615,10 +734,10 @@ Table of Contents
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
    +-+ +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
 
-      Figure 1: An example selection of subtrees to cover an interval
+      Figure 3: An example selection of subtrees to cover an interval
 
    Two subtrees are needed because a single subtree may not be able to
-   efficiently cover an interval.  Figure 2 shows the smallest subtree
+   efficiently cover an interval.  Figure 4 shows the smallest subtree
    that contains [7, 9) in a 9-element tree.  The smallest single
    subtree that contains the interval is [0, 9) but this is the entire
    tree.  Using two subtrees, the interval can be described by [7, 8)
@@ -644,7 +763,7 @@ Table of Contents
    |0| |1| |2| |3| |4| |4| |6| |7| |8|
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
 
-       Figure 2: An example showing an inefficient choice of a single
+       Figure 4: An example showing an inefficient choice of a single
                                   subtree
 
 5.  Issuance Logs
@@ -707,7 +826,7 @@ Table of Contents
        mechanisms(5) pkix(7) rdna(TBD1) TBD2}
 
    [[TODO: Fill in TBD1 from the PKIX rdna arc in
-   [I-D.draft-ietf-lamps-x509-alg-none], once allocated.]]
+   [I-D.ietf-lamps-x509-alg-none], once allocated.]]
 
    The attribute's value is a RELATIVE-OID containing the trust anchor
    ID's ASN.1 representation.  For example, the distinguished name for a
@@ -1039,7 +1158,7 @@ Table of Contents
    if end is less than or equal to the minimum index, the node's
    children MAY be discarded in favor of the node's hash.
 
-   Figure 3 shows an example pruned tree with 13 elements, where the
+   Figure 5 shows an example pruned tree with 13 elements, where the
    minimum index is 7.  It shows the original tree, followed by the
    pruned tree.  The pruned tree depicts the nodes that MUST be
    available or computable.  Note that entry 6 MAY be discarded, only
@@ -1086,11 +1205,11 @@ Table of Contents
                            |6| |7| |8| |9| |10| |11| |12|
                            +-+ +=+ +=+ +=+ +==+ +==+ +==+
 
-        Figure 3: An example showing the minimum nodes that must be
+        Figure 5: An example showing the minimum nodes that must be
                           available after pruning
 
    Logs MAY retain additional nodes, or expect log clients to compute
-   required nodes from other nodes.  For example, in Figure 3, the log's
+   required nodes from other nodes.  For example, in Figure 5, the log's
    serving protocol MAY instead serve [0, 2) and [2, 4), with the log
    client computing [0, 4) from those values.
 
@@ -1209,7 +1328,7 @@ Table of Contents
        from external cosigners to meet relying party requirements
        (Section 7.3).
 
-   5.  The CA requests subtree cosignatures (Appendix B.3) from the
+   5.  The CA requests subtree cosignatures (Appendix B.2) from the
        cosigners above.
 
    6.  For each certificate in the interval, the CA constructs
@@ -1262,122 +1381,124 @@ Table of Contents
    mechanism to select between the two.  Section 8 discusses such a
    mechanism for TLS [RFC8446].
 
-6.3.1.  Landmark Checkpoints
+6.3.1.  Landmarks
 
    A signatureless certificate is constructed based on a _landmark
-   checkpoint sequence_, which is a sequence of _landmark checkpoints_.
-   Landmark checkpoints are agreed-upon tree sizes across the ecosystem
-   for optimizing certificates.  Landmark checkpoints SHOULD be
-   allocated by the CA, but they can also be allocated by some other
-   coordinating party.  It is possible, but NOT RECOMMENDED, for
-   multiple landmark checkpoint sequences to exist per CA.  Landmark
-   checkpoints are allocated to balance minimizing the delay in
-   obtaining a signatureless certificate with minimizing the size of the
-   relying party's predistributed state.
+   sequence_, which is a sequence of _landmarks_. Landmarks are agreed-
+   upon tree sizes across the ecosystem for optimizing certificates.
+   Landmarks SHOULD be allocated by the CA, but they can also be
+   allocated by some other coordinating party.  It is possible, but NOT
+   RECOMMENDED, for multiple landmark sequences to exist per CA.
+   Landmarks are allocated to balance minimizing the delay in obtaining
+   a signatureless certificate with minimizing the size of the relying
+   party's predistributed state.
 
-   A landmark checkpoint sequence has the following fixed parameters:
+   A landmark sequence has the following fixed parameters:
 
-   *  base_id: An OID arc for trust anchor IDs of individual landmark
-      checkpoints
+   *  base_id: An OID arc for trust anchor IDs of individual landmarks
 
-   *  max_checkpoints: A positive integer, describing the maximum number
-      of landmark checkpoints that may contain unexpired certificates at
-      any time
+   *  max_landmarks: A positive integer, describing the maximum number
+      of landmarks that may contain unexpired certificates at any time
 
-   *  checkpoint_url: Some URL to fetch the current list of landmark
-      checkpoints
+   *  landmark_url: Some URL to fetch the current list of landmarks
 
-   Landmark checkpoints are numbered consecutively from zero.  Each
-   landmark checkpoint has a trust anchor ID, determined by appending
-   the checkpoint number to base_id.  For example, the trust anchor ID
-   for landmark checkpoint 42 of a sequence with base_id of 32473.1
-   would be 32473.1.42.
+   Landmarks are numbered consecutively from zero.  Each landmark has a
+   trust anchor ID, determined by appending the landmark number to
+   base_id.  For example, the trust anchor ID for landmark 42 of a
+   sequence with base_id of 32473.1 would be 32473.1.42.
 
-   Each landmark checkpoint specifies a tree size.  The first landmark
-   checkpoint, numbered zero, is always a tree size of zero.  The
-   sequence of tree sizes MUST be append-only and monotonically
-   increasing.
+   Each landmark specifies a tree size.  The first landmark, numbered
+   zero, is always a tree size of zero.  The sequence of tree sizes MUST
+   be append-only and monotonically increasing.
 
-   Landmark checkpoints determine _landmark subtrees_: for each landmark
-   checkpoint, other than number zero, let tree_size be the checkpoint's
-   tree size and prev_tree_size be that of the previous landmark
-   checkpoint.  As described in Section 4.4, select the one or two
-   subtrees that cover [prev_tree_size, tree_size).  Each of those
-   subtrees is a landmark subtree.
+   Landmarks determine _landmark subtrees_: for each landmark, other
+   than number zero, let tree_size be the landmark's tree size and
+   prev_tree_size be that of the previous landmark.  As described in
+   Section 4.4, select the one or two subtrees that cover
+   [prev_tree_size, tree_size).  Each of those subtrees is a landmark
+   subtree.
 
-   The most recent max_checkpoints landmark checkpoints are said to be
-   _active_. Landmark checkpoints MUST be allocated such that, at any
-   given time, only active landmark checkpoints contain unexpired
-   certificates.  The active landmark subtrees are those determined by
-   the active landmark checkpoints.  There are at most 2 *
-   max_checkpoints active landmark subtrees at any time.  Every
-   unexpired entry will be contained in one or more landmark subtree.
-   Active landmark subtrees are predistributed to the relying party as
-   trusted subtrees, as described in Section 7.4.
+   The most recent max_landmarks landmarks are said to be _active_.
+   Landmarks MUST be allocated such that, at any given time, only active
+   landmarks contain unexpired certificates.  The active landmark
+   subtrees are those determined by the active landmarks.  There are at
+   most 2 * max_landmarks active landmark subtrees at any time.  Every
+   unexpired entry will be contained in one or more landmark subtree, or
+   between the last landmark subtree and the latest checkpoint.  Active
+   landmark subtrees are predistributed to the relying party as trusted
+   subtrees, as described in Section 7.4.
 
-   If landmark checkpoints are allocated incorrectly (e.g. past
-   checkpoints change, or max_checkpoints is inaccurate), there are no
-   security consequences, but some older certificates may fail to
+   It is RECOMMENDED that landmarks be allocated following the procedure
+   described in Section 6.3.2.  If landmarks are allocated incorrectly
+   (e.g. past landmarks change, or max_landmarks is inaccurate), there
+   are no security consequences, but some older certificates may fail to
    validate.
 
-   It is RECOMMENDED that checkpoints be allocated by picking some
-   time_between_checkpoints interval, and then appending the latest
-   checkpoint to the sequence, once per interval.  If the latest
-   checkpoint is already a landmark checkpoint, the interval is skipped.
-   max_checkpoints can then be set to ceil(max_cert_lifetime /
-   time_between_checkpoints), where max_cert_lifetime is the CA's
-   maximum certificate lifetime.  Allocations do not need to be precise,
-   as long as max_checkpoints is accurate.
+   Relying parties will locally retain up to 2 * max_landmarks hashes
+   (Section 7.4) per CA, so max_landmarks should be set to balance the
+   delay between landmarks and the amount of state the relying party
+   must maintain.  Using the recommended procedure above, a CA with a
+   maximum certificate lifetime of 7 days, allocating a landmark every
+   hour, will have a max_landmarks of 168.  The client state is then 336
+   hashes, or 10,752 bytes with SHA-256.
 
-   Relying parties will locally retain up to 2 * max_checkpoints hashes
-   (Section 7.4) per CA, so max_checkpoints should be set to balance the
-   delay between landmark checkpoints and the amount of state the
-   relying party must maintain.  Using the recommended procedure above,
-   a CA with a maximum certificate lifetime of 7 days, allocating a
-   landmark checkpoint every hour, will have a max_checkpoints of 168.
-   The client state is then 336 hashes, or 10,752 bytes with SHA-256.
-
-   checkpoint_url MUST serve a resource with Content-Type: text/plain;
+   landmark_url MUST serve a resource with Content-Type: text/plain;
    charset=utf-8 and the following lines.  Each line MUST be terminated
    by a newline character (U+000A):
 
-   *  Two space-separated non-negative decimal integers:
-      <last_checkpoint> <num_active_checkpoints>.  This line MUST
-      satisfy the following, otherwise it is invalid:
+   *  Two space-separated non-negative decimal integers: <last_landmark>
+      <num_active_landmarks>.  This line MUST satisfy the following,
+      otherwise it is invalid:
 
-      -  num_active_checkpoints <= max_checkpoints
+      -  num_active_landmarks <= max_landmarks
 
-      -  num_active_checkpoints <= last_checkpoint
+      -  num_active_landmarks <= last_landmark
 
-   *  num_active_checkpoints + 1 lines each containing a single non-
+   *  num_active_landmarks + 1 lines each containing a single non-
       negative decimal integer, containing a tree size.  Numbered from
-      zero to num_active_checkpoints, line i contains the tree size for
-      checkpoint last_checkpoint - i.  The integers MUST be
-      monotonically decreasing and lower or equal to the log's latest
-      tree size.
+      zero to num_active_landmarks, line i contains the tree size for
+      landmark last_landmark - i.  The integers MUST be monotonically
+      decreasing and lower or equal to the log's latest tree size.
 
-6.3.2.  Constructing Signatureless Certificates
+6.3.2.  Allocating Landmarks
+
+   It is RECOMMENDED that landmarks be allocated using the following
+   procedure:
+
+   1.  Select some time_between_landmarks duration.  Define a series of
+       consecutive, non-overlapping time intervals, each of duration
+       time_between_landmarks.
+
+   2.  At most once per time interval, append the latest checkpoint tree
+       size to the landmark sequence if it is greater than the last
+       landmark's tree size.
+
+   To ensure that only active landmarks contain unexpired certificates,
+   set max_landmarks to ceil(max_cert_lifetime / time_between_landmarks)
+   + 1, where max_cert_lifetime is the CA's maximum certificate
+   lifetime.
+
+6.3.3.  Constructing Signatureless Certificates
 
    Given a TBSCertificateLogEntry in the issuance log and a landmark
-   checkpoint sequence, a signatureless certificate is constructed as
-   follows:
+   sequence, a signatureless certificate is constructed as follows:
 
-   1.  Wait for the first landmark checkpoint to be allocated that
+   1.  Wait for the first landmark to be allocated that contains the
+       entry.
+
+   2.  Determine the landmark's subtrees and select the one that
        contains the entry.
-
-   2.  Determine the landmark checkpoint's landmark subtrees and select
-       the one that contains the entry.
 
    3.  Construct a certificate (Section 6.1) using the selected subtree
        and no signatures.
 
    Before sending this certificate, the authenticating party SHOULD
    obtain some application-protocol-specific signal that implies the
-   relying party has been configured with the corresponding landmark
-   checkpoint.  (Section 7.4 defines how relying parties are
-   configured.)  The trust anchor ID of the landmark checkpoint may be
-   used as an efficient identifier in the application protocol.
-   Section 8 discusses how to do this in TLS [RFC8446].
+   relying party has been configured with the corresponding landmark.
+   (Section 7.4 defines how relying parties are configured.)  The trust
+   anchor ID of the landmark may be used as an efficient identifier in
+   the application protocol.  Section 8 discusses how to do this in TLS
+   [RFC8446].
 
 6.4.  Size Estimates
 
@@ -1414,13 +1535,13 @@ Table of Contents
    proof, or 384 bytes.  Full certificates additionally must carry a
    sufficient set of signatures to meet relying party requirements.
 
-   If a new landmark checkpoint is allocated every hour, signatureless
-   certificate subtrees will span around 4,400,000 certificates, leading
-   to 23 hashes in the inclusion proof, giving an inclusion proof size
-   of 736 bytes, with no signatures.  This is significantly smaller than
-   a single ML-DSA-44 signature, 2,420 bytes, and almost ten times
-   smaller than the three ML-DSA-44 signatures necessary to include
-   post-quantum SCTs.
+   If a new landmark is allocated every hour, signatureless certificate
+   subtrees will span around 4,400,000 certificates, leading to 23
+   hashes in the inclusion proof, giving an inclusion proof size of 736
+   bytes, with no signatures.  This is significantly smaller than a
+   single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller
+   than the three ML-DSA-44 signatures necessary to include post-quantum
+   SCTs.
 
    The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is
    sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.
@@ -1513,7 +1634,7 @@ Table of Contents
    those described below, and MAY incorporate cosigners acting in roles
    not described in this document.
 
-   In picking trusted cosigners, relying party SHOULD ensure the
+   In picking trusted cosigners, the relying party SHOULD ensure the
    following security properties:
 
    Authenticity:  The relying party only accepts entries certified by
@@ -1576,7 +1697,6 @@ Table of Contents
    This criteria can be checked given:
 
    *  Some _reference checkpoint_ that contains the latest landmark
-      checkpoint
 
    *  For each cosigner, either:
 
@@ -1604,9 +1724,9 @@ Table of Contents
    The relying party SHOULD incorporate its trusted subtree
    configuration in application-protocol-specific certificate selection
    mechanisms, to allow an authenticating party to select a
-   signatureless certificate.  The trust anchor IDs of the landmark
-   checkpoints may be used as efficient identifiers in the application
-   protocol.  Section 8 discusses how to do this in TLS [RFC8446].
+   signatureless certificate.  The trust anchor IDs of the landmarks may
+   be used as efficient identifiers in the application protocol.
+   Section 8 discusses how to do this in TLS [RFC8446].
 
 7.5.  Revocation by Index
 
@@ -1672,19 +1792,18 @@ Table of Contents
    among the relying parties that it supports.
 
    A signatureless certificate has a trust anchor ID of the
-   corresponding landmark checkpoint, as described in Section 6.3.1.
-   This can be configured in the authenticating party via out-of-band
-   information, as described in Section 3.2 of
-   [I-D.ietf-tls-trust-anchor-ids].  A relying party that has been
-   configured with trusted subtrees (Section 7.4) derived from a set of
-   landmark checkpoints SHOULD be configured to support those
-   checkpoints' trust anchor IDs.  TLS certificate selection will then
-   correctly determine whether the signatureless certificate is
-   compatible with the relying party.
+   corresponding landmark, as described in Section 6.3.1.  This can be
+   configured in the authenticating party via out-of-band information,
+   as described in Section 3.2 of [I-D.ietf-tls-trust-anchor-ids].  A
+   relying party that has been configured with trusted subtrees
+   (Section 7.4) derived from a set of landmarks SHOULD be configured to
+   support those landmarks' trust anchor IDs.  TLS certificate selection
+   will then correctly determine whether the signatureless certificate
+   is compatible with the relying party.
 
    [[TODO: We can do slightly better.  If the relying party supports
-   checkpoint 42, it can be assumed to also support checkpoint 41, 40,
-   39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62
+   landmark 42, it can be assumed to also support landmark 41, 40, 39,
+   etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62
    discusses how to fit this into the trust anchor IDs framework.  This
    allows the client to summarize its state with one ID per CA.]]
 
@@ -1724,9 +1843,9 @@ Table of Contents
    alternate URL SHOULD return a HTTP 503 (Service Unavailable)
    response, with a Retry-After header (Section 10.2.3 of [RFC9110])
    estimating when the certificate will become available.  Once the next
-   landmark checkpoint is allocated, the ACME server constructs a
-   signatureless certificate, as described in Section 6.3 and serves it
-   from the alternate URL.
+   landmark is allocated, the ACME server constructs a signatureless
+   certificate, as described in Section 6.3 and serves it from the
+   alternate URL.
 
    ACME clients supporting Merkle Tree certificates SHOULD support
    fetching alternate chains.  If an alternate chain returns an HTTP 503
@@ -1919,9 +2038,8 @@ Table of Contents
 
    When an authenticating party requests a certificate, the
    signatureless certificate will not be available until the next
-   landmark checkpoint is ready.  From there, the signatureless
-   certificate will not be available until relying parties receive new
-   trusted subtrees.
+   landmark is ready.  From there, the signatureless certificate will
+   not be available until relying parties receive new trusted subtrees.
 
    To maximize coverage of the signatureless certificate optimization,
    authenticating parties performing routine renewal SHOULD request a
@@ -2216,7 +2334,45 @@ Table of Contents
 
 13.  IANA Considerations
 
-   TODO: Fill this in.
+13.1.  Module Identifier
+
+   IANA is requested to add the following entry in the "SMI Security for
+   PKIX Module Identifier" registry [RFC7299]:
+
+                +=========+=================+============+
+                | Decimal | Description     | References |
+                +=========+=================+============+
+                | TBD     | id-mod-mtc-2025 | [this-RFC] |
+                +---------+-----------------+------------+
+
+                                 Table 1
+
+13.2.  Algorithm
+
+   IANA is requested to add the following entry to the "SMI Security for
+   PKIX Algorithms" registry [RFC7299]:
+
+                +=========+=================+============+
+                | Decimal | Description     | References |
+                +=========+=================+============+
+                | TBD     | id-alg-mtcProof | [this-RFC] |
+                +---------+-----------------+------------+
+
+                                 Table 2
+
+13.3.  Relative Distinguished Name Attribute
+
+   IANA is requested to add the following entry to the "SMI Security for
+   PKIX Relative Distinguished Name Attribute" registry
+   [I-D.ietf-lamps-x509-alg-none]:
+
+             +=========+=======================+============+
+             | Decimal | Description           | References |
+             +=========+=======================+============+
+             | TBD     | id-rdna-trustAnchorID | [this-RFC] |
+             +---------+-----------------------+------------+
+
+                                 Table 3
 
 14.  References
 
@@ -2233,7 +2389,7 @@ Table of Contents
               DOI 10.6028/nist.fips.204, August 2024,
               <https://doi.org/10.6028/nist.fips.204>.
 
-   [I-D.draft-ietf-lamps-x509-alg-none]
+   [I-D.ietf-lamps-x509-alg-none]
               Benjamin, D., "Unsigned X.509 Certificates", Work in
               Progress, Internet-Draft, draft-ietf-lamps-x509-alg-none-
               08, 7 July 2025, <https://datatracker.ietf.org/doc/html/
@@ -2265,6 +2421,11 @@ Table of Contents
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/rfc/rfc5280>.
 
+   [RFC5912]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for the
+              Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
+              DOI 10.17487/RFC5912, June 2010,
+              <https://www.rfc-editor.org/rfc/rfc5912>.
+
    [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
               Signature Algorithm (EdDSA)", RFC 8032,
               DOI 10.17487/RFC8032, January 2017,
@@ -2291,12 +2452,6 @@ Table of Contents
    [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
               Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
               December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
-
-   [RFC9612]  Mirsky, G., Tantsura, J., Varlashkin, I., and M. Chen,
-              "Bidirectional Forwarding Detection (BFD) Reverse Path for
-              MPLS Label Switched Paths (LSPs)", RFC 9612,
-              DOI 10.17487/RFC9612, July 2024,
-              <https://www.rfc-editor.org/rfc/rfc9612>.
 
    [SHS]      "Secure hash standard", National Institute of Standards
               and Technology (U.S.), DOI 10.6028/nist.fips.180-4, 2015,
@@ -2363,6 +2518,10 @@ Table of Contents
               DOI 10.17487/RFC6973, July 2013,
               <https://www.rfc-editor.org/rfc/rfc6973>.
 
+   [RFC7299]  Housley, R., "Object Identifier Registry for the PKIX
+              Working Group", RFC 7299, DOI 10.17487/RFC7299, July 2014,
+              <https://www.rfc-editor.org/rfc/rfc7299>.
+
    [SCTNotAfter]
               Adrian, D., "How to distrust a CA without any certificate
               errors", March 2025,
@@ -2401,7 +2560,60 @@ Table of Contents
 
 Appendix A.  ASN.1 Module
 
-   TODO: Add an ASN.1 module.  Leaving a placeholder as a reminder.
+   MerkleTreeCertificates
+     { iso(1) identified-organization(3) dod(6) internet(1)
+       security(5) mechanisms(5) pkix(7) id-mod(0)
+       id-mod-mtc-2025(TBD) }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+   BEGIN
+
+   IMPORTS
+     SIGNATURE-ALGORITHM
+     FROM AlgorithmInformation-2009  -- in [RFC5912]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-algorithmInformation-02(58) }
+     ATTRIBUTE
+     FROM PKIX-CommonTypes-2009 -- in [RFC5912]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-pkixCommon-02(57) } ;
+     TrustAnchorID
+     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-trustAnchorIDs-2025(TBD) }
+
+   TBSCertificateLogEntry  ::=  SEQUENCE  {
+         version             [0]  EXPLICIT Version DEFAULT v1,
+         issuer                   Name,
+         validity                 Validity,
+         subject                  Name,
+         subjectPublicKeyInfoHash OCTET STRING,
+         issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+         subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
+         extensions          [3]  EXPLICIT Extensions OPTIONAL }
+
+   id-alg-mtcProof OBJECT IDENTIFIER ::= {
+       iso(1) identified-organization(3) dod(6) internet(1) security(5)
+       mechanisms(5) pkix(7) algorithms(6) TBD}
+
+   sa-mtcProof SIGNATURE-ALGORITHM ::= {
+      IDENTIFIER id-alg-mtcProof
+      PARAMS ARE absent
+   }
+
+   id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
+       iso(1) identified-organization(3) dod(6) internet(1) security(5)
+       mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+
+   at-trustAnchorID ATTRIBUTE ::= {
+      TYPE TrustAnchorID
+      IDENTIFIED BY id-rdna-trustAnchorID
+   }
+
+   END
 
 Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
 
@@ -2409,27 +2621,7 @@ Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
    purely for illustrative purposes, until the features are defined
    somewhere else, e.g. in the upstream tlog documents.]]
 
-B.1.  Pruning a Tiled Transparency Log
-
-   https://github.com/C2SP/C2SP/pull/138 describes how to support
-   pruning in tlogs but, as of writing, is not part of [TLOG-TILES] yet.
-
-   [TLOG-MIRROR] is also updated to add a minimum index parameter to
-   each mirror and apply the above changes to its monitoring interface.
-   The first step of the recommended update procedure in [TLOG-MIRROR]
-   is updated to say, "Let mirror_size be the tree size of the mirror
-   checkpoint, or the mirror's minimum index if the mirror has not
-   copied the log yet."
-
-   A mirror MAY use the origin log's current minimum index to initialize
-   its starting minimum index, but it is not required to reflect
-   subsequent pruning.  A mirror MAY initialize its minimum index to
-   some higher value than the origin, if it does not intend to log some
-   entries.  It MAY initialize its minimum index to a lower value, if
-   the pruned resources are available from some other source, e.g.,
-   another mirror.
-
-B.2.  Subtree Signed Note Format
+B.1.  Subtree Signed Note Format
 
    A subtree, with signatures, can be represented as a signed note
    [SIGNED-NOTE].  Trust anchor IDs can be converted into log origins
@@ -2462,7 +2654,7 @@ B.2.  Subtree Signed Note Format
    The only difference between the two forms is the implicit
    transformation from the signed note text to the MTCSubtree structure.
 
-B.3.  Requesting Subtree Signatures
+B.2.  Requesting Subtree Signatures
 
    This section defines the sign-subtree cosigner HTTP endpoint for
    clients to obtain subtree signatures from non-CA cosigners, such as
@@ -2481,7 +2673,7 @@ B.3.  Requesting Subtree Signatures
    is the submission prefix.  The client's request body MUST be a
    sequence of:
 
-   *  The requested subtree as a signed note (Appendix B.2), with zero
+   *  The requested subtree as a signed note (Appendix B.1), with zero
       or more signatures.  The endpoint MAY require signatures from the
       CA as a DoS mitigation, as described below.
 
@@ -2658,6 +2850,23 @@ Since draft-davidben-tls-merkle-tree-certs-05
 
    *  Sketch out a more concrete initial ACME extension
 
+Since draft-davidben-tls-merkle-tree-certs-06
+
+   *  Fix mistyped reference
+
+   *  Removed now unnecessary placeholder text
+
+   *  First draft at IANA registration and ASN.1 module
+
+   *  Added a prose version of the procedure to select subtrees
+
+   *  Rename 'landmarks checkpoint' to 'landmarks'
+
+   *  Clarify and fix an off-by-one error in recommended landmark
+      allocation scheme
+
+   *  Add some diagrams to the Overview section
+
 Authors' Addresses
 
    David Benjamin
@@ -2666,8 +2875,7 @@ Authors' Addresses
 
 
    Devon O'Brien
-   Google LLC
-   Email: asymmetric@google.com
+   Email: devon.obrien@gmail.com
 
 
    Bas Westerbaan
