@@ -150,6 +150,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-04
      Since draft-davidben-tls-merkle-tree-certs-05
      Since draft-davidben-tls-merkle-tree-certs-06
+     Since draft-davidben-tls-merkle-tree-certs-07
    Authors' Addresses
 
 1.  Introduction
@@ -1414,7 +1415,7 @@ Table of Contents
    prev_tree_size be that of the previous landmark.  As described in
    Section 4.4, select the one or two subtrees that cover
    [prev_tree_size, tree_size).  Each of those subtrees is a landmark
-   subtree.
+   subtree.  Landmark zero has no landmark subtrees.
 
    The most recent max_landmarks landmarks are said to be _active_.
    Landmarks MUST be allocated such that, at any given time, only active
@@ -2864,6 +2865,10 @@ Since draft-davidben-tls-merkle-tree-certs-06
       allocation scheme
 
    *  Add some diagrams to the Overview section
+
+Since draft-davidben-tls-merkle-tree-certs-07
+
+   *  Clarify landmark zero
 
 Authors' Addresses
 

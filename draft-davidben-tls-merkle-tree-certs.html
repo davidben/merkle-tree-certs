@@ -1410,6 +1410,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.7">
                 <p id="section-toc.1-1.18.2.7.1"><a href="#appendix-D.7" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-t" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-06</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.8">
+                <p id="section-toc.1-1.18.2.8.1"><a href="#appendix-D.8" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tr" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-07</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
@@ -3154,7 +3157,7 @@ struct {
           </ul>
 <p id="section-6.3.1-4">Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to <code>base_id</code>. For example, the trust anchor ID for landmark 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-5">Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-6">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-6">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-7">The most recent <code>max_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-8">It is RECOMMENDED that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.3.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-9">Relying parties will locally retain up to <code>2 * max_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_landmarks</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
@@ -4218,6 +4221,18 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-D.7-1.7">
             <p id="appendix-D.7-1.7.1">Add some diagrams to the Overview section<a href="#appendix-D.7-1.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-davidben-tls-merkle-tree-certs-07">
+<section id="appendix-D.8">
+        <h3 id="name-since-draft-davidben-tls-merkle-tr">
+<a href="#name-since-draft-davidben-tls-merkle-tr" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-07</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-D.8-1.1">
+            <p id="appendix-D.8-1.1.1">Clarify landmark zero<a href="#appendix-D.8-1.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
