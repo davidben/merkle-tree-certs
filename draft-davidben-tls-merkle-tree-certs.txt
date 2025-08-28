@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 26 February 2026                                               
+Expires: 1 March 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          25 August 2025
+                                                          28 August 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 February 2026.
+   This Internet-Draft will expire on 1 March 2026.
 
 Copyright Notice
 
@@ -576,8 +576,8 @@ Table of Contents
 
        2.  Set r to node_hash.
 
-       3.  Right-shift fn and sn equally until LSB(fn) is set or sn is
-           zero.
+       3.  Until LSB(fn) is set or sn is 0, right-shift fn and sn
+           equally.
 
        4.  For each value p in the proof array:
 
@@ -586,12 +586,11 @@ Table of Contents
 
            2.  Set r to HASH(0x01 || p || r).
 
-           3.  If LSB(sn) is not set, the right-shift sn until either
-               LSB(sn) is set or sn is zero.
+           3.  Until LSB(sn) is set, right-shift sn.
 
            4.  Right-shift sn once more.
 
-       5.  Check sn is 0 and r is root_hash.  If either is not equal,
+       5.  Compare sn to 0 and r to root_hash.  If either is not equal,
            fail the proof verification.  If all are equal, accept the
            proof.
 
@@ -604,8 +603,8 @@ Table of Contents
 
        3.  Set fn to start, sn to end - 1, and tn to n - 1.
 
-       4.  Right-shift fn, sn, and tn equally until LSB(sn) is not set
-           or fn = sn.
+       4.  Until LSB(sn) is not set or fn is equal to sn, right-shift
+           fn, sn, and tn equally.
 
        5.  Set both fr and sr to the first value in the proof array.
 
@@ -620,18 +619,17 @@ Table of Contents
 
                2.  Set sr to HASH(0x01 || c || sr).
 
-               3.  If LSB(sn) is not set, then right-shift each of fn,
-                   sn, and tn equally until either LSB(sn) is set or sn
-                   is 0.
+               3.  Until LSB(sn) is set, right-shift fn, sn, and tn
+                   equally.
 
            3.  Otherwise:
 
                1.  Set sr to HASH(0x01 || sr || c).
 
-           4.  Finally, right-shift each of fn, sn, and tn one time.
+           4.  Right-shift fn, sn, and tn once more.
 
-       7.  Check tn is 0, fr is node_hash, and sr is root_hash.  If any
-           are not equal, fail the proof verification.  If all are
+       7.  Compare tn to 0, fr to node_hash, and sr to root_hash.  If
+           any are not equal, fail the proof verification.  If all are
            equal, accept the proof.
 
 4.4.  Arbitrary Intervals
