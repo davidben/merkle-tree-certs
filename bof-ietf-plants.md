@@ -13,7 +13,7 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 * Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
 
-There is an oppurtunity to define a mechanism that integrates log construction into certificate issuance.
+There is an oppurtunity to define a mechanism that integrates log construction into certificate issuance, which allows batching techniques where a single signature covers multiple key/identifier bindings.
 
 ## Required Details
 - Status: WG forming
@@ -35,6 +35,7 @@ To allow evaluation of your proposal, please include the following items:
 No standardised protocol or practice exists yet. Over the years there have
 been several proposals to address various shortcomings in the WebPKI, including,
 but not limited to, STH discipline, revocation transparency, and CTng.
+The presently dispatched MTC is the closest to experimentation and deployment.
 
 - Which (if any) modifications to existing protocols or practices are required:
 
