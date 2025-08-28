@@ -945,7 +945,7 @@ Landmarks are numbered consecutively from zero. Each landmark has a trust anchor
 
 Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.
 
-Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree.
+Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
 
 The most recent `max_landmarks` landmarks are said to be *active*. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most `2 * max_landmarks` active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in {{trusted-subtrees}}.
 
@@ -1543,3 +1543,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Clarify and fix an off-by-one error in recommended landmark allocation scheme
 
 - Add some diagrams to the Overview section
+
+## Since draft-davidben-tls-merkle-tree-certs-07
+{:numbered="false"}
+
+- Clarify landmark zero
