@@ -475,29 +475,29 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 1. If `end` is `n`, run the following:
    1. Set `fn` to `start` and `sn` to `end - 1`.
    2. Set `r` to `node_hash`.
-   3. Right-shift `fn` and `sn` equally until `LSB(fn)` is set or `sn` is zero.
+   3. Until `LSB(fn)` is set or `sn` is `0`, right-shift `fn` and `sn` equally.
    4. For each value `p` in the `proof` array:
-      1. If `sn` is 0, then stop iteration and fail the proof verification.
+      1. If `sn` is `0`, then stop iteration and fail the proof verification.
       2. Set `r` to `HASH(0x01 || p || r)`.
-      3. If `LSB(sn)` is not set, the right-shift `sn` until either `LSB(sn)` is set or `sn` is zero.
+      3. Until `LSB(sn)` is set, right-shift `sn`.
       4. Right-shift `sn` once more.
-   5. Check `sn` is 0 and `r` is `root_hash`. If either is not equal, fail the proof verification. If all are equal, accept the proof.
+   5. Compare `sn` to `0` and `r` to `root_hash`. If either is not equal, fail the proof verification. If all are equal, accept the proof.
 2. Otherwise, run the following:
    1. If `proof` is an empty array, stop and fail verification.
    2. If `end - start` is an exact power of two, prepend `node_hash` to the `proof` array.
    3. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
-   4. Right-shift `fn`, `sn`, and `tn` equally until `LSB(sn)` is not set or `fn = sn`.
+   4. Until `LSB(sn)` is not set or `fn` is equal to `sn`, right-shift `fn`, `sn`, and `tn` equally.
    5. Set both `fr` and `sr` to the first value in the `proof` array.
    6. For each subsequent value `c` in the `proof` array:
-      1. If `tn` is 0, then stop the iteration and fail the proof verification.
+      1. If `tn` is `0`, then stop the iteration and fail the proof verification.
       2. If `LSB(sn)` is set, or if `sn` is equal to `tn`, then:
          1. If `fn < sn`, set `fr` to `HASH(0x01 || c || fr)`.
          2. Set `sr` to `HASH(0x01 || c || sr)`.
-         3. If `LSB(sn)` is not set, then right-shift each of `fn`, `sn`, and `tn` equally until either `LSB(sn)` is set or `sn` is 0.
+         3. Until `LSB(sn)` is set, right-shift `fn`, `sn`, and `tn` equally.
       3. Otherwise:
          1. Set `sr` to `HASH(0x01 || sr || c)`.
-      4. Finally, right-shift each of `fn`, `sn`, and `tn` one time.
-   7. Check `tn` is 0, `fr` is `node_hash`, and `sr` is `root_hash`. If any are not equal, fail the proof verification. If all are equal, accept the proof.
+      4. Right-shift `fn`, `sn`, and `tn` once more.
+   7. Compare `tn` to `0`, `fr` to `node_hash`, and `sr` to `root_hash`. If any are not equal, fail the proof verification. If all are equal, accept the proof.
 
 ## Arbitrary Intervals
 
