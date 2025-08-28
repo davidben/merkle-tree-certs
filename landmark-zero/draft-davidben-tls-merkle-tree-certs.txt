@@ -150,6 +150,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-04
      Since draft-davidben-tls-merkle-tree-certs-05
      Since draft-davidben-tls-merkle-tree-certs-06
+     Since draft-davidben-tls-merkle-tree-certs-07
    Authors' Addresses
 
 1.  Introduction
@@ -2864,6 +2865,10 @@ Since draft-davidben-tls-merkle-tree-certs-06
       allocation scheme
 
    *  Add some diagrams to the Overview section
+
+Since draft-davidben-tls-merkle-tree-certs-07
+
+   *  Clarify landmark zero
 
 Authors' Addresses
 
