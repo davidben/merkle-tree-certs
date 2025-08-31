@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-26T02:03:14.855735+00:00",
+  "timestamp": "2025-08-31T02:04:29.384123+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -7890,7 +7890,7 @@
       "id": "PR_kwDOJIBkVc6k6OY7",
       "title": "Specify in each case how the wg will reduce PQ impacts",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/136",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -7899,14 +7899,14 @@
       ],
       "body": "",
       "createdAt": "2025-08-22T15:57:05Z",
-      "updatedAt": "2025-08-22T21:40:15Z",
+      "updatedAt": "2025-08-28T21:19:58Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "branch1",
       "headRefOid": "516d31e130b8e69f971a441a07703a23ce765849",
-      "closedAt": null,
+      "closedAt": "2025-08-28T21:19:58Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -7991,7 +7991,7 @@
       "id": "PR_kwDOJIBkVc6k6Oz1",
       "title": "Support monitoring by individual subscribers",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/137",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -8000,14 +8000,14 @@
       ],
       "body": "",
       "createdAt": "2025-08-22T15:57:50Z",
-      "updatedAt": "2025-08-22T21:38:50Z",
+      "updatedAt": "2025-08-28T21:20:15Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "efb26d55cbc506910938ef6c8564416b85900598",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "branch2",
       "headRefOid": "f906db13fa8a9cdc97333df155bb2e86e4129509",
-      "closedAt": null,
+      "closedAt": "2025-08-28T21:20:15Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -8116,6 +8116,156 @@
           "createdAt": "2025-08-22T19:34:31Z",
           "updatedAt": "2025-08-22T19:34:31Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 139,
+      "id": "PR_kwDOJIBkVc6lt-Vx",
+      "title": "Clarify language in consistency proof verification algorithm",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/139",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "* Simplify language for right-shift loops at 1.4.3 and 2.6.2.3. `sn` must be non-zero entering each of the loops, so the `sn = 0` exit condition can never occur.\r\n* Move 'until' to the start of the loop lines to clarify that the condition should be checked before entering the loop. The previous language (inherited from RFC 9162) is slightly more ambiguous and could be interpreted as right-shifting and _then_ checking the condition.\r\n* Make some other minor formatting tweaks and use language similar to RFC 9162 for the comparisons at the end.",
+      "createdAt": "2025-08-28T03:28:33Z",
+      "updatedAt": "2025-08-28T04:38:06Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4e974dac4c5bc95aff5c9e1cfd7fed28dfd899b4",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/verify-consistency-proof-language",
+      "headRefOid": "09296f2363676b1bd809ca4255a2bdda89ea818d",
+      "closedAt": "2025-08-28T04:38:06Z",
+      "mergedAt": "2025-08-28T04:38:06Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "84c5fff6f418b9f02cbbfe8dc43e490726a4d1bd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc68iWxy",
+          "commit": {
+            "abbreviatedOid": "09296f2"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-28T04:35:36Z",
+          "updatedAt": "2025-08-28T04:37:59Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "For myself: `sn` is non-zero by (1), so `LSB(sn)` will eventually be set.",
+              "createdAt": "2025-08-28T04:35:36Z",
+              "updatedAt": "2025-08-28T04:37:59Z"
+            },
+            {
+              "originalPosition": 29,
+              "body": "For myself: `tn` is non-zero by 2.6.1. (2) implies then `sn` is non-zero, which means the LSB will eventually be set.",
+              "createdAt": "2025-08-28T04:37:47Z",
+              "updatedAt": "2025-08-28T04:37:59Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 140,
+      "id": "PR_kwDOJIBkVc6l1Lix",
+      "title": "Explicitly say that landmark zero has no subtrees",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/140",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Landmark zero is kind of a fake landmark, just to make the first real landmark work out.",
+      "createdAt": "2025-08-28T15:27:20Z",
+      "updatedAt": "2025-08-28T15:39:59Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "84c5fff6f418b9f02cbbfe8dc43e490726a4d1bd",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "landmark-zero",
+      "headRefOid": "73ea0a47b53f1cd1ae3e7197f1804f61441553b7",
+      "closedAt": "2025-08-28T15:39:56Z",
+      "mergedAt": "2025-08-28T15:39:56Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b3b7cd0eb4d120c2b0b5bcde04fdcbbee0d3c6e6"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc68rMK0",
+          "commit": {
+            "abbreviatedOid": "73ea0a4"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-28T15:32:42Z",
+          "updatedAt": "2025-08-28T15:32:42Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 141,
+      "id": "PR_kwDOJIBkVc6l4YHc",
+      "title": "Specifically state how mechanism will address PQ size growth",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/141",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-08-28T21:24:35Z",
+      "updatedAt": "2025-08-30T23:20:40Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b3b7cd0eb4d120c2b0b5bcde04fdcbbee0d3c6e6",
+      "headRepository": "Bren2010/merkle-tree-certs",
+      "headRefName": "branch3",
+      "headRefOid": "f0c78efcbd8907aa04fb3621c58af8d24544d18e",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc69BZTi",
+          "commit": {
+            "abbreviatedOid": "f0c78ef"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-08-30T22:22:30Z",
+          "updatedAt": "2025-08-30T23:20:40Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "*Conditional on this not causing a lot of list drama*, I don't mind this adding this. However, keep in mind that, the work here is already unavoidably extensible to what you're trying to do. If it can bind a TBSCertificate and the TBSCertificate is constructed by the log operator, it can be extended. It's just how X.509 non-critical extensions work.\r\n\r\nAnd, of course, there is an inherent extension point here: the things the RP trusts. You can always make a new CAs that implement different signature algorithms, etc. Indeed that's the very extension point we're looking to use here. The lack of extension point has never been the limiting factor here.",
+              "createdAt": "2025-08-30T22:22:31Z",
+              "updatedAt": "2025-08-30T23:20:40Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "New sentence seems reasonable, but, per comments on other PR and our discussion, losing the \"batching techniques\" sentence loses what the text was trying to communicate. Without it, the discussion about involving the CA in tree construction doesn't make sense. The request was to integrate the text you wanted to add, without breaking core meaning of the text.\r\n\r\nI've gone ahead and done that below:\r\n\r\n```suggestion\r\nThe PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.\r\n```",
+              "createdAt": "2025-08-30T23:17:51Z",
+              "updatedAt": "2025-08-30T23:20:40Z"
+            }
+          ]
         }
       ]
     }
