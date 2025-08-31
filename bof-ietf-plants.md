@@ -13,51 +13,83 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 * Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
 
-There is an oppurtunity to define a mechanism that integrates log construction into certificate issuance, which allows batching techniques where a single signature covers multiple key/identifier bindings.
+There is an opportunity to define a mechanism that integrates log construction into certificate issuance, which allows batching techniques where a single signature covers multiple key/identifier bindings.
 
 ## Required Details
 - Status: WG forming
 - Responsible AD: Deb Cooley (Security Area)
 - BOF proponents: David Benjamin <davidben@chromium.org>, Bas Westerbaan <bas@cloudflare.com>, Devon O'Brien <devon.obrien@gmail.com>
 - BOF Chairs: Tommy Pauly <tpauly@apple.com>, Russ Housley <housley@vigilsec.com>
-- Number of people expected to attend: 100
+- Number of people expected to attend: 150
 - Length of session (1 or usually 2 hours): 2 hours
 - Conflicts (whole Areas and/or WGs)
-   - Chair Conflicts: lamps, TBD
-   - Technology Overlap: tls, lamps, acme, cfrg
+   - Chair Conflicts: HTTPBIS, PRIVACYPASS, IABOPEN, MASQUE, INTAREA, HAPPY, LAMPS, STIR, SIDROPS, TLS, PQUIP, and SAAG.
+   - Technology Overlap: TLS, LAMPS, ACME, CFRG
    - Key Participant Conflict: TBD
 
 ## Information for IAB/IESG
-To allow evaluation of your proposal, please include the following items:
 
 - Any protocols or practices that already exist in this space:
 
-No standardised protocol or practice exists yet. Over the years there have
-been several proposals to address various shortcomings in the WebPKI, including,
-but not limited to, STH discipline, revocation transparency, and CTng.
-The presently dispatched MTC is the closest to experimentation and deployment.
+  Applications in this space today combine PKIX certificates (Public-Key
+  Infrastructure using X.509; RFC 5280) with CT logs (Certificate Transparency;
+  RFC 6962 and RFC 9162). Existing practice for CT has largely followed
+  RFC 6962, though the community is deploying a new, more efficient "Static CT
+  API" (https://c2sp.org/static-ct-api and
+  https://letsencrypt.org/2025/06/11/reflections-on-a-year-of-sunlight). The
+  primary deployment of these protocols today is in PKIs (Public Key
+  Infrastructure) targetting the Web.
 
-- Which (if any) modifications to existing protocols or practices are required:
-
-TLS, PKIX certs, ACME, CT.
+  This BOF is the result of dispatching Merkle Tree Certificates
+  (MTC; draft-davidben-tls-merkle-tree-certs), which aims to build and improve
+  upon this practice.
 
 - Which (if any) entirely new protocols or practices are required:
 
-Probably none.
+  (Question order swapped for clarify.)
+
+  Exact details will depend on the solution developed, but we expect, based on
+  the initial MTC proposal, this work to involve defining a new log structure
+  (e.g. the Merkle Tree construction in RFC 6962 and RFC 9162), with formats and
+  semantics for signatures on the log, and roles (e.g. similar to today's CAs
+  and CT logs) that make those signatures.
+
+  To keep the BOF and (aspirationally) eventual WG focused, we expect the
+  initial scope to be limited to post-quantum size problem, and the protocols
+  and framework necessary to interoperably construct and consume certificates.
+  A CT deployment more broadly includes other supporting roles, such as
+  monitoring services, witnesses (https://c2sp.org/tlog-witness), and mirrors
+  (https://c2sp.org/tlog-mirror). A deployment may choose to incorporate some of
+  those roles, but we expect this initial work to be the core framework itself.
+
+- Which (if any) modifications to existing protocols or practices are required:
+
+  We expect the work will define a certificate structure, e.g. using PKIX
+  certificates. PKIX is extensible, so this is unlikely to modify PKIX itself.
+  Rather, it might define new X.509 signature algorithms, X.509 extensions,
+  etc., liaising with LAMPS WG.
+
+  Finally, the work will define how to integrate with TLS (Transport Layer
+  Security; RFC 8446) and ACME (Automatic Certificate Management Environment;
+  RFC 8555) protocols. This might include defining how to use existing protocol
+  mechanisms, or using defining ACME and TLS extensions with existing extension
+  points and liaising with ACME and TLS WGs.
 
 - Open source projects (if any) implementing this work:
 
-https://github.com/cloudflare/azul
-https://github.com/bwesterb/mtc
-https://github.com/pohlm01/mtc-verifier
+  - https://github.com/cloudflare/azul
+  - https://github.com/bwesterb/mtc
+  - https://github.com/pohlm01/mtc-verifier
 
-# TODO should we bother listing these preliminary implementations?
 
 ## Agenda
-    - Introduction, chairs (5 min)
-    - Background / context (10 min)
-    - Slots (TBD need to be scoped?)
-    - Charter / deliverable discussion (30 min)
+
+   - Introduction, chairs (5 min)
+   - Background / context (10 min)
+   - Problem: Impact of post-quantum (10 minutes)
+   - Overview of dispatched work (10 minutes)
+   - Charter / deliverable discussion (30 min)
+   - BOF Questions (55 min)
 
 ## Links to the mailing list, draft charter if any (for WG-forming BoF), relevant Internet-Drafts, etc.
    - Mailing List: https://www.ietf.org/mailman/listinfo/plants
