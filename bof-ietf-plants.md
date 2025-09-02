@@ -25,7 +25,7 @@ There is an opportunity to define a mechanism that integrates log construction i
 - Conflicts (whole Areas and/or WGs)
    - Chair Conflicts: HTTPBIS, PRIVACYPASS, IABOPEN, MASQUE, INTAREA, HAPPY, LAMPS, STIR, SIDROPS, TLS, PQUIP, and SAAG.
    - Technology Overlap: TLS, LAMPS, ACME, CFRG
-   - Key Participant Conflict: TBD
+   - Key Participant Conflict: None.
 
 ## Information for IAB/IESG
 
@@ -38,7 +38,7 @@ There is an opportunity to define a mechanism that integrates log construction i
   API" (https://c2sp.org/static-ct-api and
   https://letsencrypt.org/2025/06/11/reflections-on-a-year-of-sunlight). The
   primary deployment of these protocols today is in PKIs (Public Key
-  Infrastructure) targetting the Web.
+  Infrastructure) targeting the Web.
 
   This BOF is the result of dispatching Merkle Tree Certificates
   (MTC; draft-davidben-tls-merkle-tree-certs), which aims to build and improve
@@ -72,8 +72,7 @@ There is an opportunity to define a mechanism that integrates log construction i
   Finally, the work will define how to integrate with TLS (Transport Layer
   Security; RFC 8446) and ACME (Automatic Certificate Management Environment;
   RFC 8555) protocols. This might include defining how to use existing protocol
-  mechanisms, or using defining ACME and TLS extensions with existing extension
-  points and liaising with ACME and TLS WGs.
+  mechanisms, or by defining ACME and TLS extensions, liaising with ACME and TLS WGs.
 
 - Open source projects (if any) implementing this work:
 
