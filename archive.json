@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-31T02:04:29.384123+00:00",
+  "timestamp": "2025-09-04T01:53:00.671987+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -8221,24 +8221,28 @@
       "id": "PR_kwDOJIBkVc6l4YHc",
       "title": "Specifically state how mechanism will address PQ size growth",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/141",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "charter"
+      ],
       "body": "",
       "createdAt": "2025-08-28T21:24:35Z",
-      "updatedAt": "2025-08-30T23:20:40Z",
+      "updatedAt": "2025-09-03T18:08:57Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "b3b7cd0eb4d120c2b0b5bcde04fdcbbee0d3c6e6",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "branch3",
-      "headRefOid": "f0c78efcbd8907aa04fb3621c58af8d24544d18e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "44a375ef0a12d1a7d337f34221c79b7334aedbfb",
+      "closedAt": "2025-09-03T18:08:57Z",
+      "mergedAt": "2025-09-03T18:08:57Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "cc53581f7819091ced29fdc0d7dec2f16bfe185d"
+      },
       "comments": [],
       "reviews": [
         {
