@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-04T01:53:00.671987+00:00",
+  "timestamp": "2025-09-07T02:01:46.560810+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2387,6 +2387,22 @@
           "updatedAt": "2025-08-21T17:42:02Z"
         }
       ]
+    },
+    {
+      "number": 142,
+      "id": "I_kwDOJIBkVc7Jy9Ri",
+      "title": "X.509 name construction isn't compatible with Go",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/142",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "@cjpatton noticed that Go's X.509 parser doesn't actually accept the name construction we picked: https://github.com/golang/go/issues/75260\n\nMight be worth picking another one. Looks like Go currently only supports the following attribute values:\n* T61String\n* PrintableString\n* UTF8String\n* BMPString\n* IA5String\n* NumericString\n\nCompatibility-wise, it doesn't particularly matter for Go _relying parties_ because old relying parties won't accept these anyway. But one of the benefits of living with X.509 is that existing authenticating parties can still use these. Authenticating parties broadly only need to parse enough of the certificate to get it through their configuration pipelines and into the TLS stack. (And extract a few things like the public key.)\n\nParticularly to help early experiments, before the Go issue is fixed, it might be worth doing this. Some options off-hand:\n\n1. Don't constrain the name. Just say that a log has both an X.509 name and a trust anchor ID, and everyone needs to remember they're associated. This makes configuration more complicated.\n2. Use the text form of the trust anchor ID and stick it in a UTF8String. Burns a couple more bytes, but more straightforwardly compatible.\n3. Turn the trust anchor ID into an (absolute) OID. Use that as the attribute type and `UTF8String(\"\")` as the value.",
+      "createdAt": "2025-09-04T21:49:26Z",
+      "updatedAt": "2025-09-04T21:49:26Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
