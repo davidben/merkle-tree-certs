@@ -636,15 +636,13 @@ An issuance log's log ID determines an X.509 distinguished name ({{Section 4.1.2
 ~~~asn.1
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+    mechanisms(5) pkix(7) rdna(25) TBD}
 ~~~
-
-[[TODO: Fill in TBD1 from the PKIX rdna arc in {{!I-D.ietf-lamps-x509-alg-none}}, once allocated.]]
 
 The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named `32473.1` would be represented in syntax of {{?RFC4514}} as:
 
 ~~~
-1.3.6.1.5.5.7.TBD1.TBD2=#0d0481fd5901
+1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
 ~~~
 
 For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`.
@@ -1367,7 +1365,7 @@ sa-mtcProof SIGNATURE-ALGORITHM ::= {
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+    mechanisms(5) pkix(7) rdna(25) TBD}
 
 at-trustAnchorID ATTRIBUTE ::= {
    TYPE TrustAnchorID
