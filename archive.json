@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-07T02:01:46.560810+00:00",
+  "timestamp": "2025-09-09T01:57:09.417173+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2400,9 +2400,38 @@
       "labels": [],
       "body": "@cjpatton noticed that Go's X.509 parser doesn't actually accept the name construction we picked: https://github.com/golang/go/issues/75260\n\nMight be worth picking another one. Looks like Go currently only supports the following attribute values:\n* T61String\n* PrintableString\n* UTF8String\n* BMPString\n* IA5String\n* NumericString\n\nCompatibility-wise, it doesn't particularly matter for Go _relying parties_ because old relying parties won't accept these anyway. But one of the benefits of living with X.509 is that existing authenticating parties can still use these. Authenticating parties broadly only need to parse enough of the certificate to get it through their configuration pipelines and into the TLS stack. (And extract a few things like the public key.)\n\nParticularly to help early experiments, before the Go issue is fixed, it might be worth doing this. Some options off-hand:\n\n1. Don't constrain the name. Just say that a log has both an X.509 name and a trust anchor ID, and everyone needs to remember they're associated. This makes configuration more complicated.\n2. Use the text form of the trust anchor ID and stick it in a UTF8String. Burns a couple more bytes, but more straightforwardly compatible.\n3. Turn the trust anchor ID into an (absolute) OID. Use that as the attribute type and `UTF8String(\"\")` as the value.",
       "createdAt": "2025-09-04T21:49:26Z",
-      "updatedAt": "2025-09-04T21:49:26Z",
+      "updatedAt": "2025-09-09T00:57:58Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Given that go lacks this feature and  @lukevalenta had to patch RustCrypto to get it, it seems fair to say that relative OID is a _relatively_ immature feature. I would be in favor of not blocking on it and finding an alternative for MTCs.\n\nOption 1 seems a little scary to me. Options 2 and 3 sound isomorphic, but I don't know X.509 well enough to say which is better.",
+          "createdAt": "2025-09-08T21:45:34Z",
+          "updatedAt": "2025-09-08T23:24:05Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Option 2 seems like the fewest code changes \ud83e\udd37 ",
+          "createdAt": "2025-09-08T23:22:49Z",
+          "updatedAt": "2025-09-08T23:22:59Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "SGTM. Either of you want to give it a stab? Mildly disappointing but probably the most straightforward thing to do for now. I'm sure people will rearrange it to something differently sad later anyway.",
+          "createdAt": "2025-09-09T00:02:37Z",
+          "updatedAt": "2025-09-09T00:02:37Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I can take a stab at it ... unfortunately too late for the meeting tomorrow :(",
+          "createdAt": "2025-09-09T00:57:57Z",
+          "updatedAt": "2025-09-09T00:57:57Z"
+        }
+      ]
     }
   ],
   "pulls": [
