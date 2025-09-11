@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-09T01:57:09.417173+00:00",
+  "timestamp": "2025-09-11T01:56:25.021905+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2400,7 +2400,7 @@
       "labels": [],
       "body": "@cjpatton noticed that Go's X.509 parser doesn't actually accept the name construction we picked: https://github.com/golang/go/issues/75260\n\nMight be worth picking another one. Looks like Go currently only supports the following attribute values:\n* T61String\n* PrintableString\n* UTF8String\n* BMPString\n* IA5String\n* NumericString\n\nCompatibility-wise, it doesn't particularly matter for Go _relying parties_ because old relying parties won't accept these anyway. But one of the benefits of living with X.509 is that existing authenticating parties can still use these. Authenticating parties broadly only need to parse enough of the certificate to get it through their configuration pipelines and into the TLS stack. (And extract a few things like the public key.)\n\nParticularly to help early experiments, before the Go issue is fixed, it might be worth doing this. Some options off-hand:\n\n1. Don't constrain the name. Just say that a log has both an X.509 name and a trust anchor ID, and everyone needs to remember they're associated. This makes configuration more complicated.\n2. Use the text form of the trust anchor ID and stick it in a UTF8String. Burns a couple more bytes, but more straightforwardly compatible.\n3. Turn the trust anchor ID into an (absolute) OID. Use that as the attribute type and `UTF8String(\"\")` as the value.",
       "createdAt": "2025-09-04T21:49:26Z",
-      "updatedAt": "2025-09-09T00:57:58Z",
+      "updatedAt": "2025-09-10T17:44:29Z",
       "closedAt": null,
       "comments": [
         {
@@ -2430,6 +2430,111 @@
           "body": "I can take a stab at it ... unfortunately too late for the meeting tomorrow :(",
           "createdAt": "2025-09-09T00:57:57Z",
           "updatedAt": "2025-09-09T00:57:57Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Here's the issuer string that [Azul would now produce for Option 2](https://github.com/cloudflare/azul/pull/108):\n```\n1.3.6.1.4.1.44363.47.1=#130731333333352e32\n```\nDoes this look right?",
+          "createdAt": "2025-09-09T19:46:56Z",
+          "updatedAt": "2025-09-09T19:46:56Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@bwesterb pointed out offline that this is, in fact, a relative OID, not an absolute OID. A TAI is always the latter, so this is wrong, right?",
+          "createdAt": "2025-09-09T20:21:32Z",
+          "updatedAt": "2025-09-09T20:21:32Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "I think that's correct. The thing where we write that and not `1.3.6.1.4.1.44363.47.1=13335.2` is odd, but RFC 4514 does now mandate it.\n\nI mean, \"correct\" is what we decide to put in it (i.e. we should put together a spec PR), but I think saying it's a UTF8String containing the ID's [ASCII representation](https://tlswg.org/tls-trust-anchor-ids/draft-ietf-tls-trust-anchor-ids.html#section-3-4.3.1) is probably the right move. It's more compact than writing out the full OID, and still meets the text requirement.\n\nAnnoying that our nice 4-byte ID now needs 7 bytes to encode, but hopefully it'll compress well.",
+          "createdAt": "2025-09-09T20:37:03Z",
+          "updatedAt": "2025-09-09T20:37:03Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sorry, I got confused. Chris' example contains a PrintableString instead of a UTF8String though.",
+          "createdAt": "2025-09-09T21:01:03Z",
+          "updatedAt": "2025-09-09T21:01:03Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah whoops, wasn't paying attention to the tag. Yeah, I'd do UTF8String just because some stacks will indiscriminately normalize the string types in the name and I think people have largely settled on UTF8String being the type of preference nowadays.",
+          "createdAt": "2025-09-09T22:13:49Z",
+          "updatedAt": "2025-09-09T22:13:49Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Sadly, Go doesn't seem to like UTF8String either :(\n\nHere's a minimal example\n\n```go\nimport (\n\t\"crypto/x509/pkix\"\n\t\"encoding/asn1\"\n\t\"fmt\"\n)\n\n// A DER encoded issuer that would be produced by Azul. See:\n// https://github.com/cloudflare/azul/pull/108\n//\n// This has the tag for UTF8String: 12 (hex 0x0C)\nvar want = []byte{48, 21, 6, 10, 43, 6, 1, 4, 1, 130, 218, 75, 47, 1, 12, 7, 49, 51, 51, 51, 53, 46, 50}\n\nfunc main() {\n\tvar tv pkix.AttributeTypeAndValue\n\t_, err := asn1.Unmarshal(want, &tv)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\tgot, err := asn1.Marshal(tv)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\n\t// Output: [48 21 6 10 43 6 1 4 1 130 218 75 47 1 19 7 49 51 51 51 53\n\t// 46 50]\n\t//\n\t// This has the tag for PrintableString: 19 (hex 0x13)\n\tfmt.Println(got)\n}\n```",
+          "createdAt": "2025-09-09T22:45:25Z",
+          "updatedAt": "2025-09-09T22:45:39Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Go seems to have recorded the wrong tag type during decoding and carried it through to encoding. UTFString is only used as the tag if it doesn't know the tag type:\nhttps://github.com/golang/go/blob/master/src/encoding/asn1/marshal.go#L560-L570\n\nFWIW, Go gets the tag right if we use `PrintableString` instead.",
+          "createdAt": "2025-09-09T22:47:04Z",
+          "updatedAt": "2025-09-09T23:08:43Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Round-tripping X.509 names through \"friendly\" representations is always going to be awkward because of how complex the space of X.509 names is. What are you doing that needs `asn1.Marshal` to work on `AttributeTypeAndValue`? `crypto/x509.Certificate` stores the `RawSubject`, so things should still round-trip.\n\nI would expect what matters is:\n* If you are consuming a certificate, will the parser accept the input you want and return it in some form you can usefully interpret?\n* If you're trying to create a certificate, are you able to get the bytes out that you want?\n\n> Go seems to have recorded the wrong tag type during decoding and carried it through to encoding. UTFString is only used as the tag if it doesn't know the tag type:\n\nThe `encoding/asn1` module (which isn't really the preferred way to encode things because it's inflexible like this) doesn't record tags. It just parses most string types into `string`, as has happened in your example. Instead it looks for an annotation on the type itself and, in the snippet you linked, defaults to UTF8String when there isn't an annotation. But there's no annotation on that type, so I'm confused how it's getting PrintableString.\n\n(It clearly is getting PrintableString somehow. I'm just very confused how!)",
+          "createdAt": "2025-09-10T13:19:42Z",
+          "updatedAt": "2025-09-10T14:11:40Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> If you're trying to create a certificate, are you able to get the bytes out that you want?\n\nMore specifically, I would expect you can just make a `RawValue` and stick that in the `any` if needed.",
+          "createdAt": "2025-09-10T13:20:15Z",
+          "updatedAt": "2025-09-10T13:20:15Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "https://go.dev/play/p/gGkvfVequto",
+          "createdAt": "2025-09-10T13:23:40Z",
+          "updatedAt": "2025-09-10T13:23:40Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Round-tripping X.509 names through \"friendly\" representations is always going to be awkward because of how complex the space of X.509 names is. What are you doing that needs `asn1.Marshal` to work on `AttributeTypeAndValue`? `crypto/x509.Certificate` stores the `RawSubject`, so things should still round-trip.\n\nTo be clear, I don't have code that needs to round-trip the friendly representation of the issuer. I was merely trying to figure out an explanation for the apparently unexpected representation [here](https://github.com/davidben/merkle-tree-certs/issues/142#issuecomment-3272057915).\n\nFor another view, here we parse an MTC produced with the UTF8String encoding of the issuer and then print the issuer as a string:\nhttps://go.dev/play/p/8DnTi5jeO4v\n\n\n\n",
+          "createdAt": "2025-09-10T15:01:13Z",
+          "updatedAt": "2025-09-10T15:01:43Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "And in case this wasn't clear: I don't see a problem with using UTF8String.",
+          "createdAt": "2025-09-10T15:09:38Z",
+          "updatedAt": "2025-09-10T15:09:38Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah okay. TIL Go implements the RFC 2253 syntax as `String()`. Gosh, what a mess. It is really unfortunate that Go will actually stringify to a different name than what it parsed. That is probably also a bug, but I guess its in-memory representation makes it impossible to fix that, because as you noted it loses that information. (I guess they could add a extra fields into `pkix.Name` and then stringify based on that when available.)\nhttps://go.dev/play/p/wbjaGLDYDcv\n\nInterestingly, if I stick non-ASCII characters in there instead, *then* it picks UTF-8 string! https://go.dev/play/p/BqFkL8DDeq2\n\nI think this is the answer to the riddle. If the field is not tagged with a type, Go uses `encoding/asn1` uses PrintableString if it fits, and UTF8String otherwise.\nhttps://github.com/golang/go/blob/master/src/encoding/asn1/marshal.go#L637\n\nInterestingly, this was once what OpenSSL did. OpenSSL has a mess of logic for this in `ASN1_STRING_set_by_NID` which would also pick PrintableString when it fits. But they changed it in 2014 to preferring UTF8String by default.\nhttps://github.com/openssl/openssl/commit/3009244da47b989c4cc59ba02cf81a4e9d8f8431\n\nSo we end up diverging from what's \"convenient\" no matter what we do, unless we want to allow all string types, but then recognizing a CA requires name canonicalization which further adds to the mess.\n\nI think I'm inclined to go, for now, with:\n1. It's a UTF8String\n2. When you construct a name, you have to make sure it's a UTF8String. In some libraries, this might be easy. In others, you might need to be careful. (This is possible in Go with `asn1.RawValue`, but you have to be careful because a plain `string` will get you the wrong one.)\n3. When you parse a name, be aware that some libraries have in-memory representations that lose information. It is possible that when you print or round-trip those in-memory representations, you will get confusing results. This should not impact interop as long as you stick to point 2, it's just really really confusing because X.509 is horrible.",
+          "createdAt": "2025-09-10T15:28:09Z",
+          "updatedAt": "2025-09-10T15:31:35Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Interestingly, this was once what OpenSSL did. OpenSSL has a mess of logic for this in `ASN1_STRING_set_by_NID` which would also pick PrintableString when it fits. But they changed it in 2014 to preferring UTF8String by default. [openssl/openssl@3009244](https://github.com/openssl/openssl/commit/3009244da47b989c4cc59ba02cf81a4e9d8f8431)\n\nAside: I wonder if `encoding/asn1` was written to match OpenSSL's behavior and just stuck with it?\n\n> I think I'm inclined to go, for now, with:\n> \n>     1. It's a UTF8String\n> \n>     2. When you construct a name, you have to make sure it's a UTF8String. In some libraries, this might be easy. In others, you might need to be careful. (This is possible in Go with `asn1.RawValue`, but you have to be careful because a plain `string` will get you the wrong one.)\n> \n>     3. When you parse a name, be aware that some libraries have in-memory representations that lose information. It is possible that when you print or round-trip those in-memory representations, you will get confusing results. This should not impact interop as long as you stick to point 2, it's just really really confusing because X.509 is horrible.\n\nThis works for me. Question for the PR: should the draft discuss the points 2 and 3, perhaps inline with the normative text or in a new \"Deployment Considerations\" section?\n\nNow that we've touched \"ASN.1 third rail\" with this issue, I'm wondering if we'd be better off long-term going with relative OID. The fact that stacks haven't implemented relative OID yet plays to our advantage: to support MTC, they'll also have to implement relative OID as well, which means it's less likely that MTC will be impacted by existing bugs in ASN.1 libraries.\n\nThus, might leave the text as-is, but add a note to the draft that initial deployments will use UTF8String to encode the log ID, since the relative OID encoding is not commonly implemented. (This I think was what @bwesterb has suggested, for what it's worth.)\n\n",
+          "createdAt": "2025-09-10T17:21:43Z",
+          "updatedAt": "2025-09-10T17:21:43Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> Aside: I wonder if encoding/asn1 was written to match OpenSSL's behavior and just stuck with it?\n\nProbably. :-) The entire notion of trust anchor IDs really only exists to work around X.509 names being bad. In a more sensible PKI, we'd have had reasonable IDs for our entities and that would have been it.\n\n> This works for me. Question for the PR: should the draft discuss the points 2 and 3, perhaps inline with the normative text or in a new \"Deployment Considerations\" section?\n\nNo strong feelings. I'm sure it'll change anyway. I'd probably either omit (2) and (3) or just put it briefly inline. It's not _really_ specific to MTC, just that no one's bothered exercising X.509 name attributes forever. (And so, TBH, I wouldn't be surprised if we ended up at option 1 anyway, though it'd be really disappointing w.r.t. pointless wasted bytes.)\n\n> Now that we've touched \"ASN.1 third rail\" with this issue, I'm wondering if we'd be better off long-term going with relative OID. The fact that stacks haven't implemented relative OID yet plays to our advantage: to support MTC, they'll also have to implement relative OID as well, which means it's less likely that MTC will be impacted by existing bugs in ASN.1 libraries.\n>\n> Thus, might leave the text as-is, but add a note to the draft that initial deployments will use UTF8String to encode the log ID, since the relative OID encoding is not commonly implemented. (This I think was what @bwesterb has suggested, for what it's worth.)\n\nAlso no strong feelings. The only truly incompatible implementation we're aware of is Go, and hopefully they'll get it fixed. It is unfortunate to be incompatible with today's Go authenticating parties though.\n",
+          "createdAt": "2025-09-10T17:44:29Z",
+          "updatedAt": "2025-09-10T17:44:29Z"
         }
       ]
     }
@@ -8313,6 +8418,53 @@
               "body": "New sentence seems reasonable, but, per comments on other PR and our discussion, losing the \"batching techniques\" sentence loses what the text was trying to communicate. Without it, the discussion about involving the CA in tree construction doesn't make sense. The request was to integrate the text you wanted to add, without breaking core meaning of the text.\r\n\r\nI've gone ahead and done that below:\r\n\r\n```suggestion\r\nThe PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.\r\n```",
               "createdAt": "2025-08-30T23:17:51Z",
               "updatedAt": "2025-08-30T23:20:40Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 143,
+      "id": "PR_kwDOJIBkVc6n6DRJ",
+      "title": "Override issuer encoding used in early implementations",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/143",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #142.\r\n\r\nRELATIVE-OID isn't yet widely implemented. For example, see <https://github.com/golang/go/issues/75260>. To unblock \r\nearly deployments, we'll go with UTF8String instead.",
+      "createdAt": "2025-09-10T22:30:08Z",
+      "updatedAt": "2025-09-10T22:30:59Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "29f4e797660049e88c6726218b9db22cdd5c2e5d",
+      "headRepository": "cjpatton/merkle-tree-certs",
+      "headRefName": "cjpatton/142",
+      "headRefOid": "9ba379706fd2cf2f101e84934cbb9e6ab7c5af71",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc6_NoyY",
+          "commit": {
+            "abbreviatedOid": "9ba3797"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-10T22:30:59Z",
+          "updatedAt": "2025-09-10T22:30:59Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "As in:\r\n\r\n```go\r\nvar tv pkix.AttributeTypeAndValue\r\ntv.Type = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}\r\ntv.Value = asn1.RawValue{Tag: asn1.TagUTF8String, Bytes: []byte(\"32473.1\")}\r\n\r\nvar name pkix.Name\r\nname.Names = append(name.Names, tv)\r\nfmt.Println(name.String())\r\n```\r\n\r\n",
+              "createdAt": "2025-09-10T22:30:59Z",
+              "updatedAt": "2025-09-10T22:30:59Z"
             }
           ]
         }
