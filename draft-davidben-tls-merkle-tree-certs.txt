@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 12 March 2026                                                  
+Expires: 19 March 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        8 September 2025
+                                                       15 September 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 March 2026.
+   This Internet-Draft will expire on 19 March 2026.
 
 Copyright Notice
 
@@ -831,8 +831,19 @@ Table of Contents
    1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
 
    For initial experimentation, early implementations of this design
-   will use the OID 1.3.6.1.4.1.44363.47.1 instead of id-rdna-
-   trustAnchorID.
+   will:
+
+   1.  Use UTF8String to represent the attribute's value rather than
+       RELATIVE-OID.  The UTF8String contains trust anchor ID's ASCII
+       representation, e.g. 324731.1.
+
+   2.  Use the OID 1.3.6.1.4.1.44363.47.1 instead of id-rdna-
+       trustAnchorID.
+
+   For example, the distinguished name for a log named 32473.1 would be
+   represented in syntax of [RFC4514] as:
+
+   1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
 
 5.3.  Log Entries
 
@@ -2388,9 +2399,9 @@ Table of Contents
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-ietf-tls-trust-anchor-ids-01, 14 May 2025,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              trust-anchor-ids-01>.
+              Draft, draft-ietf-tls-trust-anchor-ids-02, 15 September
+              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              tls-trust-anchor-ids-02>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
