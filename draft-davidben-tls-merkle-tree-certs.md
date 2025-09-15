@@ -645,7 +645,17 @@ The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 r
 1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
 ~~~
 
-For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`.
+For initial experimentation, early implementations of this design will:
+
+1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. `324731.1`.
+
+1. Use the OID 1.3.6.1.4.1.44363.47.1 instead of `id-rdna-trustAnchorID`.
+
+For example, the distinguished name for a log named `32473.1` would be represented in syntax of {{?RFC4514}} as:
+
+~~~
+1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
+~~~
 
 ## Log Entries
 
