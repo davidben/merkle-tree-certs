@@ -13,20 +13,20 @@
 <meta content="
        This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional signatureless optimization, which decreases the message size by avoiding signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
-<meta content="xml2rfc 3.30.0" name="generator">
+<meta content="xml2rfc 3.30.1" name="generator">
 <meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.0
+  xml2rfc 3.30.1
     Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.3.8
+    platformdirs 4.4.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.4
+    requests 2.32.5
     setuptools 80.9.0
     wcwidth 0.2.13
 -->
@@ -1047,11 +1047,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">August 2025</td>
+<td class="right">September 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 18 February 2026</td>
+<td class="center">Expires 20 March 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-08-17" class="published">17 August 2025</time>
+<time datetime="2025-09-16" class="published">16 September 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-02-18">18 February 2026</time></dd>
+<dd class="expires"><time datetime="2026-03-20">20 March 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1129,7 +1129,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 20 March 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1180,6 +1180,14 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-subtree-inclusion-proofs" class="internal xref">Subtree Inclusion Proofs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-evaluating-a-subtree-inclus" class="internal xref">Evaluating a Subtree Inclusion Proof</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="auto internal xref">4.2.2</a>.  <a href="#name-verifying-a-subtree-inclusi" class="internal xref">Verifying a Subtree Inclusion Proof</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-subtree-consistency-proofs" class="internal xref">Subtree Consistency Proofs</a></p>
@@ -1246,10 +1254,13 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-signatureless-certificates" class="internal xref">Signatureless Certificates</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmark-checkpoints" class="internal xref">Landmark Checkpoints</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmarks" class="internal xref">Landmarks</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
-                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-constructing-signatureless-" class="internal xref">Constructing Signatureless Certificates</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-allocating-landmarks" class="internal xref">Allocating Landmarks</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
+                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-constructing-signatureless-" class="internal xref">Constructing Signatureless Certificates</a></p>
 </li>
                 </ul>
 </li>
@@ -1407,6 +1418,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.7">
                 <p id="section-toc.1-1.18.2.7.1"><a href="#appendix-D.7" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-t" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-06</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18.2.8">
+                <p id="section-toc.1-1.18.2.8.1"><a href="#appendix-D.8" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tr" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-07</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
@@ -1423,7 +1437,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </h2>
 <p id="section-1-1">Authors' Note: This is an early draft of a proposal with many parts. We expect most details will change as the proposal evolves. This document has a concrete specification of these details, but this is only intended as a starting point, and to help convey the overall idea. The name of the draft says "tls" to keep continuity with earlier iterations of this work, but the protocol itself is not TLS-specific.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate <span>[<a href="#APPLE-CT" class="cite xref">APPLE-CT</a>]</span> <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-3">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">Additionally, as PKIs transition to shorter-lived certificates <span>[<a href="#CABF-153" class="cite xref">CABF-153</a>]</span> <span>[<a href="#CABF-SC081" class="cite xref">CABF-SC081</a>]</span>, the number of entries in the log will grow.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-6" class="pilcrow">¶</a></p>
@@ -1439,7 +1453,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-8.3.1">After a processing delay, authenticating parties can obtain a second "signatureless" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-8.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-9"><a href="#overview" class="auto internal xref">Section 3</a> gives an overview of the system. <a href="#subtrees" class="auto internal xref">Section 4</a> describes a Merkle Tree primitive used by this system. <a href="#issuance-logs" class="auto internal xref">Section 5</a> describes the log structure. Finally, <a href="#certificates" class="auto internal xref">Section 6</a> and <a href="#relying-parties" class="auto internal xref">Section 7</a> describes how to construct and consume a Merkle Tree certificate.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-9"><a href="#overview" class="auto internal xref">Section 3</a> gives an overview of the system. <a href="#subtrees" class="auto internal xref">Section 4</a> describes a Merkle Tree primitive used by this system. <a href="#issuance-logs" class="auto internal xref">Section 5</a> describes the log structure. Finally, <a href="#certificates" class="auto internal xref">Section 6</a> and <a href="#relying-parties" class="auto internal xref">Section 7</a> describe how to construct and consume a Merkle Tree certificate.<a href="#section-1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1524,14 +1538,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
             <p id="section-2.1-4.12.1">A signature from either the CA or other cosigner, over some checkpoint or subtree.<a href="#section-2.1-4.12.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.1-4.13">Landmark checkpoint:</dt>
+<dt id="section-2.1-4.13">Landmark:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.14">
-            <p id="section-2.1-4.14.1">One of an infrequent subset of checkpoints that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.14.1">One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.15">Landmark subtree:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.16">
-            <p id="section-2.1-4.16.1">A subtree determined by a landmark checkpoint. Landmark subtrees are common points of reference between relying parties and signatureless certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.16.1">A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and signatureless certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.17">Full certificate:</dt>
@@ -1554,43 +1568,292 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
       <h2 id="name-overview">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
       </h2>
-<p id="section-3-1">Merkle Tree certificate issuance begins as in a typical CA: The CA receives an issuance request, e.g. over ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>, and validates it, e.g. with ACME challenges. From there, the issuance process differs.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3-2">
-<li id="section-3-2.1">
-          <p id="section-3-2.1.1">The CA operates an <em>issuance log</em> (<a href="#issuance-logs" class="auto internal xref">Section 5</a>), which is an append-only Merkle Tree (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>). Unlike a CT log, this log only contains entries added by the CA.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-3-1">In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates inverts this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<span id="name-a-diagram-of-the-issuance-a"></span><div id="fig-issuance-overview">
+<figure id="figure-1">
+        <div id="section-3-2.1">
+          <div class="alignLeft art-svg artwork" id="section-3-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="528" width="544" viewBox="0 0 544 528" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,32 L 8,272" fill="none" stroke="black"></path>
+              <path d="M 8,352 L 8,480" fill="none" stroke="black"></path>
+              <path d="M 24,480 L 24,512" fill="none" stroke="black"></path>
+              <path d="M 72,80 L 72,112" fill="none" stroke="black"></path>
+              <path d="M 128,280 L 128,320" fill="none" stroke="black"></path>
+              <path d="M 256,32 L 256,272" fill="none" stroke="black"></path>
+              <path d="M 256,352 L 256,480" fill="none" stroke="black"></path>
+              <path d="M 272,384 L 272,512" fill="none" stroke="black"></path>
+              <path d="M 296,32 L 296,272" fill="none" stroke="black"></path>
+              <path d="M 296,352 L 296,464" fill="none" stroke="black"></path>
+              <path d="M 536,32 L 536,272" fill="none" stroke="black"></path>
+              <path d="M 536,352 L 536,464" fill="none" stroke="black"></path>
+              <path d="M 8,32 L 24,32" fill="none" stroke="black"></path>
+              <path d="M 216,32 L 256,32" fill="none" stroke="black"></path>
+              <path d="M 296,32 L 312,32" fill="none" stroke="black"></path>
+              <path d="M 504,32 L 536,32" fill="none" stroke="black"></path>
+              <path d="M 224,64 L 312,64" fill="none" stroke="black"></path>
+              <path d="M 72,160 L 96,160" fill="none" stroke="black"></path>
+              <path d="M 224,176 L 312,176" fill="none" stroke="black"></path>
+              <path d="M 40,224 L 104,224" fill="none" stroke="black"></path>
+              <path d="M 8,272 L 256,272" fill="none" stroke="black"></path>
+              <path d="M 296,272 L 536,272" fill="none" stroke="black"></path>
+              <path d="M 8,352 L 24,352" fill="none" stroke="black"></path>
+              <path d="M 240,352 L 256,352" fill="none" stroke="black"></path>
+              <path d="M 296,352 L 312,352" fill="none" stroke="black"></path>
+              <path d="M 400,352 L 536,352" fill="none" stroke="black"></path>
+              <path d="M 72,384 L 96,384" fill="none" stroke="black"></path>
+              <path d="M 256,384 L 272,384" fill="none" stroke="black"></path>
+              <path d="M 240,432 L 312,432" fill="none" stroke="black"></path>
+              <path d="M 40,448 L 104,448" fill="none" stroke="black"></path>
+              <path d="M 296,464 L 536,464" fill="none" stroke="black"></path>
+              <path d="M 8,480 L 256,480" fill="none" stroke="black"></path>
+              <path d="M 24,512 L 272,512" fill="none" stroke="black"></path>
+              <path d="M 72,384 L 104,448" fill="none" stroke="black"></path>
+              <path d="M 72,160 L 104,224" fill="none" stroke="black"></path>
+              <path d="M 156,280 L 176,320" fill="none" stroke="black"></path>
+              <path d="M 40,224 L 72,160" fill="none" stroke="black"></path>
+              <path d="M 80,320 L 100,280" fill="none" stroke="black"></path>
+              <path d="M 40,448 L 72,384" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="320,176 308,170.4 308,181.6" fill="black" transform="rotate(0,312,176)"></polygon>
+              <polygon class="arrowhead" points="248,432 236,426.4 236,437.6" fill="black" transform="rotate(180,240,432)"></polygon>
+              <polygon class="arrowhead" points="232,64 220,58.4 220,69.6" fill="black" transform="rotate(180,224,64)"></polygon>
+              <polygon class="arrowhead" points="184,320 172,314.4 172,325.6" fill="black" transform="rotate(63.43494882292201,176,320)"></polygon>
+              <polygon class="arrowhead" points="136,320 124,314.4 124,325.6" fill="black" transform="rotate(90,128,320)"></polygon>
+              <polygon class="arrowhead" points="88,320 76,314.4 76,325.6" fill="black" transform="rotate(116.56505117707799,80,320)"></polygon>
+              <polygon class="arrowhead" points="80,112 68,106.4 68,117.6" fill="black" transform="rotate(90,72,112)"></polygon>
+              <circle cx="48" cy="240" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="48" cy="464" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="64" cy="240" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="64" cy="464" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="80" cy="240" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="80" cy="464" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="96" cy="240" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="96" cy="464" r="6" class="closeddot" fill="black"></circle>
+              <circle cx="384" cy="208" r="6" class="closeddot" fill="black"></circle>
+              <g class="text">
+                <text x="80" y="36">Certificate</text>
+                <text x="168" y="36">Authority</text>
+                <text x="388" y="36">Authenticating</text>
+                <text x="472" y="36">Party</text>
+                <text x="36" y="68">2.</text>
+                <text x="84" y="68">Validate</text>
+                <text x="152" y="68">request</text>
+                <text x="340" y="68">1.</text>
+                <text x="384" y="68">Request</text>
+                <text x="464" y="68">certificate</text>
+                <text x="36" y="148">3.</text>
+                <text x="64" y="148">Add</text>
+                <text x="92" y="148">to</text>
+                <text x="140" y="148">issuance</text>
+                <text x="192" y="148">log</text>
+                <text x="104" y="164">[</text>
+                <text x="124" y="164">CA</text>
+                <text x="164" y="164">cosign</text>
+                <text x="200" y="164">]</text>
+                <text x="340" y="180">5.</text>
+                <text x="388" y="180">Download</text>
+                <text x="476" y="180">certificates</text>
+                <text x="432" y="212">tbscert</text>
+                <text x="352" y="228">=</text>
+                <text x="368" y="228">=</text>
+                <text x="384" y="228">=</text>
+                <text x="440" y="228">inclusion</text>
+                <text x="504" y="228">proof</text>
+                <text x="144" y="244">tbscert</text>
+                <text x="208" y="244">entries</text>
+                <text x="344" y="244">[</text>
+                <text x="364" y="244">CA</text>
+                <text x="384" y="244">]</text>
+                <text x="452" y="244">cosignatures</text>
+                <text x="312" y="260">[</text>
+                <text x="348" y="260">mirror</text>
+                <text x="384" y="260">]</text>
+                <text x="212" y="308">4.</text>
+                <text x="252" y="308">Submit</text>
+                <text x="296" y="308">log</text>
+                <text x="324" y="308">to</text>
+                <text x="376" y="308">cosigners</text>
+                <text x="240" y="324">for</text>
+                <text x="308" y="324">cosignatures</text>
+                <text x="68" y="356">Mirrors,</text>
+                <text x="128" y="356">other</text>
+                <text x="192" y="356">cosigners</text>
+                <text x="356" y="356">Monitors</text>
+                <text x="104" y="388">[</text>
+                <text x="124" y="388">CA</text>
+                <text x="164" y="388">cosign</text>
+                <text x="200" y="388">]</text>
+                <text x="104" y="404">[</text>
+                <text x="140" y="404">mirror</text>
+                <text x="196" y="404">cosign</text>
+                <text x="232" y="404">]</text>
+                <text x="340" y="436">6.</text>
+                <text x="384" y="436">Monitor</text>
+                <text x="428" y="436">CA</text>
+                <text x="480" y="436">operation</text>
+                <text x="80" y="500">...quorum</text>
+                <text x="132" y="500">of</text>
+                <text x="196" y="500">cosigners...</text>
+              </g>
+            </svg><a href="#section-3-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-a-diagram-of-the-issuance-a" class="selfRef">A diagram of the issuance architecture, detailed below</a>
+        </figcaption></figure>
+</div>
+<p id="section-3-3">Merkle Tree Certificates are issued as follows. <a href="#fig-issuance-overview" class="auto internal xref">Figure 1</a> depicts this process.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3-4">
+<li id="section-3-4.1">
+          <p id="section-3-4.1.1">The authenticating party requests a certificate, e.g. over ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span><a href="#section-3-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-2.2">
-          <p id="section-3-2.2.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) to its log, describing the information it is certifying.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+        <li id="section-3-4.2">
+          <p id="section-3-4.2.1">The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.<a href="#section-3-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-2.3">
-          <p id="section-3-2.3.1">The CA signs a <em>checkpoint</em>, which describes the current state of the log. A signed checkpoint certifies that the CA issued <em>every</em> entry in the Merkle Tree (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>).<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
+        <li id="section-3-4.3">
+          <p id="section-3-4.3.1">The CA operates an append-only <em>issuance log</em> (<a href="#issuance-logs" class="auto internal xref">Section 5</a>). Unlike a CT log, this log only contains entries added by the CA:<a href="#section-3-4.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3-4.3.2">
+<li id="section-3-4.3.2.1">
+              <p id="section-3-4.3.2.1.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) to its log, describing the information it is certifying.<a href="#section-3-4.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-3-2.4">
-          <p id="section-3-2.4.1">The CA additionally signs <em>subtrees</em> (<a href="#subtrees" class="auto internal xref">Section 4</a>) that together contain certificates added since the last checkpoint (<a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued <em>every</em> entry in the subtree.<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
+            <li id="section-3-4.3.2.2">
+              <p id="section-3-4.3.2.2.1">The CA signs a <em>checkpoint</em>, which describes the current state of the log. A signed checkpoint certifies that the CA issued <em>every</em> entry in the Merkle Tree (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>).<a href="#section-3-4.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3-4.3.2.3">
+              <p id="section-3-4.3.2.3.1">The CA additionally signs <em>subtrees</em> (<a href="#subtrees" class="auto internal xref">Section 4</a>) that together contain certificates added since the last checkpoint (<a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued <em>every</em> entry in the subtree.<a href="#section-3-4.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+</li>
+        <li id="section-3-4.4">
+          <p id="section-3-4.4.1">The CA submits the new log state to <em>cosigners</em>. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.<a href="#section-3-4.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-3-4.5">
+          <p id="section-3-4.5.1">The CA now has enough information to construct a certificate and give it to the authenticating party. A certificate contains:<a href="#section-3-4.5.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-4.5.2.1">
+              <p id="section-3-4.5.2.1.1">The TBSCertificate being certified<a href="#section-3-4.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3-4.5.2.2">
+              <p id="section-3-4.5.2.2.1">An inclusion proof from the TBSCertificate to some subtree<a href="#section-3-4.5.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3-4.5.2.3">
+              <p id="section-3-4.5.2.3.1">Cosignatures from the CA and cosigners on the subtree<a href="#section-3-4.5.2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li id="section-3-4.6">
+          <p id="section-3-4.6.1">As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-3-3">These signatures prove to relying parties that the CA has issued the certificate.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">A relying party may require additional proof of the proper operation of the issuance log by third parties, like CT logs provide additional transparency. Instead of presenting certificates to transparency logs, CAs present their log state to <em>cosigners</em>. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<p id="section-3-5">A signature from either the CA or a cosigner is known as a <em>cosignature</em>. A combination of cosignatures from sufficient trusted parties proves both that the CA has issued the certificate, and that the issuance satisfies any additional relying party transparency requirements.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">A <em>full certificate</em> contains:<a href="#section-3-6" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3-7.1">
-          <p id="section-3-7.1.1">The TBSCertificate being certified<a href="#section-3-7.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-3-7.2">
-          <p id="section-3-7.2.1">An inclusion proof from the TBSCertificate to some subtree<a href="#section-3-7.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-3-7.3">
-          <p id="section-3-7.3.1">Sufficient cosignatures to meet the relying party's requirements<a href="#section-3-7.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="section-3-8">This same issuance process also produces a <em>signatureless certificate</em>. This is an optional optimized certificate that avoids any cosignatures:<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-5">A certificate with cosignatures is known as a <em>full certificate</em>. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) structures, which do not scale with public key or signature size.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">This same issuance process also produces a <em>signatureless certificate</em>. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable with up-to-date relying parties.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<span id="name-a-diagram-of-signatureless-"></span><div id="fig-signatureless-overview">
+<figure id="figure-2">
+        <div id="section-3-7.1">
+          <div class="alignLeft art-svg artwork" id="section-3-7.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="416" width="488" viewBox="0 0 488 416" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,32 L 8,112" fill="none" stroke="black"></path>
+              <path d="M 8,192 L 8,384" fill="none" stroke="black"></path>
+              <path d="M 224,96 L 224,184" fill="none" stroke="black"></path>
+              <path d="M 272,32 L 272,112" fill="none" stroke="black"></path>
+              <path d="M 272,192 L 272,384" fill="none" stroke="black"></path>
+              <path d="M 296,48 L 296,112" fill="none" stroke="black"></path>
+              <path d="M 296,240 L 296,288" fill="none" stroke="black"></path>
+              <path d="M 296,320 L 296,368" fill="none" stroke="black"></path>
+              <path d="M 432,80 L 432,224" fill="none" stroke="black"></path>
+              <path d="M 464,48 L 464,112" fill="none" stroke="black"></path>
+              <path d="M 480,240 L 480,288" fill="none" stroke="black"></path>
+              <path d="M 480,320 L 480,368" fill="none" stroke="black"></path>
+              <path d="M 8,32 L 24,32" fill="none" stroke="black"></path>
+              <path d="M 216,32 L 272,32" fill="none" stroke="black"></path>
+              <path d="M 296,48 L 312,48" fill="none" stroke="black"></path>
+              <path d="M 448,48 L 464,48" fill="none" stroke="black"></path>
+              <path d="M 264,80 L 432,80" fill="none" stroke="black"></path>
+              <path d="M 32,96 L 72,96" fill="none" stroke="black"></path>
+              <path d="M 8,112 L 272,112" fill="none" stroke="black"></path>
+              <path d="M 296,112 L 464,112" fill="none" stroke="black"></path>
+              <path d="M 8,192 L 24,192" fill="none" stroke="black"></path>
+              <path d="M 208,192 L 272,192" fill="none" stroke="black"></path>
+              <path d="M 296,240 L 312,240" fill="none" stroke="black"></path>
+              <path d="M 440,240 L 480,240" fill="none" stroke="black"></path>
+              <path d="M 264,256 L 288,256" fill="none" stroke="black"></path>
+              <path d="M 296,288 L 480,288" fill="none" stroke="black"></path>
+              <path d="M 296,320 L 312,320" fill="none" stroke="black"></path>
+              <path d="M 432,320 L 480,320" fill="none" stroke="black"></path>
+              <path d="M 176,352 L 288,352" fill="none" stroke="black"></path>
+              <path d="M 296,368 L 480,368" fill="none" stroke="black"></path>
+              <path d="M 8,384 L 272,384" fill="none" stroke="black"></path>
+              <path d="M 52,56 L 72,96" fill="none" stroke="black"></path>
+              <path d="M 32,96 L 52,56" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="440,224 428,218.4 428,229.6" fill="black" transform="rotate(90,432,224)"></polygon>
+              <polygon class="arrowhead" points="296,352 284,346.4 284,357.6" fill="black" transform="rotate(0,288,352)"></polygon>
+              <polygon class="arrowhead" points="296,256 284,250.4 284,261.6" fill="black" transform="rotate(0,288,256)"></polygon>
+              <polygon class="arrowhead" points="232,184 220,178.4 220,189.6" fill="black" transform="rotate(90,224,184)"></polygon>
+              <g class="text">
+                <text x="80" y="36">Certificate</text>
+                <text x="168" y="36">Authority</text>
+                <text x="348" y="52">Update</text>
+                <text x="408" y="52">Channel</text>
+                <text x="92" y="84">1.</text>
+                <text x="140" y="84">Allocate</text>
+                <text x="216" y="84">landmarks</text>
+                <text x="44" y="148">2.</text>
+                <text x="76" y="148">Make</text>
+                <text x="152" y="148">signatureless</text>
+                <text x="316" y="148">3.</text>
+                <text x="372" y="148">Distribute</text>
+                <text x="76" y="164">cert</text>
+                <text x="116" y="164">from</text>
+                <text x="172" y="164">landmark</text>
+                <text x="376" y="164">landmarks</text>
+                <text x="92" y="196">Authenticating</text>
+                <text x="176" y="196">Party</text>
+                <text x="72" y="228">signatureless</text>
+                <text x="148" y="228">cert</text>
+                <text x="64" y="244">tbscert</text>
+                <text x="364" y="244">Up-to-date</text>
+                <text x="420" y="244">RP</text>
+                <text x="72" y="260">inclusion</text>
+                <text x="136" y="260">proof</text>
+                <text x="172" y="260">to</text>
+                <text x="220" y="260">landmark</text>
+                <text x="340" y="260">landmark</text>
+                <text x="404" y="260">hashes</text>
+                <text x="336" y="276">trusted</text>
+                <text x="408" y="276">cosigners</text>
+                <text x="36" y="308">full</text>
+                <text x="76" y="308">cert</text>
+                <text x="64" y="324">tbscert</text>
+                <text x="360" y="324">Unupdated</text>
+                <text x="412" y="324">RP</text>
+                <text x="72" y="340">inclusion</text>
+                <text x="136" y="340">proof</text>
+                <text x="332" y="340">(stale</text>
+                <text x="372" y="340">or</text>
+                <text x="396" y="340">no</text>
+                <text x="440" y="340">hashes)</text>
+                <text x="84" y="356">cosignatures</text>
+                <text x="336" y="356">trusted</text>
+                <text x="408" y="356">cosigners</text>
+                <text x="180" y="404">4.</text>
+                <text x="220" y="404">Select</text>
+                <text x="296" y="404">certificate</text>
+                <text x="356" y="404">by</text>
+                <text x="380" y="404">RP</text>
+              </g>
+            </svg><a href="#section-3-7.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-a-diagram-of-signatureless-" class="selfRef">A diagram of signatureless certificate construction and usage, detailed below</a>
+        </figcaption></figure>
+</div>
+<p id="section-3-8">Signatureless certificates are constructed and used as follows. <a href="#fig-signatureless-overview" class="auto internal xref">Figure 2</a> depicts this process.<a href="#section-3-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3-9">
 <li id="section-3-9.1">
-          <p id="section-3-9.1.1">Periodically, the CA's most recent checkpoint is designated as a <em>landmark checkpoint</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and signatureless certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.1.1">Periodically, the tree size of the CA's most recent checkpoint is designated as a <em>landmark</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and signatureless certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.2">
-          <p id="section-3-9.2.1">Once some landmark checkpoint includes the TBSCertificate, the signatureless certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.2.1">Once some landmark includes the TBSCertificate, the signatureless certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-9.2.2.1">
               <p id="section-3-9.2.2.1.1">The TBSCertificate being certified<a href="#section-3-9.2.2.1.1" class="pilcrow">¶</a></p>
@@ -1604,7 +1867,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-3-9.3.1">In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.<a href="#section-3-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.4">
-          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate. The authenticating party may also select between several signatureless certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
@@ -1642,7 +1905,78 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
         <h3 id="name-subtree-inclusion-proofs">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-subtree-inclusion-proofs" class="section-name selfRef">Subtree Inclusion Proofs</a>
         </h3>
-<p id="section-4.2-1">Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry <code>index</code> of the subtree <code>[start, end)</code>. is a Merkle inclusion proof, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.1" class="relref">Section 2.1.3.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>m</code> is <code>index - start</code> and the tree inputs are <code>D[start:end]</code>. A subtree inclusion proof can be verified with the procedure in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.2" class="relref">Section 2.1.3.2</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>leaf_index</code> is <code>index - start</code> and <code>tree_size</code> is <code>end - start</code>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry <code>index</code> of the subtree <code>[start, end)</code> is a Merkle inclusion proof, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.1" class="relref">Section 2.1.3.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>m</code> is <code>index - start</code> and the tree inputs are <code>D[start:end]</code>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div id="evaluating-a-subtree-inclusion-proof">
+<section id="section-4.2.1">
+          <h4 id="name-evaluating-a-subtree-inclus">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-evaluating-a-subtree-inclus" class="section-name selfRef">Evaluating a Subtree Inclusion Proof</a>
+          </h4>
+<p id="section-4.2.1-1">Given a subtree inclusion proof, <code>inclusion_proof</code>, for entry <code>index</code>, with hash <code>entry_hash</code>, of a subtree <code>[start, end)</code>, the subtree inclusion proof can be <em>evaluated</em> to compute the expected subtree hash:<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2.1-2">
+<li id="section-4.2.1-2.1">
+              <p id="section-4.2.1-2.1.1">Check <code>start &lt;= index &lt; end</code>. If this does not hold, fail proof evaluation.<a href="#section-4.2.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.2.1-2.2">
+              <p id="section-4.2.1-2.2.1">Set <code>fn</code> to <code>index - start</code> and <code>sn</code> to <code>end - start - 1</code>.<a href="#section-4.2.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.2.1-2.3">
+              <p id="section-4.2.1-2.3.1">Set <code>r</code> to <code>entry_hash</code>.<a href="#section-4.2.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.2.1-2.4">
+              <p id="section-4.2.1-2.4.1">For each value <code>p</code> in the <code>inclusion_proof</code> array:<a href="#section-4.2.1-2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2.1-2.4.2">
+<li id="section-4.2.1-2.4.2.1">
+                  <p id="section-4.2.1-2.4.2.1.1">If <code>sn</code> is 0, then stop the iteration and fail the proof verification.<a href="#section-4.2.1-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li id="section-4.2.1-2.4.2.2">
+                  <p id="section-4.2.1-2.4.2.2.1">If <code>LSB(fn)</code> is set, or if <code>fn</code> is equal to <code>sn</code>, then:<a href="#section-4.2.1-2.4.2.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2.1-2.4.2.2.2">
+<li id="section-4.2.1-2.4.2.2.2.1">
+                      <p id="section-4.2.1-2.4.2.2.2.1.1">Set <code>r</code> to <code>HASH(0x01 || p || r)</code>.<a href="#section-4.2.1-2.4.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                    <li id="section-4.2.1-2.4.2.2.2.2">
+                      <p id="section-4.2.1-2.4.2.2.2.2.1">If <code>LSB(fn)</code> is not set, then right-shift both <code>fn</code> and <code>sn</code> equally until either <code>LSB(fn)</code> is set or <code>fn</code> is 0.<a href="#section-4.2.1-2.4.2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+<p id="section-4.2.1-2.4.2.2.3">
+Otherwise:<a href="#section-4.2.1-2.4.2.2.3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2.1-2.4.2.2.4">
+<li id="section-4.2.1-2.4.2.2.4.1">
+                      <p id="section-4.2.1-2.4.2.2.4.1.1">Set <code>r</code> to <code>HASH(0x01 || r || p)</code>.<a href="#section-4.2.1-2.4.2.2.4.1.1" class="pilcrow">¶</a></p>
+</li>
+                  </ol>
+</li>
+                <li id="section-4.2.1-2.4.2.3">
+                  <p id="section-4.2.1-2.4.2.3.1">Finally, right-shift both <code>fn</code> and <code>sn</code> one time.<a href="#section-4.2.1-2.4.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              </ol>
+</li>
+            <li id="section-4.2.1-2.5">
+              <p id="section-4.2.1-2.5.1">If <code>sn</code> is not zero, fail proof evaluation.<a href="#section-4.2.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.2.1-2.6">
+              <p id="section-4.2.1-2.6.1">Return <code>r</code> as the expected subtree hash.<a href="#section-4.2.1-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-4.2.1-3">This is the same as the procedure in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.3.2" class="relref">Section 2.1.3.2</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, where <code>leaf_index</code> is <code>index - start</code>, <code>tree_size</code> is <code>end - start</code>, and <code>r</code> is returned instead of compared with <code>root_hash</code>.<a href="#section-4.2.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="verifying-a-subtree-inclusion-proof">
+<section id="section-4.2.2">
+          <h4 id="name-verifying-a-subtree-inclusi">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-verifying-a-subtree-inclusi" class="section-name selfRef">Verifying a Subtree Inclusion Proof</a>
+          </h4>
+<p id="section-4.2.2-1">Given a subtree inclusion proof, <code>inclusion_proof</code>, for entry <code>index</code>, with hash <code>entry_hash</code>, of a subtree <code>[start, end)</code> with hash <code>subtree_hash</code>, the subtree inclusion proof can be <em>verified</em> to verify the described entry is contained in the subtree:<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2.2-2">
+<li id="section-4.2.2-2.1">
+              <p id="section-4.2.2-2.1.1">Let <code>expected_subtree_hash</code> be the result of evaluating the inclusion proof as described <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.2.1</a>. If evaluation fails, fail the proof verification.<a href="#section-4.2.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-4.2.2-2.2">
+              <p id="section-4.2.2-2.2.1">If <code>subtree_hash</code> is equal to <code>expected_subtree_hash</code>, the entry is contained in the subtree. Otherwise, fail the proof verification.<a href="#section-4.2.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+</section>
+</div>
 </section>
 </div>
 <div id="subtree-consistency-proofs">
@@ -1657,14 +1991,14 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <a href="#section-4.3.1" class="section-number selfRef">4.3.1. </a><a href="#name-generating-a-subtree-consis" class="section-name selfRef">Generating a Subtree Consistency Proof</a>
           </h4>
 <p id="section-4.3.1-1">The subtree consistency proof, <code>SUBTREE_PROOF(start, end, D_n)</code> is defined similarly to <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.4.1" class="relref">Section 2.1.4.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, in terms of a helper function that tracks whether the subtree hash is known:<a href="#section-4.3.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-2">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-2">
 <pre>
 SUBTREE_PROOF(start, end, D_n) =
     SUBTREE_SUBPROOF(start, end, D_n, true)
 </pre><a href="#section-4.3.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-4.3.1-3">If <code>start = 0</code> and <code>end = n</code>, the subtree is the root:<a href="#section-4.3.1-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-4">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-4">
 <pre>
 SUBTREE_SUBPROOF(0, n, D_n, true) = {}
 SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
@@ -1674,7 +2008,7 @@ SUBTREE_SUBPROOF(0, n, D_n, false) = {MTH(D_n)}
 <ul class="normal">
 <li class="normal" id="section-4.3.1-6.1">
               <p id="section-4.3.1-6.1.1">If <code>end &lt;= k</code>, the subtree is on the left of <code>k</code>. The proof proves consistency with the left child and includes the right child:<a href="#section-4.3.1-6.1.1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-6.1.2">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-6.1.2">
 <pre>
 SUBTREE_SUBPROOF(start, end, D_n, b) =
     SUBTREE_SUBPROOF(start, end, D[0:k], b) : MTH(D[k:n])
@@ -1683,7 +2017,7 @@ SUBTREE_SUBPROOF(start, end, D_n, b) =
 </li>
             <li class="normal" id="section-4.3.1-6.2">
               <p id="section-4.3.1-6.2.1">If <code>k &lt;= start</code>, the subtree is on the right of <code>k</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.3.1-6.2.1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-6.2.2">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-6.2.2">
 <pre>
 SUBTREE_SUBPROOF(start, end, D_n, b) =
     SUBTREE_SUBPROOF(start - k, end - k, D[k:n], b) : MTH(D[0:k])
@@ -1692,7 +2026,7 @@ SUBTREE_SUBPROOF(start, end, D_n, b) =
 </li>
             <li class="normal" id="section-4.3.1-6.3">
               <p id="section-4.3.1-6.3.1">Otherwise, <code>start &lt; k &lt; end</code>, which implies <code>start = 0</code>. The proof proves consistency with the right child and includes the left child.<a href="#section-4.3.1-6.3.1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-6.3.2">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-6.3.2">
 <pre>
 SUBTREE_SUBPROOF(0, end, D_n, b) =
     SUBTREE_SUBPROOF(0, end - k, D[k:n], false) : MTH(D[0:k])
@@ -1701,13 +2035,13 @@ SUBTREE_SUBPROOF(0, end, D_n, b) =
 </li>
           </ul>
 <p id="section-4.3.1-7">When <code>start</code> is zero, this computes a Merkle consistency proof:<a href="#section-4.3.1-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-8">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-8">
 <pre>
 SUBTREE_PROOF(0, end, D_n) = PROOF(end, D_n)
 </pre><a href="#section-4.3.1-8" class="pilcrow">¶</a>
 </div>
 <p id="section-4.3.1-9">When <code>end = start + 1</code>, this computes a Merkle inclusion proof:<a href="#section-4.3.1-9" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.3.1-10">
+<div class="lang-pseudocode sourcecode" id="section-4.3.1-10">
 <pre>
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 </pre><a href="#section-4.3.1-10" class="pilcrow">¶</a>
@@ -1732,19 +2066,19 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                   <p id="section-4.3.2-3.1.2.2.1">Set <code>r</code> to <code>node_hash</code>.<a href="#section-4.3.2-3.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.3.2-3.1.2.3">
-                  <p id="section-4.3.2-3.1.2.3.1">Right-shift <code>fn</code> and <code>sn</code> equally until <code>LSB(fn)</code> is set or <code>sn</code> is zero.<a href="#section-4.3.2-3.1.2.3.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.3.2-3.1.2.3.1">Until <code>LSB(fn)</code> is set or <code>sn</code> is <code>0</code>, right-shift <code>fn</code> and <code>sn</code> equally.<a href="#section-4.3.2-3.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.3.2-3.1.2.4">
                   <p id="section-4.3.2-3.1.2.4.1">For each value <code>p</code> in the <code>proof</code> array:<a href="#section-4.3.2-3.1.2.4.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.3.2-3.1.2.4.2">
 <li id="section-4.3.2-3.1.2.4.2.1">
-                      <p id="section-4.3.2-3.1.2.4.2.1.1">If <code>sn</code> is 0, then stop iteration and fail the proof verification.<a href="#section-4.3.2-3.1.2.4.2.1.1" class="pilcrow">¶</a></p>
+                      <p id="section-4.3.2-3.1.2.4.2.1.1">If <code>sn</code> is <code>0</code>, then stop iteration and fail the proof verification.<a href="#section-4.3.2-3.1.2.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
                     <li id="section-4.3.2-3.1.2.4.2.2">
-                      <p id="section-4.3.2-3.1.2.4.2.2.1">Set <code>r</code> to <code>HASH(0x01, || p || r)</code>.<a href="#section-4.3.2-3.1.2.4.2.2.1" class="pilcrow">¶</a></p>
+                      <p id="section-4.3.2-3.1.2.4.2.2.1">Set <code>r</code> to <code>HASH(0x01 || p || r)</code>.<a href="#section-4.3.2-3.1.2.4.2.2.1" class="pilcrow">¶</a></p>
 </li>
                     <li id="section-4.3.2-3.1.2.4.2.3">
-                      <p id="section-4.3.2-3.1.2.4.2.3.1">If <code>LSB(sn)</code> is not set, the right-shift <code>sn</code> until either <code>LSB(sn)</code> is set or <code>sn</code> is zero.<a href="#section-4.3.2-3.1.2.4.2.3.1" class="pilcrow">¶</a></p>
+                      <p id="section-4.3.2-3.1.2.4.2.3.1">Until <code>LSB(sn)</code> is set, right-shift <code>sn</code>.<a href="#section-4.3.2-3.1.2.4.2.3.1" class="pilcrow">¶</a></p>
 </li>
                     <li id="section-4.3.2-3.1.2.4.2.4">
                       <p id="section-4.3.2-3.1.2.4.2.4.1">Right-shift <code>sn</code> once more.<a href="#section-4.3.2-3.1.2.4.2.4.1" class="pilcrow">¶</a></p>
@@ -1752,7 +2086,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                   </ol>
 </li>
                 <li id="section-4.3.2-3.1.2.5">
-                  <p id="section-4.3.2-3.1.2.5.1">Check <code>sn</code> is 0 and <code>r</code> is <code>root_hash</code>. If either is not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.3.2-3.1.2.5.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.3.2-3.1.2.5.1">Compare <code>sn</code> to <code>0</code> and <code>r</code> to <code>root_hash</code>. If either is not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.3.2-3.1.2.5.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
@@ -1769,7 +2103,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                   <p id="section-4.3.2-3.2.2.3.1">Set <code>fn</code> to <code>start</code>, <code>sn</code> to <code>end - 1</code>, and <code>tn</code> to <code>n - 1</code>.<a href="#section-4.3.2-3.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.3.2-3.2.2.4">
-                  <p id="section-4.3.2-3.2.2.4.1">Right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally until <code>LSB(sn)</code> is not set or <code>fn = sn</code>.<a href="#section-4.3.2-3.2.2.4.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.3.2-3.2.2.4.1">Until <code>LSB(sn)</code> is not set or <code>fn</code> is equal to <code>sn</code>, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.3.2-3.2.2.4.1" class="pilcrow">¶</a></p>
 </li>
                 <li id="section-4.3.2-3.2.2.5">
                   <p id="section-4.3.2-3.2.2.5.1">Set both <code>fr</code> and <code>sr</code> to the first value in the <code>proof</code> array.<a href="#section-4.3.2-3.2.2.5.1" class="pilcrow">¶</a></p>
@@ -1778,7 +2112,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                   <p id="section-4.3.2-3.2.2.6.1">For each subsequent value <code>c</code> in the <code>proof</code> array:<a href="#section-4.3.2-3.2.2.6.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.3.2-3.2.2.6.2">
 <li id="section-4.3.2-3.2.2.6.2.1">
-                      <p id="section-4.3.2-3.2.2.6.2.1.1">If <code>tn</code> is 0, then stop the iteration and fail the proof verification.<a href="#section-4.3.2-3.2.2.6.2.1.1" class="pilcrow">¶</a></p>
+                      <p id="section-4.3.2-3.2.2.6.2.1.1">If <code>tn</code> is <code>0</code>, then stop the iteration and fail the proof verification.<a href="#section-4.3.2-3.2.2.6.2.1.1" class="pilcrow">¶</a></p>
 </li>
                     <li id="section-4.3.2-3.2.2.6.2.2">
                       <p id="section-4.3.2-3.2.2.6.2.2.1">If <code>LSB(sn)</code> is set, or if <code>sn</code> is equal to <code>tn</code>, then:<a href="#section-4.3.2-3.2.2.6.2.2.1" class="pilcrow">¶</a></p>
@@ -1790,7 +2124,7 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                           <p id="section-4.3.2-3.2.2.6.2.2.2.2.1">Set <code>sr</code> to <code>HASH(0x01 || c || sr)</code>.<a href="#section-4.3.2-3.2.2.6.2.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
                         <li id="section-4.3.2-3.2.2.6.2.2.2.3">
-                          <p id="section-4.3.2-3.2.2.6.2.2.2.3.1">If <code>LSB(sn)</code> is not set, then right-shift each of <code>fn</code>, <code>sn</code>, and <code>tn</code> equally until either <code>LSB(sn)</code> is set or <code>sn</code> is 0.<a href="#section-4.3.2-3.2.2.6.2.2.2.3.1" class="pilcrow">¶</a></p>
+                          <p id="section-4.3.2-3.2.2.6.2.2.2.3.1">Until <code>LSB(sn)</code> is set, right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> equally.<a href="#section-4.3.2-3.2.2.6.2.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
                       </ol>
 </li>
@@ -1803,12 +2137,12 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
                       </ol>
 </li>
                     <li id="section-4.3.2-3.2.2.6.2.4">
-                      <p id="section-4.3.2-3.2.2.6.2.4.1">Finally, right-shift each of <code>fn</code>, <code>sn</code>, and <code>tn</code> one time.<a href="#section-4.3.2-3.2.2.6.2.4.1" class="pilcrow">¶</a></p>
+                      <p id="section-4.3.2-3.2.2.6.2.4.1">Right-shift <code>fn</code>, <code>sn</code>, and <code>tn</code> once more.<a href="#section-4.3.2-3.2.2.6.2.4.1" class="pilcrow">¶</a></p>
 </li>
                   </ol>
 </li>
                 <li id="section-4.3.2-3.2.2.7">
-                  <p id="section-4.3.2-3.2.2.7.1">Check <code>tn</code> is 0, <code>fr</code> is <code>node_hash</code>, and <code>sr</code> is <code>root_hash</code>. If any are not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.3.2-3.2.2.7.1" class="pilcrow">¶</a></p>
+                  <p id="section-4.3.2-3.2.2.7.1">Compare <code>tn</code> to <code>0</code>, <code>fr</code> to <code>node_hash</code>, and <code>sr</code> to <code>root_hash</code>. If any are not equal, fail the proof verification. If all are equal, accept the proof.<a href="#section-4.3.2-3.2.2.7.1" class="pilcrow">¶</a></p>
 </li>
               </ol>
 </li>
@@ -1822,14 +2156,68 @@ SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
         <h3 id="name-arbitrary-intervals">
 <a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-arbitrary-intervals" class="section-name selfRef">Arbitrary Intervals</a>
         </h3>
-<p id="section-4.4-1">Not all <code>[start, end)</code> intervals of a Merkle tree are valid subtrees. This section describes how, for any <code>start &lt; end</code>, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following Python procedure:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<div class="lang-py sourcecode" id="section-4.4-2">
+<p id="section-4.4-1">Not all <code>[start, end)</code> intervals of a Merkle tree are valid subtrees. This section describes how, for any <code>start &lt; end</code>, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4-2">
+<li id="section-4.4-2.1">
+            <p id="section-4.4-2.1.1">If <code>end - start</code> is one, return a single subtree, <code>[start, end)</code>.<a href="#section-4.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-4.4-2.2">
+            <p id="section-4.4-2.2.1">Otherwise, run the following to return a pair of subtrees:<a href="#section-4.4-2.2.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4-2.2.2">
+<li id="section-4.4-2.2.2.1">
+                <p id="section-4.4-2.2.2.1.1">Let <code>last</code> be <code>end - 1</code>, the last index in <code>[start, end)</code>.<a href="#section-4.4-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-4.4-2.2.2.2">
+                <p id="section-4.4-2.2.2.2.1">Let <code>split</code> be the bit index of the most significant bit where <code>start</code> and <code>last</code> differ. Bits are numbered from the least significant bit, starting at zero. <code>split</code> is the height at which <code>start</code> and <code>last</code>'s paths in the tree diverge.<a href="#section-4.4-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-4.4-2.2.2.3">
+                <p id="section-4.4-2.2.2.3.1">Let <code>mid</code> be <code>last</code> with the least significant <code>split</code> bits set to zero. <code>mid</code> is the leftmost leaf node in the above divergence point's right branch.<a href="#section-4.4-2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-4.4-2.2.2.4">
+                <p id="section-4.4-2.2.2.4.1">Within the least significant <code>split</code> bits of <code>left</code>, let <code>b</code> be the bit index of the most significant bit with value zero, if any:<a href="#section-4.4-2.2.2.4.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4-2.2.2.4.2">
+<li id="section-4.4-2.2.2.4.2.1">
+                    <p id="section-4.4-2.2.2.4.2.1.1">If there is such a bit, let <code>left_split</code> be <code>b + 1</code>.<a href="#section-4.4-2.2.2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  <li id="section-4.4-2.2.2.4.2.2">
+                    <p id="section-4.4-2.2.2.4.2.2.1">Otherwise, let <code>left_split</code> be zero.<a href="#section-4.4-2.2.2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                </ol>
+<p id="section-4.4-2.2.2.4.3">
+<code>left_split</code> is the height of the lowest common ancestor of the nodes in <code>[start, mid)</code>.<a href="#section-4.4-2.2.2.4.3" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-4.4-2.2.2.5">
+                <p id="section-4.4-2.2.2.5.1">Let <code>left_start</code> be <code>start</code> with the least significant <code>left_split</code> bits set to zero. <code>left_start</code> is the above lowest common ancestor's leftmost leaf node.<a href="#section-4.4-2.2.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-4.4-2.2.2.6">
+                <p id="section-4.4-2.2.2.6.1">Return the subtrees <code>[left_start, mid)</code> and <code>[mid, end)</code>.<a href="#section-4.4-2.2.2.6.1" class="pilcrow">¶</a></p>
+</li>
+            </ol>
+</li>
+        </ol>
+<p id="section-4.4-3">When the procedure returns a single subtree, the subtree is <code>[start, start+1)</code>. When it returns two subtrees, <code>left</code> and <code>right</code>, the subtrees satisfy the following properties:<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.4-4.1">
+            <p id="section-4.4-4.1.1"><code>left.end = right.start</code>. That is, the two subtrees cover adjacent intervals.<a href="#section-4.4-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-4.2">
+            <p id="section-4.4-4.2.1"><code>left.start &lt;= start</code> and <code>end = right.end</code>. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before <code>start</code> left, but not after <code>end</code>.<a href="#section-4.4-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-4.3">
+            <p id="section-4.4-4.3.1"><code>left.end - left.start &lt; 2 * (end - start)</code> and <code>right.end - right.start &lt;= end - start</code>. That is, the two subtrees efficiently cover the interval.<a href="#section-4.4-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-4.4">
+            <p id="section-4.4-4.4.1"><code>left</code> is full, while <code>right</code> may be partial.<a href="#section-4.4-4.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.4-5">The following Python code implements this procedure:<a href="#section-4.4-5" class="pilcrow">¶</a></p>
+<div class="lang-python sourcecode" id="section-4.4-6">
 <pre>
 def find_subtrees(start, end):
     """ Returns a list of one or two subtrees that efficiently
     cover [start, end). """
     assert start &lt; end
-    if end - start &lt; 2:
+    if end - start == 1:
         return [(start, end),]
     last = end - 1
     # Find where start and last's tree paths diverge. The two
@@ -1840,31 +2228,15 @@ def find_subtrees(start, end):
     # Maximize the left endpoint. This is just before start's
     # path leaves the right edge of its new subtree.
     left_split = (~start &amp; mask).bit_length()
-    left = start &amp; ~((1 &lt;&lt; left_split) - 1)
-    return [(left, mid), (mid, end)]
-</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+    left_start = start &amp; ~((1 &lt;&lt; left_split) - 1)
+    return [(left_start, mid), (mid, end)]
+</pre><a href="#section-4.4-6" class="pilcrow">¶</a>
 </div>
-<p id="section-4.4-3">[[TODO: Write this up in prose too.]]<a href="#section-4.4-3" class="pilcrow">¶</a></p>
-<p id="section-4.4-4">When the procedure returns a single subtree, the subtree is <code>[start, end)</code>. When it returns two subtrees, <code>left</code> and <code>right</code>, the subtrees satisfy the following properties:<a href="#section-4.4-4" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.4-5">
-<li id="section-4.4-5.1">
-            <p id="section-4.4-5.1.1"><code>left.end = right.start</code>. That is, the two subtrees cover adjacent intervals.<a href="#section-4.4-5.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-4.4-5.2">
-            <p id="section-4.4-5.2.1"><code>left.start &lt;= start</code> and <code>end = right.end</code>. That is, the two subtrees together cover the entire target interval, possibly with some extra entries before <code>start</code> left, but not after <code>end</code>.<a href="#section-4.4-5.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-4.4-5.3">
-            <p id="section-4.4-5.3.1"><code>left.end - left.start &lt; 2 * (end - start)</code> and <code>right.end - right.start &lt;= end - start</code>. That is, the two subtrees efficiently cover the interval.<a href="#section-4.4-5.3.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-4.4-5.4">
-            <p id="section-4.4-5.4.1"><code>left</code> is full, while <code>right</code> may be partial.<a href="#section-4.4-5.4.1" class="pilcrow">¶</a></p>
-</li>
-        </ol>
-<p id="section-4.4-6"><a href="#fig-subtree-example" class="auto internal xref">Figure 1</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.4-6" class="pilcrow">¶</a></p>
+<p id="section-4.4-7"><a href="#fig-subtree-example" class="auto internal xref">Figure 3</a> shows the subtrees which cover <code>[5, 13)</code> in a Merkle Tree of 13 elements. The two subtrees selected are <code>[4, 8)</code> and <code>[8, 13)</code>. Note that the subtrees cover a slightly larger interval than <code>[5, 13)</code>.<a href="#section-4.4-7" class="pilcrow">¶</a></p>
 <span id="name-an-example-selection-of-sub"></span><div id="fig-subtree-example">
-<figure id="figure-1">
-          <div id="section-4.4-7.1">
-            <div class="alignLeft art-svg artwork" id="section-4.4-7.1.1">
+<figure id="figure-3">
+          <div id="section-4.4-8.1">
+            <div class="alignLeft art-svg artwork" id="section-4.4-8.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="456" viewBox="0 0 456 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
                 <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
@@ -2043,18 +2415,18 @@ def find_subtrees(start, end):
                   <text x="380" y="308">11</text>
                   <text x="420" y="308">12</text>
                 </g>
-              </svg><a href="#section-4.4-7.1.1" class="pilcrow">¶</a>
+              </svg><a href="#section-4.4-8.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-an-example-selection-of-sub" class="selfRef">An example selection of subtrees to cover an interval</a>
           </figcaption></figure>
 </div>
-<p id="section-4.4-8">Two subtrees are needed because a single subtree may not be able to efficiently cover an interval. <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 2</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code> but this is the entire tree. Using two subtrees, the interval can be described by <code>[7, 8)</code> and <code>[8, 9)</code>.<a href="#section-4.4-8" class="pilcrow">¶</a></p>
+<p id="section-4.4-9">Two subtrees are needed because a single subtree may not be able to efficiently cover an interval. <a href="#fig-subtree-counterexample" class="auto internal xref">Figure 4</a> shows the smallest subtree that contains <code>[7, 9)</code> in a 9-element tree. The smallest single subtree that contains the interval is <code>[0, 9)</code> but this is the entire tree. Using two subtrees, the interval can be described by <code>[7, 8)</code> and <code>[8, 9)</code>.<a href="#section-4.4-9" class="pilcrow">¶</a></p>
 <span id="name-an-example-showing-an-ineff"></span><div id="fig-subtree-counterexample">
-<figure id="figure-2">
-          <div id="section-4.4-9.1">
-            <div class="alignLeft art-svg artwork" id="section-4.4-9.1.1">
+<figure id="figure-4">
+          <div id="section-4.4-10.1">
+            <div class="alignLeft art-svg artwork" id="section-4.4-10.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="336" width="304" viewBox="0 0 304 336" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,224 L 8,256" fill="none" stroke="black"></path>
                 <path d="M 8,288 L 8,320" fill="none" stroke="black"></path>
@@ -2169,10 +2541,10 @@ def find_subtrees(start, end):
                   <text x="240" y="308">7</text>
                   <text x="272" y="308">8</text>
                 </g>
-              </svg><a href="#section-4.4-9.1.1" class="pilcrow">¶</a>
+              </svg><a href="#section-4.4-10.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-an-example-showing-an-ineff" class="selfRef">An example showing an inefficient choice of a single subtree</a>
           </figcaption></figure>
 </div>
@@ -2217,21 +2589,34 @@ def find_subtrees(start, end):
         </h3>
 <p id="section-5.2-1">Each issuance log is identified by a <em>log ID</em>, which is a trust anchor ID <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">An issuance log's log ID determines an X.509 distinguished name (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.4" class="relref">Section 4.1.2.4</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>). The distinguished name has a single relative distinguished name, which has a single attribute. The attribute has type <code>id-rdna-trustAnchorID</code>, defined below:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.2-3">
+<div class="lang-asn.1 sourcecode" id="section-5.2-3">
 <pre>
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+    mechanisms(5) pkix(7) rdna(25) TBD}
 </pre><a href="#section-5.2-3" class="pilcrow">¶</a>
 </div>
-<p id="section-5.2-4">[[TODO: Fill in TBD1 from the PKIX rdna arc in <span>[<a href="#I-D.ietf-lamps-x509-alg-none" class="cite xref">I-D.ietf-lamps-x509-alg-none</a>]</span>, once allocated.]]<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.2-6">
+<p id="section-5.2-4">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-5">
 <pre>
-1.3.6.1.5.5.7.TBD1.TBD2=#0d0481fd5901
-</pre><a href="#section-5.2-6" class="pilcrow">¶</a>
+1.3.6.1.5.5.7.25.TBD=#0d0481fd5901
+</pre><a href="#section-5.2-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5.2-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.1 instead of <code>id-rdna-trustAnchorID</code>.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
+<p id="section-5.2-6">For initial experimentation, early implementations of this design will:<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5.2-7">
+<li id="section-5.2-7.1">
+            <p id="section-5.2-7.1.1">Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. <code>324731.1</code>.<a href="#section-5.2-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.2-7.2">
+            <p id="section-5.2-7.2.1">Use the OID 1.3.6.1.4.1.44363.47.1 instead of <code>id-rdna-trustAnchorID</code>.<a href="#section-5.2-7.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-5.2-8">For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.2-9">
+<pre>
+1.3.6.1.4.1.44363.47.1=#0c0733323437332e31
+</pre><a href="#section-5.2-9" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="log-entries">
@@ -2240,7 +2625,7 @@ id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-log-entries" class="section-name selfRef">Log Entries</a>
         </h3>
 <p id="section-5.3-1">Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentation syntax below. A MerkleTreeCertEntry describes certificate information that the CA has validated and certified.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.3-2">
+<div class="lang-tls-presentation sourcecode" id="section-5.3-2">
 <pre>
 struct {} Empty;
 
@@ -2260,7 +2645,7 @@ struct {
 </div>
 <p id="section-5.3-3">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 <p id="section-5.3-4"><code>tbs_cert_entry_data</code> contains the DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding of a TBSCertificateLogEntry, defined below:<a href="#section-5.3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.3-5">
+<div class="lang-asn.1 sourcecode" id="section-5.3-5">
 <pre>
 TBSCertificateLogEntry  ::=  SEQUENCE  {
       version             [0]  EXPLICIT Version DEFAULT v1,
@@ -2293,7 +2678,7 @@ TBSCertificateLogEntry  ::=  SEQUENCE  {
 <a href="#section-5.4.1" class="section-number selfRef">5.4.1. </a><a href="#name-signature-format" class="section-name selfRef">Signature Format</a>
           </h4>
 <p id="section-5.4.1-1">A cosigner computes a cosignature for a subtree in some log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.4.1-2">
+<div class="lang-tls-presentation sourcecode" id="section-5.4.1-2">
 <pre>
 opaque HashValue[HASH_SIZE];
 
@@ -2314,7 +2699,7 @@ struct {
 } MTCSubtreeSignatureInput;
 </pre><a href="#section-5.4.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-5.4.1-3"><code>log_id</code> MUST be the issuance log's ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>), in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>). <code>start</code> and <code>end</code> MUST define a valid subtree of the log, and <code>hash</code> MUST be the subtree's hash value in the cosigner's view of the log. The <code>label</code> is a fixed prefix for domain separation. Its value MUST be the string <code>mtc-subtree/v1</code>, followed by a newline (U+000A), followed by a zero byte (U+0000). <code>cosigner_id</code> MUST be the cosigner ID, in its binary representation.<a href="#section-5.4.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.4.1-3"><code>log_id</code> MUST be the issuance log's ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>), in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>). <code>start</code> and <code>end</code> MUST define a valid subtree of the log, and <code>hash</code> MUST be the subtree's hash value in the cosigner's view of the log. The <code>label</code> is a fixed prefix for domain separation. Its value MUST be the string <code>mtc-subtree/v1</code>, followed by a newline (U+000A), followed by a zero byte (U+0000). <code>cosigner_id</code> MUST be the cosigner ID, in its binary representation.<a href="#section-5.4.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.4.1-4">The resulting signature is known as a <em>subtree signature</em>. When <code>start</code> is zero, the resulting signature describes the checkpoint with tree size <code>end</code> and is also known as a <em>checkpoint signature</em>.<a href="#section-5.4.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.4.1-5">For each supported log, a cosigner retains its checkpoint signature with the largest <code>end</code>. This is known as the cosigner's <em>current</em> checkpoint. If the cosigner's current checkpoint has tree size <code>tree_size</code>, it MUST NOT generate a signature for a subtree <code>[start, end)</code> if <code>start &gt; 0</code> and <code>end &gt; tree_size</code>. That is, a cosigner can only sign a non-checkpoint subtree if it is contained in its current checkpoint. In a correctly-operated cosigner, every signature made by the cosigner can be proven consistent with its current checkpoint with a subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.3</a>). As a consequence, a cosigner that signs a subtree is held responsible for all the entries in the tree of size matching the subtree end, even if the corresponding checkpoint is erroneously unavailable.<a href="#section-5.4.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.4.1-6">Before signing a subtree, the cosigner MUST ensure that <code>hash</code> is consistent with its log state. Different cosigner roles may obtain this assurance differently. For example, a cosigner may compute the hash from its saved log state (e.g. if it is the log operator or maintains a copy of the log) or by verifying a subtree consistency proof (<a href="#subtree-consistency-proofs" class="auto internal xref">Section 4.3</a>) from its current checkpoint. When a cosigner signs a subtree, it is held responsible <em>both</em> for the subtree being consistent with its other signatures, <em>and</em> for the cosigner-specific additional statements.<a href="#section-5.4.1-6" class="pilcrow">¶</a></p>
@@ -2422,9 +2807,9 @@ struct {
 </li>
           </ul>
 <p id="section-5.6.1-7">Meeting these requirements requires a log to retain some information about pruned entries. Given a node <code>[start, end)</code> in the Merkle Tree, if <code>end</code> is less than or equal to the minimum index, the node's children MAY be discarded in favor of the node's hash.<a href="#section-5.6.1-7" class="pilcrow">¶</a></p>
-<p id="section-5.6.1-8"><a href="#fig-prune-tree" class="auto internal xref">Figure 3</a> shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.<a href="#section-5.6.1-8" class="pilcrow">¶</a></p>
+<p id="section-5.6.1-8"><a href="#fig-prune-tree" class="auto internal xref">Figure 5</a> shows an example pruned tree with 13 elements, where the minimum index is 7. It shows the original tree, followed by the pruned tree. The pruned tree depicts the nodes that MUST be available or computable. Note that entry 6 MAY be discarded, only the hash of entry 6 must be available.<a href="#section-5.6.1-8" class="pilcrow">¶</a></p>
 <span id="name-an-example-showing-the-mini"></span><div id="fig-prune-tree">
-<figure id="figure-3">
+<figure id="figure-5">
             <div id="section-5.6.1-9.1">
               <div class="alignLeft art-svg artwork" id="section-5.6.1-9.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="672" width="456" viewBox="0 0 456 672" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -2733,11 +3118,11 @@ struct {
                 </svg><a href="#section-5.6.1-9.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-an-example-showing-the-mini" class="selfRef">An example showing the minimum nodes that must be available after pruning</a>
             </figcaption></figure>
 </div>
-<p id="section-5.6.1-10">Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in <a href="#fig-prune-tree" class="auto internal xref">Figure 3</a>, the log's serving protocol MAY instead serve <code>[0, 2)</code> and <code>[2, 4)</code>, with the log client computing <code>[0, 4)</code> from those values.<a href="#section-5.6.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.6.1-10">Logs MAY retain additional nodes, or expect log clients to compute required nodes from other nodes. For example, in <a href="#fig-prune-tree" class="auto internal xref">Figure 5</a>, the log's serving protocol MAY instead serve <code>[0, 2)</code> and <code>[2, 4)</code>, with the log client computing <code>[0, 4)</code> from those values.<a href="#section-5.6.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2775,7 +3160,7 @@ struct {
 <p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> MUST contain the zero-based index of the TBSCertificateLogEntry in the log. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.2" class="relref">Section 4.1.2.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> forbids zero as a serial number, but <a href="#log-entries" class="auto internal xref">Section 5.3</a> defines a <code>null_entry</code> type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> MUST contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.1-6">
+<div class="lang-asn.1 sourcecode" id="section-6.1-6">
 <pre>
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
@@ -2784,7 +3169,7 @@ id-alg-mtcProof OBJECT IDENTIFIER ::= {
 </div>
 <p id="section-6.1-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of <code>id-alg-mtcProof</code>.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
 <p id="section-6.1-8">The <code>signatureValue</code> contains an MTCProof structure, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-6.1-8" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.1-9">
+<div class="lang-tls-presentation sourcecode" id="section-6.1-9">
 <pre>
 opaque HashValue[HASH_SIZE];
 
@@ -2801,7 +3186,7 @@ struct {
 } MTCProof;
 </pre><a href="#section-6.1-9" class="pilcrow">¶</a>
 </div>
-<p id="section-6.1-10"><code>start</code> and <code>end</code> MUST contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> MUST contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.2</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-6.1-10" class="pilcrow">¶</a></p>
+<p id="section-6.1-10"><code>start</code> and <code>end</code> MUST contain the corresponding parameters of the chosen subtree. <code>inclusion_proof</code> MUST contain a subtree inclusion proof (<a href="#subtree-inclusion-proofs" class="auto internal xref">Section 4.2</a>) for the log entry and the subtree. <code>signatures</code> contains the chosen subtree signatures. In each signature, <code>cosigner_id</code> contains the cosigner ID (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) in its binary representation (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3" class="relref">Section 3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), and <code>signature</code> contains the signature value as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-6.1-10" class="pilcrow">¶</a></p>
 <p id="section-6.1-11">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.<a href="#section-6.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2844,69 +3229,85 @@ struct {
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-signatureless-certificates" class="section-name selfRef">Signatureless Certificates</a>
         </h3>
 <p id="section-6.3-1">A <em>signatureless certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Signatureless certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding full certificate alongside any signatureless certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<div id="landmark-checkpoints">
+<div id="landmarks">
 <section id="section-6.3.1">
-          <h4 id="name-landmark-checkpoints">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmark-checkpoints" class="section-name selfRef">Landmark Checkpoints</a>
+          <h4 id="name-landmarks">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmarks" class="section-name selfRef">Landmarks</a>
           </h4>
-<p id="section-6.3.1-1">A signatureless certificate is constructed based on a <em>landmark checkpoint sequence</em>, which is a sequence of <em>landmark checkpoints</em>. Landmark checkpoints are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmark checkpoints SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark checkpoint sequences to exist per CA. Landmark checkpoints are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">A landmark checkpoint sequence has the following fixed parameters:<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-1">A signatureless certificate is constructed based on a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">A landmark sequence has the following fixed parameters:<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-3.1">
-              <p id="section-6.3.1-3.1.1"><code>base_id</code>: An OID arc for trust anchor IDs of individual landmark checkpoints<a href="#section-6.3.1-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.1.1"><code>base_id</code>: An OID arc for trust anchor IDs of individual landmarks<a href="#section-6.3.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.2">
-              <p id="section-6.3.1-3.2.1"><code>max_checkpoints</code>: A positive integer, describing the maximum number of landmark checkpoints that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.2.1"><code>max_landmarks</code>: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.3">
-              <p id="section-6.3.1-3.3.1"><code>checkpoint_url</code>: Some URL to fetch the current list of landmark checkpoints<a href="#section-6.3.1-3.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.3.1"><code>landmark_url</code>: Some URL to fetch the current list of landmarks<a href="#section-6.3.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.3.1-4">Landmark checkpoints are numbered consecutively from zero. Each landmark checkpoint has a trust anchor ID, determined by appending the checkpoint number to <code>base_id</code>. For example, the trust anchor ID for landmark checkpoint 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-5">Each landmark checkpoint specifies a tree size. The first landmark checkpoint, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-6">Landmark checkpoints determine <em>landmark subtrees</em>: for each landmark checkpoint, other than number zero, let <code>tree_size</code> be the checkpoint's tree size and <code>prev_tree_size</code> be that of the previous landmark checkpoint. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-7">The most recent <code>max_checkpoints</code> landmark checkpoints are said to be <em>active</em>. Landmark checkpoints MUST be allocated such that, at any given time, only active landmark checkpoints contain unexpired certificates. The active landmark subtrees are those determined by the active landmark checkpoints. There are at most <code>2 * max_checkpoints</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-8">If landmark checkpoints are allocated incorrectly (e.g. past checkpoints change, or <code>max_checkpoints</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-9">It is RECOMMENDED that checkpoints be allocated by picking some <code>time_between_checkpoints</code> interval, and then appending the latest checkpoint to the sequence, once per interval. If the latest checkpoint is already a landmark checkpoint, the interval is skipped. <code>max_checkpoints</code> can then be set to <code>ceil(max_cert_lifetime / time_between_checkpoints)</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime. Allocations do not need to be precise, as long as <code>max_checkpoints</code> is accurate.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-10">Relying parties will locally retain up to <code>2 * max_checkpoints</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_checkpoints</code> should be set to balance the delay between landmark checkpoints and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark checkpoint every hour, will have a <code>max_checkpoints</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-10" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-11"><code>checkpoint_url</code> MUST serve a resource with <code>Content-Type: text/plain; charset=utf-8</code> and the following lines. Each line MUST be terminated by a newline character (U+000A):<a href="#section-6.3.1-11" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to <code>base_id</code>. For example, the trust anchor ID for landmark 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-5">Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-6">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.4</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-7">The most recent <code>max_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-8">It is RECOMMENDED that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.3.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-9">Relying parties will locally retain up to <code>2 * max_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_landmarks</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-10"><code>landmark_url</code> MUST serve a resource with <code>Content-Type: text/plain; charset=utf-8</code> and the following lines. Each line MUST be terminated by a newline character (U+000A):<a href="#section-6.3.1-10" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.1-12.1">
-              <p id="section-6.3.1-12.1.1">Two space-separated non-negative decimal integers: <code>&lt;last_checkpoint&gt; &lt;num_active_checkpoints&gt;</code>.
-This line MUST satisfy the following, otherwise it is invalid:<a href="#section-6.3.1-12.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.1-11.1">
+              <p id="section-6.3.1-11.1.1">Two space-separated non-negative decimal integers: <code>&lt;last_landmark&gt; &lt;num_active_landmarks&gt;</code>.
+This line MUST satisfy the following, otherwise it is invalid:<a href="#section-6.3.1-11.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.1-12.1.2.1">
-                  <p id="section-6.3.1-12.1.2.1.1"><code>num_active_checkpoints &lt;= max_checkpoints</code><a href="#section-6.3.1-12.1.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.1-11.1.2.1">
+                  <p id="section-6.3.1-11.1.2.1.1"><code>num_active_landmarks &lt;= max_landmarks</code><a href="#section-6.3.1-11.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-                <li class="normal" id="section-6.3.1-12.1.2.2">
-                  <p id="section-6.3.1-12.1.2.2.1"><code>num_active_checkpoints &lt;= last_checkpoint</code><a href="#section-6.3.1-12.1.2.2.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-6.3.1-11.1.2.2">
+                  <p id="section-6.3.1-11.1.2.2.1"><code>num_active_landmarks &lt;= last_landmark</code><a href="#section-6.3.1-11.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-6.3.1-12.2">
-              <p id="section-6.3.1-12.2.1"><code>num_active_checkpoints + 1</code> lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to <code>num_active_checkpoints</code>, line <code>i</code> contains the tree size for checkpoint <code>last_checkpoint - i</code>. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.<a href="#section-6.3.1-12.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.3.1-11.2">
+              <p id="section-6.3.1-11.2.1"><code>num_active_landmarks + 1</code> lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to <code>num_active_landmarks</code>, line <code>i</code> contains the tree size for landmark <code>last_landmark - i</code>. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.<a href="#section-6.3.1-11.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
 </div>
-<div id="constructing-signatureless-certificates">
+<div id="allocating-landmarks">
 <section id="section-6.3.2">
-          <h4 id="name-constructing-signatureless-">
-<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-constructing-signatureless-" class="section-name selfRef">Constructing Signatureless Certificates</a>
+          <h4 id="name-allocating-landmarks">
+<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-allocating-landmarks" class="section-name selfRef">Allocating Landmarks</a>
           </h4>
-<p id="section-6.3.2-1">Given a TBSCertificateLogEntry in the issuance log and a landmark checkpoint sequence, a signatureless certificate is constructed as follows:<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-1">It is RECOMMENDED that landmarks be allocated using the following procedure:<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.3.2-2">
 <li id="section-6.3.2-2.1">
-              <p id="section-6.3.2-2.1.1">Wait for the first landmark checkpoint to be allocated that contains the entry.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.1.1">Select some <code>time_between_landmarks</code> duration. Define a series of consecutive, non-overlapping time intervals, each of duration <code>time_between_landmarks</code>.<a href="#section-6.3.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-6.3.2-2.2">
-              <p id="section-6.3.2-2.2.1">Determine the landmark checkpoint's landmark subtrees and select the one that contains the entry.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-6.3.2-2.3">
-              <p id="section-6.3.2-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>) using the selected subtree and no signatures.<a href="#section-6.3.2-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.2-2.2.1">At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-3">Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark checkpoint. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark checkpoint may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-3">To ensure that only active landmarks contain unexpired certificates, set <code>max_landmarks</code> to <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="constructing-signatureless-certificates">
+<section id="section-6.3.3">
+          <h4 id="name-constructing-signatureless-">
+<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-constructing-signatureless-" class="section-name selfRef">Constructing Signatureless Certificates</a>
+          </h4>
+<p id="section-6.3.3-1">Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a signatureless certificate is constructed as follows:<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.3-2">
+<li id="section-6.3.3-2.1">
+              <p id="section-6.3.3-2.1.1">Wait for the first landmark to be allocated that contains the entry.<a href="#section-6.3.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.3-2.2">
+              <p id="section-6.3.3-2.2.1">Determine the landmark's subtrees and select the one that contains the entry.<a href="#section-6.3.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.3-2.3">
+              <p id="section-6.3.3-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>) using the selected subtree and no signatures.<a href="#section-6.3.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.3.3-3">Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2931,7 +3332,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-6.4-4">The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
 <p id="section-6.4-5">Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
-<p id="section-6.4-6">If a new landmark checkpoint is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4-6">If a new landmark is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
 <p id="section-6.4-7">The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.<a href="#section-6.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2960,7 +3361,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-7.1-2.3.1">A policy on which combinations of cosigners to accept in a certificate (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.4">
-            <p id="section-7.1-2.4.1">An optional list of trusted subtrees that are known to be consistent with the relying party's cosigner requirements (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>)<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.4.1">An optional list of trusted subtrees, with their hashes, that are known to be consistent with the relying party's cosigner requirements (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>)<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.5">
             <p id="section-7.1-2.5.1">A list of revoked ranges of indices (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>)<a href="#section-7.1-2.5.1" class="pilcrow">¶</a></p>
@@ -2977,36 +3378,39 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-7.2-1">When verifying the signature on an X.509 certificate (Step (a)(1) of <span><a href="https://rfc-editor.org/rfc/rfc5280#section-6.1.3" class="relref">Section 6.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.2-2">
 <li id="section-7.2-2.1">
-            <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-mtc-proof</code> with omitted parameters. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-alg-mtcProof</code> with omitted parameters. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1">Let <code>index</code> be the certificate's serial number. Check that <code>start &lt;= index &lt; end</code>, and that <code>[start, end)</code> describes a subtree per <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">If <code>index</code> is contained in one of the relying party's revoked ranges (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.3.1">Let <code>index</code> be the certificate's serial number. If <code>index</code> is contained in one of the relying party's revoked ranges (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), abort this process and fail verification.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.4">
-            <p id="section-7.2-2.4.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.2-2.4.2">
-<li id="section-7.2-2.4.2.1">
-                <p id="section-7.2-2.4.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.4.1">Check the MTCProof's <code>start</code> and <code>end</code> describe a subtree per <a href="#definition-of-a-subtree" class="auto internal xref">Section 4.1</a>. If not, abort this process and fail verification.<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-7.2-2.4.2.2">
-                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-7.2-2.5">
+            <p id="section-7.2-2.5.1">Construct a TBSCertificateLogEntry as follows:<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.2-2.5.2">
+<li id="section-7.2-2.5.2.1">
+                <p id="section-7.2-2.5.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.5.2.2">
+                <p id="section-7.2-2.5.2.2.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.5.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
-          <li id="section-7.2-2.5">
-            <p id="section-7.2-2.5.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry.<a href="#section-7.2-2.5.1" class="pilcrow">¶</a></p>
-</li>
           <li id="section-7.2-2.6">
-            <p id="section-7.2-2.6.1">Evaluate <code>inclusion_proof</code> against the MerkleTreeCertEntry to compute the expected subtree hash<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.6.1">Construct a MerkleTreeCertEntry of type <code>tbs_cert_entry</code> with contents the TBSCertificateLogEntry. Let <code>entry_hash</code> be the hash of the entry, <code>MTH({entry}) = HASH(0x00 || entry)</code>, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.7">
-            <p id="section-7.2-2.7.1">If the subtree is a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>), check that the hash matches. Return success if it matches and failure if it does not.<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.7.1">Let <code>expected_subtree_hash</code> be the result of evaluating the MTCProof's <code>inclusion_proof</code> for entry <code>index</code>, with hash <code>entry_hash</code>, of a subtree <code>[start, end)</code>, as described in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.2.1</a>. If evaluation fails, abort this process and fail verification.<a href="#section-7.2-2.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.8">
-            <p id="section-7.2-2.8.1">Otherwise, check that <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.8.1">If <code>[start, end)</code> matches a trusted subtree (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>), check that <code>expected_subtree_hash</code> is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.<a href="#section-7.2-2.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-2.9">
+            <p id="section-7.2-2.9.1">Otherwise, check that the MTCProof's <code>signatures</code> contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>). Unrecognized cosigners MUST be ignored. Signatures are verified as described in <a href="#signature-format" class="auto internal xref">Section 5.4.1</a>. The <code>hash</code> field of the MTCSubtree is set to <code>expected_subtree_hash</code>.<a href="#section-7.2-2.9.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-7.2-3">This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
@@ -3019,7 +3423,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </h3>
 <p id="section-7.3-1">A relying party's cosigner policy determines the sets of cosigners that must sign a view of the issuance log before it is trusted.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
 <p id="section-7.3-2">This document does not prescribe a particular policy, but gives general guidance. Relying parties MAY implement policies other than those described below, and MAY incorporate cosigners acting in roles not described in this document.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.3-3">In picking trusted cosigners, relying party SHOULD ensure the following security properties:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-3">In picking trusted cosigners, the relying party SHOULD ensure the following security properties:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-7.3-4">
           <dt id="section-7.3-4.1">Authenticity:</dt>
           <dd style="margin-left: 1.5em" id="section-7.3-4.2">
@@ -3045,12 +3449,12 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmark-checkpoints" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates (<a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates (<a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.4</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <p id="section-7.4-3">This criteria can be checked given:<a href="#section-7.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.4-4.1">
-            <p id="section-7.4-4.1.1">Some <em>reference checkpoint</em> that contains the latest landmark checkpoint<a href="#section-7.4-4.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.4-4.1.1">Some <em>reference checkpoint</em> that contains the latest landmark<a href="#section-7.4-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.4-4.2">
             <p id="section-7.4-4.2.1">For each cosigner, either:<a href="#section-7.4-4.2.1" class="pilcrow">¶</a></p>
@@ -3069,7 +3473,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-7.4-5">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <p id="section-7.4-6">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-6" class="pilcrow">¶</a></p>
-<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmark checkpoints may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revocation-by-index">
@@ -3091,11 +3495,11 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-use-in-tls" class="section-name selfRef">Use in TLS</a>
       </h2>
 <p id="section-8-1">TLS implementations that authenticate with or accept Merkle Tree certificates SHOULD support trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for certificate selection.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">A full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-2">A full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">A full certificate MAY be used without signals about what the relying party trusts. As with other choices of default certificates, an authenticating party that does so assumes that the relying party trusts the issuing CA, e.g. because the CA is relatively ubiquitous among the relying parties that it supports.<a href="#section-8-4" class="pilcrow">¶</a></p>
-<p id="section-8-5">A signatureless certificate has a trust anchor ID of the corresponding landmark checkpoint, as described in <a href="#landmark-checkpoints" class="auto internal xref">Section 6.3.1</a>. This can be configured in the authenticating party via out-of-band information, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmark checkpoints SHOULD be configured to support those checkpoints' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.<a href="#section-8-5" class="pilcrow">¶</a></p>
-<p id="section-8-6">[[TODO: We can do slightly better. If the relying party supports checkpoint 42, it can be assumed to also support checkpoint 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]<a href="#section-8-6" class="pilcrow">¶</a></p>
+<p id="section-8-5">A signatureless certificate has a trust anchor ID of the corresponding landmark, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. This can be configured in the authenticating party via out-of-band information, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD be configured to support those landmarks' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-6">[[TODO: We can do slightly better. If the relying party supports landmark 42, it can be assumed to also support landmark 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]<a href="#section-8-6" class="pilcrow">¶</a></p>
 <p id="section-8-7">Authenticating parties SHOULD preferentially use signatureless certificates over full certificates, when both are supported by the relying party. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. A signatureless certificate SHOULD NOT be used without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees predistributed.<a href="#section-8-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3105,9 +3509,9 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for full and signatureless certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for full and signatureless certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in <a href="#full-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark checkpoint is allocated, the ACME server constructs a signatureless certificate, as described in <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-4">The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a signatureless certificate, as described in <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3188,7 +3592,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-certificate-renewal">
 <a href="#section-10.4" class="section-number selfRef">10.4. </a><a href="#name-certificate-renewal" class="section-name selfRef">Certificate Renewal</a>
         </h3>
-<p id="section-10.4-1">When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark checkpoint is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
+<p id="section-10.4-1">When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
 <p id="section-10.4-2">To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate some time before the previous Merkle Tree certificate expires. Renewing around 75% into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.<a href="#section-10.4-2" class="pilcrow">¶</a></p>
 <p id="section-10.4-3">The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-10.4-3" class="pilcrow">¶</a></p>
 <p id="section-10.4-4">If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a full certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new signatureless certificate is available and relying parties are updated.<a href="#section-10.4-4" class="pilcrow">¶</a></p>
@@ -3209,7 +3613,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01#section-9" class="relref">Section 9</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-9" class="relref">Section 9</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">In particular, relying parties that share an update process for trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3426,13 +3830,9 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <dd>
 <span class="refTitle">"Module-lattice-based digital signature standard"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.204</span>, <time datetime="2024-08" class="refDate">August 2024</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.204">https://doi.org/10.6028/nist.fips.204</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="I-D.ietf-lamps-x509-alg-none">[I-D.ietf-lamps-x509-alg-none]</dt>
-        <dd>
-<span class="refAuthor">Benjamin, D.</span>, <span class="refTitle">"Unsigned X.509 Certificates"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-x509-alg-none-08</span>, <time datetime="2025-07-07" class="refDate">7 July 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-lamps-x509-alg-none-08">https://datatracker.ietf.org/doc/html/draft-ietf-lamps-x509-alg-none-08</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="I-D.ietf-tls-trust-anchor-ids">[I-D.ietf-tls-trust-anchor-ids]</dt>
         <dd>
-<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, <span class="refAuthor">O'Brien, D.</span>, and <span class="refAuthor">K. Nekritz</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-trust-anchor-ids-01</span>, <time datetime="2025-05-14" class="refDate">14 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01">https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Beck, B.</span>, <span class="refAuthor">Benjamin, D.</span>, <span class="refAuthor">O'Brien, D.</span>, and <span class="refAuthor">K. Nekritz</span>, <span class="refTitle">"TLS Trust Anchor Identifiers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-trust-anchor-ids-02</span>, <time datetime="2025-09-15" class="refDate">15 September 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02">https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -3523,6 +3923,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <dd>
 <span class="refAuthor">Mozilla</span>, <span class="refTitle">"Firefox Remote Settings"</span>, <time datetime="2022-08-20" class="refDate">20 August 2022</time>, <span>&lt;<a href="https://wiki.mozilla.org/Firefox/RemoteSettings">https://wiki.mozilla.org/Firefox/RemoteSettings</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="I-D.ietf-lamps-x509-alg-none">[I-D.ietf-lamps-x509-alg-none]</dt>
+        <dd>
+<span class="refAuthor">Benjamin, D.</span>, <span class="refTitle">"Unsigned X.509 Certificates"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-x509-alg-none-10</span>, <time datetime="2025-09-05" class="refDate">5 September 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-lamps-x509-alg-none-10">https://datatracker.ietf.org/doc/html/draft-ietf-lamps-x509-alg-none-10</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="LetsEncrypt">[LetsEncrypt]</dt>
         <dd>
 <span class="refAuthor">Let's Encrypt</span>, <span class="refTitle">"Let's Encrypt Stats"</span>, <time datetime="2023-03-07" class="refDate">7 March 2023</time>, <span>&lt;<a href="https://letsencrypt.org/stats/">https://letsencrypt.org/stats/</a>&gt;</span>. </dd>
@@ -3589,7 +3993,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
       <h2 id="name-asn1-module">
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-asn1-module" class="section-name selfRef">ASN.1 Module</a>
       </h2>
-<div class="alignLeft art-text artwork" id="appendix-A-1">
+<div class="breakable lang-asn.1 sourcecode" id="appendix-A-1">
 <pre>
 MerkleTreeCertificates
   { iso(1) identified-organization(3) dod(6) internet(1)
@@ -3637,7 +4041,7 @@ sa-mtcProof SIGNATURE-ALGORITHM ::= {
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(TBD1) TBD2}
+    mechanisms(5) pkix(7) rdna(25) TBD}
 
 at-trustAnchorID ATTRIBUTE ::= {
    TYPE TrustAnchorID
@@ -3674,13 +4078,13 @@ END
 </li>
         </ul>
 <p id="appendix-B.1-4">Each note signature has a key name of the cosigner name. The signature's key ID is computed using the reserved signature type in <span>[<a href="#SIGNED-NOTE" class="cite xref">SIGNED-NOTE</a>]</span>, and a fixed string, as follows:<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-B.1-5">
+<div class="lang-pseudocode sourcecode" id="appendix-B.1-5">
 <pre>
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 </pre><a href="#appendix-B.1-5" class="pilcrow">¶</a>
 </div>
 <p id="appendix-B.1-6">A subtree whose <code>start</code> is zero can also be represented as a checkpoint <span>[<a href="#TLOG-CHECKPOINT" class="cite xref">TLOG-CHECKPOINT</a>]</span>. A corresponding subtree signature can be represented as a note signature using a key ID computed as follows:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-B.1-7">
+<div class="lang-pseudocode sourcecode" id="appendix-B.1-7">
 <pre>
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-checkpoint/v1")[:4]
 </pre><a href="#appendix-B.1-7" class="pilcrow">¶</a>
@@ -3755,7 +4159,7 @@ key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-checkpoint/v1")[:4]
 <a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
 <p id="appendix-C-1">This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
-<p id="appendix-C-2">The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable, Nick Harper, Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
+<p id="appendix-C-2">The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable, Nick Harper, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
 <p id="appendix-C-3">The idea to mint tree heads infrequently was originally described by Richard Barnes in <span>[<a href="#STH-Discipline" class="cite xref">STH-Discipline</a>]</span>. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3900,6 +4304,30 @@ final version of this document.<a href="#appendix-D-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-D.7-1.3">
             <p id="appendix-D.7-1.3.1">First draft at IANA registration and ASN.1 module<a href="#appendix-D.7-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.4">
+            <p id="appendix-D.7-1.4.1">Added a prose version of the procedure to select subtrees<a href="#appendix-D.7-1.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.5">
+            <p id="appendix-D.7-1.5.1">Rename 'landmarks checkpoint' to 'landmarks'<a href="#appendix-D.7-1.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.6">
+            <p id="appendix-D.7-1.6.1">Clarify and fix an off-by-one error in recommended landmark allocation scheme<a href="#appendix-D.7-1.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-D.7-1.7">
+            <p id="appendix-D.7-1.7.1">Add some diagrams to the Overview section<a href="#appendix-D.7-1.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-davidben-tls-merkle-tree-certs-07">
+<section id="appendix-D.8">
+        <h3 id="name-since-draft-davidben-tls-merkle-tr">
+<a href="#name-since-draft-davidben-tls-merkle-tr" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-07</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-D.8-1.1">
+            <p id="appendix-D.8-1.1.1">Clarify landmark zero<a href="#appendix-D.8-1.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
