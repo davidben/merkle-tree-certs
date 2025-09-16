@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-11T01:56:25.021905+00:00",
+  "timestamp": "2025-09-16T01:53:30.416699+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2393,15 +2393,15 @@
       "id": "I_kwDOJIBkVc7Jy9Ri",
       "title": "X.509 name construction isn't compatible with Go",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/142",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "@cjpatton noticed that Go's X.509 parser doesn't actually accept the name construction we picked: https://github.com/golang/go/issues/75260\n\nMight be worth picking another one. Looks like Go currently only supports the following attribute values:\n* T61String\n* PrintableString\n* UTF8String\n* BMPString\n* IA5String\n* NumericString\n\nCompatibility-wise, it doesn't particularly matter for Go _relying parties_ because old relying parties won't accept these anyway. But one of the benefits of living with X.509 is that existing authenticating parties can still use these. Authenticating parties broadly only need to parse enough of the certificate to get it through their configuration pipelines and into the TLS stack. (And extract a few things like the public key.)\n\nParticularly to help early experiments, before the Go issue is fixed, it might be worth doing this. Some options off-hand:\n\n1. Don't constrain the name. Just say that a log has both an X.509 name and a trust anchor ID, and everyone needs to remember they're associated. This makes configuration more complicated.\n2. Use the text form of the trust anchor ID and stick it in a UTF8String. Burns a couple more bytes, but more straightforwardly compatible.\n3. Turn the trust anchor ID into an (absolute) OID. Use that as the attribute type and `UTF8String(\"\")` as the value.",
       "createdAt": "2025-09-04T21:49:26Z",
-      "updatedAt": "2025-09-10T17:44:29Z",
-      "closedAt": null,
+      "updatedAt": "2025-09-15T18:35:45Z",
+      "closedAt": "2025-09-15T18:35:45Z",
       "comments": [
         {
           "author": "cjpatton",
@@ -8428,25 +8428,35 @@
       "id": "PR_kwDOJIBkVc6n6DRJ",
       "title": "Override issuer encoding used in early implementations",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/143",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "cjpatton",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #142.\r\n\r\nRELATIVE-OID isn't yet widely implemented. For example, see <https://github.com/golang/go/issues/75260>. To unblock \r\nearly deployments, we'll go with UTF8String instead.",
       "createdAt": "2025-09-10T22:30:08Z",
-      "updatedAt": "2025-09-10T22:30:59Z",
+      "updatedAt": "2025-09-15T18:35:44Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "29f4e797660049e88c6726218b9db22cdd5c2e5d",
       "headRepository": "cjpatton/merkle-tree-certs",
       "headRefName": "cjpatton/142",
-      "headRefOid": "9ba379706fd2cf2f101e84934cbb9e6ab7c5af71",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "3659eabdf0511ee91d383c08fd7fc89da1a55e25",
+      "closedAt": "2025-09-15T18:35:44Z",
+      "mergedAt": "2025-09-15T18:35:44Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "a3438ec54667d3a562edc0b905e41e35951a176c"
+      },
+      "comments": [
+        {
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@davidben I took your suggestion and squashed. I don't have the merge button, but feel free at your convenience.",
+          "createdAt": "2025-09-15T14:47:07Z",
+          "updatedAt": "2025-09-15T14:47:07Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc6_NoyY",
@@ -8465,6 +8475,26 @@
               "body": "As in:\r\n\r\n```go\r\nvar tv pkix.AttributeTypeAndValue\r\ntv.Type = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}\r\ntv.Value = asn1.RawValue{Tag: asn1.TagUTF8String, Bytes: []byte(\"32473.1\")}\r\n\r\nvar name pkix.Name\r\nname.Names = append(name.Names, tv)\r\nfmt.Println(name.String())\r\n```\r\n\r\n",
               "createdAt": "2025-09-10T22:30:59Z",
               "updatedAt": "2025-09-10T22:30:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7ADubL",
+          "commit": {
+            "abbreviatedOid": "9ba3797"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-09-14T16:02:21Z",
+          "updatedAt": "2025-09-14T16:02:46Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "```suggestion\r\n1. Use UTF8String to represent the attribute's value rather than RELATIVE-OID. The UTF8String contains trust anchor ID's ASCII representation, e.g. `324731.1`.\r\n```",
+              "createdAt": "2025-09-14T16:02:21Z",
+              "updatedAt": "2025-09-14T16:02:46Z"
             }
           ]
         }
