@@ -1673,8 +1673,9 @@ Table of Contents
 
    6.  Let expected_subtree_hash be the result of evaluating the
        MTCProof's inclusion_proof for entry index, with hash entry_hash,
-       of a subtree [start, end), as described in Section 4.2.1.  If
-       evaluation fails, abort this process and fail verification.
+       of the subtree described by the MTCProof's start and end,
+       following the procedure in Section 4.2.1.  If evaluation fails,
+       abort this process and fail verification.
 
    7.  If [start, end) matches a trusted subtree (Section 7.4), check
        that expected_subtree_hash is equal to the trusted subtree's
