@@ -517,7 +517,8 @@ Table of Contents
    inclusion proof can be _evaluated_ to compute the expected subtree
    hash:
 
-   1.  Check start <= index < end.  If this does not hold, fail proof
+   1.  Check that [start, end) is a valid subtree (Section 4.1), and
+       that start <= index < end.  If either do not hold, fail proof
        evaluation.
 
    2.  Set fn to index - start and sn to end - start - 1.
@@ -1656,10 +1657,7 @@ Table of Contents
        contained in one of the relying party's revoked ranges
        (Section 7.5), abort this process and fail verification.
 
-   4.  Check the MTCProof's start and end describe a subtree per
-       Section 4.1.  If not, abort this process and fail verification.
-
-   5.  Construct a TBSCertificateLogEntry as follows:
+   4.  Construct a TBSCertificateLogEntry as follows:
 
        1.  Copy the version, issuer, validity, subject, issuerUniqueID,
            subjectUniqueID, and extensions fields from the
@@ -1668,21 +1666,21 @@ Table of Contents
        2.  Set subjectPublicKeyInfoHash to the hash of the DER encoding
            of subjectPublicKeyInfo.
 
-   6.  Construct a MerkleTreeCertEntry of type tbs_cert_entry with
+   5.  Construct a MerkleTreeCertEntry of type tbs_cert_entry with
        contents the TBSCertificateLogEntry.  Let entry_hash be the hash
        of the entry, MTH({entry}) = HASH(0x00 || entry), as defined in
        Section 2.1.1 of [RFC9162].
 
-   7.  Let expected_subtree_hash be the result of evaluating the
+   6.  Let expected_subtree_hash be the result of evaluating the
        MTCProof's inclusion_proof for entry index, with hash entry_hash,
        of a subtree [start, end), as described in Section 4.2.1.  If
        evaluation fails, abort this process and fail verification.
 
-   8.  If [start, end) matches a trusted subtree (Section 7.4), check
+   7.  If [start, end) matches a trusted subtree (Section 7.4), check
        that expected_subtree_hash is equal to the trusted subtree's
        hash.  Return success if it matches and failure if it does not.
 
-   9.  Otherwise, check that the MTCProof's signatures contain a
+   8.  Otherwise, check that the MTCProof's signatures contain a
        sufficient set of valid signatures from cosigners to satisfy the
        relying party's cosigner requirements (Section 7.3).
        Unrecognized cosigners MUST be ignored.  Signatures are verified
@@ -2940,6 +2938,8 @@ Since draft-davidben-tls-merkle-tree-certs-06
 Since draft-davidben-tls-merkle-tree-certs-07
 
    *  Clarify landmark zero
+
+   *  Clarify signature verification process
 
 Authors' Addresses
 
