@@ -1078,7 +1078,7 @@ When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
 
-1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of a subtree `[start, end)`, as described in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
+1. Let `expected_subtree_hash` be the result of evaluating the MTCProof's `inclusion_proof` for entry `index`, with hash `entry_hash`, of the subtree described by the MTCProof's `start` and `end`, following the procedure in {{evaluating-a-subtree-inclusion-proof}}. If evaluation fails, abort this process and fail verification.
 
 1. If `[start, end)` matches a trusted subtree ({{trusted-subtrees}}), check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
