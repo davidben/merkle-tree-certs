@@ -415,7 +415,7 @@ Subtrees are Merkle Trees, so entries can be proven to be contained in the subtr
 
 Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash `entry_hash`, of a subtree `[start, end)`, the subtree inclusion proof can be *evaluated* to compute the expected subtree hash:
 
-1. Check `start <= index < end`. If this does not hold, fail proof evaluation.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `start <= index < end`. If either do not hold, fail proof evaluation.
 
 1. Set `fn` to `index - start` and `sn` to `end - start - 1`.
 
@@ -1071,8 +1071,6 @@ When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6
 1. Decode the `signatureValue` as an MTCProof, as described in {{certificate-format}}.
 
 1. Let `index` be the certificate's serial number. If `index` is contained in one of the relying party's revoked ranges ({{revocation-by-index}}), abort this process and fail verification.
-
-1. Check the MTCProof's `start` and `end` describe a subtree per {{definition-of-a-subtree}}. If not, abort this process and fail verification.
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
