@@ -534,8 +534,7 @@ Table of Contents
 
            1.  Set r to HASH(0x01 || p || r).
 
-           2.  If LSB(fn) is not set, then right-shift both fn and sn
-               equally until either LSB(fn) is set or fn is 0.
+           2.  Until LSB(fn) is set, right-shift fn and sn equally.
 
            Otherwise:
 
