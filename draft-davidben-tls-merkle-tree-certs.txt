@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 19 March 2026                                                  
+Expires: 21 March 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       15 September 2025
+                                                       17 September 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 March 2026.
+   This Internet-Draft will expire on 21 March 2026.
 
 Copyright Notice
 
@@ -83,6 +83,8 @@ Table of Contents
    4.  Subtrees
      4.1.  Definition of a Subtree
      4.2.  Subtree Inclusion Proofs
+       4.2.1.  Evaluating a Subtree Inclusion Proof
+       4.2.2.  Verifying a Subtree Inclusion Proof
      4.3.  Subtree Consistency Proofs
        4.3.1.  Generating a Subtree Consistency Proof
        4.3.2.  Verifying a Subtree Consistency Proof
@@ -506,9 +508,63 @@ Table of Contents
    in the subtree.  A subtree inclusion proof for entry index of the
    subtree [start, end) is a Merkle inclusion proof, as defined in
    Section 2.1.3.1 of [RFC9162], where m is index - start and the tree
-   inputs are D[start:end].  A subtree inclusion proof can be verified
-   with the procedure in Section 2.1.3.2 of [RFC9162], where leaf_index
-   is index - start and tree_size is end - start.
+   inputs are D[start:end].
+
+4.2.1.  Evaluating a Subtree Inclusion Proof
+
+   Given a subtree inclusion proof, inclusion_proof, for entry index,
+   with hash entry_hash, of a subtree [start, end), the subtree
+   inclusion proof can be _evaluated_ to compute the expected subtree
+   hash:
+
+   1.  Check that [start, end) is a valid subtree (Section 4.1), and
+       that start <= index < end.  If either do not hold, fail proof
+       evaluation.
+
+   2.  Set fn to index - start and sn to end - start - 1.
+
+   3.  Set r to entry_hash.
+
+   4.  For each value p in the inclusion_proof array:
+
+       1.  If sn is 0, then stop the iteration and fail the proof
+           verification.
+
+       2.  If LSB(fn) is set, or if fn is equal to sn, then:
+
+           1.  Set r to HASH(0x01 || p || r).
+
+           2.  If LSB(fn) is not set, then right-shift both fn and sn
+               equally until either LSB(fn) is set or fn is 0.
+
+           Otherwise:
+
+           1.  Set r to HASH(0x01 || r || p).
+
+       3.  Finally, right-shift both fn and sn one time.
+
+   5.  If sn is not zero, fail proof evaluation.
+
+   6.  Return r as the expected subtree hash.
+
+   This is the same as the procedure in Section 2.1.3.2 of [RFC9162],
+   where leaf_index is index - start, tree_size is end - start, and r is
+   returned instead of compared with root_hash.
+
+4.2.2.  Verifying a Subtree Inclusion Proof
+
+   Given a subtree inclusion proof, inclusion_proof, for entry index,
+   with hash entry_hash, of a subtree [start, end) with hash
+   subtree_hash, the subtree inclusion proof can be _verified_ to verify
+   the described entry is contained in the subtree:
+
+   1.  Let expected_subtree_hash be the result of evaluating the
+       inclusion proof as described Section 4.2.1.  If evaluation fails,
+       fail the proof verification.
+
+   2.  If subtree_hash is equal to expected_subtree_hash, the entry is
+       contained in the subtree.  Otherwise, fail the proof
+       verification.
 
 4.3.  Subtree Consistency Proofs
 
@@ -1571,9 +1627,9 @@ Table of Contents
    *  A policy on which combinations of cosigners to accept in a
       certificate (Section 7.3)
 
-   *  An optional list of trusted subtrees that are known to be
-      consistent with the relying party's cosigner requirements
-      (Section 7.4)
+   *  An optional list of trusted subtrees, with their hashes, that are
+      known to be consistent with the relying party's cosigner
+      requirements (Section 7.4)
 
    *  A list of revoked ranges of indices (Section 7.5)
 
@@ -1590,17 +1646,16 @@ Table of Contents
    Section 6.1.3 of [RFC5280]) whose issuer is a Merkle Tree CA, the
    relying party performs the following procedure:
 
-   1.  Check that the TBSCertificate's signature field is id-mtc-proof
-       with omitted parameters.  If either check fails, abort this
-       process and fail verification.
+   1.  Check that the TBSCertificate's signature field is id-alg-
+       mtcProof with omitted parameters.  If either check fails, abort
+       this process and fail verification.
 
-   2.  Let index be the certificate's serial number.  Check that start
-       <= index < end, and that [start, end) describes a subtree per
-       Section 4.1.  If either check fails, abort this process and fail
-       verification.
+   2.  Decode the signatureValue as an MTCProof, as described in
+       Section 6.1.
 
-   3.  If index is contained in one of the relying party's revoked
-       ranges (Section 7.5), abort this process and fail verification.
+   3.  Let index be the certificate's serial number.  If index is
+       contained in one of the relying party's revoked ranges
+       (Section 7.5), abort this process and fail verification.
 
    4.  Construct a TBSCertificateLogEntry as follows:
 
@@ -1612,20 +1667,26 @@ Table of Contents
            of subjectPublicKeyInfo.
 
    5.  Construct a MerkleTreeCertEntry of type tbs_cert_entry with
-       contents the TBSCertificateLogEntry.
+       contents the TBSCertificateLogEntry.  Let entry_hash be the hash
+       of the entry, MTH({entry}) = HASH(0x00 || entry), as defined in
+       Section 2.1.1 of [RFC9162].
 
-   6.  Evaluate inclusion_proof against the MerkleTreeCertEntry to
-       compute the expected subtree hash
+   6.  Let expected_subtree_hash be the result of evaluating the
+       MTCProof's inclusion_proof for entry index, with hash entry_hash,
+       of the subtree described by the MTCProof's start and end,
+       following the procedure in Section 4.2.1.  If evaluation fails,
+       abort this process and fail verification.
 
-   7.  If the subtree is a trusted subtree (Section 7.4), check that the
-       hash matches.  Return success if it matches and failure if it
-       does not.
+   7.  If [start, end) matches a trusted subtree (Section 7.4), check
+       that expected_subtree_hash is equal to the trusted subtree's
+       hash.  Return success if it matches and failure if it does not.
 
-   8.  Otherwise, check that signatures contain a sufficient set of
-       valid signatures from cosigners to satisfy the relying party's
-       cosigner requirements (Section 7.3).  Unrecognized cosigners MUST
-       be ignored.  Signatures are verified as described in
-       Section 5.4.1.
+   8.  Otherwise, check that the MTCProof's signatures contain a
+       sufficient set of valid signatures from cosigners to satisfy the
+       relying party's cosigner requirements (Section 7.3).
+       Unrecognized cosigners MUST be ignored.  Signatures are verified
+       as described in Section 5.4.1.  The hash field of the MTCSubtree
+       is set to expected_subtree_hash.
 
    This procedure only replaces the signature verification portion of
    X.509 path validation.  The relying party MUST continue to perform
@@ -2750,9 +2811,9 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable,
-   Nick Harper, Dennis Jackson, Chris Patton, Ryan Sleevi, and Emily
-   Stark for many valuable discussions and insights which led to this
-   document.  We wish to thank Mia Celeste in particular, whose
+   Nick Harper, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi,
+   and Emily Stark for many valuable discussions and insights which led
+   to this document.  We wish to thank Mia Celeste in particular, whose
    implementation of an earlier draft revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
@@ -2878,6 +2939,8 @@ Since draft-davidben-tls-merkle-tree-certs-06
 Since draft-davidben-tls-merkle-tree-certs-07
 
    *  Clarify landmark zero
+
+   *  Clarify signature verification process
 
 Authors' Addresses
 
