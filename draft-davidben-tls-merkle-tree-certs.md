@@ -429,7 +429,7 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 
       1. Set `r` to `HASH(0x01 || p || r)`.
 
-      1. If `LSB(fn)` is not set, then right-shift both `fn` and `sn` equally until either `LSB(fn)` is set or `fn` is 0.
+      1. Until `LSB(fn)` is set, right-shift `fn` and `sn` equally.
 
       Otherwise:
 
