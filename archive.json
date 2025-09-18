@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-16T01:53:30.416699+00:00",
+  "timestamp": "2025-09-18T01:53:22.856727+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -8497,6 +8497,150 @@
               "updatedAt": "2025-09-14T16:02:46Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 144,
+      "id": "PR_kwDOJIBkVc6o7Pao",
+      "title": "Clarify verification process",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/144",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Matt Mueller noticed that the process was ambiguous about where the MTCProof fields came from, and that we didn't consistently rename the OID to match the id-alg-* convention that LAMPS seems to be using these days.\r\n\r\nFrom there I also noticed that the shape of RFC 9162, section 2.1.3.2 doesn't quite fit what we need. We want to run the inclusion proof, get the expected subtree hash, and then check a signature over it. RFC 9162 assumes you already know the subtree hash and are just checking it. I copy-pasted the description from RFC 9162 and inlined the small changes we were making.",
+      "createdAt": "2025-09-16T19:15:01Z",
+      "updatedAt": "2025-09-17T14:31:35Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a3438ec54667d3a562edc0b905e41e35951a176c",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "clarify-verification",
+      "headRefOid": "df21aa784d32ab4f86f13950bfbf19c4909c4d07",
+      "closedAt": "2025-09-17T14:21:47Z",
+      "mergedAt": "2025-09-17T14:21:47Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7d0cadd3925a67ce9d0c34efa26261f2ed95eb90"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7AmqJp",
+          "commit": {
+            "abbreviatedOid": "18d138a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-16T19:19:36Z",
+          "updatedAt": "2025-09-16T19:19:37Z",
+          "comments": [
+            {
+              "originalPosition": 65,
+              "body": "This is implicit in subtree evaluation now.",
+              "createdAt": "2025-09-16T19:19:37Z",
+              "updatedAt": "2025-09-16T19:19:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7AvG2j",
+          "commit": {
+            "abbreviatedOid": "df21aa7"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-09-17T09:42:33Z",
+          "updatedAt": "2025-09-17T09:42:33Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7AzrcA",
+          "commit": {
+            "abbreviatedOid": "df21aa7"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-17T14:28:07Z",
+          "updatedAt": "2025-09-17T14:28:08Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "I think this is another case where it will never terminate due to the \"`fn` is 0\" condition.\r\n```suggestion\r\n      1. Until LSB(fn) is set, right-shift both `fn` and `sn` equally.\r\n```",
+              "createdAt": "2025-09-17T14:28:08Z",
+              "updatedAt": "2025-09-17T14:28:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7Azvak",
+          "commit": {
+            "abbreviatedOid": "df21aa7"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-17T14:31:35Z",
+          "updatedAt": "2025-09-17T14:31:35Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "(I made a new PR: https://github.com/davidben/merkle-tree-certs/pull/145)",
+              "createdAt": "2025-09-17T14:31:35Z",
+              "updatedAt": "2025-09-17T14:38:12Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 145,
+      "id": "PR_kwDOJIBkVc6pF5KJ",
+      "title": "Clarify loop exit condition in subtree inclusion proof verification",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/145",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Entering the loop, either `LSB(fn)` is already set, or `fn` is equal to `sn` which is non-zero. Thus, the right-shifting loop will only ever exit due to `LSB(fn)` being set.",
+      "createdAt": "2025-09-17T14:37:23Z",
+      "updatedAt": "2025-09-17T15:00:07Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7d0cadd3925a67ce9d0c34efa26261f2ed95eb90",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lukevalenta-patch-1",
+      "headRefOid": "891a74a1fb707e7bda88ed955ea18c8ad61a05b7",
+      "closedAt": "2025-09-17T15:00:02Z",
+      "mergedAt": "2025-09-17T15:00:02Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0012b785843b8449011fd2402db236309e09105f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7A0Q00",
+          "commit": {
+            "abbreviatedOid": "891a74a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "I considered suggesting we add an explanatory sentence to \u201cThis is the same as the procedure [\u2026]\u201d because it\u2019s now not as obvious, but it seemed awkward so\u2026 meh.",
+          "createdAt": "2025-09-17T14:59:54Z",
+          "updatedAt": "2025-09-17T14:59:54Z",
+          "comments": []
         }
       ]
     }
