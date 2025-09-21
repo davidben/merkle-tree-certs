@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-18T01:53:22.856727+00:00",
+  "timestamp": "2025-09-21T02:04:31.436008+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2537,6 +2537,22 @@
           "updatedAt": "2025-09-10T17:44:29Z"
         }
       ]
+    },
+    {
+      "number": 146,
+      "id": "I_kwDOJIBkVc7MhZgu",
+      "title": "What happens when a MTC CA issues an unconstrained intermediate certificate?",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/146",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
+      "createdAt": "2025-09-18T17:26:53Z",
+      "updatedAt": "2025-09-18T17:26:53Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
