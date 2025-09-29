@@ -38,10 +38,11 @@ const (
 )
 
 var (
-	flagURL          = flag.String("url", "", "the URL of the log to sample")
-	flagSamples      = flag.Int("samples", 5, "number of samples to run")
-	flagFilterKeyIDs = flag.Bool("filter-key-id", false, "filter out SKID and AKID extensions")
-	flagFilterAIA    = flag.Bool("filter-aia", false, "filter out AIA extension")
+	flagURL            = flag.String("url", "", "the URL of the log to sample")
+	flagSamples        = flag.Int("samples", 5, "number of samples to run")
+	flagFilterKeyIDs   = flag.Bool("filter-key-id", false, "filter out SKID and AKID extensions")
+	flagFilterAIA      = flag.Bool("filter-aia", false, "filter out AIA extension")
+	flagPQEmbeddedSCTs = flag.Bool("pq-embedded-scts", false, "simulate embedded SCTs getting upgraded to post-quantum")
 
 	// Put together some placeholder value based on https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-06.html#name-log-ids
 	placeholderIssuer = []byte{0x30, 0x14, 0x31, 0x12, 0x30, 0x10, 0x06, 0x08, 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x00, 0x00, 0x0d, 0x04, 0xd6, 0x79, 0x09, 0x01}
@@ -152,6 +153,47 @@ func tbsCertLogEntryFromCert(cert *x509.Certificate) []byte {
 	return b.BytesOrPanic()
 }
 
+type embeddedSCTInfo struct {
+	numSCTs int
+	totSig  int
+}
+
+func parseEmbeddedSCTs(cert *x509.Certificate) (embeddedSCTInfo, error) {
+	var info embeddedSCTInfo
+	var ext *pkix.Extension
+	for i := range cert.Extensions {
+		if cert.Extensions[i].Id.Equal(oidSCTExtension) {
+			ext = &cert.Extensions[i]
+			break
+		}
+	}
+	if ext == nil {
+		return info, nil
+	}
+
+	value := cryptobyte.String(ext.Value)
+	var sctList, scts cryptobyte.String
+	if !value.ReadASN1(&sctList, cbasn1.OCTET_STRING) || !value.Empty() ||
+		!sctList.ReadUint16LengthPrefixed(&scts) || !sctList.Empty() ||
+		scts.Empty() {
+		return embeddedSCTInfo{}, fmt.Errorf("error parsing SCT extension")
+	}
+	for !scts.Empty() {
+		var sct, ctExts, sig cryptobyte.String
+		if !scts.ReadUint16LengthPrefixed(&sct) ||
+			!sct.Skip(1+32+8) || // version, id, timestamp
+			!sct.ReadUint16LengthPrefixed(&ctExts) ||
+			!sct.Skip(2) || // sigalg
+			!sct.ReadUint16LengthPrefixed(&sig) ||
+			!sct.Empty() {
+			return embeddedSCTInfo{}, fmt.Errorf("error parsing SCT extension")
+		}
+		info.numSCTs++
+		info.totSig += len(sig)
+	}
+	return info, nil
+}
+
 func fetchTreeSize(baseURL *url.URL) (int, error) {
 	resp, err := http.Get(baseURL.JoinPath("checkpoint").String())
 	if err != nil {
@@ -244,6 +286,7 @@ func do() error {
 	fmt.Printf("Sampling from log %s\n", *flagURL)
 	fmt.Printf("Filtering AIA in simulated MTC tiles: %t\n", *flagFilterAIA)
 	fmt.Printf("Filtering SKID/AKID in simulated MTC tiles: %t\n", *flagFilterKeyIDs)
+	fmt.Printf("Including embedded SCTs in PQ simulation: %t\n", *flagPQEmbeddedSCTs)
 
 	treeSize, err := fetchTreeSize(baseURL)
 	if err != nil {
@@ -278,14 +321,19 @@ func do() error {
 		pqIncrease := 0
 		b := cryptobyte.NewBuilder(nil)
 		for _, cert := range certs {
+			scts, err := parseEmbeddedSCTs(cert)
+			if err != nil {
+				return err
+			}
+
 			// As a very, very rough estimate of the status quo with PQ,
-			// subtract the size of the SPKI and the signature, then replace
-			// them with ML-DSA-44.
-			//
-			// This is actually an underestimate because embedded SCTs end up in
-			// logs today.
+			// simulate replacing the leaf SPKI, leaf signature, and embedded
+			// SCT signatures with ML-DSA-44.
 			pqIncrease += mldsaPublicKey - len(cert.RawSubjectPublicKeyInfo)
 			pqIncrease += mldsaSignature - len(cert.Signature)
+			if *flagPQEmbeddedSCTs {
+				pqIncrease += scts.numSCTs*mldsaSignature - scts.totSig
+			}
 
 			// Construct the new tiles.
 			entry := tbsCertLogEntryFromCert(cert)
