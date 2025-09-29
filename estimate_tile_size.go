@@ -31,10 +31,6 @@ const (
 	fullTileSize = 256
 
 	tbsCertEntry = 1
-
-	// Sizes for ML-DSA-44
-	mldsaPublicKey = 1312
-	mldsaSignature = 2420
 )
 
 var (
@@ -43,10 +39,28 @@ var (
 	flagFilterKeyIDs   = flag.Bool("filter-key-id", false, "filter out SKID and AKID extensions")
 	flagFilterAIA      = flag.Bool("filter-aia", false, "filter out AIA extension")
 	flagPQEmbeddedSCTs = flag.Bool("pq-embedded-scts", false, "simulate embedded SCTs getting upgraded to post-quantum")
+	flagPQAlg          = flag.String("pq-alg", "ML-DSA-44", "the PQ algorithm to simulate")
 
 	// Put together some placeholder value based on https://www.ietf.org/archive/id/draft-davidben-tls-merkle-tree-certs-06.html#name-log-ids
 	placeholderIssuer = []byte{0x30, 0x14, 0x31, 0x12, 0x30, 0x10, 0x06, 0x08, 0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x00, 0x00, 0x0d, 0x04, 0xd6, 0x79, 0x09, 0x01}
 )
+
+type pqAlgorithm struct {
+	publicKeySize int
+	signatureSize int
+}
+
+func getPQAlgorithm(alg string) (pqAlgorithm, bool) {
+	switch alg {
+	case "ML-DSA-44":
+		return pqAlgorithm{publicKeySize: 1312, signatureSize: 2420}, true
+	case "ML-DSA-65":
+		return pqAlgorithm{publicKeySize: 1952, signatureSize: 3309}, true
+	case "ML-DSA-87":
+		return pqAlgorithm{publicKeySize: 2592, signatureSize: 4627}, true
+	}
+	return pqAlgorithm{}, false
+}
 
 // Extracts leaf certificates from a data tile, as defined in https://c2sp.org/static-ct-api
 func parseDataTile(tile []byte, n int) ([]*x509.Certificate, error) {
@@ -282,11 +296,17 @@ func do() error {
 	if !baseURL.IsAbs() {
 		return errors.New("not a valid URL")
 	}
+	pqAlg, ok := getPQAlgorithm(*flagPQAlg)
+	if !ok {
+		return fmt.Errorf("unknown post-quantum algorithm: %s", *flagPQAlg)
+	}
 
 	fmt.Printf("Sampling from log %s\n", *flagURL)
 	fmt.Printf("Filtering AIA in simulated MTC tiles: %t\n", *flagFilterAIA)
 	fmt.Printf("Filtering SKID/AKID in simulated MTC tiles: %t\n", *flagFilterKeyIDs)
+	fmt.Printf("Simulating PQ with %s\n", *flagPQAlg)
 	fmt.Printf("Including embedded SCTs in PQ simulation: %t\n", *flagPQEmbeddedSCTs)
+	fmt.Printf("\n")
 
 	treeSize, err := fetchTreeSize(baseURL)
 	if err != nil {
@@ -328,11 +348,11 @@ func do() error {
 
 			// As a very, very rough estimate of the status quo with PQ,
 			// simulate replacing the leaf SPKI, leaf signature, and embedded
-			// SCT signatures with ML-DSA-44.
-			pqIncrease += mldsaPublicKey - len(cert.RawSubjectPublicKeyInfo)
-			pqIncrease += mldsaSignature - len(cert.Signature)
+			// SCT signatures with the chosen PQ algorithm.
+			pqIncrease += pqAlg.publicKeySize - len(cert.RawSubjectPublicKeyInfo)
+			pqIncrease += pqAlg.signatureSize - len(cert.Signature)
 			if *flagPQEmbeddedSCTs {
-				pqIncrease += scts.numSCTs*mldsaSignature - scts.totSig
+				pqIncrease += scts.numSCTs*pqAlg.signatureSize - scts.totSig
 			}
 
 			// Construct the new tiles.
@@ -363,7 +383,7 @@ func do() error {
 	compareStats(newStats, oldStats)
 	compareStats(newStats, oldPQStats)
 	fmt.Printf("\n")
-	fmt.Printf("old + PQ estimated with ML-DSA-44. new + PQ would be the same as new.\n")
+	fmt.Printf("new + PQ would be the same as new.\n")
 	return nil
 }
 
