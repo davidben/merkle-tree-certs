@@ -216,11 +216,15 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
-This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}.
+This document additionally uses the TLS presentation language defined in {{Section 3 of !RFC8446}}, as well as the notation defined in {{Section 2.1.1 of !RFC9162}}.
 
 `U+` followed by four hexadecimal characters denotes a Unicode codepoint, to be encoded in UTF-8 {{!RFC3629}}. `0x` followed by two hexadecimal characters denotes a byte value in the 0-255 range.
 
 `[start, end)`, where `start <= end`, denotes the half-open interval containing integers `x` such that `start <= x < end`.
+
+Given a non-negative integer `n`, `LSB(n)` refers to the least-significant bit of `n`'s binary representation. Equivalently, it is the remainder when `n` is divided by 2.
+
+To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2.
 
 ## Terminology and Roles
 
