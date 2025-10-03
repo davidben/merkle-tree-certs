@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 2 April 2026                                                   
+Expires: 6 April 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                       29 September 2025
+                                                          3 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 April 2026.
+   This Internet-Draft will expire on 6 April 2026.
 
 Copyright Notice
 
@@ -232,7 +232,8 @@ Table of Contents
    capitals, as shown here.
 
    This document additionally uses the TLS presentation language defined
-   in Section 3 of [RFC8446].
+   in Section 3 of [RFC8446], as well as the notation defined in
+   Section 2.1.1 of [RFC9162].
 
    U+ followed by four hexadecimal characters denotes a Unicode
    codepoint, to be encoded in UTF-8 [RFC3629]. 0x followed by two
@@ -240,6 +241,14 @@ Table of Contents
 
    [start, end), where start <= end, denotes the half-open interval
    containing integers x such that start <= x < end.
+
+   Given a non-negative integer n, LSB(n) refers to the least-
+   significant bit of n's binary representation.  Equivalently, it is
+   the remainder when n is divided by 2.
+
+   To _right-shift_ a non-negative integer n is to shift each bit in its
+   binary representation to one lower position, discarding the least-
+   significant bit.  Equivalently, it is the floor of n divided by 2.
 
 2.1.  Terminology and Roles
 
