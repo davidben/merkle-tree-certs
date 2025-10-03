@@ -246,8 +246,8 @@ Table of Contents
    significant bit of n's binary representation.  Equivalently, it is
    the remainder when n is divided by 2.
 
-   To _right-shift_ a non-negative integer n by one bit is to shift all
-   bits in its binary representation by one bit, discarding the least-
+   To _right-shift_ a non-negative integer n is to shift each bit in its
+   binary representation to one lower position, discarding the least-
    significant bit.  Equivalently, it is the floor of n divided by 2.
 
 2.1.  Terminology and Roles
