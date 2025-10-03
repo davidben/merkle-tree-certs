@@ -222,9 +222,15 @@ This document additionally uses the TLS presentation language defined in {{Secti
 
 `[start, end)`, where `start <= end`, denotes the half-open interval containing integers `x` such that `start <= x < end`.
 
-Given a non-negative integer `n`, `LSB(n)` refers to the least-significant bit of `n`'s binary representation. Equivalently, it is the remainder when `n` is divided by 2.
+Given a non-negative integer `n`,
 
-To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2.
+* `LSB(n)` refers to the least-significant bit of `n`'s binary representation. Equivalently, it is the remainder when `n` is divided by 2.
+
+* `BIT_WIDTH(n)` refers to the smallest number of bits needed to represent `n`. `BIT_WIDTH(0)` is zero.
+
+* `POPCOUNT(n)` refers to the number of set bits in `n`'s binary representation`.
+
+To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2. Given non-negative integers `a` and `b`, `a >> b` refers to `a` right-shifted `b` times.
 
 ## Terminology and Roles
 
@@ -419,6 +425,8 @@ Subtrees are Merkle Trees, so entries can be proven to be contained in the subtr
 
 Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash `entry_hash`, of a subtree `[start, end)`, the subtree inclusion proof can be *evaluated* to compute the expected subtree hash:
 
+<!-- If changing this procedure, remember to update {{inclusion-proof-bits}} -->
+
 1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `start <= index < end`. If either do not hold, fail proof evaluation.
 
 1. Set `fn` to `index - start` and `sn` to `end - start - 1`.
@@ -446,6 +454,8 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 1. Return `r` as the expected subtree hash.
 
 This is the same as the procedure in {{Section 2.1.3.2 of !RFC9162}}, where `leaf_index` is `index - start`, `tree_size` is `end - start`, and `r` is returned instead of compared with `root_hash`.
+
+{{inclusion-proof-bits}} explains this procedure in more detail.
 
 ### Verifying a Subtree Inclusion Proof
 
@@ -516,6 +526,8 @@ The following procedure can be used to verify a subtree consistency proof.
 
 Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a consistency proof `proof`, a subtree hash `node_hash`, and a root hash `root_hash`:
 
+<!-- If changing this procedure, remember to update {{consistency-proof-bits}} -->
+
 1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= end`.
 1. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
 1. If `sn` is `tn`, then:
@@ -536,6 +548,8 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
       1. Set `sr` to `HASH(0x01 || sr || c)`.
    1. Right-shift `fn`, `sn`, and `tn` once more.
 1. Compare `tn` to `0`, `fr` to `node_hash`, and `sr` to `root_hash`. If any are not equal, fail the proof verification. If all are equal, accept the proof.
+
+{{consistency-proof-bits}} explains this procedure in more detail.
 
 ## Arbitrary Intervals
 
@@ -1423,6 +1437,100 @@ at-trustAnchorID ATTRIBUTE ::= {
 END
 ~~~
 
+# Merkle Tree Structure
+
+This non-normative section describes how the Merkle Tree structure relates to the binary representations of indices. It is included to help implementors understand the procedures described in {{subtrees}}.
+
+## Binary Representations
+
+Within a Merkle Tree whose size is a power of two, the binary representation of an leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. {{fig-merkle-tree-bits-full}} demonstrates this in a Merkle Tree of size 8:
+
+~~~aasvg
+       +----------------+
+       |     [0, 8)     |        level 3
+       +----------------+
+        /              \
+   +--------+      +--------+
+   | [0, 4) |      | [4, 8) |    level 2
+   +--------+      +--------+
+    /      \        /      \
++-----+ +-----+ +-----+ +-----+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)|  level 1
++-----+ +-----+ +-----+ +-----+
+  / \     / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5| |6| |7|  level 0
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+~~~
+{: #fig-merkle-tree-bits-full title="An example Merkle tree of size 8"}
+
+The binary representation of `4` is `0b100`. It is the left (0) child of `[4, 6)`, which is the left (0) child of `[4, 8)`, which is the right (1) child of `[0, 8)`.
+
+Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, let `s` be the smallest power of two that is greater than or equal to `end - start`. The node's level is `log2(s)`.
+
+Comparing two indices determines how the two paths diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. Numbering bits from least to most significant, with the least significant bit numbered zero, they share bit 2 but diverge at bit 1. The paths to leaves 4 and 6 diverges when moving from level 2 to level 1.
+
+This can be generalized to arbitrary-sized Merkle trees. {{fig-merkle-tree-bits-partial}} depicts a Merkle Tree of size 6:
+
+~~~aasvg
+       +--------------+
+       |     [0, 6)   |   level 3
+       +--------------+
+        /          |
+   +--------+      |
+   | [0, 4) |      *      level 2
+   +--------+      |
+    /      \       |
++-----+ +-----+ +-----+
+|[0,2)| |[2,4)| |[4,6)|   level 1
++-----+ +-----+ +-----+
+  / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5|   level 0
++-+ +-+ +-+ +-+ +-+ +-+
+~~~
+{: #fig-merkle-tree-bits-partial title="An example Merkle tree of size 6"}
+
+When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. These can be seen in the binary representation of the last element of the tree. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
+
+Compared to a tree of the next power of two size, here {{fig-merkle-tree-bits-full}}, the skipped nodes are where the last element *would* have been a left child, had there been enough elements to construct a right sibling.
+
+This is additionally true for any indices before they diverge from the rightmost edge. The binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
+
+## Inclusion Proof Evaluation {#inclusion-proof-bits}
+
+The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by staring from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
+
+Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes by based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start`. The procedure additionally follows `sn = end - start - 1`, the path to the last element.
+
+Step 4 iterates through `inclusion_proof` and bit positions in parallel. Comparing `sn` to zero ensures that the two iterators stop together, i.e. there aren't extra or missing inclusion proof entries.
+
+Iterating from level 0 up, `fn` and `sn` will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in {{binary-representations}}.
+
+Once `fn = sn`, the procedure has reached the point where the path diverges from the right edge. At that point, the condition in step 4.2 is always tree. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.
+
+Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes `l1 = BIT_WIDTH(fn XOR sn)` proof entries. The second stage consumes `l2 = POPCOUNT(fn >> l1)` proof entries. A valid inclusion proof must then have `l1 + l2` entries. The first `l1` entries are hashed based on `fn`'s least significant bits, and the remaining `l2` entries are hashed on the left.
+
+## Consistency Proof Verification {#consistency-proof-bits}
+
+The procedure in {{verifying-a-subtree-consistency-proof}} iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
+
+A subtree consistency proof for `[start, end)` with the tree of `n` elements is a truncated inclusion proof for element `end - 1`. The proof is truncated until the highest common node between the right edge of `[start, end)` and the right edge of the tree.
+
+Steps 3 and 4 skip to this common node. It may be:
+
+* The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n`, or if `[start, end)` is full.
+
+* Otherwise, the highest full subtree along the right edge of `[start, end)`.
+
+In the first case, `fn` will equal `sn` after truncation. Step 5 will then initialize the hashes to `node_hash`. The consistency proof does not need to include a separate copy of `node_hash`.
+
+In the second case, `fn` is less than `sn`. Step 6 will then initialize the hashes to the first value in the consistency proof.
+
+From there, step 6 incorporates the consistency proof into `sr` as in inclusion proof evaluation. In parallel, step 7.2.1 incorporates a subset of the hashes into `fr`, ony of those subtrees are contained within `[start, end)`. Specifically, it incorporates only those hashes to the left of the path, and stops incorporating when `fn` and `sn` have no longer diverged.
+
+In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always false, and `fr` is always equal to `node_hash` in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree `[fn, sn + 1)` and truncated tree `tn + 1`.
+
 # Extensions to Tiled Transparency Logs (To Be Removed)
 
 [[TODO: This section is expected to be removed. It is sketched here purely for illustrative purposes, until the features are defined somewhere else, e.g. in the upstream tlog documents.]]
@@ -1596,3 +1704,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Clarify landmark zero
 
 - Clarify signature verification process
+
+- Add an appendix that explains the Merkle Tree proof procedures
