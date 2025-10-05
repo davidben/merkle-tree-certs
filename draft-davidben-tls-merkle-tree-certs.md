@@ -427,7 +427,7 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 
 1. For each value `p` in the `inclusion_proof` array:
 
-   1. If `sn` is 0, then stop the iteration and fail the proof verification.
+   1. If `sn` is 0, then stop the iteration and fail proof evaluation.
 
    1. If `LSB(fn)` is set, or if `fn` is equal to `sn`, then:
 
