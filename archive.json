@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-21T02:04:31.436008+00:00",
+  "timestamp": "2025-10-05T02:04:48.467714+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2551,6 +2551,24 @@
       "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
       "createdAt": "2025-09-18T17:26:53Z",
       "updatedAt": "2025-09-18T17:26:53Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 147,
+      "id": "I_kwDOJIBkVc7PZWMx",
+      "title": "Explain the proof verification procedures in an appendix",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/147",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "davidben"
+      ],
+      "labels": [],
+      "body": "We borrowed them from 9162, which also didn't explain them, but it's probably worth doing so.",
+      "createdAt": "2025-10-03T02:21:25Z",
+      "updatedAt": "2025-10-03T02:21:25Z",
       "closedAt": null,
       "comments": []
     }
@@ -8656,6 +8674,50 @@
           "body": "I considered suggesting we add an explanatory sentence to \u201cThis is the same as the procedure [\u2026]\u201d because it\u2019s now not as obvious, but it seemed awkward so\u2026 meh.",
           "createdAt": "2025-09-17T14:59:54Z",
           "updatedAt": "2025-09-17T14:59:54Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 148,
+      "id": "PR_kwDOJIBkVc6sCqic",
+      "title": "List out some notation we use in Conventions and Definitions",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/148",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "lukevalenta"
+      ],
+      "labels": [],
+      "body": "We never defined LSB. Also call out that we use a bunch of notation (a || b, A : B, D[k1:k2]) from RFC 9162.",
+      "createdAt": "2025-10-03T22:23:15Z",
+      "updatedAt": "2025-10-03T22:38:51Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "0acf655b3161629bfecb5870ca2666b4aec61770",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "notation",
+      "headRefOid": "5966a7ca842b8f3dc3c27f2eb3caad9dd538f3bc",
+      "closedAt": "2025-10-03T22:38:49Z",
+      "mergedAt": "2025-10-03T22:38:49Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "24e4ff9f3ca3890f33659567ccec76110c48d898"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7Ew_TW",
+          "commit": {
+            "abbreviatedOid": "5966a7c"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-10-03T22:25:50Z",
+          "updatedAt": "2025-10-03T22:25:50Z",
           "comments": []
         }
       ]
