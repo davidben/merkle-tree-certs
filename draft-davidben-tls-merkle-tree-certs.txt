@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 6 April 2026                                                   
+Expires: 8 April 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          3 October 2025
+                                                          5 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 April 2026.
+   This Internet-Draft will expire on 8 April 2026.
 
 Copyright Notice
 
@@ -536,8 +536,8 @@ Table of Contents
 
    4.  For each value p in the inclusion_proof array:
 
-       1.  If sn is 0, then stop the iteration and fail the proof
-           verification.
+       1.  If sn is 0, then stop the iteration and fail proof
+           evaluation.
 
        2.  If LSB(fn) is set, or if fn is equal to sn, then:
 
