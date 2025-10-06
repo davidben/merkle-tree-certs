@@ -516,7 +516,7 @@ The following procedure can be used to verify a subtree consistency proof.
 
 Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a consistency proof `proof`, a subtree hash `node_hash`, and a root hash `root_hash`:
 
-1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= end`.
 1. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
 1. If `sn` is `tn`, then:
    1. Until `fn` is `sn`, right-shift `fn`, `sn`, and `tn` equally.
