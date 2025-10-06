@@ -1466,7 +1466,7 @@ Within a Merkle Tree whose size is a power of two, the binary representation of 
 
 The binary representation of `4` is `0b100`. It is the left (0) child of `[4, 6)`, which is the left (0) child of `[4, 8)`, which is the right (1) child of `[0, 8)`.
 
-Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, let `s` be the smallest power of two that is greater than or equal to `end - start`. The node's level is `log2(s)`.
+Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, the node's level is `BIT_WIDTH(end - start - 1)`.
 
 Comparing two indices determines how the two paths diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. Numbering bits from least to most significant, with the least significant bit numbered zero, they share bit 2 but diverge at bit 1. The paths to leaves 4 and 6 diverges when moving from level 2 to level 1.
 
