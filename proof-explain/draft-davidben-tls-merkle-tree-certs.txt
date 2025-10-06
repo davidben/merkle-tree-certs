@@ -2732,8 +2732,7 @@ B.1.  Binary Representations
    correspondingly numbered, with 0 indicating the least-significant bit
    and the leaf level, and so on.  In this numbering, a node's level can
    be determined as follows: if the node is a root of subtree [start,
-   end), let s be the smallest power of two that is greater than or
-   equal to end - start.  The node's level is log2(s).
+   end), the node's level is BIT_WIDTH(end - start - 1).
 
    Comparing two indices determines how the two paths diverge.  For
    example, the bit representations of 4 and 6 are 0b100 and 0b110,
