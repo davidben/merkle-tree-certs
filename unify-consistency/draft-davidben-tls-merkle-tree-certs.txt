@@ -637,6 +637,7 @@ Table of Contents
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
        that end <= n.  If either do not hold, fail proof verification.
+       These checks imply 0 <= start < end <= end.
 
    2.  Set fn to start, sn to end - 1, and tn to n - 1.
 
