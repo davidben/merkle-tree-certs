@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-05T02:04:48.467714+00:00",
+  "timestamp": "2025-10-07T01:54:52.698811+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2550,9 +2550,17 @@
       "labels": [],
       "body": "When we recast MTC as X.509, we picked up all of X.509's semantics, including the fact that a CA can, at least mechanically, issue non-MTC intermediate certificates. Doing so partially bypasses transparency benefits because only the intermediate is logged, not certificates chaining off of it.\n\nI say partially because the fact that the CA has done so is definitely visible in the log. But if the intermediate is unconstrained, and a PKI is okay with it, then we don't actually know what certificates are valid. But this might vary a lot by PKI:\n\n* Maybe your PKI is okay with transparency stopping at an intermediate, as long as it has name constraints, but it's not okay with intermediates without name constraints.\n\n* Maybe your PKI is the above, but its notion of \"name\" is something other than SANs + name constraints and is looking for a random other X.509 extension\n\n* Maybe you do not want to support this at all and want to forbid all intermediates\n\n* Maybe you're just unabashedly okay with all transparency stopping at any intermediate for... some reason? I can't come up with a reason for this.\n\nIf there's a range of options, one plausible, if a bit unsatisfying, answer is that we solve this by policy. X.509 often forces us down this path, sadly. :-( We say that the MTC mechanism itself has no opinion on this, but that a relying party and root program might (and probably should!) opine on this and say what they do and don't allow.\n\nIn that case, the spec should say something about this and note that you need to pick something. We also need the technical mechanisms to apply that policy.\n\nAt a bare minimum, the technical mechanism is \"monitors can see everything the CA signs and know to look for this\" and \"relying parties will hold the CA responsible for detected violations in trust decisions\". If you see a CA=true certificate in the log, you need to treat it as impacting _every_ name (up to constraints) and monitor it it accordingly.\n\nYou might also want relying party enforcement in code so that, even if it is in there, the relying party won't accept it. For at least the \"this CA should not issue intermediates period\" policy, there is _almost_ a natural mechanism in X.509 already: path length constraints.\n\nBut only _almost_ because X.509 special-cases self-issued certificates everywhere as part of key rollover. Is it worth updating RFC 5280 to knock out the self-issued special case? (Alternatively, the enforcement can just be using some extra mechanism. Relying parties add checks atop RFC 5280 path validation all the time.)",
       "createdAt": "2025-09-18T17:26:53Z",
-      "updatedAt": "2025-09-18T17:26:53Z",
+      "updatedAt": "2025-10-06T20:37:18Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Places where RFC 5280 special-cases self-issued certificates:\n\n* pathLenConstraint does not count self-issued certificates\n* Name constraints are not applied to SANs in self-issued certificates, unless the certificate is the final one\n* The inhibitAnyPolicy counter does not count self-issued certificates\n* The requireExplicitPolicy counter does not count self-issued certificates",
+          "createdAt": "2025-10-06T20:35:16Z",
+          "updatedAt": "2025-10-06T20:37:18Z"
+        }
+      ]
     },
     {
       "number": 147,
@@ -8718,6 +8726,222 @@
           "body": "",
           "createdAt": "2025-10-03T22:25:50Z",
           "updatedAt": "2025-10-03T22:25:50Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 149,
+      "id": "PR_kwDOJIBkVc6sSGpH",
+      "title": "Unify the two branches in the consistency proof check",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/149",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Also replace prepending to the proof list with removing in the other branch. It makes it a little obvious how to implement this without making a copy of the proof. This should also hopefully make the relationship between inclusion and consistency proof evaluation clearer.\r\n\r\nWhile I'm here, use '1.' for the steps so we don't have to renumber it as it changes.\r\n\r\n(CC @nharper)",
+      "createdAt": "2025-10-06T14:09:54Z",
+      "updatedAt": "2025-10-06T22:25:19Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "edbcb0a2ad1ec530c01bd555d4f81ec42f8121fe",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "unify-consistency",
+      "headRefOid": "27988cae15ecd5d242d65f45171fc3ddb62a0ce7",
+      "closedAt": "2025-10-06T22:25:17Z",
+      "mergedAt": "2025-10-06T22:25:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "ddafe7889a99a477a99e2eb0a9da1fe555b58a27"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7FDksq",
+          "commit": {
+            "abbreviatedOid": "d2d5021"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Nice refactor! Just a couple comments.",
+          "createdAt": "2025-10-06T17:02:12Z",
+          "updatedAt": "2025-10-06T20:51:48Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "As I'm re-implementing this logic, I found a panic in the original version of my code when `n = 0` due to an underflow. The fact that `[start, end)` is a subtree of the tree of size `n` implies that `0 <= start < end <= n` so it must be the case that `end > 0` and `n > 0`, but maybe we should add an explicit note about that?",
+              "createdAt": "2025-10-06T18:05:34Z",
+              "updatedAt": "2025-10-06T20:51:48Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "We could collapse lines 520-523:\r\n```suggestion\r\n1. Right-shift `fn`, `sn`, and `tn` equally until either `fn` is `sn` or both `sn` is not `tn` and `LSB(sn)` is not set.\r\n```",
+              "createdAt": "2025-10-06T20:22:20Z",
+              "updatedAt": "2025-10-06T20:51:48Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "And maybe swap the until to the start for consistency with below (or switch below to be consistent with this). Although maybe this doesn't read as well:\r\n```suggestion\r\n1. Until either `fn` is `sn` or both `sn` is not `tn` and `LSB(sn)` is not set, right-shift `fn`, `sn`, and `tn` equally.\r\n```",
+              "createdAt": "2025-10-06T20:50:24Z",
+              "updatedAt": "2025-10-06T20:51:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7FJEfT",
+          "commit": {
+            "abbreviatedOid": "27988ca"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-06T21:27:31Z",
+          "updatedAt": "2025-10-06T21:39:59Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Hmm... how about we just make the function check the preconditions? It's fallible anyway, and makes it consistent with the inclusion proof version. Arguably it's redundant with the \"type signature\" but people will be sloppy.",
+              "createdAt": "2025-10-06T21:27:31Z",
+              "updatedAt": "2025-10-06T21:39:59Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "Ah yeah, probably good to make that consistent. No strong feelings about whether the condition or the action is first. I did condition, action just to match what was previously there.\r\n\r\nRe collapsing, I had one version where it was one expression, but having both AND and OR in the same English expression felt pushing it w.r.t. readability. Though it's not toooo bad if you put the condition last? I dunno. No very strong feelings either way. WDYT?\r\n\r\nStrictly speaking, to convince yourself that the two are the same, you have to believe that `sn` can't become `tn` partway through the loop and through you off. But if `sn != tn`, we know that `sn < tn`, which means that we'll hit \"`LSB(sn)` is not set\" before `sn` becomes equal to `tn`.",
+              "createdAt": "2025-10-06T21:38:30Z",
+              "updatedAt": "2025-10-06T21:39:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7FJfwr",
+          "commit": {
+            "abbreviatedOid": "d2d5021"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-06T21:52:33Z",
+          "updatedAt": "2025-10-06T21:52:33Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "I think the \u2018both\u2019 helps to make it unambiguous (and Gemini agreed), but it does take a little more brain power to process so I\u2019m fine with keeping it separated out.\r\n\r\nOoh yeah that\u2019s a good point about checking if sn is tn initially vs in the loop condition. I think not condensing is the right call.",
+              "createdAt": "2025-10-06T21:52:33Z",
+              "updatedAt": "2025-10-06T21:54:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7FJ34t",
+          "commit": {
+            "abbreviatedOid": "d2d5021"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-06T22:25:10Z",
+          "updatedAt": "2025-10-06T22:25:11Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "Sounds good. Leaving as-is then!",
+              "createdAt": "2025-10-06T22:25:10Z",
+              "updatedAt": "2025-10-06T22:25:11Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 150,
+      "id": "PR_kwDOJIBkVc6sUSSZ",
+      "title": "Add an appendix that explains the proof procedures",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/150",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "CC @nharper\r\n    \r\nCloses #147",
+      "createdAt": "2025-10-06T16:34:12Z",
+      "updatedAt": "2025-10-06T22:27:44Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "ddafe7889a99a477a99e2eb0a9da1fe555b58a27",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "proof-explain",
+      "headRefOid": "3ffb3a1b3831acdf673e818d3cfee8f18584046c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7FC-dQ",
+          "commit": {
+            "abbreviatedOid": "6b8aa18"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-06T16:34:50Z",
+          "updatedAt": "2025-10-06T16:34:50Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "I used the C++20 names for these operations:\r\nhttps://en.cppreference.com/w/cpp/header/bit.html",
+              "createdAt": "2025-10-06T16:34:50Z",
+              "updatedAt": "2025-10-06T16:34:50Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 151,
+      "id": "PR_kwDOJIBkVc6sZIhF",
+      "title": "Fix typo in consistency proof initial condition",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/151",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-10-07T00:14:59Z",
+      "updatedAt": "2025-10-07T00:30:58Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "ddafe7889a99a477a99e2eb0a9da1fe555b58a27",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lukevalenta-patch-1",
+      "headRefOid": "8ffcd516a577cd8d0d201a9ad57677532c86586e",
+      "closedAt": "2025-10-07T00:30:51Z",
+      "mergedAt": "2025-10-07T00:30:51Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3d9d29f36ebadc7b761323377a219901813794ee"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7FKunQ",
+          "commit": {
+            "abbreviatedOid": "8ffcd51"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-10-07T00:30:45Z",
+          "updatedAt": "2025-10-07T00:30:45Z",
           "comments": []
         }
       ]
