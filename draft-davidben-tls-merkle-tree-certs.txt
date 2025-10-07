@@ -2935,6 +2935,8 @@ Since draft-davidben-tls-merkle-tree-certs-07
 
    *  Clarify signature verification process
 
+   *  Improve subtree consistency proof verification algorithm
+
 Authors' Addresses
 
    David Benjamin
