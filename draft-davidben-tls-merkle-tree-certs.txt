@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 9 April 2026                                                   
+Expires: 10 April 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          6 October 2025
+                                                          7 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 April 2026.
+   This Internet-Draft will expire on 10 April 2026.
 
 Copyright Notice
 
@@ -637,7 +637,7 @@ Table of Contents
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
        that end <= n.  If either do not hold, fail proof verification.
-       These checks imply 0 <= start < end <= end.
+       These checks imply 0 <= start < end <= n.
 
    2.  Set fn to start, sn to end - 1, and tn to n - 1.
 
