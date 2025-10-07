@@ -1596,3 +1596,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Clarify landmark zero
 
 - Clarify signature verification process
+
+- Improve subtree consistency proof verification algorithm
