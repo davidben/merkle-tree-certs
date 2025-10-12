@@ -720,7 +720,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 <!-- If changing this procedure, remember to update {{consistency-proof-bits}} -->
 
-1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= end`.
+1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= n`.
 1. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
 1. If `sn` is `tn`, then:
    1. Until `fn` is `sn`, right-shift `fn`, `sn`, and `tn` equally.
@@ -1961,5 +1961,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Clarify landmark zero
 
 - Clarify signature verification process
+
+- Improve subtree consistency proof verification algorithm
 
 - Add an appendix that explains the Merkle Tree proof procedures
