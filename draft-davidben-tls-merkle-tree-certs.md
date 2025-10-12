@@ -1778,7 +1778,13 @@ In the first case, `fn` will equal `sn` after truncation. Step 5 will then initi
 
 In the second case, `fn` is less than `sn`. Step 6 will then initialize the hashes to the first value in the consistency proof.
 
-From there, step 7 incorporates the consistency proof into `sr` as in inclusion proof evaluation. In parallel, step 7.2.1 incorporates a subset of the hashes into `fr`, ony of those subtrees are contained within `[start, end)`. Specifically, it incorporates only those hashes to the left of the path, and stops incorporating when `fn` and `sn` have no longer diverged.
+From there, step 7 incorporates the consistency proof into `fr` and `sr`:
+
+* All hashes are incorporated into `sr`, with hashing on the left or right determined the same as in inclusion proof evaluation.
+
+* A subset of the hashes are incorporated into `fr`. It skips any hash on the right because those contain elements greater than `end - 1`. It also stops incorporating when `fn` and `sn` have converged.
+
+This reconstructs the hashes of the subtree and full tree, which are then compared to expected values in step 8.
 
 In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always false, and `fr` is always equal to `node_hash` in step 8. In this case, steps 6 through 8 are equivalent to verifying an inclusion proof for the truncated subtree `[fn, sn + 1)` and truncated tree `tn + 1`.
 
