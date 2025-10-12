@@ -865,7 +865,7 @@ Table of Contents
 
    1.  Check that [start, end) is a valid subtree (Section 4.1), and
        that end <= n.  If either do not hold, fail proof verification.
-       These checks imply 0 <= start < end <= end.
+       These checks imply 0 <= start < end <= n.
 
    2.  Set fn to start, sn to end - 1, and tn to n - 1.
 
@@ -3410,6 +3410,8 @@ Since draft-davidben-tls-merkle-tree-certs-07
    *  Clarify landmark zero
 
    *  Clarify signature verification process
+
+   *  Improve subtree consistency proof verification algorithm
 
    *  Add an appendix that explains the Merkle Tree proof procedures
 
