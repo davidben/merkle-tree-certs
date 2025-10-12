@@ -417,9 +417,119 @@ If a subtree is full, then it is directly contained in the tree of hash operatio
 
 If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end`.
 
+## Example Subtrees
+
+{{fig-subtree-example}} shows the subtrees `[4, 8)` and `[8, 13)`:
+
+~~~aasvg
+   +--------+
+   | [4, 8) |
+   +--------+
+    /      \
++-----+ +-----+
+|[4,6)| |[6,8)|
++-----+ +-----+
+  / \     / \
++-+ +-+ +-+ +-+
+|4| |5| |6| |7|
++-+ +-+ +-+ +-+
+
+      +----------------+
+      |     [8, 13)    |
+      +----------------+
+         /          |
+   +---------+      |
+   | [8, 12) |      |
+   +---------+      |
+     /      \       |
++------+ +-------+  |
+|[8,10)| |[10,12)|  |
++------+ +-------+  |
+  / \      / \      |
++-+ +-+ +--+ +--+ +--+
+|8| |9| |10| |11| |12|
++-+ +-+ +--+ +--+ +--+
+~~~
+{: #fig-subtree-example title="Two example subtrees, one full and one partial"}
+
+Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained because `n` (13) is `end` (13).
+
+~~~aasvg
+                +-----------------------------+
+                |            [0, 13)          |
+                +-----------------------------+
+                   /                       \
+       +----------------+             +~~~~~~~~~~~~~~~~+
+       |     [0, 8)     |             |     [8, 13)    |
+       +----------------+             +~~~~~~~~~~~~~~~~+
+        /              \                 /          |
+   +--------+      +========+      +~~~~~~~~~+      |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |      |
+   +--------+      +========+      +~~~~~~~~~+      |
+    /      \        /      \         /      \       |
++-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+  |
+|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
++-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+  |
+  / \     / \     / \     / \     / \      / \      |
++-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+
+|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
++-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+
+~~~
+{: #fig-subtree-containment-example title="A Merkle Tree of size 13"}
+
+In contrast, `[8, 13)` is not directly contained in a Merkle Tree of size 14, depicted in {{fig-subtree-containment-example-2}}. However, the subtree is still computed over consistent elements.
+
+~~~aasvg
+                +-----------------------------+
+                |            [0, 14)          |
+                +-----------------------------+
+                   /                       \
+       +----------------+             +----------------+
+       |     [0, 8)     |             |     [8, 14)    |
+       +----------------+             +----------------+
+        /              \                 /           |
+   +--------+      +--------+      +---------+       |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+   +--------+      +--------+      +---------+       |
+    /      \        /      \         /      \        |
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+  / \     / \     / \     / \     / \      / \       / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+~~~
+{: #fig-subtree-containment-example-2 title="A Merkle Tree of size 14"}
+
 ## Subtree Inclusion Proofs
 
 Subtrees are Merkle Trees, so entries can be proven to be contained in the subtree. A subtree inclusion proof for entry `index` of the subtree `[start, end)` is a Merkle inclusion proof, as defined in {{Section 2.1.3.1 of !RFC9162}}, where `m` is `index - start` and the tree inputs are `D[start:end]`.
+
+Subtree inclusion proofs contain a sequence of nodes that are sufficient to reconstruct the subtree hash, `MTH(D[start:end])`, out of the hash for entry `index`, `MTH({d[index]})`, thus demonstrating that the subtree hash contains the entry's hash.
+
+### Example Subtree Inclusion Proofs
+
+The inclusion proof for entry 10 of subtree `[8, 13)` contains the hashes `MTH({d[11]})`, `MTH(D[8:10])`, and `MTH({d[12]})`, depicted in  {{fig-subtree-inclusion-proof}}. `MTH({d[10]})` is not part of the proof because the verifier is assumed to already know its value.
+
+~~~aasvg
+      +----------------+
+      |     [8, 13)    |
+      +----------------+
+         /          |
+   +---------+      |
+   | [8, 12) |      |
+   +---------+      |
+     /      \       |
++======+ +-------+  |
+|[8,10)| |[10,12)|  |
++======+ +-------+  |
+  / \      / \      |
++-+ +-+ +~~+ +==+ +==+
+|8| |9| |10| |11| |12|
++-+ +-+ +~~+ +==+ +==+
+~~~
+{: #fig-subtree-inclusion-proof title="An example subtree inclusion proof"}
 
 ### Evaluating a Subtree Inclusion Proof
 
@@ -468,6 +578,8 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 ## Subtree Consistency Proofs
 
 A subtree `[start, end)` can be efficiently proven to be consistent with the full Merkle Tree. That is, given `MTH(D[start:end])` and `MTH(D_n)`, the proof demonstrates that the input `D[start:end]` to the subtree hash was equal to the corresponding elements of the input `D_n` to the Merkle Tree hash.
+
+Subtree consistency proofs contain sufficient nodes to reconstruct both the subtree hash, `MTH(D[start:end])`, and the full tree hash, `MTH(D_n)`, in such a way that every input to the subtree hash was also incorporated into the full tree hash.
 
 ### Generating a Subtree Consistency Proof
 
@@ -519,6 +631,86 @@ When `end = start + 1`, this computes a Merkle inclusion proof:
 ~~~pseudocode
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 ~~~
+
+### Example Subtree Consistency Proofs
+
+The subtree consistency proof for `[4, 8)` and a tree of size 14 contains `MTH(D[0:4])` and `MTH(D[8:14])`, depicted in {{fig-subtree-consistency-example-1}}. The verifier is assumed to know the subtree hash, so there is no need to include `MTH(D[4:8])` itself in the consistency proof.
+
+~~~aasvg
+   +~~~~~~~~+
+   | [4, 8) |
+   +~~~~~~~~+
+    /      \
++-----+ +-----+
+|[4,6)| |[6,8)|
++-----+ +-----+
+  / \     / \
++-+ +-+ +-+ +-+
+|4| |5| |6| |7|
++-+ +-+ +-+ +-+
+
+                +-----------------------------+
+                |            [0, 14)          |
+                +-----------------------------+
+                   /                       \
+       +----------------+             +================+
+       |     [0, 8)     |             |     [8, 14)    |
+       +----------------+             +================+
+        /              \                 /           |
+   +========+      +~~~~~~~~+      +---------+       |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+   +========+      +~~~~~~~~+      +---------+       |
+    /      \        /      \         /      \        |
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+  / \     / \     / \     / \     / \      / \       / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
+|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
+~~~
+{: #fig-subtree-consistency-example-1 title="An example subtree consistency proof for a subtree that is directly contained in the full tree"}
+
+The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH({d[12]})`, `MTH({d[12]})`, `MTH(D[8:12])`, and `MTH(D[0:8])`, depicted in {{fig-subtree-consistency-example-2}}. `[8, 13)` is not directly contained in the tree, so the proof must include sufficient nodes to reconstruct both hashes.
+
+~~~aasvg
+      +----------------+
+      |     [8, 13)    |
+      +----------------+
+         /          |
+   +=========+      |
+   | [8, 12) |      |
+   +=========+      |
+     /      \       |
++------+ +-------+  |
+|[8,10)| |[10,12)|  |
++------+ +-------+  |
+  / \      / \      |
++-+ +-+ +--+ +--+ +==+
+|8| |9| |10| |11| |12|
++-+ +-+ +--+ +--+ +==+
+
+                +-----------------------------+
+                |            [0, 14)          |
+                +-----------------------------+
+                   /                       \
+       +================+             +----------------+
+       |     [0, 8)     |             |     [8, 14)    |
+       +================+             +----------------+
+        /              \                 /           |
+   +--------+      +--------+      +=========+       |
+   | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+   +--------+      +--------+      +=========+       |
+    /      \        /      \         /      \        |
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
++-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+  / \     / \     / \     / \     / \      / \       / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
+|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
+~~~
+{: #fig-subtree-consistency-example-2 title="An example subtree consistency proof for a subtree that is not directly contained in the full tree"}
 
 ### Verifying a Subtree Consistency Proof
 
@@ -605,7 +797,7 @@ def find_subtrees(start, end):
     return [(left_start, mid), (mid, end)]
 ~~~
 
-{{fig-subtree-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
+{{fig-subtree-pair-example}} shows the subtrees which cover `[5, 13)` in a Merkle Tree of 13 elements. The two subtrees selected are `[4, 8)` and `[8, 13)`. Note that the subtrees cover a slightly larger interval than `[5, 13)`.
 
 <!-- Ideally we'd use the Unicode box-drawing characters for the text form, but aasvg doesn't support them: https://github.com/martinthomson/aasvg/issues/9 -->
 
@@ -630,7 +822,7 @@ def find_subtrees(start, end):
 |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
 +-+ +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
 ~~~
-{: #fig-subtree-example title="An example selection of subtrees to cover an interval"}
+{: #fig-subtree-pair-example title="An example selection of subtrees to cover an interval"}
 
 Two subtrees are needed because a single subtree may not be able to efficiently cover an interval. {{fig-subtree-counterexample}} shows the smallest subtree that contains `[7, 9)` in a 9-element tree. The smallest single subtree that contains the interval is `[0, 9)` but this is the entire tree. Using two subtrees, the interval can be described by `[7, 8)` and `[8, 9)`.
 
