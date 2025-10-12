@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-07T01:54:52.698811+00:00",
+  "timestamp": "2025-10-12T02:02:46.519827+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -8869,7 +8869,7 @@
       "labels": [],
       "body": "CC @nharper\r\n    \r\nCloses #147",
       "createdAt": "2025-10-06T16:34:12Z",
-      "updatedAt": "2025-10-06T22:27:44Z",
+      "updatedAt": "2025-10-10T23:24:11Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "ddafe7889a99a477a99e2eb0a9da1fe555b58a27",
@@ -8899,6 +8899,68 @@
               "body": "I used the C++20 names for these operations:\r\nhttps://en.cppreference.com/w/cpp/header/bit.html",
               "createdAt": "2025-10-06T16:34:50Z",
               "updatedAt": "2025-10-06T16:34:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7GPMSR",
+          "commit": {
+            "abbreviatedOid": "3ffb3a1"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "Some suggestions and questions, and I need to keep reading.",
+          "createdAt": "2025-10-10T20:40:40Z",
+          "updatedAt": "2025-10-10T23:24:11Z",
+          "comments": [
+            {
+              "originalPosition": 128,
+              "body": "\"the condition in step 4.2 is always tree\": should that be \"is always true\" instead of \"is always tree\"?",
+              "createdAt": "2025-10-10T20:40:40Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "Possibly add:\r\n\r\n> `fn` has the bit pattern that tracks the path from `index` to the root of the subtree, and `sn` has the bit pattern that that tracks the right edge of the subtree.",
+              "createdAt": "2025-10-10T20:42:58Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 124,
+              "body": "Possibly add:\r\n\r\n> Since `sn` tracks the path of the right edge to the root of the subtree, the last direction in this path will always be right, which is a 1 bit, hence `sn` is non-zero exactly when there are additional levels to traverse.",
+              "createdAt": "2025-10-10T20:50:16Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 62,
+              "body": "Nit: should this have `{#binary-representations}` so that if the heading gets renamed, the xref from below will still be correct?",
+              "createdAt": "2025-10-10T20:52:13Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 132,
+              "body": "Something that helped me understand this better was when you told me that `fn`, `sn`, and `tn` stand for \"first number\", \"second number\", and \"third number\". Perhaps that would be useful for others and could be mentioned in this section. I think `r` means \"running hash\"?\r\n\r\n(EDIT 1: Out of scope for this PR, but the naming of `fr` and `sr` implies some correlation between those and `fn` and `sn`. In RFC 9162 2.1.4.2, there is no `tn`, and there is direct correlation between the inputs `first`, `first_hash` and variables `fn` and `fr` (same for `second`, `second_hash`, `sn`, and `sr`). In this MTC draft, the variables `fr` and `sr` seem more closely correlated with `sn` and `tn` than they do with `fn` and `sn`, which makes me think those variables should be renamed. Maybe `sr` and `tr`? Maybe `nh` (node hash) and `rh` (root hash)?)\r\n\r\nEDIT 2 (also out of scope for this PR): Both verification procedures follow the same pattern: initialize some variables, then loop over the proof array and incorporate hashes. Could the variables be renamed so that `fn` and `r` in the inclusion proof procedure have the same names as `sn` and `sr` in the consistency proof procedure? AFAICT, once we're in the loop, those are performing the exact same steps (though the initialization is different). (While we're there, maybe give the same name to `p` in the inclusion proof procedure as `c` in the consistency proof procedure? I'm assuming `p` means \"proof\" and `c` means \"consistency proof\", which isn't consistent.)",
+              "createdAt": "2025-10-10T21:06:27Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "\"From there, step 6 incorporates the consistency proof ...\" Step 6 was initializing `fr` and `sr`, and is described above. I think that sentence is supposed to say \"step 7\" instead of \"step 6\", or I'm misunderstanding something in the verification or this explanation.",
+              "createdAt": "2025-10-10T22:28:17Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 136,
+              "body": "I think something is missing from this description, but I haven't figured it out yet. I'll take another look next week.",
+              "createdAt": "2025-10-10T23:21:59Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
+            },
+            {
+              "originalPosition": 151,
+              "body": "I'm getting a bit of \"and then draw the rest of the owl\" vibes from this. I'll take another look on Monday to see if I can offer a suggestion on more words here.",
+              "createdAt": "2025-10-10T23:22:20Z",
+              "updatedAt": "2025-10-10T23:24:11Z"
             }
           ]
         }
