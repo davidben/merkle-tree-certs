@@ -1685,7 +1685,7 @@ This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-
 
 When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. The rightmost edge is the path to the last element. The skipped levels can be seen in its binary representation. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
 
-In a tree of the next power of two size, the skipped nodes in this path are where there *would* have been a right child, had there been enough elements to construct a right sibling. {{fig-merkle-tree-bits-partial-comparison}} depicts this for a tree of size 6.
+In a tree of the next power of two size, the skipped nodes in this path are where there *would* have been a right child, had there been enough elements to construct one. Without a right child, the hash operation is skipped and a skipped node has the same value as its singular child.{{fig-merkle-tree-bits-partial-comparison}} depicts this for a tree of size 6.
 
 ~~~aasvg
        +----------------+
@@ -1693,7 +1693,7 @@ In a tree of the next power of two size, the skipped nodes in this path are wher
        +----------------+
         /              \
    +--------+      +--------+
-   | [0, 4) |      |  skip  |    level 2
+   | [0, 4) |      | [4, 6) |    level 2
    +--------+      +--------+
     /      \        /      \
 +-----+ +-----+ +-----+ +-----+
@@ -1726,9 +1726,47 @@ Inclusion proofs can also be evaluated by considering these two stages separatel
 
 The procedure in {{verifying-a-subtree-consistency-proof}} iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
 
-A subtree consistency proof for `[start, end)` with the tree of `n` elements is a truncated inclusion proof for element `end - 1`. The proof is truncated until the highest common node between the right edge of `[start, end)` and the right edge of the tree.
+A subtree consistency proof for `[start, end)` and the tree of `n` elements is very similar to an inclusion proof for element `end - 1`. Starting at this element, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. However, instead of starting at level 0, the proof can be optimized to start at a higher level, specifically the highest ancestor of `end - 1` that is also directly contained in the tree.
 
-Steps 3 and 4 skip to this common node. It may be:
+{{fig-truncate-consistency-proof}} depicts a subtree consistency proof between the subtree `[0, 6)` and the Merkle Tree of size 7. The consistency proof begins at level 1, or node `[4, 6)`. Note that, although element 6 at level 0 is in the consistency proof, there is a corresponding skipped node at level 1, the starting level. To demonstrate this, the figure denotes skipped nodes with duplicate values.
+
+~~~aasvg
+       +----------------+
+       |     [0, 6)     |       level 3
+       +----------------+
+        /           |
+   +========+  +--------+
+   | [0, 4) |  | [4, 6) |       level 2
+   +========+  +--------+
+    /      \        |
++-----+ +-----+ +~~~~~+
+|[0,2)| |[2,4)| |[4,6)|         level 1
++-----+ +-----+ +~~~~~+
+  / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5|         level 0
++-+ +-+ +-+ +-+ +-+ +-+
+
+
+       +----------------+
+       |     [0, 7)     |       level 3
+       +----------------+
+        /              \
+   +========+      +--------+
+   | [0, 4) |      | [4, 7) |   level 2
+   +========+      +--------+
+    /      \        /    |
++-----+ +-----+ +~~~~~+ +=+
+|[0,2)| |[2,4)| |[4,6)| |6|     level 1
++-----+ +-----+ +~~~~~+ +=+
+  / \     / \     / \    |
++-+ +-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5| |6|     level 0
++-+ +-+ +-+ +-+ +-+ +-+ +-+
+~~~
+{: #fig-truncate-consistency-proof title="A subtree consistency proof that starts at level 1 instead of level 0"}
+
+Steps 3 and 4 skip to this starting node. The starting node may be:
 
 * The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n`, or if `[start, end)` is full.
 
