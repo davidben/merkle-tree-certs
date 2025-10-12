@@ -1712,9 +1712,9 @@ Zero bits also indicate skipped nodes in paths that have not yet diverged from t
 
 The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by staring from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
 
-Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes by based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start`. The procedure additionally follows `sn = end - start - 1`, the path to the last element.
+Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes by based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start` (first number), and the last element has index `sn = end - start - 1` (second number).
 
-Step 4 iterates through `inclusion_proof` and bit positions in parallel. Comparing `sn` to zero ensures that the two iterators stop together, i.e. there aren't extra or missing inclusion proof entries.
+Step 4 iterates through `inclusion_proof` and the paths to `fn` and `sn` in parallel. As the procedure right-shifts `fn` and `sn` and looks at the least-significant bit, it moves up the two paths, towards the root. When `sn` is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.
 
 Iterating from level 0 up, `fn` and `sn` will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in {{binary-representations}}.
 
