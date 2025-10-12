@@ -1683,11 +1683,30 @@ This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-
 ~~~
 {: #fig-merkle-tree-bits-partial title="An example Merkle Tree of size 6"}
 
-When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. These can be seen in the binary representation of the last element of the tree. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
+When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. The rightmost edge is the path to the last element. The skipped levels can be seen in its binary representation. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
 
-Compared to a tree of the next power of two size, here {{fig-merkle-tree-bits-full}}, the skipped nodes are where the last element *would* have been a left child, had there been enough elements to construct a right sibling.
+In a tree of the next power of two size, the skipped nodes in this path are where there *would* have been a right child, had there been enough elements to construct a right sibling. {{fig-merkle-tree-bits-partial-comparison}} depicts this for a tree of size 6.
 
-This is additionally true for any indices before they diverge from the rightmost edge. The binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
+~~~aasvg
+       +----------------+
+       |     [0, 6)     |        level 3
+       +----------------+
+        /              \
+   +--------+      +--------+
+   | [0, 4) |      |  skip  |    level 2
+   +--------+      +--------+
+    /      \        /      \
++-----+ +-----+ +-----+ +-----+
+|[0,2)| |[2,4)| |[4,6)| |     |  level 1
++-----+ +-----+ +-----+ +-----+
+  / \     / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5| | | | |  level 0
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+~~~
+{: #fig-merkle-tree-bits-partial-comparison title="An example Merkle Tree of size 6, viewed as a subset of a tree of size 8"}
+
+Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
 
 ## Inclusion Proof Evaluation {#inclusion-proof-bits}
 
