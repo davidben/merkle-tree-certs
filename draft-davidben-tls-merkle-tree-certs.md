@@ -553,7 +553,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 
 ## Arbitrary Intervals
 
-Not all `[start, end)` intervals of a Merkle tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:
+Not all `[start, end)` intervals of a Merkle Tree are valid subtrees. This section describes how, for any `start < end`, to determine up to two subtrees that efficiently cover the interval. The subtrees are determined by the following procedure:
 
 1. If `end - start` is one, return a single subtree, `[start, end)`.
 
@@ -1462,7 +1462,7 @@ Within a Merkle Tree whose size is a power of two, the binary representation of 
 |0| |1| |2| |3| |4| |5| |6| |7|  level 0
 +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
 ~~~
-{: #fig-merkle-tree-bits-full title="An example Merkle tree of size 8"}
+{: #fig-merkle-tree-bits-full title="An example Merkle Tree of size 8"}
 
 The binary representation of `4` is `0b100`. It is the left (0) child of `[4, 6)`, which is the left (0) child of `[4, 8)`, which is the right (1) child of `[0, 8)`.
 
@@ -1470,7 +1470,7 @@ Each level in the tree corresponds to a bit position and can be correspondingly 
 
 Comparing two indices determines how the two paths diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. Numbering bits from least to most significant, with the least significant bit numbered zero, they share bit 2 but diverge at bit 1. The paths to leaves 4 and 6 diverges when moving from level 2 to level 1.
 
-This can be generalized to arbitrary-sized Merkle trees. {{fig-merkle-tree-bits-partial}} depicts a Merkle Tree of size 6:
+This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-partial}} depicts a Merkle Tree of size 6:
 
 ~~~aasvg
        +--------------+
@@ -1489,7 +1489,7 @@ This can be generalized to arbitrary-sized Merkle trees. {{fig-merkle-tree-bits-
 |0| |1| |2| |3| |4| |5|   level 0
 +-+ +-+ +-+ +-+ +-+ +-+
 ~~~
-{: #fig-merkle-tree-bits-partial title="An example Merkle tree of size 6"}
+{: #fig-merkle-tree-bits-partial title="An example Merkle Tree of size 6"}
 
 When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. These can be seen in the binary representation of the last element of the tree. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
 
@@ -1624,7 +1624,7 @@ The idea to mint tree heads infrequently was originally described by Richard Bar
 
 - Split Assertion into Assertion and AbridgedAssertion. The latter is used in the Merkle Tree and HTTP interface. It replaces `subject_info` by a hash, to save space by not serving large post-quantum public keys. The original Assertion is used everywhere else, including BikeshedCertificate. #6
 
-- Add proper context to every node in the Merkle tree. #32
+- Add proper context to every node in the Merkle Tree. #32
 
 - Clarify we use a single `CertificateEntry`. #11
 
@@ -1662,13 +1662,13 @@ Substantially reworked the design. The old design was essentially the landmark c
 
 In both draft-04 and draft-05, a CA looks like today’s CAs except that they run some software to publish what they issue and sign tree heads to certify certificates in bulk.
 
-In draft-04, the CA software publishes certificates in a bunch of independent Merkle trees. This is very easy to do as a collection of highly cacheable, immutable static files because each tree is constructed independently, and never appended to after being built. In draft-05, the certificates are published in a single Merkle tree. The {{TLOG-TILES}} interface allows such trees to also use highly cacheable, immutable static files.
+In draft-04, the CA software publishes certificates in a bunch of independent Merkle Trees. This is very easy to do as a collection of highly cacheable, immutable static files because each tree is constructed independently, and never appended to after being built. In draft-05, the certificates are published in a single Merkle Tree. The {{TLOG-TILES}} interface allows such trees to also use highly cacheable, immutable static files.
 
 In draft-04, there only are hourly tree heads. Clients are provisioned with tree heads ahead of time so we can make small, inclusion-proof-only certificates. In draft-05, the ecosystem must coordinate on defining "landmark" checkpoints. Clients are provisioned with subtrees describing landmark checkpoints ahead of time so we can make small, inclusion-proof-only certificates.
 
 In draft-04, each tree head is independent. In draft-05, each landmark checkpoint contains all the previous checkpoints.
 
-In draft-04, the independent tree heads were easily prunable. In draft-05, we define how to prune a Merkle tree.
+In draft-04, the independent tree heads were easily prunable. In draft-05, we define how to prune a Merkle Tree.
 
 In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark checkpoints can be combined with inclusion proofs and witness signatures for fast issuance. This is essentially an STH and inclusion proof in CT.
 
