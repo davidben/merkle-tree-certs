@@ -1766,7 +1766,9 @@ A subtree consistency proof for `[start, end)` and the tree of `n` elements is v
 ~~~
 {: #fig-truncate-consistency-proof title="A subtree consistency proof that starts at level 1 instead of level 0"}
 
-Steps 3 and 4 skip to this starting node. The starting node may be:
+The procedure is structured similarly to inclusion proof evaluation ({{inclusion-proof-bits}}). Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third number) to follow, respectively, the paths to `start`, `end - 1` (the last element of the subtree), and `n - 1` (the last element of the tree).
+
+Steps 3 and 4 then skip to the starting node, described above. The starting node may be:
 
 * The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n`, or if `[start, end)` is full.
 
