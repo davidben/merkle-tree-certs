@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-12T02:02:46.519827+00:00",
+  "timestamp": "2025-10-14T01:56:19.944525+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -8869,13 +8869,13 @@
       "labels": [],
       "body": "CC @nharper\r\n    \r\nCloses #147",
       "createdAt": "2025-10-06T16:34:12Z",
-      "updatedAt": "2025-10-10T23:24:11Z",
+      "updatedAt": "2025-10-12T17:48:36Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "ddafe7889a99a477a99e2eb0a9da1fe555b58a27",
+      "baseRefOid": "8fd36010dd8e613b3f566be965c6872a89b85475",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "proof-explain",
-      "headRefOid": "3ffb3a1b3831acdf673e818d3cfee8f18584046c",
+      "headRefOid": "f7da5bc66b0ecc7df586e5e90c8d4d01073816c9",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -8961,6 +8961,68 @@
               "body": "I'm getting a bit of \"and then draw the rest of the owl\" vibes from this. I'll take another look on Monday to see if I can offer a suggestion on more words here.",
               "createdAt": "2025-10-10T23:22:20Z",
               "updatedAt": "2025-10-10T23:24:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7GRwtG",
+          "commit": {
+            "abbreviatedOid": "3ffb3a1"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Made a bunch of changes, including to supporting text.",
+          "createdAt": "2025-10-11T03:11:56Z",
+          "updatedAt": "2025-10-12T17:45:46Z",
+          "comments": [
+            {
+              "originalPosition": 128,
+              "body": "Whoops, yes. Fixed.",
+              "createdAt": "2025-10-11T03:11:56Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 62,
+              "body": "I'm not sure what the convention is. At one point I gave everything names, but that got tedious. Other docs I've not seen bother. For this I mostly didn't bother and just did it for these two subsections because they'd otherwise risk colliding with the actual one. \ud83e\udd37 ",
+              "createdAt": "2025-10-11T03:13:00Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "Ah yeah, things got jumbled when the steps were renumbered in another PR. Fixed.",
+              "createdAt": "2025-10-11T03:24:04Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "Think that fit slightly better in the next paragraph, but added something to this effect. I added some text in the previous section to make it clear that the right edge and the path to the last element are the same. (It seems to work better to talk about paths.)",
+              "createdAt": "2025-10-12T16:50:14Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 124,
+              "body": "Hmm. I tend to think of every tree as having infinite levels. If zeros on the right edge mean \"skip\", that just means there are infinitely many \"skip\" directives at the front of every path. (Subtrees also potentially have infinite levels, but past some point, zeros and ones both mean \"skip\". Or you subtract `start` and that removes the ones.) But I think this is probably what equivalent interpretation makes most sense to you.\r\n\r\nI added \"When `sn` is zero, the procedure has reached the top of the tree.\" I think there's lots of ways to see why (including \"In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, the node's level is `BIT_WIDTH(end - start - 1)`\") that we can probably just assert that and let the reader justify it to themselves in whatever way makes most sense. This doesn't need to be a rigorous proof, just enough to get the intuition across.",
+              "createdAt": "2025-10-12T16:57:40Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 136,
+              "body": "I think in part because it's wrong. :-) (It's not the right edge of the tree) I've rephrased it and elaborated.",
+              "createdAt": "2025-10-12T17:26:52Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 132,
+              "body": "Added some notes about first, second, and third number. Agreed the variable names are horrid. I'm on board with changing them. Maybe we can do better than first/second/third in the first place, I dunno.",
+              "createdAt": "2025-10-12T17:36:59Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
+            },
+            {
+              "originalPosition": 151,
+              "body": "Mostly it's assumed you already read the inclusion proof one. It's really the same function, we're just doing more work along the side. Expanded on it a bit.",
+              "createdAt": "2025-10-12T17:40:30Z",
+              "updatedAt": "2025-10-12T17:45:46Z"
             }
           ]
         }
