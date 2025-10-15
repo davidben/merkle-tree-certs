@@ -1685,7 +1685,7 @@ This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-
 
 When the size of a Merkle Tree is not a power of two, some levels on the rightmost edge of the tree are skipped. The rightmost edge is the path to the last element. The skipped levels can be seen in its binary representation. Here, the last element is 5, which has binary representation `0b101`. When a bit is set, the corresponding node is a right child. When it is unset, the corresponding node is skipped.
 
-In a tree of the next power of two size, the skipped nodes in this path are where there *would* have been a right child, had there been enough elements to construct one. Without a right child, the hash operation is skipped and a skipped node has the same value as its singular child.{{fig-merkle-tree-bits-partial-comparison}} depicts this for a tree of size 6.
+In a tree of the next power of two size, the skipped nodes in this path are where there *would* have been a right child, had there been enough elements to construct one. Without a right child, the hash operation is skipped and a skipped node has the same value as its singular child. {{fig-merkle-tree-bits-partial-comparison}} depicts this for a tree of size 6.
 
 ~~~aasvg
        +----------------+
@@ -1734,7 +1734,45 @@ A subtree consistency proof for `[start, end)` and the tree of `n` elements is s
 
 A Merkle consistency proof, defined in {{Section 2.1.4 of ?RFC9162}}, applies these same optimizations.
 
-{{fig-truncate-consistency-proof}} depicts a subtree consistency proof between the subtree `[0, 6)` and the Merkle Tree of size 7. The consistency proof begins at level 1, or node `[4, 6)`. Note that, although element 6 at level 0 is in the consistency proof, there is a corresponding skipped node at level 1, the starting level. To demonstrate this, the figure denotes skipped nodes with duplicate values.
+{{fig-truncate-consistency-proof}} depicts a subtree consistency proof between the subtree `[0, 6)` and the Merkle Tree of size 8. The consistency proof begins at level 1, or node `[4, 6)`. The inclusion proof portion is similarly truncated to start at level 1: `[6, 8)` and `[0, 4)`. If the consistency proof began at level 0, the starting node would be leaf 5, and the consistency proof would additionally include leaf 4.
+
+~~~aasvg
+       +----------------+
+       |     [0, 6)     |         level 3
+       +----------------+
+        /           |
+   +========+  +--------+
+   | [0, 4) |  | [4, 6) |         level 2
+   +========+  +--------+
+    /      \        |
++-----+ +-----+ +~~~~~+
+|[0,2)| |[2,4)| |[4,6)|           level 1
++-----+ +-----+ +~~~~~+
+  / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5|           level 0
++-+ +-+ +-+ +-+ +-+ +-+
+
+
+       +----------------+
+       |     [0, 8)     |         level 3
+       +----------------+
+        /              \
+   +========+      +--------+
+   | [0, 4) |      | [4, 8) |     level 2
+   +========+      +--------+
+    /      \        /      \
++-----+ +-----+ +~~~~~+ +=====+
+|[0,2)| |[2,4)| |[4,6)| |[6,8)|   level 1
++-----+ +-----+ +~~~~~+ +=====+
+  / \     / \     / \     / \
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+|0| |1| |2| |3| |4| |5| |6| |7|   level 0
++-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+~~~
+{: #fig-truncate-consistency-proof title="A subtree consistency proof that starts at level 1 instead of level 0"}
+
+Note that the truncated inclusion proof may include nodes from lower levels, if the corresponding level was skipped on the right edge. {{fig-truncate-consistency-proof-2}} depicts a subtree consistency proof between the subtree `[0, 6)` and the Merkle Tree of size 7. As above, the starting node is `[4, 6)` at level 1. The inclusion proof portion includes leaf 6 at level 0. This is because leaf 6 is taking the place of its skipped parent at level 1. (A skipped node can be thought of as a duplicate of its singular child.)
 
 ~~~aasvg
        +----------------+
@@ -1770,7 +1808,7 @@ A Merkle consistency proof, defined in {{Section 2.1.4 of ?RFC9162}}, applies th
 |0| |1| |2| |3| |4| |5| |6|     level 0
 +-+ +-+ +-+ +-+ +-+ +-+ +-+
 ~~~
-{: #fig-truncate-consistency-proof title="A subtree consistency proof that starts at level 1 instead of level 0"}
+{: #fig-truncate-consistency-proof-2 title="The interaction between inclusion proof truncation and skipped levels"}
 
 The procedure is structured similarly to inclusion proof evaluation ({{inclusion-proof-bits}}). Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third number) to follow, respectively, the paths to `start`, `end - 1` (the last element of the subtree), and `n - 1` (the last element of the tree).
 
