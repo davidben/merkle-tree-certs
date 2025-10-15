@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 15 April 2026                                                  
+Expires: 18 April 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         12 October 2025
+                                                         15 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 April 2026.
+   This Internet-Draft will expire on 18 April 2026.
 
 Copyright Notice
 
@@ -146,7 +146,8 @@ Table of Contents
    Appendix B.  Merkle Tree Structure
      B.1.  Binary Representations
      B.2.  Inclusion Proof Evaluation
-     B.3.  Consistency Proof Verification
+     B.3.  Consistency Proof Structure
+     B.4.  Consistency Proof Verification
    Appendix C.  Extensions to Tiled Transparency Logs (To Be Removed)
      C.1.  Subtree Signed Note Format
      C.2.  Requesting Subtree Signatures
@@ -767,6 +768,9 @@ Table of Contents
 
    SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 
+   Appendix B.3 explains the structure of a subtree consistency proof in
+   more detail.
+
 4.4.2.  Example Subtree Consistency Proofs
 
    The subtree consistency proof for [4, 8) and a tree of size 14
@@ -875,7 +879,7 @@ Table of Contents
 
    4.  Otherwise:
 
-       1.  Until LSB(sn) is not set or fn is sn, right-shift fn, sn, and
+       1.  Until fn is sn or LSB(sn) is not set, right-shift fn, sn, and
            tn equally.
 
    5.  If fn is sn, set fr and sr to node_hash.
@@ -910,7 +914,7 @@ Table of Contents
        are not equal, fail the proof verification.  If all are equal,
        accept the proof.
 
-   Appendix B.3 explains this procedure in more detail.
+   Appendix B.4 explains this procedure in more detail.
 
 4.5.  Arbitrary Intervals
 
@@ -2950,11 +2954,12 @@ B.1.  Binary Representations
    be determined as follows: if the node is a root of subtree [start,
    end), the node's level is BIT_WIDTH(end - start - 1).
 
-   Comparing two indices determines how the two paths diverge.  For
-   example, the bit representations of 4 and 6 are 0b100 and 0b110,
-   respectively.  Numbering bits from least to most significant, with
-   the least significant bit numbered zero, they share bit 2 but diverge
-   at bit 1.  The paths to leaves 4 and 6 diverges when moving from
+   Comparing two indices determines the relationship between two paths.
+   The highest differing bit gives the level at which paths from root to
+   leaf diverge.  For example, the bit representations of 4 and 6 are
+   0b100 and 0b110, respectively.  The highest differing bit is bit 1.
+   Bits 2 and up are the same between the two indices.  This indicates
+   that the paths from the root to leaves 4 and 6 diverge when going to
    level 2 to level 1.
 
    This can be generalized to arbitrary-sized Merkle Trees.  Figure 13
@@ -2989,7 +2994,7 @@ B.1.  Binary Representations
    path are where there _would_ have been a right child, had there been
    enough elements to construct one.  Without a right child, the hash
    operation is skipped and a skipped node has the same value as its
-   singular child.Figure 14 depicts this for a tree of size 6.
+   singular child.  Figure 14 depicts this for a tree of size 6.
 
           +----------------+
           |     [0, 6)     |        level 3
@@ -3011,7 +3016,8 @@ B.1.  Binary Representations
                             of a tree of size 8
 
    Zero bits also indicate skipped nodes in paths that have not yet
-   diverged from the rightmost edge.  In the example, the binary
+   diverged from the rightmost edge (i.e. the path to the last element),
+   when viewed from root to leaf.  In the example, the binary
    representation of 4 is 0b100.  While bit 0 and bit 1 are both unset,
    they manifest in the tree differently.  Bit 0 indicates that 4 is a
    right child.  However, at bit 1, 0b100 has not yet diverged from the
@@ -3040,10 +3046,10 @@ B.2.  Inclusion Proof Evaluation
    While they are different, step 4.2 hashes on the left or right based
    on the binary representation, as discussed in Appendix B.1.
 
-   Once fn = sn, the procedure has reached the point where the path
-   diverges from the right edge.  At that point, the condition in step
-   4.2 is always true.  It only incorporates proof entries on the left,
-   once per set bit.  Unset bits are skipped.
+   Once fn = sn, the remainder of the path is on the right edge.  At
+   that point, the condition in step 4.2 is always true.  It only
+   incorporates proof entries on the left, once per set bit.  Unset bits
+   are skipped.
 
    Inclusion proofs can also be evaluated by considering these two
    stages separately.  The first stage consumes l1 = BIT_WIDTH(fn XOR
@@ -3053,28 +3059,81 @@ B.2.  Inclusion Proof Evaluation
    significant bits, and the remaining l2 entries are hashed on the
    left.
 
-B.3.  Consistency Proof Verification
-
-   The procedure in Section 4.4.3 iteratively builds two hashes, fr and
-   sr, which are expected to equal node_hash and root_hash,
-   respectively.  Everything hashed into fr is also hashed into sr, so
-   success demonstrates that root_hash contains node_hash.
+B.3.  Consistency Proof Structure
 
    A subtree consistency proof for [start, end) and the tree of n
-   elements is very similar to an inclusion proof for element end - 1.
-   Starting at this element, incorporating the whole inclusion proof
-   should reconstruct root_hash and incorporating a subset of the
-   inclusion proof should reconstruct node_hash.  However, instead of
-   starting at level 0, the proof can be optimized to start at a higher
-   level, specifically the highest ancestor of end - 1 that is also
-   directly contained in the tree.
+   elements is similar to an inclusion proof for element end - 1.  If
+   one starts from end - 1's hash, incorporating the whole inclusion
+   proof should reconstruct root_hash and incorporating a subset of the
+   inclusion proof should reconstruct node_hash.  Thus end - 1's hash
+   and this inclusion proof can prove consistency.  A subtree
+   consistency proof in this document applies two optimizations over
+   this construction:
+
+   1.  Instead of starting at level 0 with end - 1, the proof can start
+       at a higher level.  Any ancestor of end - 1 shared by both the
+       subtree and the overall tree will node_hash and root_hash.  Use
+       the highest level with a commmon ancestor.  This truncates the
+       inclusion proof portion of the consistency proof.
+
+   2.  If this starting node is the entire subtree, omit its hash from
+       the consistency proof.  The verifier is assumed to already know
+       node_hash.
+
+   A Merkle consistency proof, defined in Section 2.1.4 of [RFC9162],
+   applies these same optimizations.
 
    Figure 15 depicts a subtree consistency proof between the subtree [0,
-   6) and the Merkle Tree of size 7.  The consistency proof begins at
-   level 1, or node [4, 6).  Note that, although element 6 at level 0 is
-   in the consistency proof, there is a corresponding skipped node at
-   level 1, the starting level.  To demonstrate this, the figure denotes
-   skipped nodes with duplicate values.
+   6) and the Merkle Tree of size 8.  The consistency proof begins at
+   level 1, or node [4, 6).  The inclusion proof portion is similarly
+   truncated to start at level 1: [6, 8) and [0, 4).  If the consistency
+   proof began at level 0, the starting node would be leaf 5, and the
+   consistency proof would additionally include leaf 4.
+
+          +----------------+
+          |     [0, 6)     |         level 3
+          +----------------+
+           /           |
+      +========+  +--------+
+      | [0, 4) |  | [4, 6) |         level 2
+      +========+  +--------+
+       /      \        |
+   +-----+ +-----+ +~~~~~+
+   |[0,2)| |[2,4)| |[4,6)|           level 1
+   +-----+ +-----+ +~~~~~+
+     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5|           level 0
+   +-+ +-+ +-+ +-+ +-+ +-+
+
+
+          +----------------+
+          |     [0, 8)     |         level 3
+          +----------------+
+           /              \
+      +========+      +--------+
+      | [0, 4) |      | [4, 8) |     level 2
+      +========+      +--------+
+       /      \        /      \
+   +-----+ +-----+ +~~~~~+ +=====+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)|   level 1
+   +-----+ +-----+ +~~~~~+ +=====+
+     / \     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| |6| |7|   level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+       Figure 15: A subtree consistency proof that starts at level 1
+                             instead of level 0
+
+   Note that the truncated inclusion proof may include nodes from lower
+   levels, if the corresponding level was skipped on the right edge.
+   Figure 16 depicts a subtree consistency proof between the subtree [0,
+   6) and the Merkle Tree of size 7.  As above, the starting node is [4,
+   6) at level 1.  The inclusion proof portion includes leaf 6 at level
+   0.  This is because leaf 6 is taking the place of its skipped parent
+   at level 1.  (A skipped node can be thought of as a duplicate of its
+   singular child.)
 
           +----------------+
           |     [0, 6)     |       level 3
@@ -3109,33 +3168,44 @@ B.3.  Consistency Proof Verification
    |0| |1| |2| |3| |4| |5| |6|     level 0
    +-+ +-+ +-+ +-+ +-+ +-+ +-+
 
-       Figure 15: A subtree consistency proof that starts at level 1
-                             instead of level 0
+     Figure 16: The interaction between inclusion proof truncation and
+                               skipped levels
 
-   The procedure is structured similarly to inclusion proof evaluation
-   (Appendix B.2).  Step 2 initializes fn (first number), sn (second
-   number), and tn (third number) to follow, respectively, the paths to
-   start, end - 1 (the last element of the subtree), and n - 1 (the last
-   element of the tree).
+B.4.  Consistency Proof Verification
 
-   Steps 3 and 4 then skip to the starting node, described above.  The
-   starting node may be:
+   The procedure in Section 4.4.3 is structured similarly to inclusion
+   proof evaluation (Appendix B.2).  It iteratively builds two hashes,
+   fr and sr, which are expected to equal node_hash and root_hash,
+   respectively.  Everything hashed into fr is also hashed into sr, so
+   success demonstrates that root_hash contains node_hash.
+
+   Step 2 initializes fn (first number), sn (second number), and tn
+   (third number) to follow, respectively, the paths to start, end - 1
+   (the last element of the subtree), and n - 1 (the last element of the
+   tree).
+
+   Steps 3 and 4 then skip to the starting node, described in
+   Appendix B.3.  The starting node may be:
 
    *  The entire subtree [start, end) if [start, end) is directly
-      contained in the tree.  This will occur if end is n, or if [start,
-      end) is full.
+      contained in the tree.  This will occur if end is n (step 3), or
+      if [start, end) is full (exiting step 4 because fn is sn).
 
    *  Otherwise, the highest full subtree along the right edge of
-      [start, end).
+      [start, end).  This corresponds to the process exiting step 4
+      because LSB(sn) is not set.
 
-   In the first case, fn will equal sn after truncation.  Step 5 will
-   then initialize the hashes to node_hash.  The consistency proof does
-   not need to include a separate copy of node_hash.
+   Steps 5 and 6 initialize the hashes fr and sr:
 
-   In the second case, fn is less than sn.  Step 6 will then initialize
-   the hashes to the first value in the consistency proof.
+   *  In the first case above, fn will equal sn after truncation.  Step
+      5 will then initialize the hashes to node_hash because consistency
+      proof does not need to include the starting node.
 
-   From there, step 7 incorporates the consistency proof into fr and sr:
+   *  In the second case above, fn is less than sn.  Step 6 will then
+      initialize the hashes to the first value in the consistency proof.
+
+   Step 7 incorporates the remainder of the consistency proof into fr
+   and sr:
 
    *  All hashes are incorporated into sr, with hashing on the left or
       right determined the same as in inclusion proof evaluation.
