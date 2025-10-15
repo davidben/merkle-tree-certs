@@ -535,7 +535,7 @@ The inclusion proof for entry 10 of subtree `[8, 13)` contains the hashes `MTH({
 
 Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash `entry_hash`, of a subtree `[start, end)`, the subtree inclusion proof can be *evaluated* to compute the expected subtree hash:
 
-<!-- If changing this procedure, remember to update {{inclusion-proof-bits}} -->
+<!-- If changing this procedure, remember to update {{inclusion-proof-evaluation-explain}} -->
 
 1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `start <= index < end`. If either do not hold, fail proof evaluation.
 
@@ -565,7 +565,7 @@ Given a subtree inclusion proof, `inclusion_proof`, for entry `index`, with hash
 
 This is the same as the procedure in {{Section 2.1.3.2 of !RFC9162}}, where `leaf_index` is `index - start`, `tree_size` is `end - start`, and `r` is returned instead of compared with `root_hash`.
 
-{{inclusion-proof-bits}} explains this procedure in more detail.
+{{inclusion-proof-evaluation-explain}} explains this procedure in more detail.
 
 ### Verifying a Subtree Inclusion Proof
 
@@ -631,6 +631,8 @@ When `end = start + 1`, this computes a Merkle inclusion proof:
 ~~~pseudocode
 SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 ~~~
+
+{{consistency-proof-structure}} explains the structure of a subtree consistency proof in more detail.
 
 ### Example Subtree Consistency Proofs
 
@@ -718,7 +720,7 @@ The following procedure can be used to verify a subtree consistency proof.
 
 Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a consistency proof `proof`, a subtree hash `node_hash`, and a root hash `root_hash`:
 
-<!-- If changing this procedure, remember to update {{consistency-proof-bits}} -->
+<!-- If changing this procedure, remember to update {{consistency-proof-verification-explain}} -->
 
 1. Check that `[start, end)` is a valid subtree ({{definition-of-a-subtree}}), and that `end <= n`. If either do not hold, fail proof verification. These checks imply `0 <= start < end <= n`.
 1. Set `fn` to `start`, `sn` to `end - 1`, and `tn` to `n - 1`.
@@ -741,7 +743,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
    1. Right-shift `fn`, `sn`, and `tn` once more.
 1. Compare `tn` to `0`, `fr` to `node_hash`, and `sr` to `root_hash`. If any are not equal, fail the proof verification. If all are equal, accept the proof.
 
-{{consistency-proof-bits}} explains this procedure in more detail.
+{{consistency-proof-verification-explain}} explains this procedure in more detail.
 
 ## Arbitrary Intervals
 
@@ -1708,7 +1710,7 @@ In a tree of the next power of two size, the skipped nodes in this path are wher
 
 Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
 
-## Inclusion Proof Evaluation {#inclusion-proof-bits}
+## Inclusion Proof Evaluation {#inclusion-proof-evaluation-explain}
 
 The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by staring from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
 
@@ -1722,9 +1724,7 @@ Once `fn = sn`, the procedure has reached the point where the path diverges from
 
 Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes `l1 = BIT_WIDTH(fn XOR sn)` proof entries. The second stage consumes `l2 = POPCOUNT(fn >> l1)` proof entries. A valid inclusion proof must then have `l1 + l2` entries. The first `l1` entries are hashed based on `fn`'s least significant bits, and the remaining `l2` entries are hashed on the left.
 
-## Consistency Proof Verification {#consistency-proof-bits}
-
-The procedure in {{verifying-a-subtree-consistency-proof}} iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
+## Consistency Proof Structure
 
 A subtree consistency proof for `[start, end)` and the tree of `n` elements is similar to an inclusion proof for element `end - 1`. If one starts from `end - 1`'s hash, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. Thus `end - 1`'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:
 
@@ -1810,9 +1810,13 @@ Note that the truncated inclusion proof may include nodes from lower levels, if 
 ~~~
 {: #fig-truncate-consistency-proof-2 title="The interaction between inclusion proof truncation and skipped levels"}
 
-The procedure is structured similarly to inclusion proof evaluation ({{inclusion-proof-bits}}). Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third number) to follow, respectively, the paths to `start`, `end - 1` (the last element of the subtree), and `n - 1` (the last element of the tree).
+## Consistency Proof Verification {#consistency-proof-verification-explain}
 
-Steps 3 and 4 then skip to the starting node, described above. The starting node may be:
+The procedure in {{verifying-a-subtree-consistency-proof}} is structured similarly to inclusion proof evaluation ({{inclusion-proof-evaluation-explain}}). It iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
+
+Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third number) to follow, respectively, the paths to `start`, `end - 1` (the last element of the subtree), and `n - 1` (the last element of the tree).
+
+Steps 3 and 4 then skip to the starting node, described in {{consistency-proof-structure}}. The starting node may be:
 
 * The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n`, or if `[start, end)` is full.
 
