@@ -1662,7 +1662,7 @@ The binary representation of `4` is `0b100`. It is the left (0) child of `[4, 6)
 
 Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, the node's level is `BIT_WIDTH(end - start - 1)`.
 
-Comparing two indices determines how the two paths diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. Numbering bits from least to most significant, with the least significant bit numbered zero, they share bit 2 but diverge at bit 1. The paths to leaves 4 and 6 diverges when moving from level 2 to level 1.
+Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going to level 2 to level 1.
 
 This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-partial}} depicts a Merkle Tree of size 6:
 
@@ -1708,7 +1708,7 @@ In a tree of the next power of two size, the skipped nodes in this path are wher
 ~~~
 {: #fig-merkle-tree-bits-partial-comparison title="An example Merkle Tree of size 6, viewed as a subset of a tree of size 8"}
 
-Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
+Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
 
 ## Inclusion Proof Evaluation {#inclusion-proof-evaluation-explain}
 
@@ -1720,7 +1720,7 @@ Step 4 iterates through `inclusion_proof` and the paths to `fn` and `sn` in para
 
 Iterating from level 0 up, `fn` and `sn` will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in {{binary-representations}}.
 
-Once `fn = sn`, the procedure has reached the point where the path diverges from the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.
+Once `fn = sn`, the remainder of the path is on the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.
 
 Inclusion proofs can also be evaluated by considering these two stages separately. The first stage consumes `l1 = BIT_WIDTH(fn XOR sn)` proof entries. The second stage consumes `l2 = POPCOUNT(fn >> l1)` proof entries. A valid inclusion proof must then have `l1 + l2` entries. The first `l1` entries are hashed based on `fn`'s least significant bits, and the remaining `l2` entries are hashed on the left.
 
