@@ -1726,7 +1726,13 @@ Inclusion proofs can also be evaluated by considering these two stages separatel
 
 The procedure in {{verifying-a-subtree-consistency-proof}} iteratively builds two hashes, `fr` and `sr`, which are expected to equal `node_hash` and `root_hash`, respectively. Everything hashed into `fr` is also hashed into `sr`, so success demonstrates that `root_hash` contains `node_hash`.
 
-A subtree consistency proof for `[start, end)` and the tree of `n` elements is very similar to an inclusion proof for element `end - 1`. Starting at this element, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. However, instead of starting at level 0, the proof can be optimized to start at a higher level, specifically the highest ancestor of `end - 1` that is also directly contained in the tree.
+A subtree consistency proof for `[start, end)` and the tree of `n` elements is similar to an inclusion proof for element `end - 1`. If one starts from `end - 1`'s hash, incorporating the whole inclusion proof should reconstruct `root_hash` and incorporating a subset of the inclusion proof should reconstruct `node_hash`. Thus `end - 1`'s hash and this inclusion proof can prove consistency. A subtree consistency proof in this document applies two optimizations over this construction:
+
+1. Instead of starting at level 0 with `end - 1`, the proof can start at a higher level. Any ancestor of `end - 1` shared by both the subtree and the overall tree will `node_hash` and `root_hash`. Use the highest level with a commmon ancestor. This truncates the inclusion proof portion of the consistency proof.
+
+2. If this starting node is the entire subtree, omit its hash from the consistency proof. The verifier is assumed to already know `node_hash`.
+
+A Merkle consistency proof, defined in {{Section 2.1.4 of ?RFC9162}}, applies these same optimizations.
 
 {{fig-truncate-consistency-proof}} depicts a subtree consistency proof between the subtree `[0, 6)` and the Merkle Tree of size 7. The consistency proof begins at level 1, or node `[4, 6)`. Note that, although element 6 at level 0 is in the consistency proof, there is a corresponding skipped node at level 1, the starting level. To demonstrate this, the figure denotes skipped nodes with duplicate values.
 
