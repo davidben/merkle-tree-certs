@@ -727,7 +727,7 @@ Given a Merkle Tree over `n` elements, a subtree defined by `[start, end)`, a co
 1. If `sn` is `tn`, then:
    1. Until `fn` is `sn`, right-shift `fn`, `sn`, and `tn` equally.
 1. Otherwise:
-   1. Until `LSB(sn)` is not set or `fn` is `sn`, right-shift `fn`, `sn`, and `tn` equally.
+   1. Until `fn` is `sn` or `LSB(sn)` is not set, right-shift `fn`, `sn`, and `tn` equally.
 1. If `fn` is `sn`, set `fr` and `sr` to `node_hash`.
 1. Otherwise:
    1. If `proof` is an empty array, stop and fail verification.
@@ -1818,15 +1818,17 @@ Step 2 initializes `fn` (first number), `sn` (second number), and `tn` (third nu
 
 Steps 3 and 4 then skip to the starting node, described in {{consistency-proof-structure}}. The starting node may be:
 
-* The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n`, or if `[start, end)` is full.
+* The entire subtree `[start, end)` if `[start, end)` is directly contained in the tree. This will occur if `end` is `n` (step 3), or if `[start, end)` is full (exiting step 4 because `fn` is `sn`).
 
-* Otherwise, the highest full subtree along the right edge of `[start, end)`.
+* Otherwise, the highest full subtree along the right edge of `[start, end)`. This corresponds to the process exiting step 4 because `LSB(sn)` is not set.
 
-In the first case, `fn` will equal `sn` after truncation. Step 5 will then initialize the hashes to `node_hash`. The consistency proof does not need to include a separate copy of `node_hash`.
+Steps 5 and 6 initialize the hashes `fr` and `sr`:
 
-In the second case, `fn` is less than `sn`. Step 6 will then initialize the hashes to the first value in the consistency proof.
+* In the first case above, `fn` will equal `sn` after truncation. Step 5 will then initialize the hashes to `node_hash` because consistency proof does not need to include the starting node.
 
-From there, step 7 incorporates the consistency proof into `fr` and `sr`:
+* In the second case above, `fn` is less than `sn`. Step 6 will then initialize the hashes to the first value in the consistency proof.
+
+Step 7 incorporates the remainder of the consistency proof into `fr` and `sr`:
 
 * All hashes are incorporated into `sr`, with hashing on the left or right determined the same as in inclusion proof evaluation.
 
