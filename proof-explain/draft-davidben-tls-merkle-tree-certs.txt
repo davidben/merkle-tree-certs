@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 18 April 2026                                                  
+Expires: 19 April 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         15 October 2025
+                                                         16 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 April 2026.
+   This Internet-Draft will expire on 19 April 2026.
 
 Copyright Notice
 
@@ -814,7 +814,7 @@ Table of Contents
                    is directly contained in the full tree
 
    The subtree consistency proof for [8, 13) and a tree of size 14
-   contains MTH({d[12]}), MTH({d[12]}), MTH(D[8:12]), and MTH(D[0:8]),
+   contains MTH({d[12]}), MTH({d[13]}), MTH(D[8:12]), and MTH(D[0:8]),
    depicted in Figure 8. [8, 13) is not directly contained in the tree,
    so the proof must include sufficient nodes to reconstruct both
    hashes.
@@ -3072,9 +3072,10 @@ B.3.  Consistency Proof Structure
 
    1.  Instead of starting at level 0 with end - 1, the proof can start
        at a higher level.  Any ancestor of end - 1 shared by both the
-       subtree and the overall tree will node_hash and root_hash.  Use
-       the highest level with a commmon ancestor.  This truncates the
-       inclusion proof portion of the consistency proof.
+       subtree and the overall tree is a valid starting node to
+       reconstruct node_hash and root_hash.  Use the highest level with
+       a commmon ancestor.  This truncates the inclusion proof portion
+       of the consistency proof.
 
    2.  If this starting node is the entire subtree, omit its hash from
        the consistency proof.  The verifier is assumed to already know
