@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-14T01:56:19.944525+00:00",
+  "timestamp": "2025-10-16T01:58:12.517327+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2577,6 +2577,22 @@
       "body": "We borrowed them from 9162, which also didn't explain them, but it's probably worth doing so.",
       "createdAt": "2025-10-03T02:21:25Z",
       "updatedAt": "2025-10-03T02:21:25Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 152,
+      "id": "I_kwDOJIBkVc7Ru346",
+      "title": "Be more opinionated about ID allocation",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/152",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Right now we have the following IDs, to denote the various different animals:\n\n1. The log has an ID\n2. Each cosigner has an ID, including the cosigner operated by the log (CA) operator\n3. The landmark sequence has an ID arc\n\nFor now, they refer to slightly different things, and we allow for some generality that we may not need:\n\n* A CA can have multiple cosigners for a single log\n* A landmark sequence could be allocated by an entity other than the CA, if the CA finds this difficult\n\nIt is not clear how many of these we need. The first is somewhat related to the question of how best to manage key rotation and log rotation. The second is... almost certainly not needed. I think it just came out of building atop tlog in the most orthogonal ways possible.\n\nAnd then there's the question of whether these IDs are allowed to overlap or must they be different. I think that comes from designs of cosigner negotiation.\n\nOnce the dust settles on the rest of the details, we should take a pass and:\n* Decide if any IDs should overlap\n* If IDs don't overlap, perhaps ask the CA operator to pick an ID arc, and then the protocol determines the substructure for you.",
+      "createdAt": "2025-10-15T16:13:39Z",
+      "updatedAt": "2025-10-15T16:13:39Z",
       "closedAt": null,
       "comments": []
     }
@@ -8869,13 +8885,13 @@
       "labels": [],
       "body": "CC @nharper\r\n    \r\nCloses #147",
       "createdAt": "2025-10-06T16:34:12Z",
-      "updatedAt": "2025-10-12T17:48:36Z",
+      "updatedAt": "2025-10-16T00:02:55Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "8fd36010dd8e613b3f566be965c6872a89b85475",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "proof-explain",
-      "headRefOid": "f7da5bc66b0ecc7df586e5e90c8d4d01073816c9",
+      "headRefOid": "07988d2e3db10b6719a88f11d931086fbaa05b4d",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -9023,6 +9039,224 @@
               "body": "Mostly it's assumed you already read the inclusion proof one. It's really the same function, we're just doing more work along the side. Expanded on it a bit.",
               "createdAt": "2025-10-12T17:40:30Z",
               "updatedAt": "2025-10-12T17:45:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7G6oj-",
+          "commit": {
+            "abbreviatedOid": "f7da5bc"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-14T20:04:06Z",
+          "updatedAt": "2025-10-14T23:02:52Z",
+          "comments": [
+            {
+              "originalPosition": 62,
+              "body": "SGTM",
+              "createdAt": "2025-10-14T20:04:06Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 370,
+              "body": "Here (and I think everywhere else) you describe paths as going from the root node to a leaf node. My mental model is that paths go the other direction, which also matches how the verification processes read the bits from LSB to MSB (i.e. from leaf to root).",
+              "createdAt": "2025-10-14T20:11:19Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 382,
+              "body": "\"the point where the path diverges from the right edge\" is confusing, because earlier you're talking about right-shifting through `fn` and `sn` and \"mov[ing] up the two paths, towards the root\". With this phrase, you're now implicitly looking at the paths in the root-to-leaf direction. If we always define the path as leaf-to-root, then we've reached the point where the two paths have converged and we're on the right edge of the subtree.",
+              "createdAt": "2025-10-14T20:16:27Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 132,
+              "body": "The notes look good. If I think of better names, I'll write up a PR.",
+              "createdAt": "2025-10-14T20:17:59Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 390,
+              "body": "There are some ambiguities in this. The first is describing the \"very similar to an inclusion proof\": it's not clear that \"starting at this element\" means \"include element `end - 1` in the proof\" (from all of the examples I've looked at of consistency proofs that go down to level 0, they include two sibling elements, whereas an inclusion proof doesn't).\r\n\r\nThe second is \"specifically the highest ancestor of `end - 1`\". Ancestor isn't defined in this document. Perhaps add a definition of ancestor (at the beginning of the doc), e.g. a valid subtree `[start, end)` is an ancestor of leaf node `i` if `start <= i < end`.\r\n\r\nThe third is \"that is also directly contained in the tree\". I assume that \"the tree\" is \"the tree of `n` elements\" rather than the unnamed subtree \"`[start, end)`\". With that phrase being the only qualifier on the highest ancestor, that highest ancestor becomes the root of the tree of `n` elements, when it should be an interior node that is common to both trees.\r\n\r\nPossible rewording:\r\n\r\nA subtree consistency proof for the subtree `[start, end)` and the tree of `n` elements is very similar to an inclusion proof for element `end - 1`. A proof can be constructed by adding the element `end - 1` to the inclusion proof of `end - 1` in the tree. This new proof allows reconstructing `root_hash`, and a subset of that proof can be used to reconstruct `node_hash`. Depending on the structure of the subtree, instead of starting this proof at level 0, the proof can be optimized to start a higher level. The consistency proof starts at the highest level of an ancestor of `end - 1` shared by both the subtree and the tree.",
+              "createdAt": "2025-10-14T21:40:28Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 347,
+              "body": "\"some levels on the rightmost edge of the tree are skipped\" makes it sound like levels are only skipped on the rightmost edge (your diagram disproves that by way of `4` and `5`), or only the levels skipped by the rightmost edge get skipped (this statement is true for your diagram but not generally). I'd replace that phrase with \"some levels in the right subtree are skipped\". Consider the following tree.\r\n\r\n```\r\n                +----------------------------+\r\n                |            [0, 11)         |   level 4\r\n                +----------------------------+\r\n                   /                     |\r\n       +----------------+                |\r\n       |     [0, 8)     |                *       level 3\r\n       +----------------+                |\r\n        /              \\                 |\r\n   +--------+      +--------+      +---------+\r\n   | [0, 4) |      | [4, 8) |      | [8, 11) |   level 2\r\n   +--------+      +--------+      +---------+\r\n    /      \\        /      \\         /    |\r\n+-----+ +-----+ +-----+ +-----+ +------+  |\r\n|[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)|  *      level 1\r\n+-----+ +-----+ +-----+ +-----+ +------+  |\r\n  / \\     / \\     / \\     / \\     / \\     |\r\n+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+\r\n|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10|     level 0\r\n+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+\r\n```\r\n\r\nThe rightmost edge is the path from `10` to `[0, 11)`. That path skips levels 1 and 3. The paths from `8` and `9` also skip levels (and in your diagram `fig-merkle-tree-bits-partial`, the paths from both `4` and `5` skip level 2), but those only skip level 3.",
+              "createdAt": "2025-10-14T22:13:52Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 428,
+              "body": "This diagram is showing two different kinds of skipped levels. One is proof truncation (aka skipping level 0 in the proof). Proof truncation can also be demonstrated with the same subtree but with a tree of size 8 instead of 7. Picturing that tree is what got me to understand proof truncation. (There's a simple case of proof truncation when the subtree is full instead of partial; a subtree of size 6 is the first time an \"interesting\" example of truncation happens.)\r\n\r\nThe second thing this diagram is showing is what's mentioned in the text \"although element 6 at level 0 is in the proof, there is a corresponding skipped node at level 1, the starting level\". Here, it's referring to how some levels of the tree are skipped when the size of the tree is not a power of 2. I'd separate out the two cases.",
+              "createdAt": "2025-10-14T22:17:41Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            },
+            {
+              "originalPosition": 440,
+              "body": "It's not clear what cases these are referring to, and they're not the two bullet points above. (`fn` can equal `sn` after performing either of those steps.) I'd clarify by changing this to something like the following:\r\n\r\n> Steps 5 and 6 initialize the hashes `fr` and `sr`.\r\n>\r\n> If `fn` equals `sn` (possibly after truncation), step 5 initializes the hashes to `node_hash` because the subtree `[start, end)` is directly contained in the tree, so the consistency proof did not need to include a separate copy of `node_hash`.\r\n>\r\n> Otherwise, `fn` is less than `sn`, and step 6 initializes the hashes to the first value in the consistency proof.",
+              "createdAt": "2025-10-14T22:45:36Z",
+              "updatedAt": "2025-10-14T23:02:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HHGGh",
+          "commit": {
+            "abbreviatedOid": "07988d2"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-15T13:51:23Z",
+          "updatedAt": "2025-10-15T16:07:54Z",
+          "comments": [
+            {
+              "originalPosition": 347,
+              "body": "Hmm. Right subtree would suggest this is possible, but it's not because only the very rightmost edge can skip stuff.\r\n\r\n```\r\n                +----------------------------+\r\n                |            [0, 11)         |   level 4\r\n                +----------------------------+\r\n                   /                  |\r\n       +----------------+             |\r\n       |     [0, 8)     |             *          level 3\r\n       +----------------+             |\r\n        /              \\              |\r\n   +--------+      +--------+   +---------+\r\n   | [0, 4) |      | [4, 8) |   | [8, 11) |      level 2\r\n   +--------+      +--------+   +---------+\r\n    /      \\        /      \\     |      |\r\n+-----+ +-----+ +-----+ +-----+  |  +------+\r\n|[0,2)| |[2,4)| |[4,6)| |[6,8)|  *  |[9,11)|     level 1\r\n+-----+ +-----+ +-----+ +-----+  |  +------+\r\n  / \\     / \\     / \\     / \\    |    /  \\\r\n+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+\r\n|0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10|     level 0\r\n+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+\r\n```\r\n\r\nWas trying to capture that it was specifically the right edge of the tree that skips things. It's true that they're also skipped for other *paths*, but only if they haven't diverged from the right edge before then, so it still seems right to talk about the rightmost edge? Or am I confused and misunderstanding you. (I probably am. See below.) The connection to those paths covered by the later paragraph \"Zero bits also indicate...\" covers that.\r\n\r\n> or only the levels skipped by the rightmost edge get skipped (this statement is true for your diagram but not generally)\r\n\r\nI'm not quite following this. In your example, isn't it also only the rightmost edge's levels that get skipped? The skipped nodes `[0, 11)`'s right child and `[8, 11)`'s right child. Aren't those both on the rightmost edge?",
+              "createdAt": "2025-10-15T13:51:23Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            },
+            {
+              "originalPosition": 390,
+              "body": "> There are some ambiguities in this. The first is describing the \"very similar to an inclusion proof\": it's not clear that \"starting at this element\" means \"include element end - 1 in the proof\" (from all of the examples I've looked at of consistency proofs that go down to level 0, they include two sibling elements, whereas an inclusion proof doesn't).\r\n\r\nAh yeah, I had a hard time here because _actually_ say which is the extra starting element, we have covered:\r\n\r\n* Actually it's not `end - 1`, but some ancestor of `end - 1`.\r\n* Oh but if the ancestor is the whole subtree we don't actually have a starting point\r\n\r\nI like your framing better, though it was unclear to me whether \"a proof can be constructed\" was saying \"a [subtree consistency] proof\" or \"a proof [that proves consistency but not our specific construction]\". I've wordsmithed again, and also brought the starting node discussion up a bit. What do you think?\r\n\r\n> The second is \"specifically the highest ancestor of end - 1\". Ancestor isn't defined in this document. Perhaps add a definition of ancestor (at the beginning of the doc), e.g. a valid subtree [start, end) is an ancestor of leaf node i if start <= i < end.\r\n\r\nRe \"ancestor\", we haven't defined \"child\" or \"parent\" either, right? (Or \"left\" and \"right\" for that matter...) We seem to mostly be assuming general terminology around trees, which is probably fine here? I thought ancestor was fairly common? The lowest common ancestor problem and all that.\r\n\r\nI don't think a purely numerical definition of ancestor works because that doesn't capture the structures of the tree. For example, if our subtree is `[0, 14)`, `[8, 16)` is also an ancestor of element 13, but we're not interested in that ancestor. See below.\r\n\r\n(We're already doing this sleight of hand where the tree is defined in terms of MTH, a recursive function to compute a hash, which is not actually a tree. The tree comes from you expanding out the evaluation tree of that function, but RFC 9162 never actually said this. RFC 9162 could probably have done it better, but I think we can leave that to the WG.)\r\n\r\n> The third is \"that is also directly contained in the tree\". I assume that \"the tree\" is \"the tree of n elements\" rather than the unnamed subtree \"[start, end)\". With that phrase being the only qualifier on the highest ancestor, that highest ancestor becomes the root of the tree of n elements, when it should be an interior node that is common to both trees.\r\n\r\nAh yeah, that's unclear. That's supposed to come from you looking at ancestors of `end - 1` *within the subtree* but I forgot to say that. If you look at ancestors of `end - 1` within the big tree, well every node is common. I like your phrasing.",
+              "createdAt": "2025-10-15T14:29:52Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            },
+            {
+              "originalPosition": 428,
+              "body": "Done.",
+              "createdAt": "2025-10-15T14:45:45Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            },
+            {
+              "originalPosition": 440,
+              "body": "They should be the same as the two bullet points, I think. Rather, the two bullets don't _quite_ match step 3 and step 4. I added some parentheses to make that clear. (I found these two cases to be more natural, but they didn't quite line up with code.)",
+              "createdAt": "2025-10-15T15:00:13Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            },
+            {
+              "originalPosition": 370,
+              "body": "Hehe, that's true, I definitely generally think of paths are going from root to leaf in trees.\r\n\r\nI would guess that's more common? I think that comes from reading top-down and trees being drawn from root down. And you usually go down in a decision or binary search tree. The recursive procedure also goes down. Even though, you're right, in an evaluation tree, which is how you verify a proof, and you go bottom-up.\r\n\r\nI think, similarly, left-to-write readers tend to think of bits as going from most to least significant, even though we number them from least to most, and it's actually way easier to go from least to most in code.\r\n\r\nReworded things a bit to be clearer. I tried a few options and I think root to leaf works better for this explanation. If we go root to leaf, we say the highest different bit is the point at which we diverge. If we go from leaf to root, we have to say the highest different bit is the point *just before* we converge, which feels clumsier.",
+              "createdAt": "2025-10-15T15:03:13Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            },
+            {
+              "originalPosition": 382,
+              "body": "Ah yeah, I agree that, now that we're explicitly moving up, \"diverge\" is extra weird. I've rephrased this to, hopefully, make it moot.",
+              "createdAt": "2025-10-15T15:12:55Z",
+              "updatedAt": "2025-10-15T16:07:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HPOL_",
+          "commit": {
+            "abbreviatedOid": "07988d2"
+          },
+          "author": "meacer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-15T23:42:07Z",
+          "updatedAt": "2025-10-15T23:42:07Z",
+          "comments": [
+            {
+              "originalPosition": 208,
+              "body": "`MTH({d[12]})`, `MTH({d[12]})` --> should be `MTH({d[12]})`, `MTH({d[13]})`?",
+              "createdAt": "2025-10-15T23:42:07Z",
+              "updatedAt": "2025-10-15T23:42:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HPQ9y",
+          "commit": {
+            "abbreviatedOid": "f7da5bc"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-15T23:52:24Z",
+          "updatedAt": "2025-10-15T23:52:25Z",
+          "comments": [
+            {
+              "originalPosition": 370,
+              "body": "Thanks for adding the clarification about paths being root-to-leaf, and I agree with your logic that root-to-leaf might be more common interpretation. (I realized after writing up these comments that the recursive procedure for generating proofs generates them in the top-down direction \u2014 it's just the evaluation/verification that's bottom-up.)",
+              "createdAt": "2025-10-15T23:52:24Z",
+              "updatedAt": "2025-10-15T23:52:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HPRBU",
+          "commit": {
+            "abbreviatedOid": "f7da5bc"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-15T23:52:36Z",
+          "updatedAt": "2025-10-15T23:52:37Z",
+          "comments": [
+            {
+              "originalPosition": 382,
+              "body": "The new phrasing looks good.",
+              "createdAt": "2025-10-15T23:52:37Z",
+              "updatedAt": "2025-10-15T23:52:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HPRgv",
+          "commit": {
+            "abbreviatedOid": "f7da5bc"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-15T23:54:25Z",
+          "updatedAt": "2025-10-15T23:54:25Z",
+          "comments": [
+            {
+              "originalPosition": 390,
+              "body": "Your wordsmithing looks good.",
+              "createdAt": "2025-10-15T23:54:25Z",
+              "updatedAt": "2025-10-15T23:54:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HPRv3",
+          "commit": {
+            "abbreviatedOid": "07988d2"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "one nit, otherwise looks good",
+          "createdAt": "2025-10-15T23:55:04Z",
+          "updatedAt": "2025-10-16T00:02:55Z",
+          "comments": [
+            {
+              "originalPosition": 399,
+              "body": "nit: missing a word in \"the overall tree will `node_hash` and `root_hash`\"?",
+              "createdAt": "2025-10-15T23:55:04Z",
+              "updatedAt": "2025-10-16T00:02:55Z"
+            },
+            {
+              "originalPosition": 347,
+              "body": "I think I was confused \u2014 disregard this comment thread. (It appears that for some reason I thought \"rightmost edge\" meant \"only consider the path from the root to the rightmost leaf node\", and when combined with \"some levels are skipped\" was thinking \"some levels are skipped, but only when looking at the path to the rightmost leaf node and not to any other nodes\".)",
+              "createdAt": "2025-10-15T23:59:03Z",
+              "updatedAt": "2025-10-16T00:02:55Z"
             }
           ]
         }
