@@ -673,7 +673,7 @@ The subtree consistency proof for `[4, 8)` and a tree of size 14 contains `MTH(D
 ~~~
 {: #fig-subtree-consistency-example-1 title="An example subtree consistency proof for a subtree that is directly contained in the full tree"}
 
-The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH({d[12]})`, `MTH({d[12]})`, `MTH(D[8:12])`, and `MTH(D[0:8])`, depicted in {{fig-subtree-consistency-example-2}}. `[8, 13)` is not directly contained in the tree, so the proof must include sufficient nodes to reconstruct both hashes.
+The subtree consistency proof for `[8, 13)` and a tree of size 14 contains `MTH({d[12]})`, `MTH({d[13]})`, `MTH(D[8:12])`, and `MTH(D[0:8])`, depicted in {{fig-subtree-consistency-example-2}}. `[8, 13)` is not directly contained in the tree, so the proof must include sufficient nodes to reconstruct both hashes.
 
 ~~~aasvg
       +----------------+
