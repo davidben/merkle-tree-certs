@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 10 April 2026                                                  
+Expires: 20 April 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          7 October 2025
+                                                         17 October 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 April 2026.
+   This Internet-Draft will expire on 20 April 2026.
 
 Copyright Notice
 
@@ -82,13 +82,16 @@ Table of Contents
    3.  Overview
    4.  Subtrees
      4.1.  Definition of a Subtree
-     4.2.  Subtree Inclusion Proofs
-       4.2.1.  Evaluating a Subtree Inclusion Proof
-       4.2.2.  Verifying a Subtree Inclusion Proof
-     4.3.  Subtree Consistency Proofs
-       4.3.1.  Generating a Subtree Consistency Proof
-       4.3.2.  Verifying a Subtree Consistency Proof
-     4.4.  Arbitrary Intervals
+     4.2.  Example Subtrees
+     4.3.  Subtree Inclusion Proofs
+       4.3.1.  Example Subtree Inclusion Proofs
+       4.3.2.  Evaluating a Subtree Inclusion Proof
+       4.3.3.  Verifying a Subtree Inclusion Proof
+     4.4.  Subtree Consistency Proofs
+       4.4.1.  Generating a Subtree Consistency Proof
+       4.4.2.  Example Subtree Consistency Proofs
+       4.4.3.  Verifying a Subtree Consistency Proof
+     4.5.  Arbitrary Intervals
    5.  Issuance Logs
      5.1.  Log Parameters
      5.2.  Log IDs
@@ -140,9 +143,14 @@ Table of Contents
      14.1.  Normative References
      14.2.  Informative References
    Appendix A.  ASN.1 Module
-   Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
-     B.1.  Subtree Signed Note Format
-     B.2.  Requesting Subtree Signatures
+   Appendix B.  Merkle Tree Structure
+     B.1.  Binary Representations
+     B.2.  Inclusion Proof Evaluation
+     B.3.  Consistency Proof Structure
+     B.4.  Consistency Proof Verification
+   Appendix C.  Extensions to Tiled Transparency Logs (To Be Removed)
+     C.1.  Subtree Signed Note Format
+     C.2.  Requesting Subtree Signatures
    Acknowledgements
    Change log
      Since draft-davidben-tls-merkle-tree-certs-00
@@ -242,13 +250,23 @@ Table of Contents
    [start, end), where start <= end, denotes the half-open interval
    containing integers x such that start <= x < end.
 
-   Given a non-negative integer n, LSB(n) refers to the least-
-   significant bit of n's binary representation.  Equivalently, it is
-   the remainder when n is divided by 2.
+   Given a non-negative integer n,
+
+   *  LSB(n) refers to the least-significant bit of n's binary
+      representation.  Equivalently, it is the remainder when n is
+      divided by 2.
+
+   *  BIT_WIDTH(n) refers to the smallest number of bits needed to
+      represent n.  BIT_WIDTH(0) is zero.
+
+   *  POPCOUNT(n) refers to the number of set bits in n's binary
+      representation`.
 
    To _right-shift_ a non-negative integer n is to shift each bit in its
    binary representation to one lower position, discarding the least-
    significant bit.  Equivalently, it is the floor of n divided by 2.
+   Given non-negative integers a and b, a >> b refers to a right-shifted
+   b times.
 
 2.1.  Terminology and Roles
 
@@ -378,7 +396,7 @@ Table of Contents
 
        3.  The CA additionally signs _subtrees_ (Section 4) that
            together contain certificates added since the last checkpoint
-           (Section 4.4).  This is an optimization to reduce inclusion
+           (Section 4.5).  This is an optimization to reduce inclusion
            proof sizes.  A signed subtree certifies that the CA has
            issued _every_ entry in the subtree.
 
@@ -511,7 +529,94 @@ Table of Contents
    If a subtree is partial, it is directly contained in MTH(D_n) only if
    n = end.
 
-4.2.  Subtree Inclusion Proofs
+4.2.  Example Subtrees
+
+   Figure 3 shows the subtrees [4, 8) and [8, 13):
+
+      +--------+
+      | [4, 8) |
+      +--------+
+       /      \
+   +-----+ +-----+
+   |[4,6)| |[6,8)|
+   +-----+ +-----+
+     / \     / \
+   +-+ +-+ +-+ +-+
+   |4| |5| |6| |7|
+   +-+ +-+ +-+ +-+
+
+         +----------------+
+         |     [8, 13)    |
+         +----------------+
+            /          |
+      +---------+      |
+      | [8, 12) |      |
+      +---------+      |
+        /      \       |
+   +------+ +-------+  |
+   |[8,10)| |[10,12)|  |
+   +------+ +-------+  |
+     / \      / \      |
+   +-+ +-+ +--+ +--+ +--+
+   |8| |9| |10| |11| |12|
+   +-+ +-+ +--+ +--+ +--+
+
+          Figure 3: Two example subtrees, one full and one partial
+
+   Both subtrees are directly contained in a Merkle Tree of size 13,
+   depicted in Figure 4. [4, 8) is contained because, although n (13) is
+   not end (8), the subtree is full. [8, 13) is contained because n (13)
+   is end (13).
+
+                   +-----------------------------+
+                   |            [0, 13)          |
+                   +-----------------------------+
+                      /                       \
+          +----------------+             +~~~~~~~~~~~~~~~~+
+          |     [0, 8)     |             |     [8, 13)    |
+          +----------------+             +~~~~~~~~~~~~~~~~+
+           /              \                 /          |
+      +--------+      +========+      +~~~~~~~~~+      |
+      | [0, 4) |      | [4, 8) |      | [8, 12) |      |
+      +--------+      +========+      +~~~~~~~~~+      |
+       /      \        /      \         /      \       |
+   +-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+  |
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)|  |
+   +-----+ +-----+ +=====+ +=====+ +~~~~~~+ +~~~~~~~+  |
+     / \     / \     / \     / \     / \      / \      |
+   +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+
+   |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
+   +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +~+ +~+ +~~+ +~~+ +~~+
+
+                     Figure 4: A Merkle Tree of size 13
+
+   In contrast, [8, 13) is not directly contained in a Merkle Tree of
+   size 14, depicted in Figure 5.  However, the subtree is still
+   computed over consistent elements.
+
+                   +-----------------------------+
+                   |            [0, 14)          |
+                   +-----------------------------+
+                      /                       \
+          +----------------+             +----------------+
+          |     [0, 8)     |             |     [8, 14)    |
+          +----------------+             +----------------+
+           /              \                 /           |
+      +--------+      +--------+      +---------+       |
+      | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+      +--------+      +--------+      +---------+       |
+       /      \        /      \         /      \        |
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+     / \     / \     / \     / \     / \      / \       / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+   |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +~+ +~+ +~~+ +~~+ +~~+ +--+
+
+                     Figure 5: A Merkle Tree of size 14
+
+4.3.  Subtree Inclusion Proofs
 
    Subtrees are Merkle Trees, so entries can be proven to be contained
    in the subtree.  A subtree inclusion proof for entry index of the
@@ -519,7 +624,37 @@ Table of Contents
    Section 2.1.3.1 of [RFC9162], where m is index - start and the tree
    inputs are D[start:end].
 
-4.2.1.  Evaluating a Subtree Inclusion Proof
+   Subtree inclusion proofs contain a sequence of nodes that are
+   sufficient to reconstruct the subtree hash, MTH(D[start:end]), out of
+   the hash for entry index, MTH({d[index]}), thus demonstrating that
+   the subtree hash contains the entry's hash.
+
+4.3.1.  Example Subtree Inclusion Proofs
+
+   The inclusion proof for entry 10 of subtree [8, 13) contains the
+   hashes MTH({d[11]}), MTH(D[8:10]), and MTH({d[12]}), depicted in
+   Figure 6.  MTH({d[10]}) is not part of the proof because the verifier
+   is assumed to already know its value.
+
+         +----------------+
+         |     [8, 13)    |
+         +----------------+
+            /          |
+      +---------+      |
+      | [8, 12) |      |
+      +---------+      |
+        /      \       |
+   +======+ +-------+  |
+   |[8,10)| |[10,12)|  |
+   +======+ +-------+  |
+     / \      / \      |
+   +-+ +-+ +~~+ +==+ +==+
+   |8| |9| |10| |11| |12|
+   +-+ +-+ +~~+ +==+ +==+
+
+                Figure 6: An example subtree inclusion proof
+
+4.3.2.  Evaluating a Subtree Inclusion Proof
 
    Given a subtree inclusion proof, inclusion_proof, for entry index,
    with hash entry_hash, of a subtree [start, end), the subtree
@@ -559,7 +694,9 @@ Table of Contents
    where leaf_index is index - start, tree_size is end - start, and r is
    returned instead of compared with root_hash.
 
-4.2.2.  Verifying a Subtree Inclusion Proof
+   Appendix B.2 explains this procedure in more detail.
+
+4.3.3.  Verifying a Subtree Inclusion Proof
 
    Given a subtree inclusion proof, inclusion_proof, for entry index,
    with hash entry_hash, of a subtree [start, end) with hash
@@ -567,14 +704,14 @@ Table of Contents
    the described entry is contained in the subtree:
 
    1.  Let expected_subtree_hash be the result of evaluating the
-       inclusion proof as described Section 4.2.1.  If evaluation fails,
+       inclusion proof as described Section 4.3.2.  If evaluation fails,
        fail the proof verification.
 
    2.  If subtree_hash is equal to expected_subtree_hash, the entry is
        contained in the subtree.  Otherwise, fail the proof
        verification.
 
-4.3.  Subtree Consistency Proofs
+4.4.  Subtree Consistency Proofs
 
    A subtree [start, end) can be efficiently proven to be consistent
    with the full Merkle Tree.  That is, given MTH(D[start:end]) and
@@ -582,7 +719,12 @@ Table of Contents
    subtree hash was equal to the corresponding elements of the input D_n
    to the Merkle Tree hash.
 
-4.3.1.  Generating a Subtree Consistency Proof
+   Subtree consistency proofs contain sufficient nodes to reconstruct
+   both the subtree hash, MTH(D[start:end]), and the full tree hash,
+   MTH(D_n), in such a way that every input to the subtree hash was also
+   incorporated into the full tree hash.
+
+4.4.1.  Generating a Subtree Consistency Proof
 
    The subtree consistency proof, SUBTREE_PROOF(start, end, D_n) is
    defined similarly to Section 2.1.4.1 of [RFC9162], in terms of a
@@ -626,7 +768,97 @@ Table of Contents
 
    SUBTREE_PROOF(start, start + 1, D_n) = PATH(start, D_n)
 
-4.3.2.  Verifying a Subtree Consistency Proof
+   Appendix B.3 explains the structure of a subtree consistency proof in
+   more detail.
+
+4.4.2.  Example Subtree Consistency Proofs
+
+   The subtree consistency proof for [4, 8) and a tree of size 14
+   contains MTH(D[0:4]) and MTH(D[8:14]), depicted in Figure 7.  The
+   verifier is assumed to know the subtree hash, so there is no need to
+   include MTH(D[4:8]) itself in the consistency proof.
+
+      +~~~~~~~~+
+      | [4, 8) |
+      +~~~~~~~~+
+       /      \
+   +-----+ +-----+
+   |[4,6)| |[6,8)|
+   +-----+ +-----+
+     / \     / \
+   +-+ +-+ +-+ +-+
+   |4| |5| |6| |7|
+   +-+ +-+ +-+ +-+
+
+                   +-----------------------------+
+                   |            [0, 14)          |
+                   +-----------------------------+
+                      /                       \
+          +----------------+             +================+
+          |     [0, 8)     |             |     [8, 14)    |
+          +----------------+             +================+
+           /              \                 /           |
+      +========+      +~~~~~~~~+      +---------+       |
+      | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+      +========+      +~~~~~~~~+      +---------+       |
+       /      \        /      \         /      \        |
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+     / \     / \     / \     / \     / \      / \       / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
+   |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +--+ +--+
+
+     Figure 7: An example subtree consistency proof for a subtree that
+                   is directly contained in the full tree
+
+   The subtree consistency proof for [8, 13) and a tree of size 14
+   contains MTH({d[12]}), MTH({d[13]}), MTH(D[8:12]), and MTH(D[0:8]),
+   depicted in Figure 8. [8, 13) is not directly contained in the tree,
+   so the proof must include sufficient nodes to reconstruct both
+   hashes.
+
+         +----------------+
+         |     [8, 13)    |
+         +----------------+
+            /          |
+      +=========+      |
+      | [8, 12) |      |
+      +=========+      |
+        /      \       |
+   +------+ +-------+  |
+   |[8,10)| |[10,12)|  |
+   +------+ +-------+  |
+     / \      / \      |
+   +-+ +-+ +--+ +--+ +==+
+   |8| |9| |10| |11| |12|
+   +-+ +-+ +--+ +--+ +==+
+
+                   +-----------------------------+
+                   |            [0, 14)          |
+                   +-----------------------------+
+                      /                       \
+          +================+             +----------------+
+          |     [0, 8)     |             |     [8, 14)    |
+          +================+             +----------------+
+           /              \                 /           |
+      +--------+      +--------+      +=========+       |
+      | [0, 4) |      | [4, 8) |      | [8, 12) |       |
+      +--------+      +--------+      +=========+       |
+       /      \        /      \         /      \        |
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)| |[8,10)| |[10,12)| |[12,14)|
+   +-----+ +-----+ +-----+ +-----+ +------+ +-------+ +-------+
+     / \     / \     / \     / \     / \      / \       / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
+   |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12| |13|
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +--+ +--+ +==+ +==+
+
+     Figure 8: An example subtree consistency proof for a subtree that
+                 is not directly contained in the full tree
+
+4.4.3.  Verifying a Subtree Consistency Proof
 
    The following procedure can be used to verify a subtree consistency
    proof.
@@ -647,7 +879,7 @@ Table of Contents
 
    4.  Otherwise:
 
-       1.  Until LSB(sn) is not set or fn is sn, right-shift fn, sn, and
+       1.  Until fn is sn or LSB(sn) is not set, right-shift fn, sn, and
            tn equally.
 
    5.  If fn is sn, set fr and sr to node_hash.
@@ -682,9 +914,11 @@ Table of Contents
        are not equal, fail the proof verification.  If all are equal,
        accept the proof.
 
-4.4.  Arbitrary Intervals
+   Appendix B.4 explains this procedure in more detail.
 
-   Not all [start, end) intervals of a Merkle tree are valid subtrees.
+4.5.  Arbitrary Intervals
+
+   Not all [start, end) intervals of a Merkle Tree are valid subtrees.
    This section describes how, for any start < end, to determine up to
    two subtrees that efficiently cover the interval.  The subtrees are
    determined by the following procedure:
@@ -758,7 +992,7 @@ Table of Contents
        left_start = start & ~((1 << left_split) - 1)
        return [(left_start, mid), (mid, end)]
 
-   Figure 3 shows the subtrees which cover [5, 13) in a Merkle Tree of
+   Figure 9 shows the subtrees which cover [5, 13) in a Merkle Tree of
    13 elements.  The two subtrees selected are [4, 8) and [8, 13).  Note
    that the subtrees cover a slightly larger interval than [5, 13).
 
@@ -782,10 +1016,10 @@ Table of Contents
    |0| |1| |2| |3| |4| |5| |6| |7| |8| |9| |10| |11| |12|
    +-+ +-+ +-+ +-+ +-+ +=+ +=+ +=+ +=+ +=+ +==+ +==+ +==+
 
-      Figure 3: An example selection of subtrees to cover an interval
+      Figure 9: An example selection of subtrees to cover an interval
 
    Two subtrees are needed because a single subtree may not be able to
-   efficiently cover an interval.  Figure 4 shows the smallest subtree
+   efficiently cover an interval.  Figure 10 shows the smallest subtree
    that contains [7, 9) in a 9-element tree.  The smallest single
    subtree that contains the interval is [0, 9) but this is the entire
    tree.  Using two subtrees, the interval can be described by [7, 8)
@@ -811,7 +1045,7 @@ Table of Contents
    |0| |1| |2| |3| |4| |4| |6| |7| |8|
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
 
-       Figure 4: An example showing an inefficient choice of a single
+      Figure 10: An example showing an inefficient choice of a single
                                   subtree
 
 5.  Issuance Logs
@@ -1030,7 +1264,7 @@ Table of Contents
    sign a non-checkpoint subtree if it is contained in its current
    checkpoint.  In a correctly-operated cosigner, every signature made
    by the cosigner can be proven consistent with its current checkpoint
-   with a subtree consistency proof (Section 4.3).  As a consequence, a
+   with a subtree consistency proof (Section 4.4).  As a consequence, a
    cosigner that signs a subtree is held responsible for all the entries
    in the tree of size matching the subtree end, even if the
    corresponding checkpoint is erroneously unavailable.
@@ -1040,7 +1274,7 @@ Table of Contents
    this assurance differently.  For example, a cosigner may compute the
    hash from its saved log state (e.g. if it is the log operator or
    maintains a copy of the log) or by verifying a subtree consistency
-   proof (Section 4.3) from its current checkpoint.  When a cosigner
+   proof (Section 4.4) from its current checkpoint.  When a cosigner
    signs a subtree, it is held responsible _both_ for the subtree being
    consistent with its other signatures, _and_ for the cosigner-specific
    additional statements.
@@ -1091,7 +1325,7 @@ Table of Contents
    domain-validating CA states that it has performed domain validation
    for each entry, at some time consistent with the entry's validity
    dates.  CAs are held responsible for every entry in every subtree
-   they sign.  Proving an entry is included (Section 4.2) in a CA-signed
+   they sign.  Proving an entry is included (Section 4.3) in a CA-signed
    subtree is sufficient to prove the CA certified it.
 
    What it means to certify an entry depends on the entry type:
@@ -1203,10 +1437,10 @@ Table of Contents
 
    *  The hash value of any available subtree (Section 4)
 
-   *  A subtree inclusion proof (Section 4.2) for any available entry in
+   *  A subtree inclusion proof (Section 4.3) for any available entry in
       any containing subtree
 
-   *  A subtree consistency proof (Section 4.3) between any available
+   *  A subtree consistency proof (Section 4.4) between any available
       subtree to any containing checkpoint
 
    Meeting these requirements requires a log to retain some information
@@ -1214,7 +1448,7 @@ Table of Contents
    if end is less than or equal to the minimum index, the node's
    children MAY be discarded in favor of the node's hash.
 
-   Figure 5 shows an example pruned tree with 13 elements, where the
+   Figure 11 shows an example pruned tree with 13 elements, where the
    minimum index is 7.  It shows the original tree, followed by the
    pruned tree.  The pruned tree depicts the nodes that MUST be
    available or computable.  Note that entry 6 MAY be discarded, only
@@ -1261,13 +1495,13 @@ Table of Contents
                            |6| |7| |8| |9| |10| |11| |12|
                            +-+ +=+ +=+ +=+ +==+ +==+ +==+
 
-        Figure 5: An example showing the minimum nodes that must be
+        Figure 11: An example showing the minimum nodes that must be
                           available after pruning
 
    Logs MAY retain additional nodes, or expect log clients to compute
-   required nodes from other nodes.  For example, in Figure 5, the log's
-   serving protocol MAY instead serve [0, 2) and [2, 4), with the log
-   client computing [0, 4) from those values.
+   required nodes from other nodes.  For example, in Figure 11, the
+   log's serving protocol MAY instead serve [0, 2) and [2, 4), with the
+   log client computing [0, 4) from those values.
 
 6.  Certificates
 
@@ -1347,7 +1581,7 @@ Table of Contents
 
    start and end MUST contain the corresponding parameters of the chosen
    subtree. inclusion_proof MUST contain a subtree inclusion proof
-   (Section 4.2) for the log entry and the subtree. signatures contains
+   (Section 4.3) for the log entry and the subtree. signatures contains
    the chosen subtree signatures.  In each signature, cosigner_id
    contains the cosigner ID (Section 5.4) in its binary representation
    (Section 3 of [I-D.ietf-tls-trust-anchor-ids]), and signature
@@ -1374,7 +1608,7 @@ Table of Contents
 
    1.  The CA signs the checkpoint with its key(s) (Section 5.5).
 
-   2.  Using the procedure in Section 4.4, the CA determines the two
+   2.  Using the procedure in Section 4.5, the CA determines the two
        subtrees that cover the entries added between this checkpoint and
        the most recent checkpoint.
 
@@ -1384,7 +1618,7 @@ Table of Contents
        from external cosigners to meet relying party requirements
        (Section 7.3).
 
-   5.  The CA requests subtree cosignatures (Appendix B.2) from the
+   5.  The CA requests subtree cosignatures (Appendix C.2) from the
        cosigners above.
 
    6.  For each certificate in the interval, the CA constructs
@@ -1470,7 +1704,7 @@ Table of Contents
    Landmarks determine _landmark subtrees_: for each landmark, other
    than number zero, let tree_size be the landmark's tree size and
    prev_tree_size be that of the previous landmark.  As described in
-   Section 4.4, select the one or two subtrees that cover
+   Section 4.5, select the one or two subtrees that cover
    [prev_tree_size, tree_size).  Each of those subtrees is a landmark
    subtree.  Landmark zero has no landmark subtrees.
 
@@ -1667,7 +1901,7 @@ Table of Contents
    6.  Let expected_subtree_hash be the result of evaluating the
        MTCProof's inclusion_proof for entry index, with hash entry_hash,
        of the subtree described by the MTCProof's start and end,
-       following the procedure in Section 4.2.1.  If evaluation fails,
+       following the procedure in Section 4.3.2.  If evaluation fails,
        abort this process and fail verification.
 
    7.  If [start, end) matches a trusted subtree (Section 7.4), check
@@ -1767,7 +2001,7 @@ Table of Contents
          a valid Merkle consistency proof (Section 2.1.4 of [RFC9162])
          between the two
 
-   *  For each subtree, a valid subtree consistency proof (Section 4.3)
+   *  For each subtree, a valid subtree consistency proof (Section 4.4)
       between the subtree and the reference checkpoint
 
    [[TODO: The subtree consistency proofs have many nodes in common.  It
@@ -2677,13 +2911,326 @@ Appendix A.  ASN.1 Module
 
    END
 
-Appendix B.  Extensions to Tiled Transparency Logs (To Be Removed)
+Appendix B.  Merkle Tree Structure
+
+   This non-normative section describes how the Merkle Tree structure
+   relates to the binary representations of indices.  It is included to
+   help implementors understand the procedures described in Section 4.
+
+B.1.  Binary Representations
+
+   Within a Merkle Tree whose size is a power of two, the binary
+   representation of an leaf's index gives the path to that leaf.  The
+   leaf is a left child if the least-significant bit is unset and a
+   right child if it is set.  The next bit indicates the direction of
+   the parent node, and so on.  Figure 12 demonstrates this in a Merkle
+   Tree of size 8:
+
+          +----------------+
+          |     [0, 8)     |        level 3
+          +----------------+
+           /              \
+      +--------+      +--------+
+      | [0, 4) |      | [4, 8) |    level 2
+      +--------+      +--------+
+       /      \        /      \
+   +-----+ +-----+ +-----+ +-----+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)|  level 1
+   +-----+ +-----+ +-----+ +-----+
+     / \     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| |6| |7|  level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+                Figure 12: An example Merkle Tree of size 8
+
+   The binary representation of 4 is 0b100.  It is the left (0) child of
+   [4, 6), which is the left (0) child of [4, 8), which is the right (1)
+   child of [0, 8).
+
+   Each level in the tree corresponds to a bit position and can be
+   correspondingly numbered, with 0 indicating the least-significant bit
+   and the leaf level, and so on.  In this numbering, a node's level can
+   be determined as follows: if the node is a root of subtree [start,
+   end), the node's level is BIT_WIDTH(end - start - 1).
+
+   Comparing two indices determines the relationship between two paths.
+   The highest differing bit gives the level at which paths from root to
+   leaf diverge.  For example, the bit representations of 4 and 6 are
+   0b100 and 0b110, respectively.  The highest differing bit is bit 1.
+   Bits 2 and up are the same between the two indices.  This indicates
+   that the paths from the root to leaves 4 and 6 diverge when going to
+   level 2 to level 1.
+
+   This can be generalized to arbitrary-sized Merkle Trees.  Figure 13
+   depicts a Merkle Tree of size 6:
+
+          +--------------+
+          |     [0, 6)   |   level 3
+          +--------------+
+           /          |
+      +--------+      |
+      | [0, 4) |      *      level 2
+      +--------+      |
+       /      \       |
+   +-----+ +-----+ +-----+
+   |[0,2)| |[2,4)| |[4,6)|   level 1
+   +-----+ +-----+ +-----+
+     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5|   level 0
+   +-+ +-+ +-+ +-+ +-+ +-+
+
+                Figure 13: An example Merkle Tree of size 6
+
+   When the size of a Merkle Tree is not a power of two, some levels on
+   the rightmost edge of the tree are skipped.  The rightmost edge is
+   the path to the last element.  The skipped levels can be seen in its
+   binary representation.  Here, the last element is 5, which has binary
+   representation 0b101.  When a bit is set, the corresponding node is a
+   right child.  When it is unset, the corresponding node is skipped.
+
+   In a tree of the next power of two size, the skipped nodes in this
+   path are where there _would_ have been a right child, had there been
+   enough elements to construct one.  Without a right child, the hash
+   operation is skipped and a skipped node has the same value as its
+   singular child.  Figure 14 depicts this for a tree of size 6.
+
+          +----------------+
+          |     [0, 6)     |        level 3
+          +----------------+
+           /              \
+      +--------+      +--------+
+      | [0, 4) |      | [4, 6) |    level 2
+      +--------+      +--------+
+       /      \        /      \
+   +-----+ +-----+ +-----+ +-----+
+   |[0,2)| |[2,4)| |[4,6)| |     |  level 1
+   +-----+ +-----+ +-----+ +-----+
+     / \     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| | | | |  level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+      Figure 14: An example Merkle Tree of size 6, viewed as a subset
+                            of a tree of size 8
+
+   Zero bits also indicate skipped nodes in paths that have not yet
+   diverged from the rightmost edge (i.e. the path to the last element),
+   when viewed from root to leaf.  In the example, the binary
+   representation of 4 is 0b100.  While bit 0 and bit 1 are both unset,
+   they manifest in the tree differently.  Bit 0 indicates that 4 is a
+   right child.  However, at bit 1, 0b100 has not yet diverged from the
+   last element, 0b101.  That instead indicates a skipped node, not a
+   left child.
+
+B.2.  Inclusion Proof Evaluation
+
+   The procedure in Section 4.3.2 builds up a subtree hash in r by
+   staring from entry_hash and iteratively hashing elements of
+   inclusion_proof on the left or right.  That means this procedure,
+   when successful, must return _some_ hash that contains entry_hash.
+
+   Treating [start, end) as a Merkle Tree of size end - start, the
+   procedure hashes by based on the path to index.  Within this smaller
+   Merkle Tree, it has index fn = index - start (first number), and the
+   last element has index sn = end - start - 1 (second number).
+
+   Step 4 iterates through inclusion_proof and the paths to fn and sn in
+   parallel.  As the procedure right-shifts fn and sn and looks at the
+   least-significant bit, it moves up the two paths, towards the root.
+   When sn is zero, the procedure has reached the top of the tree.  The
+   procedure checks that the two iterations complete together.
+
+   Iterating from level 0 up, fn and sn will initially be different.
+   While they are different, step 4.2 hashes on the left or right based
+   on the binary representation, as discussed in Appendix B.1.
+
+   Once fn = sn, the remainder of the path is on the right edge.  At
+   that point, the condition in step 4.2 is always true.  It only
+   incorporates proof entries on the left, once per set bit.  Unset bits
+   are skipped.
+
+   Inclusion proofs can also be evaluated by considering these two
+   stages separately.  The first stage consumes l1 = BIT_WIDTH(fn XOR
+   sn) proof entries.  The second stage consumes l2 = POPCOUNT(fn >> l1)
+   proof entries.  A valid inclusion proof must then have l1 + l2
+   entries.  The first l1 entries are hashed based on fn's least
+   significant bits, and the remaining l2 entries are hashed on the
+   left.
+
+B.3.  Consistency Proof Structure
+
+   A subtree consistency proof for [start, end) and the tree of n
+   elements is similar to an inclusion proof for element end - 1.  If
+   one starts from end - 1's hash, incorporating the whole inclusion
+   proof should reconstruct root_hash and incorporating a subset of the
+   inclusion proof should reconstruct node_hash.  Thus end - 1's hash
+   and this inclusion proof can prove consistency.  A subtree
+   consistency proof in this document applies two optimizations over
+   this construction:
+
+   1.  Instead of starting at level 0 with end - 1, the proof can start
+       at a higher level.  Any ancestor of end - 1 shared by both the
+       subtree and the overall tree is a valid starting node to
+       reconstruct node_hash and root_hash.  Use the highest level with
+       a commmon ancestor.  This truncates the inclusion proof portion
+       of the consistency proof.
+
+   2.  If this starting node is the entire subtree, omit its hash from
+       the consistency proof.  The verifier is assumed to already know
+       node_hash.
+
+   A Merkle consistency proof, defined in Section 2.1.4 of [RFC9162],
+   applies these same optimizations.
+
+   Figure 15 depicts a subtree consistency proof between the subtree [0,
+   6) and the Merkle Tree of size 8.  The consistency proof begins at
+   level 1, or node [4, 6).  The inclusion proof portion is similarly
+   truncated to start at level 1: [6, 8) and [0, 4).  If the consistency
+   proof began at level 0, the starting node would be leaf 5, and the
+   consistency proof would additionally include leaf 4.
+
+          +----------------+
+          |     [0, 6)     |         level 3
+          +----------------+
+           /           |
+      +========+  +--------+
+      | [0, 4) |  | [4, 6) |         level 2
+      +========+  +--------+
+       /      \        |
+   +-----+ +-----+ +~~~~~+
+   |[0,2)| |[2,4)| |[4,6)|           level 1
+   +-----+ +-----+ +~~~~~+
+     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5|           level 0
+   +-+ +-+ +-+ +-+ +-+ +-+
+
+
+          +----------------+
+          |     [0, 8)     |         level 3
+          +----------------+
+           /              \
+      +========+      +--------+
+      | [0, 4) |      | [4, 8) |     level 2
+      +========+      +--------+
+       /      \        /      \
+   +-----+ +-----+ +~~~~~+ +=====+
+   |[0,2)| |[2,4)| |[4,6)| |[6,8)|   level 1
+   +-----+ +-----+ +~~~~~+ +=====+
+     / \     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| |6| |7|   level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+       Figure 15: A subtree consistency proof that starts at level 1
+                             instead of level 0
+
+   Note that the truncated inclusion proof may include nodes from lower
+   levels, if the corresponding level was skipped on the right edge.
+   Figure 16 depicts a subtree consistency proof between the subtree [0,
+   6) and the Merkle Tree of size 7.  As above, the starting node is [4,
+   6) at level 1.  The inclusion proof portion includes leaf 6 at level
+   0.  This is because leaf 6 is taking the place of its skipped parent
+   at level 1.  (A skipped node can be thought of as a duplicate of its
+   singular child.)
+
+          +----------------+
+          |     [0, 6)     |       level 3
+          +----------------+
+           /           |
+      +========+  +--------+
+      | [0, 4) |  | [4, 6) |       level 2
+      +========+  +--------+
+       /      \        |
+   +-----+ +-----+ +~~~~~+
+   |[0,2)| |[2,4)| |[4,6)|         level 1
+   +-----+ +-----+ +~~~~~+
+     / \     / \     / \
+   +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5|         level 0
+   +-+ +-+ +-+ +-+ +-+ +-+
+
+
+          +----------------+
+          |     [0, 7)     |       level 3
+          +----------------+
+           /              \
+      +========+      +--------+
+      | [0, 4) |      | [4, 7) |   level 2
+      +========+      +--------+
+       /      \        /    |
+   +-----+ +-----+ +~~~~~+ +=+
+   |[0,2)| |[2,4)| |[4,6)| |6|     level 1
+   +-----+ +-----+ +~~~~~+ +=+
+     / \     / \     / \    |
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+
+   |0| |1| |2| |3| |4| |5| |6|     level 0
+   +-+ +-+ +-+ +-+ +-+ +-+ +-+
+
+     Figure 16: The interaction between inclusion proof truncation and
+                               skipped levels
+
+B.4.  Consistency Proof Verification
+
+   The procedure in Section 4.4.3 is structured similarly to inclusion
+   proof evaluation (Appendix B.2).  It iteratively builds two hashes,
+   fr and sr, which are expected to equal node_hash and root_hash,
+   respectively.  Everything hashed into fr is also hashed into sr, so
+   success demonstrates that root_hash contains node_hash.
+
+   Step 2 initializes fn (first number), sn (second number), and tn
+   (third number) to follow, respectively, the paths to start, end - 1
+   (the last element of the subtree), and n - 1 (the last element of the
+   tree).
+
+   Steps 3 and 4 then skip to the starting node, described in
+   Appendix B.3.  The starting node may be:
+
+   *  The entire subtree [start, end) if [start, end) is directly
+      contained in the tree.  This will occur if end is n (step 3), or
+      if [start, end) is full (exiting step 4 because fn is sn).
+
+   *  Otherwise, the highest full subtree along the right edge of
+      [start, end).  This corresponds to the process exiting step 4
+      because LSB(sn) is not set.
+
+   Steps 5 and 6 initialize the hashes fr and sr:
+
+   *  In the first case above, fn will equal sn after truncation.  Step
+      5 will then initialize the hashes to node_hash because consistency
+      proof does not need to include the starting node.
+
+   *  In the second case above, fn is less than sn.  Step 6 will then
+      initialize the hashes to the first value in the consistency proof.
+
+   Step 7 incorporates the remainder of the consistency proof into fr
+   and sr:
+
+   *  All hashes are incorporated into sr, with hashing on the left or
+      right determined the same as in inclusion proof evaluation.
+
+   *  A subset of the hashes are incorporated into fr.  It skips any
+      hash on the right because those contain elements greater than end
+      - 1.  It also stops incorporating when fn and sn have converged.
+
+   This reconstructs the hashes of the subtree and full tree, which are
+   then compared to expected values in step 8.
+
+   In the case when fn is sn in step 5, the condition in step 7.2.1 is
+   always false, and fr is always equal to node_hash in step 8.  In this
+   case, steps 6 through 8 are equivalent to verifying an inclusion
+   proof for the truncated subtree [fn, sn + 1) and truncated tree tn +
+   1.
+
+Appendix C.  Extensions to Tiled Transparency Logs (To Be Removed)
 
    [[TODO: This section is expected to be removed.  It is sketched here
    purely for illustrative purposes, until the features are defined
    somewhere else, e.g. in the upstream tlog documents.]]
 
-B.1.  Subtree Signed Note Format
+C.1.  Subtree Signed Note Format
 
    A subtree, with signatures, can be represented as a signed note
    [SIGNED-NOTE].  Trust anchor IDs can be converted into log origins
@@ -2716,7 +3263,7 @@ B.1.  Subtree Signed Note Format
    The only difference between the two forms is the implicit
    transformation from the signed note text to the MTCSubtree structure.
 
-B.2.  Requesting Subtree Signatures
+C.2.  Requesting Subtree Signatures
 
    This section defines the sign-subtree cosigner HTTP endpoint for
    clients to obtain subtree signatures from non-CA cosigners, such as
@@ -2735,7 +3282,7 @@ B.2.  Requesting Subtree Signatures
    is the submission prefix.  The client's request body MUST be a
    sequence of:
 
-   *  The requested subtree as a signed note (Appendix B.1), with zero
+   *  The requested subtree as a signed note (Appendix C.1), with zero
       or more signatures.  The endpoint MAY require signatures from the
       CA as a DoS mitigation, as described below.
 
@@ -2746,7 +3293,7 @@ B.2.  Requesting Subtree Signatures
 
    *  A blank line
 
-   *  Zero or more subtree consistency proof (Section 4.3) lines.  Each
+   *  Zero or more subtree consistency proof (Section 4.4) lines.  Each
       line MUST encode a single hash in base64 [RFC4648].  The client
       MUST NOT send more than 63 consistency proof lines.
 
@@ -2792,7 +3339,7 @@ B.2.  Requesting Subtree Signatures
    *  Caching subtree signatures
 
    *  Requiring a CA signature on the subtree; CAs are only expected to
-      sign two subtrees (Section 4.4) for each checkpoint
+      sign two subtrees (Section 4.5) for each checkpoint
 
    *  Rate-limiting requests
 
@@ -2836,7 +3383,7 @@ Since draft-davidben-tls-merkle-tree-certs-00
       quantum public keys.  The original Assertion is used everywhere
       else, including BikeshedCertificate. #6
 
-   *  Add proper context to every node in the Merkle tree. #32
+   *  Add proper context to every node in the Merkle Tree. #32
 
    *  Clarify we use a single CertificateEntry. #11
 
@@ -2878,10 +3425,10 @@ Since draft-davidben-tls-merkle-tree-certs-04
    heads to certify certificates in bulk.
 
    In draft-04, the CA software publishes certificates in a bunch of
-   independent Merkle trees.  This is very easy to do as a collection of
+   independent Merkle Trees.  This is very easy to do as a collection of
    highly cacheable, immutable static files because each tree is
    constructed independently, and never appended to after being built.
-   In draft-05, the certificates are published in a single Merkle tree.
+   In draft-05, the certificates are published in a single Merkle Tree.
    The [TLOG-TILES] interface allows such trees to also use highly
    cacheable, immutable static files.
 
@@ -2896,7 +3443,7 @@ Since draft-davidben-tls-merkle-tree-certs-04
    landmark checkpoint contains all the previous checkpoints.
 
    In draft-04, the independent tree heads were easily prunable.  In
-   draft-05, we define how to prune a Merkle tree.
+   draft-05, we define how to prune a Merkle Tree.
 
    In draft-04, there is no fast issuance mode.  In draft-05, frequent,
    non-landmark checkpoints can be combined with inclusion proofs and
@@ -2936,6 +3483,8 @@ Since draft-davidben-tls-merkle-tree-certs-07
    *  Clarify signature verification process
 
    *  Improve subtree consistency proof verification algorithm
+
+   *  Add an appendix that explains the Merkle Tree proof procedures
 
 Authors' Addresses
 
