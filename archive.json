@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-16T01:58:12.517327+00:00",
+  "timestamp": "2025-10-19T02:10:15.407888+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2567,7 +2567,7 @@
       "id": "I_kwDOJIBkVc7PZWMx",
       "title": "Explain the proof verification procedures in an appendix",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/147",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -2576,8 +2576,8 @@
       "labels": [],
       "body": "We borrowed them from 9162, which also didn't explain them, but it's probably worth doing so.",
       "createdAt": "2025-10-03T02:21:25Z",
-      "updatedAt": "2025-10-03T02:21:25Z",
-      "closedAt": null,
+      "updatedAt": "2025-10-17T20:06:06Z",
+      "closedAt": "2025-10-17T20:06:06Z",
       "comments": []
     },
     {
@@ -8878,24 +8878,26 @@
       "id": "PR_kwDOJIBkVc6sUSSZ",
       "title": "Add an appendix that explains the proof procedures",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/150",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "CC @nharper\r\n    \r\nCloses #147",
       "createdAt": "2025-10-06T16:34:12Z",
-      "updatedAt": "2025-10-16T00:02:55Z",
+      "updatedAt": "2025-10-17T20:06:07Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "8fd36010dd8e613b3f566be965c6872a89b85475",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "proof-explain",
-      "headRefOid": "07988d2e3db10b6719a88f11d931086fbaa05b4d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "c5959712290c306d231e086936ffd0f62206f6b6",
+      "closedAt": "2025-10-17T20:06:05Z",
+      "mergedAt": "2025-10-17T20:06:05Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "923c83b92be94447b589b4bbff74817e707dc775"
+      },
       "comments": [],
       "reviews": [
         {
@@ -9257,6 +9259,32 @@
               "body": "I think I was confused \u2014 disregard this comment thread. (It appears that for some reason I thought \"rightmost edge\" meant \"only consider the path from the root to the rightmost leaf node\", and when combined with \"some levels are skipped\" was thinking \"some levels are skipped, but only when looking at the path to the rightmost leaf node and not to any other nodes\".)",
               "createdAt": "2025-10-15T23:59:03Z",
               "updatedAt": "2025-10-16T00:02:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7HQDKJ",
+          "commit": {
+            "abbreviatedOid": "07988d2"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-16T02:39:36Z",
+          "updatedAt": "2025-10-16T02:42:07Z",
+          "comments": [
+            {
+              "originalPosition": 208,
+              "body": "Whoops, yes. Fixed.",
+              "createdAt": "2025-10-16T02:39:37Z",
+              "updatedAt": "2025-10-16T02:42:07Z"
+            },
+            {
+              "originalPosition": 399,
+              "body": "Whoops, fixed.",
+              "createdAt": "2025-10-16T02:41:48Z",
+              "updatedAt": "2025-10-16T02:42:07Z"
             }
           ]
         }
