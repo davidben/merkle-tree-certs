@@ -1352,19 +1352,72 @@ When a CA is found to be untrustworthy, relying parties SHOULD remove trust in t
 
 # Use in TLS
 
-TLS implementations that authenticate with or accept Merkle Tree certificates SHOULD support trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}) for certificate selection.
+Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in a traditional X.509 certificate. The primary new considerations for use in TLS are:
 
-A full certificate has a trust anchor ID of the corresponding log ID ({{log-ids}}). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}.
+* Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA
+* Whether the authenticating party should send a full or signatureless certificate
+* What the relying party should communicate to the authenticating party to help it make this decision
+
+Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3 of !RFC8446}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
+
+## Extensions to Trust Anchor IDs
+
+[[TODO: Move this into draft-ietf-tls-trust-anchor-ids once the PLANTS WG is further along. See https://github.com/tlswg/tls-trust-anchor-ids/issues/62]]
+
+A TLS deployment may know that all relying parties that accept one trust anchor must additionally accept another trust anchor, or desire identifiers for groups of related trust anchors. For example, in this document, any relying party which recognizes some landmark is known to additionally accept earlier landmarks, up to the `max_landmarks` parameter.
+
+Incorporating this knowledge into certificate selection can optimize the ClientHello or CertificateRequest extension. It is RECOMMENDED that this information be provisioned alongside the certificate, e.g. provided by the CA. This section extends the CertificatePropertyList structure ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) with the `additional_trust_anchor_ranges` certificate property to do this:
+
+~~~ tls-presentation
+enum {
+    additional_trust_anchor_ranges(1), (2^16-1)
+} CertificatePropertyType;
+
+struct {
+    TrustAnchorID base;
+    uint64 min;
+    uint64 max;
+} TrustAnchorRange;
+
+TrustAnchorRange TrustAnchorRangeList<1..2^16-1>;
+~~~
+
+A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, as a relative OID, is the concatenation of `r.base` and some integer component between `min` and `max`. The following procedure succeeds if `r` contains `id` and fails otherwise:
+
+1. Check that the most-significant bit of the last byte of `r.base` is unset. If it is set, fail the procedure.
+2. Check that `r.base` is a prefix of `id`. If not, fail the procedure. Let `rest` be `id` with the prefix removed.
+3. Decode `rest` as a minimally-encoded, big-endian, base-128 OID component as follows:
+   1. If `rest` is empty, fail the procedure.
+   2. If the most-significant bit of the last byte of `rest` is set, fail the procedure.
+   3. If the most-significant bit of any other byte of `rest` is unset, fail the procedure.
+   4. If the first byte of `rest` is 0x80, fail the procedure.
+   5. Set `v` to zero. Throughout this procedure, `v` will be less than 2<sup>64</sup>.
+   6. For each byte `b` of `rest`:
+      1. Unset the most significant bit of `b`. `b` is now at most 127.
+      2. If `v` is greater than or equal to 2<sup>57</sup>, fail the procedure.
+      3. Set `v` to `(v << 7) + b`.
+4. Check if `min <= v <= max`. If this is not true, fail the procedure. Otherwise, the procedure succeeds.
+
+{{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}} is updated as follows. If the ClientHello or CertificateRequest contains a `trust_anchors extension`, the authenticating party SHOULD send a certification path such that one of the following is true:
+
+* The certification path's trust anchor ID appears in the relying party's `trust_anchors` extension
+* One of the certification path's additional trust anchor ranges contains some ID in the relying party's `trust_anchors` extension
+
+In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID.
+
+## Using Trust Anchor IDs
+
+A full certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a full certificate has a trust anchor ID of the corresponding log ID ({{log-ids}}). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether the full certificate would be acceptable.
 
 [[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
-A full certificate MAY be used without signals about what the relying party trusts. As with other choices of default certificates, an authenticating party that does so assumes that the relying party trusts the issuing CA, e.g. because the CA is relatively ubiquitous among the relying parties that it supports.
+A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
-A signatureless certificate has a trust anchor ID of the corresponding landmark, as described in {{landmarks}}. This can be configured in the authenticating party via out-of-band information, as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD be configured to support those landmarks' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.
+A signatureless certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmarks}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L + 1`, and `max` is `L + max_landmarks - 1`.
 
-[[TODO: We can do slightly better. If the relying party supports landmark 42, it can be assumed to also support landmark 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]
+A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a signatureless certificate is compatible with the relying party.
 
-Authenticating parties SHOULD preferentially use signatureless certificates over full certificates, when both are supported by the relying party. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. A signatureless certificate SHOULD NOT be used without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees predistributed.
+When both a signatureless and full certificate are supported by a relying party, an authenticating party SHOULD preferentially use the signatureless certificate. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a signatureless certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
 # ACME Extensions
 
@@ -2021,3 +2074,12 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Improve subtree consistency proof verification algorithm
 
 - Add an appendix that explains the Merkle Tree proof procedures
+
+## Since draft-davidben-tls-merkle-tree-certs-08
+{:numbered="false"}
+
+- Improvements to malleability discussion
+
+- Improvements to subtree definition
+
+- Improvements to `trust_anchors` integration
