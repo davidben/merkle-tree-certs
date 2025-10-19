@@ -304,8 +304,8 @@ func do() error {
 	fmt.Printf("Sampling from log %s\n", *flagURL)
 	fmt.Printf("Filtering AIA in simulated MTC tiles: %t\n", *flagFilterAIA)
 	fmt.Printf("Filtering SKID/AKID in simulated MTC tiles: %t\n", *flagFilterKeyIDs)
-	fmt.Printf("Simulating PQ with %s\n", *flagPQAlg)
-	fmt.Printf("Including embedded SCTs in PQ simulation: %t\n", *flagPQEmbeddedSCTs)
+	fmt.Printf("Simulating PQ CT tiles with %s\n", *flagPQAlg)
+	fmt.Printf("Including embedded SCTs in PQ CT simulation: %t\n", *flagPQEmbeddedSCTs)
 	fmt.Printf("\n")
 
 	treeSize, err := fetchTreeSize(baseURL)
@@ -314,9 +314,9 @@ func do() error {
 	}
 	fmt.Printf("Tree size: %d\n", treeSize)
 
-	oldStats := tileStats{name: "old"}
-	newStats := tileStats{name: "new"}
-	oldPQStats := tileStats{name: "old + PQ"}
+	ctStats := tileStats{name: "CT"}
+	mtcStats := tileStats{name: "MTC"}
+	pqCTStats := tileStats{name: "PQ CT"}
 
 	for range *flagSamples {
 		numFullTiles := treeSize / fullTileSize
@@ -330,8 +330,8 @@ func do() error {
 			return err
 		}
 		// For a fair comparison, redo the gzip rather than reuse the original
-		// log's gzip, so that old and new tiles have the same gzip settings.
-		oldGzipSize := gzipSize(tile)
+		// log's gzip, so that CT and MTC tiles have the same gzip settings.
+		ctGzipSize := gzipSize(tile)
 
 		certs, err := parseDataTile(tile, tileSize)
 		if err != nil {
@@ -355,35 +355,35 @@ func do() error {
 				pqIncrease += scts.numSCTs*pqAlg.signatureSize - scts.totSig
 			}
 
-			// Construct the new tiles.
+			// Construct the MTC tiles.
 			entry := tbsCertLogEntryFromCert(cert)
 			b.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) {
 				child.AddBytes(entry)
 			})
 		}
-		newTile := b.BytesOrPanic()
-		newGzipSize := gzipSize(newTile)
+		mtcTile := b.BytesOrPanic()
+		mtcGzipSize := gzipSize(mtcTile)
 
-		oldStats.tot += len(tile)
-		oldStats.gzipTot += oldGzipSize
+		ctStats.tot += len(tile)
+		ctStats.gzipTot += ctGzipSize
 		// Assume that keys and signatures are incompressible, so just add it to
 		// the gzip sizes.
-		oldPQStats.tot += len(tile) + pqIncrease
-		oldPQStats.gzipTot += oldGzipSize + pqIncrease
-		newStats.tot += len(newTile)
-		newStats.gzipTot += newGzipSize
+		pqCTStats.tot += len(tile) + pqIncrease
+		pqCTStats.gzipTot += ctGzipSize + pqIncrease
+		mtcStats.tot += len(mtcTile)
+		mtcStats.gzipTot += mtcGzipSize
 	}
 
 	fmt.Printf("\n")
-	printAvg(oldStats)
-	printAvg(oldPQStats)
-	printAvg(newStats)
+	printAvg(ctStats)
+	printAvg(pqCTStats)
+	printAvg(mtcStats)
 	fmt.Printf("\n")
-	compareStats(oldPQStats, oldStats)
-	compareStats(newStats, oldStats)
-	compareStats(newStats, oldPQStats)
+	compareStats(pqCTStats, ctStats)
+	compareStats(mtcStats, ctStats)
+	compareStats(mtcStats, pqCTStats)
 	fmt.Printf("\n")
-	fmt.Printf("new + PQ would be the same as new.\n")
+	fmt.Printf("(PQ MTC and MTC tiles have the same size.)\n")
 	return nil
 }
 
