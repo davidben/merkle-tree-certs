@@ -285,6 +285,14 @@ func compareStats(s1, s2 tileStats) {
 	fmt.Printf("%s / %s: %.2f%% uncompressed, %.2f%% gzipped\n", s1.name, s2.name, percent(s1.tot, s2.tot), percent(s1.gzipTot, s2.gzipTot))
 }
 
+func ifElse[T any](b bool, ifTrue, ifFalse T) T {
+	if b {
+		return ifTrue
+	} else {
+		return ifFalse
+	}
+}
+
 func do() error {
 	if len(*flagURL) == 0 {
 		return errors.New("no log supplied, see https://googlechrome.github.io/CertificateTransparency/log_lists.html for available logs (must be tiled)")
@@ -301,12 +309,7 @@ func do() error {
 		return fmt.Errorf("unknown post-quantum algorithm: %s", *flagPQAlg)
 	}
 
-	fmt.Printf("Sampling from log %s\n", *flagURL)
-	fmt.Printf("Filtering AIA in simulated MTC tiles: %t\n", *flagFilterAIA)
-	fmt.Printf("Filtering SKID/AKID in simulated MTC tiles: %t\n", *flagFilterKeyIDs)
-	fmt.Printf("Simulating PQ CT tiles with %s\n", *flagPQAlg)
-	fmt.Printf("Including embedded SCTs in PQ CT simulation: %t\n", *flagPQEmbeddedSCTs)
-	fmt.Printf("\n")
+	fmt.Printf("Sampling %d tile%s from log %s\n", *flagSamples, ifElse(*flagSamples == 1, "", "s"), *flagURL)
 
 	treeSize, err := fetchTreeSize(baseURL)
 	if err != nil {
@@ -377,13 +380,18 @@ func do() error {
 	fmt.Printf("\n")
 	printAvg(ctStats)
 	printAvg(pqCTStats)
+	fmt.Printf("    Simulated by replacing public keys and signatures with %s\n", *flagPQAlg)
+	fmt.Printf("    Embedded SCT signatures %s replaced\n", ifElse(*flagPQEmbeddedSCTs, "also", "not"))
 	printAvg(mtcStats)
+	fmt.Printf("    Simulated by converting CT tiles to MTC tiles\n")
+	fmt.Printf("    AIA extensions %sremoved (AIA is unnecessary without path-building)\n", ifElse(*flagFilterAIA, "", "not "))
+	fmt.Printf("    SKID/AKID extensions %sremoved (SKID/AKID are unnecessary without path-building)\n", ifElse(*flagFilterKeyIDs, "", "not "))
+	fmt.Printf("(PQ MTC and MTC tiles have the same size.)\n")
 	fmt.Printf("\n")
+
 	compareStats(pqCTStats, ctStats)
 	compareStats(mtcStats, ctStats)
 	compareStats(mtcStats, pqCTStats)
-	fmt.Printf("\n")
-	fmt.Printf("(PQ MTC and MTC tiles have the same size.)\n")
 	return nil
 }
 
