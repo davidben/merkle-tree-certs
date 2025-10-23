@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-19T02:10:15.407888+00:00",
+  "timestamp": "2025-10-23T01:58:58.737387+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2593,6 +2593,22 @@
       "body": "Right now we have the following IDs, to denote the various different animals:\n\n1. The log has an ID\n2. Each cosigner has an ID, including the cosigner operated by the log (CA) operator\n3. The landmark sequence has an ID arc\n\nFor now, they refer to slightly different things, and we allow for some generality that we may not need:\n\n* A CA can have multiple cosigners for a single log\n* A landmark sequence could be allocated by an entity other than the CA, if the CA finds this difficult\n\nIt is not clear how many of these we need. The first is somewhat related to the question of how best to manage key rotation and log rotation. The second is... almost certainly not needed. I think it just came out of building atop tlog in the most orthogonal ways possible.\n\nAnd then there's the question of whether these IDs are allowed to overlap or must they be different. I think that comes from designs of cosigner negotiation.\n\nOnce the dust settles on the rest of the details, we should take a pass and:\n* Decide if any IDs should overlap\n* If IDs don't overlap, perhaps ask the CA operator to pick an ID arc, and then the protocol determines the substructure for you.",
       "createdAt": "2025-10-15T16:13:39Z",
       "updatedAt": "2025-10-15T16:13:39Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 153,
+      "id": "I_kwDOJIBkVc7S6XKc",
+      "title": "Inclusion and consistency proof test vectors",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/153",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "I think the best strategy to test an implementation is actually to just exhaustively test all subtrees in all trees up to size, say, 128, but we should also have some representative test vectors.\n\nIn addition to finding funny cases along the right edge, we should include a test vector where the tree size is 2^64 - 1. I think we can construct this input by just pretending every leaf in the tree is identical, then we can compute the hash at every layer.",
+      "createdAt": "2025-10-21T23:31:08Z",
+      "updatedAt": "2025-10-21T23:31:08Z",
       "closedAt": null,
       "comments": []
     }
