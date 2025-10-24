@@ -1528,17 +1528,21 @@ While the signature verification process in {{verifying-certificate-signatures}}
 
 * `subjectPublicKeyInfo` is hashed as `subjectPublicKeyInfoHash` in TBSCertificateLogEntry. Provided the underlying hash function is collision-resistant, no other values are possible for a given log entry.
 
-Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of DER and then, instead of computing the canonical DER encoding per {{Section 4.1.1.3 of ?RFC5280}}, verify the signature over the particular BER encoding received. Those implementations may still assume the received BER-encoded TBSCertificate is not malleable. However, as BER encoding is not unique, this breaks the above assumptions in Merkle Tree Certificates. To preserve non-malleability, these non-conforming implementations MUST do the following when verifying a Merkle Tree Certificate:
+X.509 implementations often implement {{Section 4.1.1.3 of ?RFC5280}} by equivalently retaining the original received DER encoding, rather than recomputing the canonical DER encoding TBSCertificate. This optimization is compatible with the assumptions above.
 
-* When parsing the outermost TBSCertificate SEQUENCE tag and length, reparse with a conforming DER parser.
+Some non-conforming X.509 implementations use a BER {{X.690}} parser instead of DER, and then apply this optimization to the received BER encoding. BER encoding is not unique, so this does not produce the same result. In such implementations, the BER-encoded TBSCertificate becomes also non-malleable, and applications may rely on this. To preserve this property in Merkle Tree Certificates, such non-conforming implementations MUST do the following when implementing {{verifying-certificate-signatures}}:
 
-* When copying the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields, either reparse with a conforming DER parser, or copy over the observed BER encodings.
+* Reparse the initial identifier (the SEQUENCE tag) and length octets of the TBSCertificate structure with a conforming DER parser and fail verification if invalid.
 
-* Reparse the `serialNumber` field with a conforming DER parser.
+* When copying the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields, either copy over the observed BER encodings, or reparse each field with a conforming DER parser and fail verification if invalid.
 
-* Reparse the `signature` field with a conforming DER parser. Equivalently, check for an exact match for the expected, DER-encoded value.
+* Reparse the `serialNumber` field with a conforming DER parser and fail verification if invalid.
 
-* When hashing `subjectPublicKeyInfo`, either reparse with a conforming DER parser, or hash the observed BER encoding.
+* Reparse the `signature` field with a conforming DER parser and fail verification if invalid. Equivalently, check for an exact equality with for the expected, DER-encoded value.
+
+* When hashing `subjectPublicKeyInfo`, either hash the observed BER encoding, or reparse the structure with a conforming DER parser and fail verification if invalid.
+
+These additional checks are redundant in X.509 implementations that use a conforming DER parser.
 
 {{log-entries}} requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates is new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.
 
