@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-23T01:58:58.737387+00:00",
+  "timestamp": "2025-10-26T02:06:07.288405+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -9347,6 +9347,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 154,
+      "id": "PR_kwDOJIBkVc6vkzxb",
+      "title": "Take another editing pass at the malleability section",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/154",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-10-24T18:31:20Z",
+      "updatedAt": "2025-10-24T18:31:21Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "d9b702d07c20caafe46690806bf708b41d894d40",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "malleability-reword",
+      "headRefOid": "ad3a15731a3d9d4ca41c1c5bf4bf8de7cdf1336b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
