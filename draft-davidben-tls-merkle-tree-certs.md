@@ -404,14 +404,14 @@ This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} b
 
 Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Section 2.1.1 of !RFC9162}} defines the Merkle Tree via the Merkle Tree Hash `MTH(D_n)`.
 
-A *subtree* of this Merkle Tree is defined by two integers, `start` and `end`, such that:
+A *subtree* of this Merkle Tree is itself a Merkle Tree, defined by `MTH(D[start:end])`. `start` and `end` are integers such that:
 
 *  `0 <= start < end <= n`
 * `start` is a multiple of `BIT_CEIL(end - start)`
 
 Note that, if `start` is zero, the second condition is always true.
 
-A subtree is itself a Merkle Tree, defined by `MTH(D[start:end])`. In the context of a single Merkle Tree, the subtree defined by `start` and `end` is denoted by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
+In the context of a single Merkle Tree, the subtree defined by `start` and `end` is denoted by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
 
 The *size* of the subtree is `end - start`. If the subtree's size is a power of two, it is said to be *full*, otherwise it is said to be *partial*.
 
