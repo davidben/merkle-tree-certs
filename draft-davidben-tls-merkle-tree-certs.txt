@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 22 April 2026                                                  
+Expires: 8 May 2026                                                     
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         19 October 2025
+                                                         4 November 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 April 2026.
+   This Internet-Draft will expire on 8 May 2026.
 
 Copyright Notice
 
@@ -2582,32 +2582,42 @@ Table of Contents
       collision-resistant, no other values are possible for a given log
       entry.
 
-   Some non-conforming X.509 implementations use a BER [X.690] parser
-   instead of DER and then, instead of computing the canonical DER
-   encoding per Section 4.1.1.3 of [RFC5280], verify the signature over
-   the particular BER encoding received.  Those implementations may
-   still assume the received BER-encoded TBSCertificate is not
-   malleable.  However, as BER encoding is not unique, this breaks the
-   above assumptions in Merkle Tree Certificates.  To preserve non-
-   malleability, these non-conforming implementations MUST do the
-   following when verifying a Merkle Tree Certificate:
+   X.509 implementations often implement Section 4.1.1.3 of [RFC5280] by
+   equivalently retaining the original received DER encoding, rather
+   than recomputing the canonical DER encoding TBSCertificate.  This
+   optimization is compatible with the assumptions above.
 
-   *  When parsing the outermost TBSCertificate SEQUENCE tag and length,
-      reparse with a conforming DER parser.
+   Some non-conforming X.509 implementations use a BER [X.690] parser
+   instead of DER, and then apply this optimization to the received BER
+   encoding.  BER encoding is not unique, so this does not produce the
+   same result.  In such implementations, the BER-encoded TBSCertificate
+   becomes also non-malleable, and applications may rely on this.  To
+   preserve this property in Merkle Tree Certificates, such non-
+   conforming implementations MUST do the following when implementing
+   Section 7.2:
+
+   *  Reparse the initial identifier (the SEQUENCE tag) and length
+      octets of the TBSCertificate structure with a conforming DER
+      parser and fail verification if invalid.
 
    *  When copying the version, issuer, validity, subject,
       issuerUniqueID, subjectUniqueID, and extensions fields, either
-      reparse with a conforming DER parser, or copy over the observed
-      BER encodings.
+      copy over the observed BER encodings, or reparse each field with a
+      conforming DER parser and fail verification if invalid.
 
-   *  Reparse the serialNumber field with a conforming DER parser.
+   *  Reparse the serialNumber field with a conforming DER parser and
+      fail verification if invalid.
 
-   *  Reparse the signature field with a conforming DER parser.
-      Equivalently, check for an exact match for the expected, DER-
-      encoded value.
+   *  Reparse the signature field with a conforming DER parser and fail
+      verification if invalid.  Equivalently, check for an exact
+      equality with for the expected, DER-encoded value.
 
-   *  When hashing subjectPublicKeyInfo, either reparse with a
-      conforming DER parser, or hash the observed BER encoding.
+   *  When hashing subjectPublicKeyInfo, either hash the observed BER
+      encoding, or reparse the structure with a conforming DER parser
+      and fail verification if invalid.
+
+   These additional checks are redundant in X.509 implementations that
+   use a conforming DER parser.
 
    Section 5.3 requires that the TBSCertificateLogEntry in a
    MerkleTreeCertEntry be DER-encoded, so applying a stricter parser
