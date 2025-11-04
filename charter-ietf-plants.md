@@ -14,6 +14,8 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 * Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
 
+Additionally, more entities are requesting certificates, and certificate validity windows are narrowing, both of which increase the overall size of a CT log, with correspondingly costs for log operators.
+
 The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
 
 The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
