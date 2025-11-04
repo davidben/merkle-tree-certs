@@ -230,6 +230,8 @@ Given a non-negative integer `n`,
 
 * `POPCOUNT(n)` refers to the number of set bits in `n`'s binary representation.
 
+* `BIT_CEIL(n)` refers to the smallest power of 2 that is greater or equal to `n`.
+
 To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2. Given non-negative integers `a` and `b`, `a >> b` refers to `a` right-shifted `b` times.
 
 ## Terminology and Roles
@@ -405,7 +407,7 @@ Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Sectio
 A *subtree* of this Merkle Tree is defined by two integers, `start` and `end`, such that:
 
 *  `0 <= start < end <= n`
-* If `s` is the smallest power of two that is greater than or equal to `end - start`, `start` must be a multiple of `s`
+* `start` is a multiple of `BIT_CEIL(end - start)`
 
 Note that, if `start` is zero, the second condition is always true.
 
