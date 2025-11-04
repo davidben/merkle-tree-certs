@@ -228,7 +228,7 @@ Given a non-negative integer `n`,
 
 * `BIT_WIDTH(n)` refers to the smallest number of bits needed to represent `n`. `BIT_WIDTH(0)` is zero.
 
-* `POPCOUNT(n)` refers to the number of set bits in `n`'s binary representation`.
+* `POPCOUNT(n)` refers to the number of set bits in `n`'s binary representation.
 
 To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2. Given non-negative integers `a` and `b`, `a >> b` refers to `a` right-shifted `b` times.
 
