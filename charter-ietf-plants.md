@@ -22,7 +22,7 @@ The Working Group will initially put down roots and define the mechanisms needed
 
 2. Certificate constructions to prove to relying parties that a binding is both in the CA's view of the log and externally monitorable.
 
-3. How the certificate constructions may be provisioned with ACME (RFC 8555) and used in TLS.
+3. How the certificate constructions may be used in TLS and  provisioned with ACME (RFC 8555) and other certificate provisioning mechanisms.
 
 As part of this work, the Working Group may extend PKIX (RFC 5280), e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
 
