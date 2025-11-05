@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 8 May 2026                                                     
+Expires: 9 May 2026                                                     
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         4 November 2025
+                                                         5 November 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 May 2026.
+   This Internet-Draft will expire on 9 May 2026.
 
 Copyright Notice
 
@@ -507,8 +507,8 @@ Table of Contents
    Section 2.1.1 of [RFC9162] defines the Merkle Tree via the Merkle
    Tree Hash MTH(D_n).
 
-   A _subtree_ of this Merkle Tree is defined by two integers, start and
-   end, such that:
+   A _subtree_ of this Merkle Tree is itself a Merkle Tree, defined by
+   MTH(D[start:end]). start and end are integers such that:
 
    *  0 <= start < end <= n
 
@@ -516,10 +516,9 @@ Table of Contents
 
    Note that, if start is zero, the second condition is always true.
 
-   A subtree is itself a Merkle Tree, defined by MTH(D[start:end]).  In
-   the context of a single Merkle Tree, the subtree defined by start and
-   end is denoted by half-open interval [start, end).  It contains the
-   entries whose indices are in that half-open interval.
+   In the context of a single Merkle Tree, the subtree defined by start
+   and end is denoted by half-open interval [start, end).  It contains
+   the entries whose indices are in that half-open interval.
 
    The _size_ of the subtree is end - start.  If the subtree's size is a
    power of two, it is said to be _full_, otherwise it is said to be
