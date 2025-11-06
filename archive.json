@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-26T02:06:07.288405+00:00",
+  "timestamp": "2025-11-06T02:04:43.880737+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -9353,26 +9353,329 @@
       "id": "PR_kwDOJIBkVc6vkzxb",
       "title": "Take another editing pass at the malleability section",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/154",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-10-24T18:31:20Z",
-      "updatedAt": "2025-10-24T18:31:21Z",
+      "updatedAt": "2025-11-04T11:01:15Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "d9b702d07c20caafe46690806bf708b41d894d40",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "malleability-reword",
       "headRefOid": "ad3a15731a3d9d4ca41c1c5bf4bf8de7cdf1336b",
+      "closedAt": "2025-11-04T11:01:11Z",
+      "mergedAt": "2025-11-04T11:01:11Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "86ead1519f685fa2953e9091611ff30cdd271456"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7Lgy-v",
+          "commit": {
+            "abbreviatedOid": "ad3a157"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-04T07:16:46Z",
+          "updatedAt": "2025-11-04T07:16:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 155,
+      "id": "PR_kwDOJIBkVc6xd9Pg",
+      "title": "Stray backtick",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/155",
+      "state": "MERGED",
+      "author": "dconnolly",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-11-04T17:09:03Z",
+      "updatedAt": "2025-11-04T19:06:37Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "86ead1519f685fa2953e9091611ff30cdd271456",
+      "headRepository": "dconnolly/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "251accd4cc3e38a239016b54b810eb97a384ea6f",
+      "closedAt": "2025-11-04T18:52:05Z",
+      "mergedAt": "2025-11-04T18:52:05Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "cad80fe64527cffee3c302f6ab0407ea2f7b8bf8"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7LvaDa",
+          "commit": {
+            "abbreviatedOid": "251accd"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thanks!",
+          "createdAt": "2025-11-04T18:51:01Z",
+          "updatedAt": "2025-11-04T18:51:01Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 156,
+      "id": "PR_kwDOJIBkVc6xgZcv",
+      "title": "More straightforward definition of subtree",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/156",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-11-04T21:36:21Z",
+      "updatedAt": "2025-11-04T21:43:06Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "cad80fe64527cffee3c302f6ab0407ea2f7b8bf8",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "subtree-bit-ceil",
+      "headRefOid": "6d40c1cb33c3083f29b79ae894d4d480e4da2328",
+      "closedAt": "2025-11-04T21:37:17Z",
+      "mergedAt": "2025-11-04T21:37:17Z",
+      "mergedBy": "devonobrien",
+      "mergeCommit": {
+        "oid": "dba1d0e3391701595d4bbc13a77dad1c30d4d3ed"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7LxXPF",
+          "commit": {
+            "abbreviatedOid": "6d40c1c"
+          },
+          "author": "devonobrien",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-04T21:37:07Z",
+          "updatedAt": "2025-11-04T21:37:07Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 157,
+      "id": "PR_kwDOJIBkVc6xgfBp",
+      "title": "Tweak subtree definition some more",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/157",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The old phrasing made it seem like a subtree was the integers rather than the tree.",
+      "createdAt": "2025-11-04T21:49:24Z",
+      "updatedAt": "2025-11-05T05:05:38Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "dba1d0e3391701595d4bbc13a77dad1c30d4d3ed",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "subtree-dfn",
+      "headRefOid": "af99e7000099b7788851327054a1bcf6410a939a",
+      "closedAt": "2025-11-05T05:05:35Z",
+      "mergedAt": "2025-11-05T05:05:35Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "2f1c8dd7b504ece7c32392583ada020a126f56f0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7Lxg3U",
+          "commit": {
+            "abbreviatedOid": "af99e70"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-04T21:52:57Z",
+          "updatedAt": "2025-11-04T21:52:57Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 158,
+      "id": "PR_kwDOJIBkVc6xhEyk",
+      "title": "Additional motivation: reduce the cost of log operation",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/158",
+      "state": "OPEN",
+      "author": "dkg",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "this was motivated by discussion in the PLANTS BoF today.  PQ signing algorithms are not the only additional pressure on log operators.",
+      "createdAt": "2025-11-04T23:21:51Z",
+      "updatedAt": "2025-11-05T09:25:42Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "dba1d0e3391701595d4bbc13a77dad1c30d4d3ed",
+      "headRepository": "dkg/merkle-tree-certs",
+      "headRefName": "expand-motivation",
+      "headRefOid": "b4980039971fa3ed615d4509f7a600ef4e35de60",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "dkg",
+          "authorAssociation": "NONE",
+          "body": "there may be some additional motivations related to the costs of operating a CT monitor (not just the costs of operating a CT log), which i haven't included in this PR.  If anyone thinks those are motivating, feel free to include those in a separate PR :)",
+          "createdAt": "2025-11-04T23:38:57Z",
+          "updatedAt": "2025-11-04T23:38:57Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Works for me! Not sure what the process looks like post-BoF but hopefully that'll become clear.",
+          "createdAt": "2025-11-05T05:16:36Z",
+          "updatedAt": "2025-11-05T05:16:36Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7LyNq4",
+          "commit": {
+            "abbreviatedOid": "5b160ac"
+          },
+          "author": "JonathanLennox",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-04T23:24:33Z",
+          "updatedAt": "2025-11-04T23:24:33Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Should be \"corresponding costs\", or else \"costs increasing correspondingly\".",
+              "createdAt": "2025-11-04T23:24:33Z",
+              "updatedAt": "2025-11-04T23:24:33Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 159,
+      "id": "PR_kwDOJIBkVc6xmd3C",
+      "title": "charter: elaborate that private PKIs might not need transparency",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/159",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "Does this work for you @johngray-dev @ounsworth as an alternative to removing transparency earlier on?",
+      "createdAt": "2025-11-05T09:29:03Z",
+      "updatedAt": "2025-11-05T09:30:19Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/charter-private-twaek",
+      "headRefOid": "d7a7883de6a30cc56ba8323c22f9c0f7acf3c23b",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 160,
+      "id": "PR_kwDOJIBkVc6xsz2i",
+      "title": "charter: Not just ACME",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/160",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "",
+      "createdAt": "2025-11-05T16:54:37Z",
+      "updatedAt": "2025-11-05T17:43:54Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/delivery",
+      "headRefOid": "dad323141159913b430be63c79aa636ee1f5373f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7MDwzf",
+          "commit": {
+            "abbreviatedOid": "dad3231"
+          },
+          "author": "devonobrien",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-05T17:43:02Z",
+          "updatedAt": "2025-11-05T17:43:02Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Just noting this is now a requirement to for an initial deliverable to encompass ACME *and* other mechanisms.",
+              "createdAt": "2025-11-05T17:43:02Z",
+              "updatedAt": "2025-11-05T17:43:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7MDxjW",
+          "commit": {
+            "abbreviatedOid": "dad3231"
+          },
+          "author": "devonobrien",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-05T17:43:53Z",
+          "updatedAt": "2025-11-05T17:43:54Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Also, double space after \"and\" from editing.",
+              "createdAt": "2025-11-05T17:43:54Z",
+              "updatedAt": "2025-11-05T17:43:54Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
