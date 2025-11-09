@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-06T02:04:43.880737+00:00",
+  "timestamp": "2025-11-09T02:07:58.322045+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -9622,13 +9622,13 @@
       ],
       "body": "",
       "createdAt": "2025-11-05T16:54:37Z",
-      "updatedAt": "2025-11-05T17:43:54Z",
+      "updatedAt": "2025-11-07T07:37:17Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "bas/delivery",
-      "headRefOid": "dad323141159913b430be63c79aa636ee1f5373f",
+      "headRefOid": "303d2b008514a295cf751dc9c65f4e0479e3f360",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -9672,6 +9672,199 @@
               "body": "Also, double space after \"and\" from editing.",
               "createdAt": "2025-11-05T17:43:54Z",
               "updatedAt": "2025-11-05T17:43:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7MMbHN",
+          "commit": {
+            "abbreviatedOid": "dad3231"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-06T03:55:50Z",
+          "updatedAt": "2025-11-06T03:55:50Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "It's unclear to me how the WG would meet this. If we only write it for ACME, have we met the charter? If we do it for ACME and Protocol A but not Protocol B, have we?",
+              "createdAt": "2025-11-06T03:55:50Z",
+              "updatedAt": "2025-11-06T03:55:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7MXX6w",
+          "commit": {
+            "abbreviatedOid": "dad3231"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-06T15:04:10Z",
+          "updatedAt": "2025-11-06T15:04:11Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "I'd suggest something like:\r\n```suggestion\r\n3. How the certificate constructions may be provisioned (with mechanisms including ACME (RFC 8555)) and used in TLS.\r\n```",
+              "createdAt": "2025-11-06T15:04:10Z",
+              "updatedAt": "2025-11-06T15:04:11Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 161,
+      "id": "PR_kwDOJIBkVc6yAjzY",
+      "title": "Restore the more efficient trust anchor negotiation",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/161",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "When trust_anchors was extracted from the first MTC drafts, we lost an optimization because it was not, at the time, relevant for the baseline version of the problem. However, it is still quite useful for MTCs (and may be useful for other scenarios too).\r\n\r\nThis implements https://github.com/tlswg/tls-trust-anchor-ids/issues/62 to put it back. For now, it's in the MTC repo, but in the long run, we should put it back in TAI itself.",
+      "createdAt": "2025-11-06T22:27:21Z",
+      "updatedAt": "2025-11-07T13:10:23Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "ec6bdf99df5d03f40fec460dbd664bc84f749b6f",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "tai-alias",
+      "headRefOid": "1a9b5f9d06728ec17dcc5b51c79fb56073d3a271",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "matt-mueller",
+          "authorAssociation": "NONE",
+          "body": "Should there be something said about how the DNS negotiation & the retry mechanism work with ranges?\r\n\r\nSince the DNS hint could be stale, the client would probably want to match the prefix against its known base_ids, but send the base_id.max for highest chance of success without requiring a round trip. For the retry mechanism the client could do a specific match, but for simplicity it would be nice to just have the client do the same thing in both cases.\r\n",
+          "createdAt": "2025-11-07T00:24:37Z",
+          "updatedAt": "2025-11-07T00:24:37Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7MkrvE",
+          "commit": {
+            "abbreviatedOid": "1a9b5f9"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-07T08:10:28Z",
+          "updatedAt": "2025-11-07T09:05:02Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "> any relying party which recognizes some landmark is known to additionally accept earlier landmarks, up to the `max_landmarks` parameter.\r\n\r\nNit: by induction a relying will then accept all previous landmarks if *up to* isn't read as a bound.\r\n\r\nWhat about:\r\n\r\n> For example, in this document, the relying party will recognize up to `max_landmark` consecutive landmarks.",
+              "createdAt": "2025-11-07T08:10:28Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 36,
+              "body": "Add \"inclusive\".",
+              "createdAt": "2025-11-07T08:13:14Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "Perhaps mention that this is to check whether `base` is well formed to begin with.",
+              "createdAt": "2025-11-07T08:14:25Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 39,
+              "body": "Suggestion: \"with the prefix r.base removed\"",
+              "createdAt": "2025-11-07T08:15:15Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 47,
+              "body": "This might be read as that the MSB should've been set. We can say \"Unset the MSB (if set)\", or we can just use `(b & 127)` below",
+              "createdAt": "2025-11-07T08:21:20Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 49,
+              "body": "In step 2, `v` can be `2^57-1`. Thus in step 3, `v` can be `2^64 - 1 + 127`, which is larger than 2^64. We can limit to 2^56 in step 2, if we don't care about such that one bit, or we add a step 2b, where we check that `2^64 - b > v<<7`.\r\n\r\n",
+              "createdAt": "2025-11-07T08:26:47Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "It's superfluous, but maybe end this sentence with \"or\".",
+              "createdAt": "2025-11-07T08:29:27Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 61,
+              "body": "To double check: we're not using the ID of the CA's own cosigner.",
+              "createdAt": "2025-11-07T08:33:12Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "If max_landmarks is 1, then max would be set to L, which seems incorrect.",
+              "createdAt": "2025-11-07T08:57:53Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "What is the reason not to simply use a TA range and forego a single TA?",
+              "createdAt": "2025-11-07T08:58:39Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "Do we need to mention the subtrees here? Can't we say \"a relying party that has been configured with landmarks\"?",
+              "createdAt": "2025-11-07T08:59:43Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "It will be common for servers to configure two signatureless certs. If I read it correctly, we're not telling how to pick between them. It seems sensible to sent the signatureless cert with the most recent landmark, as an older one might be expired.",
+              "createdAt": "2025-11-07T09:03:03Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "Actually, it might be the case that all signatureless certs are expired, and it's better to send the full cert.",
+              "createdAt": "2025-11-07T09:04:05Z",
+              "updatedAt": "2025-11-07T09:05:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7Mqz0h",
+          "commit": {
+            "abbreviatedOid": "1a9b5f9"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-07T12:59:46Z",
+          "updatedAt": "2025-11-07T13:10:23Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "nit: I haven't checked, but I imagine this doesn't render the way you expect in the .txt version of the draft. Perhaps write exponents in Python? Here and below.\n```suggestion\n   5. Set `v` to zero. Throughout this procedure, `v` will be less than `2**64`",
+              "createdAt": "2025-11-07T12:59:46Z",
+              "updatedAt": "2025-11-07T13:10:23Z"
+            },
+            {
+              "originalPosition": 36,
+              "body": "Maybe add a sentence here explaining what the procedure is doing.",
+              "createdAt": "2025-11-07T13:01:33Z",
+              "updatedAt": "2025-11-07T13:10:24Z"
             }
           ]
         }
