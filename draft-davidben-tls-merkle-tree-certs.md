@@ -1215,7 +1215,7 @@ Relying parties will locally retain up to `2 * max_landmarks` hashes ({{trusted-
   This line MUST satisfy the following, otherwise it is invalid:
   * `num_active_landmarks <= max_landmarks`
   * `num_active_landmarks <= last_landmark`
-* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be monotonically decreasing and lower or equal to the log's latest tree size.
+* `num_active_landmarks + 1` lines each containing a single non-negative decimal integer, containing a tree size. Numbered from zero to `num_active_landmarks`, line `i` contains the tree size for landmark `last_landmark - i`. The integers MUST be strictly monotonically decreasing and lower or equal to the log's latest tree size.
 
 ### Allocating Landmarks
 
