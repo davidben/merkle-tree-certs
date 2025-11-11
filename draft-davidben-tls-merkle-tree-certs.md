@@ -232,7 +232,11 @@ Given a non-negative integer `n`,
 
 * `BIT_CEIL(n)` refers to the smallest power of 2 that is greater or equal to `n`.
 
+To *left-shift* a non-negative integer `n` is to shift each bit in its binary representation to one upper position. Equivalently, it is `n` times 2. Given non-negative integers `a` and `b`, `a << b` refers to `a` left-shifted `b` times.
+
 To *right-shift* a non-negative integer `n` is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of `n` divided by 2. Given non-negative integers `a` and `b`, `a >> b` refers to `a` right-shifted `b` times.
+
+Given two non-negative integers `a` and `b`, `a & b` refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both `a` and `b`, and unset otherwise. This is commonly referred to as the bitwise AND operator.
 
 ## Terminology and Roles
 
@@ -1393,9 +1397,8 @@ A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, a
    4. If the first byte of `rest` is 0x80, fail the procedure.
    5. Set `v` to zero. Throughout this procedure, `v` will be less than 2<sup>64</sup>.
    6. For each byte `b` of `rest`:
-      1. Unset the most significant bit of `b`. `b` is now at most 127.
-      2. If `v` is greater than or equal to 2<sup>57</sup>, fail the procedure.
-      3. Set `v` to `(v << 7) + b`.
+      1. If `v` is greater than or equal to 2<sup>57</sup>, fail the procedure.
+      2. Set `v` to `(v << 7) + (b & 127)`.
 4. Check if `min <= v <= max`. If this is not true, fail the procedure. Otherwise, the procedure succeeds.
 
 {{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}} is updated as follows. If the ClientHello or CertificateRequest contains a `trust_anchors extension`, the authenticating party SHOULD send a certification path such that one of the following is true:
