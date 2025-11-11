@@ -1199,7 +1199,7 @@ A landmark sequence has the following fixed parameters:
 
 Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to `base_id`. For example, the trust anchor ID for landmark 42 of a sequence with `base_id` of `32473.1` would be `32473.1.42`.
 
-Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and monotonically increasing.
+Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.
 
 Landmarks determine *landmark subtrees*: for each landmark, other than number zero, let `tree_size` be the landmark's tree size and `prev_tree_size` be that of the previous landmark. As described in {{arbitrary-intervals}}, select the one or two subtrees that cover `[prev_tree_size, tree_size)`. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.
 
