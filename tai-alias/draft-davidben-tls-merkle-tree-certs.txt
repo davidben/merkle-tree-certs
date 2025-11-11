@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Experimental                                 D. O'Brien
-Expires: 10 May 2026                                                    
+Expires: 15 May 2026                                                    
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         6 November 2025
+                                                        11 November 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 May 2026.
+   This Internet-Draft will expire on 15 May 2026.
 
 Copyright Notice
 
@@ -268,11 +268,21 @@ Table of Contents
    *  BIT_CEIL(n) refers to the smallest power of 2 that is greater or
       equal to n.
 
+   To _left-shift_ a non-negative integer n is to shift each bit in its
+   binary representation to one upper position.  Equivalently, it is n
+   times 2.  Given non-negative integers a and b, a << b refers to a
+   left-shifted b times.
+
    To _right-shift_ a non-negative integer n is to shift each bit in its
    binary representation to one lower position, discarding the least-
    significant bit.  Equivalently, it is the floor of n divided by 2.
    Given non-negative integers a and b, a >> b refers to a right-shifted
    b times.
+
+   Given two non-negative integers a and b, a & b refers to the non-
+   negative integer such that each bit position is set if the
+   corresponding bit is set in both a and b, and unset otherwise.  This
+   is commonly referred to as the bitwise AND operator.
 
 2.1.  Terminology and Roles
 
@@ -2099,9 +2109,9 @@ Table of Contents
    A TLS deployment may know that all relying parties that accept one
    trust anchor must additionally accept another trust anchor, or desire
    identifiers for groups of related trust anchors.  For example, in
-   this document, any relying party which recognizes some landmark is
-   known to additionally accept earlier landmarks, up to the
-   max_landmarks parameter.
+   this document, the relying party will recognize up to max_landmark
+   consecutive landmarks, so the latest landmark can be used to
+   represent the range.
 
    Incorporating this knowledge into certificate selection can optimize
    the ClientHello or CertificateRequest extension.  It is RECOMMENDED
@@ -2124,14 +2134,17 @@ Table of Contents
 
    A trust anchor range r is said to _contain_ a trust anchor ID id, if
    id, as a relative OID, is the concatenation of r.base and some
-   integer component between min and max.  The following procedure
+   integer component between min and max, inclusive.
+
+   The following procedure can be used to perform this check.  It
    succeeds if r contains id and fails otherwise:
 
-   1.  Check that the most-significant bit of the last byte of r.base is
-       unset.  If it is set, fail the procedure.
+   1.  Check that r.base does not end in the middle of an OID component.
+       That is, check that the most-significant bit of the last byte of
+       r.base is unset.  If it is set, fail the procedure.
 
    2.  Check that r.base is a prefix of id.  If not, fail the procedure.
-       Let rest be id with the prefix removed.
+       Let rest be id with the r.base prefix removed.
 
    3.  Decode rest as a minimally-encoded, big-endian, base-128 OID
        component as follows:
@@ -2151,13 +2164,10 @@ Table of Contents
 
        6.  For each byte b of rest:
 
-           1.  Unset the most significant bit of b. b is now at most
-               127.
-
-           2.  If v is greater than or equal to 2^57, fail the
+           1.  If v is greater than or equal to 2^57, fail the
                procedure.
 
-           3.  Set v to (v << 7) + b.
+           2.  Set v to (v << 7) + (b & 127).
 
    4.  Check if min <= v <= max.  If this is not true, fail the
        procedure.  Otherwise, the procedure succeeds.
@@ -2168,14 +2178,28 @@ Table of Contents
    such that one of the following is true:
 
    *  The certification path's trust anchor ID appears in the relying
-      party's trust_anchors extension
+      party's trust_anchors extension, or
 
    *  One of the certification path's additional trust anchor ranges
       contains some ID in the relying party's trust_anchors extension
 
+   Trust anchor ranges do not impact an authenticating party's list of
+   available trust anchors in EncryptedExtensions (see Section 4.3 of
+   [I-D.ietf-tls-trust-anchor-ids]) or the HTTPS/SVCB record (see
+   Section 5 of [I-D.ietf-tls-trust-anchor-ids]).  Those continue to
+   reference the single trust anchor ID that corresponds to each
+   certificate.
+
    In applications that use additional trust anchor ranges, relying
    parties MAY send a single trust anchor ID to represent all
    certificates whose trust anchor ranges contain that trust anchor ID.
+   This includes:
+
+   *  Trust anchors that are sent in response to an EncryptedExtensions
+      or HTTPS/SVCB message from the authenticating party
+
+   *  Trust anchors that are sent in trust_anchors, independently of the
+      authenticating party
 
 8.2.  Using Trust Anchor IDs
 
@@ -2209,7 +2233,7 @@ Table of Contents
    Additionally, relying parties that trust later landmarks may also be
    assumed to trust landmark L, so a signatureless certificate SHOULD
    additionally provisioned with an additional trust anchor range whose
-   base is base_id, min is L + 1, and max is L + max_landmarks - 1.
+   base is base_id, min is L, and max is L + max_landmarks - 1.
 
    A relying party that has been configured with trusted subtrees
    (Section 7.4) derived from a set of landmarks SHOULD configure the
