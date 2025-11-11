@@ -1368,7 +1368,7 @@ Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3
 
 [[TODO: Move this into draft-ietf-tls-trust-anchor-ids once the PLANTS WG is further along. See https://github.com/tlswg/tls-trust-anchor-ids/issues/62]]
 
-A TLS deployment may know that all relying parties that accept one trust anchor must additionally accept another trust anchor, or desire identifiers for groups of related trust anchors. For example, in this document, any relying party which recognizes some landmark is known to additionally accept earlier landmarks, up to the `max_landmarks` parameter.
+A TLS deployment may know that all relying parties that accept one trust anchor must additionally accept another trust anchor, or desire identifiers for groups of related trust anchors. For example, in this document, the relying party will recognize up to `max_landmark` consecutive landmarks, so the latest landmark can be used to represent the range.
 
 Incorporating this knowledge into certificate selection can optimize the ClientHello or CertificateRequest extension. It is RECOMMENDED that this information be provisioned alongside the certificate, e.g. provided by the CA. This section extends the CertificatePropertyList structure ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}) with the `additional_trust_anchor_ranges` certificate property to do this:
 
@@ -1386,10 +1386,12 @@ struct {
 TrustAnchorRange TrustAnchorRangeList<1..2^16-1>;
 ~~~
 
-A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, as a relative OID, is the concatenation of `r.base` and some integer component between `min` and `max`. The following procedure succeeds if `r` contains `id` and fails otherwise:
+A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, as a relative OID, is the concatenation of `r.base` and some integer component between `min` and `max`, inclusive.
 
-1. Check that the most-significant bit of the last byte of `r.base` is unset. If it is set, fail the procedure.
-2. Check that `r.base` is a prefix of `id`. If not, fail the procedure. Let `rest` be `id` with the prefix removed.
+The following procedure can be used to perform this check. It succeeds if `r` contains `id` and fails otherwise:
+
+1. Check that `r.base` does not end in the middle of an OID component. That is, check that the most-significant bit of the last byte of `r.base` is unset. If it is set, fail the procedure.
+2. Check that `r.base` is a prefix of `id`. If not, fail the procedure. Let `rest` be `id` with the `r.base` prefix removed.
 3. Decode `rest` as a minimally-encoded, big-endian, base-128 OID component as follows:
    1. If `rest` is empty, fail the procedure.
    2. If the most-significant bit of the last byte of `rest` is set, fail the procedure.
@@ -1403,7 +1405,7 @@ A trust anchor range `r` is said to *contain* a trust anchor ID `id`, if `id`, a
 
 {{Section 4.2 of !I-D.ietf-tls-trust-anchor-ids}} is updated as follows. If the ClientHello or CertificateRequest contains a `trust_anchors extension`, the authenticating party SHOULD send a certification path such that one of the following is true:
 
-* The certification path's trust anchor ID appears in the relying party's `trust_anchors` extension
+* The certification path's trust anchor ID appears in the relying party's `trust_anchors` extension, or
 * One of the certification path's additional trust anchor ranges contains some ID in the relying party's `trust_anchors` extension
 
 In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID.
@@ -1416,7 +1418,7 @@ A full certificate will generally be accepted by relying parties that trust the 
 
 A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
-A signatureless certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmarks}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L + 1`, and `max` is `L + max_landmarks - 1`.
+A signatureless certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmarks}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_landmarks - 1`.
 
 A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a signatureless certificate is compatible with the relying party.
 
