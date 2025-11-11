@@ -1408,7 +1408,12 @@ The following procedure can be used to perform this check. It succeeds if `r` co
 * The certification path's trust anchor ID appears in the relying party's `trust_anchors` extension, or
 * One of the certification path's additional trust anchor ranges contains some ID in the relying party's `trust_anchors` extension
 
-In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID.
+Trust anchor ranges do not impact an authenticating party's list of available trust anchors in EncryptedExtensions (see {{Section 4.3 of !I-D.ietf-tls-trust-anchor-ids}}) or the HTTPS/SVCB record (see {{Section 5 of !I-D.ietf-tls-trust-anchor-ids}}). Those continue to reference the single trust anchor ID that corresponds to each certificate.
+
+In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID. This includes:
+
+* Trust anchors that are sent in response to an EncryptedExtensions or HTTPS/SVCB message from the authenticating party
+* Trust anchors that are sent in `trust_anchors`, independently of the authenticating party
 
 ## Using Trust Anchor IDs
 
