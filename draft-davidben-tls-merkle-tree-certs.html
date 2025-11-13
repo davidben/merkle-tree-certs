@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 15 May 2026</td>
+<td class="center">Expires 17 May 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-11-11" class="published">11 November 2025</time>
+<time datetime="2025-11-13" class="published">13 November 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-05-15">15 May 2026</time></dd>
+<dd class="expires"><time datetime="2026-05-17">17 May 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 17 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1299,6 +1299,14 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-use-in-tls" class="internal xref">Use in TLS</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-extensions-to-trust-anchor-" class="internal xref">Extensions to Trust Anchor IDs</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-using-trust-anchor-ids" class="internal xref">Using Trust Anchor IDs</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
             <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-acme-extensions" class="internal xref">ACME Extensions</a></p>
@@ -1446,6 +1454,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.8">
                 <p id="section-toc.1-1.19.2.8.1"><a href="#appendix-E.8" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tr" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-07</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.9">
+                <p id="section-toc.1-1.19.2.9.1"><a href="#appendix-E.9" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tre" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-08</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
@@ -1508,7 +1519,9 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-2-6.4.1"><code>BIT_CEIL(n)</code> refers to the smallest power of 2 that is greater or equal to <code>n</code>.<a href="#section-2-6.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-2-7">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-7" class="pilcrow">¶</a></p>
+<p id="section-2-7">To <em>left-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one upper position. Equivalently, it is <code>n</code> times 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &lt;&lt; b</code> refers to <code>a</code> left-shifted <code>b</code> times.<a href="#section-2-7" class="pilcrow">¶</a></p>
+<p id="section-2-8">To <em>right-shift</em> a non-negative integer <code>n</code> is to shift each bit in its binary representation to one lower position, discarding the least-significant bit. Equivalently, it is the floor of <code>n</code> divided by 2. Given non-negative integers <code>a</code> and <code>b</code>, <code>a &gt;&gt; b</code> refers to <code>a</code> right-shifted <code>b</code> times.<a href="#section-2-8" class="pilcrow">¶</a></p>
+<p id="section-2-9">Given two non-negative integers <code>a</code> and <code>b</code>, <code>a &amp; b</code> refers to the non-negative integer such that each bit position is set if the corresponding bit is set in both <code>a</code> and <code>b</code>, and unset otherwise. This is commonly referred to as the bitwise AND operator.<a href="#section-2-9" class="pilcrow">¶</a></p>
 <div id="terminology-and-roles">
 <section id="section-2.1">
         <h3 id="name-terminology-and-roles">
@@ -4571,13 +4584,120 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
       <h2 id="name-use-in-tls">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-use-in-tls" class="section-name selfRef">Use in TLS</a>
       </h2>
-<p id="section-8-1">TLS implementations that authenticate with or accept Merkle Tree certificates SHOULD support trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) for certificate selection.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">A full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>.<a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8-3" class="pilcrow">¶</a></p>
-<p id="section-8-4">A full certificate MAY be used without signals about what the relying party trusts. As with other choices of default certificates, an authenticating party that does so assumes that the relying party trusts the issuing CA, e.g. because the CA is relatively ubiquitous among the relying parties that it supports.<a href="#section-8-4" class="pilcrow">¶</a></p>
-<p id="section-8-5">A signatureless certificate has a trust anchor ID of the corresponding landmark, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. This can be configured in the authenticating party via out-of-band information, as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD be configured to support those landmarks' trust anchor IDs. TLS certificate selection will then correctly determine whether the signatureless certificate is compatible with the relying party.<a href="#section-8-5" class="pilcrow">¶</a></p>
-<p id="section-8-6">[[TODO: We can do slightly better. If the relying party supports landmark 42, it can be assumed to also support landmark 41, 40, 39, etc. https://github.com/tlswg/tls-trust-anchor-ids/issues/62 discusses how to fit this into the trust anchor IDs framework. This allows the client to summarize its state with one ID per CA.]]<a href="#section-8-6" class="pilcrow">¶</a></p>
-<p id="section-8-7">Authenticating parties SHOULD preferentially use signatureless certificates over full certificates, when both are supported by the relying party. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. A signatureless certificate SHOULD NOT be used without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees predistributed.<a href="#section-8-7" class="pilcrow">¶</a></p>
+<p id="section-8-1">Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in a traditional X.509 certificate. The primary new considerations for use in TLS are:<a href="#section-8-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8-2.1">
+          <p id="section-8-2.1.1">Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-8-2.2">
+          <p id="section-8-2.2.1">Whether the authenticating party should send a full or signatureless certificate<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-8-2.3">
+          <p id="section-8-2.3.1">What the relying party should communicate to the authenticating party to help it make this decision<a href="#section-8-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-8-3">Certificate selection in TLS, described in Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.2" class="relref">4.4.2.2</a> and Section <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2.3" class="relref">4.4.2.3</a> of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs (<span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<div id="extensions-to-trust-anchor-ids">
+<section id="section-8.1">
+        <h3 id="name-extensions-to-trust-anchor-">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-extensions-to-trust-anchor-" class="section-name selfRef">Extensions to Trust Anchor IDs</a>
+        </h3>
+<p id="section-8.1-1">[[TODO: Move this into draft-ietf-tls-trust-anchor-ids once the PLANTS WG is further along. See https://github.com/tlswg/tls-trust-anchor-ids/issues/62]]<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">A TLS deployment may know that all relying parties that accept one trust anchor must additionally accept another trust anchor, or desire identifiers for groups of related trust anchors. For example, in this document, the relying party will recognize up to <code>max_landmark</code> consecutive landmarks, so the latest landmark can be used to represent the range.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-3">Incorporating this knowledge into certificate selection can optimize the ClientHello or CertificateRequest extension. It is RECOMMENDED that this information be provisioned alongside the certificate, e.g. provided by the CA. This section extends the CertificatePropertyList structure (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) with the <code>additional_trust_anchor_ranges</code> certificate property to do this:<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-8.1-4">
+<pre>
+enum {
+    additional_trust_anchor_ranges(1), (2^16-1)
+} CertificatePropertyType;
+
+struct {
+    TrustAnchorID base;
+    uint64 min;
+    uint64 max;
+} TrustAnchorRange;
+
+TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
+</pre><a href="#section-8.1-4" class="pilcrow">¶</a>
+</div>
+<p id="section-8.1-5">A trust anchor range <code>r</code> is said to <em>contain</em> a trust anchor ID <code>id</code>, if <code>id</code>, as a relative OID, is the concatenation of <code>r.base</code> and some integer component between <code>min</code> and <code>max</code>, inclusive.<a href="#section-8.1-5" class="pilcrow">¶</a></p>
+<p id="section-8.1-6">The following procedure can be used to perform this check. It succeeds if <code>r</code> contains <code>id</code> and fails otherwise:<a href="#section-8.1-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.1-7">
+<li id="section-8.1-7.1">
+            <p id="section-8.1-7.1.1">Check that <code>r.base</code> does not end in the middle of an OID component. That is, check that the most-significant bit of the last byte of <code>r.base</code> is unset. If it is set, fail the procedure.<a href="#section-8.1-7.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-8.1-7.2">
+            <p id="section-8.1-7.2.1">Check that <code>r.base</code> is a prefix of <code>id</code>. If not, fail the procedure. Let <code>rest</code> be <code>id</code> with the <code>r.base</code> prefix removed.<a href="#section-8.1-7.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-8.1-7.3">
+            <p id="section-8.1-7.3.1">Decode <code>rest</code> as a minimally-encoded, big-endian, base-128 OID component as follows:<a href="#section-8.1-7.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.1-7.3.2">
+<li id="section-8.1-7.3.2.1">
+                <p id="section-8.1-7.3.2.1.1">If <code>rest</code> is empty, fail the procedure.<a href="#section-8.1-7.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-8.1-7.3.2.2">
+                <p id="section-8.1-7.3.2.2.1">If the most-significant bit of the last byte of <code>rest</code> is set, fail the procedure.<a href="#section-8.1-7.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-8.1-7.3.2.3">
+                <p id="section-8.1-7.3.2.3.1">If the most-significant bit of any other byte of <code>rest</code> is unset, fail the procedure.<a href="#section-8.1-7.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-8.1-7.3.2.4">
+                <p id="section-8.1-7.3.2.4.1">If the first byte of <code>rest</code> is 0x80, fail the procedure.<a href="#section-8.1-7.3.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-8.1-7.3.2.5">
+                <p id="section-8.1-7.3.2.5.1">Set <code>v</code> to zero. Throughout this procedure, <code>v</code> will be less than 2<sup>64</sup>.<a href="#section-8.1-7.3.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-8.1-7.3.2.6">
+                <p id="section-8.1-7.3.2.6.1">For each byte <code>b</code> of <code>rest</code>:<a href="#section-8.1-7.3.2.6.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.1-7.3.2.6.2">
+<li id="section-8.1-7.3.2.6.2.1">
+                    <p id="section-8.1-7.3.2.6.2.1.1">If <code>v</code> is greater than or equal to 2<sup>57</sup>, fail the procedure.<a href="#section-8.1-7.3.2.6.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  <li id="section-8.1-7.3.2.6.2.2">
+                    <p id="section-8.1-7.3.2.6.2.2.1">Set <code>v</code> to <code>(v &lt;&lt; 7) + (b &amp; 127)</code>.<a href="#section-8.1-7.3.2.6.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                </ol>
+</li>
+            </ol>
+</li>
+          <li id="section-8.1-7.4">
+            <p id="section-8.1-7.4.1">Check if <code>min &lt;= v &lt;= max</code>. If this is not true, fail the procedure. Otherwise, the procedure succeeds.<a href="#section-8.1-7.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-8.1-8"><span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-4.2" class="relref">Section 4.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> is updated as follows. If the ClientHello or CertificateRequest contains a <code>trust_anchors extension</code>, the authenticating party SHOULD send a certification path such that one of the following is true:<a href="#section-8.1-8" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.1-9.1">
+            <p id="section-8.1-9.1.1">The certification path's trust anchor ID appears in the relying party's <code>trust_anchors</code> extension, or<a href="#section-8.1-9.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.1-9.2">
+            <p id="section-8.1-9.2.1">One of the certification path's additional trust anchor ranges contains some ID in the relying party's <code>trust_anchors</code> extension<a href="#section-8.1-9.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.1-10">Trust anchor ranges do not impact an authenticating party's list of available trust anchors in EncryptedExtensions (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-4.3" class="relref">Section 4.3</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>) or the HTTPS/SVCB record (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-5" class="relref">Section 5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>). Those continue to reference the single trust anchor ID that corresponds to each certificate.<a href="#section-8.1-10" class="pilcrow">¶</a></p>
+<p id="section-8.1-11">In applications that use additional trust anchor ranges, relying parties MAY send a single trust anchor ID to represent all certificates whose trust anchor ranges contain that trust anchor ID. This includes:<a href="#section-8.1-11" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.1-12.1">
+            <p id="section-8.1-12.1.1">Trust anchors that are sent in response to an EncryptedExtensions or HTTPS/SVCB message from the authenticating party<a href="#section-8.1-12.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.1-12.2">
+            <p id="section-8.1-12.2.1">Trust anchors that are sent in <code>trust_anchors</code>, independently of the authenticating party<a href="#section-8.1-12.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="using-trust-anchor-ids">
+<section id="section-8.2">
+        <h3 id="name-using-trust-anchor-ids">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-using-trust-anchor-ids" class="section-name selfRef">Using Trust Anchor IDs</a>
+        </h3>
+<p id="section-8.2-1">A full certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether the full certificate would be acceptable.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">A signatureless certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-5">A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD configure the <code>trust_anchors</code> extension to advertise the highest supported landmark in the set. The selection procedures defined in <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <a href="#extensions-to-trust-anchor-ids" class="auto internal xref">Section 8.1</a> will then correctly determine whether a signatureless certificate is compatible with the relying party.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">When both a signatureless and full certificate are supported by a relying party, an authenticating party SHOULD preferentially use the signatureless certificate. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a signatureless certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="acme-extensions">
@@ -6222,6 +6342,24 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.8-1.4">
             <p id="appendix-E.8-1.4.1">Add an appendix that explains the Merkle Tree proof procedures<a href="#appendix-E.8-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-davidben-tls-merkle-tree-certs-08">
+<section id="appendix-E.9">
+        <h3 id="name-since-draft-davidben-tls-merkle-tre">
+<a href="#name-since-draft-davidben-tls-merkle-tre" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-08</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.9-1.1">
+            <p id="appendix-E.9-1.1.1">Improvements to malleability discussion<a href="#appendix-E.9-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.9-1.2">
+            <p id="appendix-E.9-1.2.1">Improvements to subtree definition<a href="#appendix-E.9-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.9-1.3">
+            <p id="appendix-E.9-1.3.1">Improvements to <code>trust_anchors</code> integration<a href="#appendix-E.9-1.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
