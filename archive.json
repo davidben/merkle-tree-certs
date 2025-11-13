@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-09T02:07:58.322045+00:00",
+  "timestamp": "2025-11-13T02:06:33.454965+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2611,6 +2611,44 @@
       "updatedAt": "2025-10-21T23:31:08Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 162,
+      "id": "I_kwDOJIBkVc7XOAU2",
+      "title": "Duplicate landmarks?",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/162",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "If we want to keep a regular cadence of landmarks, then we need to be able to issue duplicate landmarks if the MTCA didn't issue for that period. Currently, the section on landmarks doesn't prohibit this (there is no \"strictly\" in front of \"monotonically increasing\".) However, the text on how to assign subtrees to landmarks tacitly assumes they're not empty.\n\nI see two options:\n\n- Explicitly allow duplicate landmarks, and change text accordingly (eg. no subtrees are associated to them.)\n- Be explicit that landmark issuance can be stalled when no new certificates were issued.\n\nThe advantage of the latter is that it's simpler. The downside is that it's not directly obvious which landmarks are useless because all certificates in them expired. The advantage of allowing duplicate landmarks, is that it naturally leaves out the useless tree heads that expired.",
+      "createdAt": "2025-11-11T05:31:47Z",
+      "updatedAt": "2025-11-11T06:10:28Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "The latter is what I had in mind. I think I'd just forgotten that \"monotonically increasing\" and \"strictly monotonically increasing\" were different things. \ud83d\ude06  It does mean that you might have some landmarks with expired certificates, but that's always true. It was only ever an upper bound:\n* Maybe the CA set tighter notAfter than it needed\n* Maybe we're right before the next allocation and 99% of the last landmark is expired already\n\nBut also saying that duplication landmarks just contribute zero subtrees is also easy enough, if we prefer that. \ud83e\udd37",
+          "createdAt": "2025-11-11T05:36:23Z",
+          "updatedAt": "2025-11-11T05:36:23Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I think I'd just forgotten that \"monotonically increasing\" and \"strictly monotonically increasing\" were different things.\n\nTotal tangent: is zero a positive number? In the past it was common to read *increasing* strictly, and they would use non-decreasing for the non-strict version like non-negative to include zero.\n\n> But also saying that duplication landmarks just contribute zero subtrees is also easy enough, if we prefer that. \ud83e\udd37\n\nLet's stick with what we have now, and revisit if slow issuing MTCAs turn out to be a thing.\n\nUpdate: clarified in https://github.com/davidben/merkle-tree-certs/commit/494e27f920efcc4dff5fcb6cb0311b95ac8396bf",
+          "createdAt": "2025-11-11T05:42:02Z",
+          "updatedAt": "2025-11-11T05:46:26Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Added another missing one in 27312f81241a32bdbd72bc9db8650e214f03316c",
+          "createdAt": "2025-11-11T06:10:27Z",
+          "updatedAt": "2025-11-11T06:10:27Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -9729,13 +9767,13 @@
       "labels": [],
       "body": "When trust_anchors was extracted from the first MTC drafts, we lost an optimization because it was not, at the time, relevant for the baseline version of the problem. However, it is still quite useful for MTCs (and may be useful for other scenarios too).\r\n\r\nThis implements https://github.com/tlswg/tls-trust-anchor-ids/issues/62 to put it back. For now, it's in the MTC repo, but in the long run, we should put it back in TAI itself.",
       "createdAt": "2025-11-06T22:27:21Z",
-      "updatedAt": "2025-11-07T13:10:23Z",
+      "updatedAt": "2025-11-11T20:38:48Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "ec6bdf99df5d03f40fec460dbd664bc84f749b6f",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "tai-alias",
-      "headRefOid": "1a9b5f9d06728ec17dcc5b51c79fb56073d3a271",
+      "headRefOid": "86af2bd12b4d3964c1e27f1f842fdc23e60764a1",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -9865,6 +9903,124 @@
               "body": "Maybe add a sentence here explaining what the procedure is doing.",
               "createdAt": "2025-11-07T13:01:33Z",
               "updatedAt": "2025-11-07T13:10:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7NnvYy",
+          "commit": {
+            "abbreviatedOid": "1a9b5f9"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-11T19:52:10Z",
+          "updatedAt": "2025-11-11T19:52:10Z",
+          "comments": [
+            {
+              "originalPosition": 49,
+              "body": "Whoops, correction: In step 2, `v` can be `2^57-1`. Thus in step 3, `v` can be `2^64 - 127 + 127`, which is larger than 2^64-1. ",
+              "createdAt": "2025-11-11T19:52:10Z",
+              "updatedAt": "2025-11-11T19:52:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7NkM9e",
+          "commit": {
+            "abbreviatedOid": "86af2bd"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "> Should there be something said about how the DNS negotiation & the retry mechanism work with ranges?\r\n\r\nDone\r\n\r\n> Since the DNS hint could be stale, the client would probably want to match the prefix against its known base_ids, but send the base_id.max for highest chance of success without requiring a round trip. For the retry mechanism the client could do a specific match, but for simplicity it would be nice to just have the client do the same thing in both cases.\r\n\r\nAgreed. Tried to clarify this in the new text.",
+          "createdAt": "2025-11-11T16:08:34Z",
+          "updatedAt": "2025-11-11T20:38:48Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "Apparently it works, amazingly. `<sup>` is one of the tags in the RFC XML syntax, and it actually renders as `2^64` in the text form.",
+              "createdAt": "2025-11-11T16:08:35Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 47,
+              "body": "Ah good idea. Done.",
+              "createdAt": "2025-11-11T16:25:40Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 49,
+              "body": "I believe this is fine. `(2^57-1) << 7` is not `2^64-1`. It's `2^64-128`, so 127 slots in nicely.",
+              "createdAt": "2025-11-11T16:26:57Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "Done.",
+              "createdAt": "2025-11-11T16:27:18Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 61,
+              "body": "Yeah, at least right now we're just negotiating log IDs and the cosigner IDs don't really do much. I'd really like to do cosigner negotiation, but we'll have to get to that. :-)",
+              "createdAt": "2025-11-11T16:28:17Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "Just so there's something to fit into the DNS and EE bits.",
+              "createdAt": "2025-11-11T16:37:31Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 18,
+              "body": "Done",
+              "createdAt": "2025-11-11T17:37:56Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 36,
+              "body": "Done",
+              "createdAt": "2025-11-11T17:38:12Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 36,
+              "body": "Reworded slightly.",
+              "createdAt": "2025-11-11T17:38:43Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 39,
+              "body": "Done",
+              "createdAt": "2025-11-11T19:22:32Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "Done",
+              "createdAt": "2025-11-11T19:23:39Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 69,
+              "body": "I think that's correct? If `max_landmarks` is 1, then the client keeps track of one landmark at a time, which means the only landmark that matches is `L`.\r\n\r\nStrictly speaking, this is all irrelevant. We can just set `max` to 2<sup>64</sup>-1 and not think about it very hard. The expired ones will fall off anyway.\r\n\r\n(I turned `L+1` to `L` so we don't produce an invalid range, but this is redundant with the exact match.)",
+              "createdAt": "2025-11-11T19:27:12Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "It seemed worth making it clear that we're negotiating based on the thing that derives the subtrees, not the subtrees.",
+              "createdAt": "2025-11-11T19:28:12Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
+            },
+            {
+              "originalPosition": 72,
+              "body": "...I could have sworn \"don't send the expired ones\" was already implicitly in TAI, but maybe that was lost when going from trust expressions to trust anchor IDs. I think expiry should be part of the general framework because it's a general problem.\r\n\r\n(It's *already* the case that you might trust a subtree but some certificates in the subtree are expired.)",
+              "createdAt": "2025-11-11T19:30:13Z",
+              "updatedAt": "2025-11-11T20:38:48Z"
             }
           ]
         }
