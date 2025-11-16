@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-13T02:06:33.454965+00:00",
+  "timestamp": "2025-11-16T02:11:42.461511+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2649,6 +2649,22 @@
           "updatedAt": "2025-11-11T06:10:27Z"
         }
       ]
+    },
+    {
+      "number": 163,
+      "id": "I_kwDOJIBkVc7YPsWE",
+      "title": "Consider better names for full and signatureless certificate",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/163",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-11-15T04:11:01Z",
+      "updatedAt": "2025-11-15T04:11:01Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -9760,24 +9776,26 @@
       "id": "PR_kwDOJIBkVc6yAjzY",
       "title": "Restore the more efficient trust anchor negotiation",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/161",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "When trust_anchors was extracted from the first MTC drafts, we lost an optimization because it was not, at the time, relevant for the baseline version of the problem. However, it is still quite useful for MTCs (and may be useful for other scenarios too).\r\n\r\nThis implements https://github.com/tlswg/tls-trust-anchor-ids/issues/62 to put it back. For now, it's in the MTC repo, but in the long run, we should put it back in TAI itself.",
       "createdAt": "2025-11-06T22:27:21Z",
-      "updatedAt": "2025-11-11T20:38:48Z",
+      "updatedAt": "2025-11-13T19:27:19Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "ec6bdf99df5d03f40fec460dbd664bc84f749b6f",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "tai-alias",
       "headRefOid": "86af2bd12b4d3964c1e27f1f842fdc23e60764a1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-11-13T19:27:16Z",
+      "mergedAt": "2025-11-13T19:27:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "239b376b6eeb0937986cd13e51851e0d090dd923"
+      },
       "comments": [
         {
           "author": "matt-mueller",
@@ -10021,6 +10039,26 @@
               "body": "...I could have sworn \"don't send the expired ones\" was already implicitly in TAI, but maybe that was lost when going from trust expressions to trust anchor IDs. I think expiry should be part of the general framework because it's a general problem.\r\n\r\n(It's *already* the case that you might trust a subtree but some certificates in the subtree are expired.)",
               "createdAt": "2025-11-11T19:30:13Z",
               "updatedAt": "2025-11-11T20:38:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7OT9lY",
+          "commit": {
+            "abbreviatedOid": "1a9b5f9"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-11-13T19:26:56Z",
+          "updatedAt": "2025-11-13T19:26:56Z",
+          "comments": [
+            {
+              "originalPosition": 49,
+              "body": "Crossed mid-air, but I believe `2^64 - 127 + 127` should be `2^64 - 128 + 127`, which is then the right bounds.\r\n\r\nI think it's easier to see this by looking at bits. The check that `v` is less than `2^57-1` is saying that `v` is at most 57 bits. `v << 7` then is at most 64 bits _and has the bottom 7 bits zero_. Adding a 7-bit number will just add in those zero bits.",
+              "createdAt": "2025-11-13T19:26:56Z",
+              "updatedAt": "2025-11-13T19:26:56Z"
             }
           ]
         }
