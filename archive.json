@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-16T02:11:42.461511+00:00",
+  "timestamp": "2025-11-18T02:04:16.154623+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2662,9 +2662,38 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-11-15T04:11:01Z",
-      "updatedAt": "2025-11-15T04:11:01Z",
+      "updatedAt": "2025-11-17T18:31:16Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Yeah, I'm not loving the current terms. \"Signatureless\" and \"unsigned\" collision is particularly awkward. Spitballing:\n\n* Inclusion-proof-only certificate is a mouthful\n* Inclusion-proof certificate is shorter, but slightly misleading because they both have inclusion proofs\n* Optimized certificate could mean a lot of things\n* Landmark certificate is unlikely to collide with much, but is only meaningful relative to our other terms",
+          "createdAt": "2025-11-16T17:17:07Z",
+          "updatedAt": "2025-11-16T17:17:07Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "It's not there yet, but what about \"small MTC\" vs \"self-contained MTC\". Instead of trying to name what it is, I'm naming what it means in use.",
+          "createdAt": "2025-11-17T04:36:25Z",
+          "updatedAt": "2025-11-17T04:37:17Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ooh, I like that. Self-contained is particularly nice.\n\nSome other misc ideas. (Not sure I like them better than yours, just tossing some more thoughts around):\n* Immediate certificates to capture that you get the full certificates immediately.\n* Preverified or prechecked certificates to capture that the reason they're small / not self-contained is that the client is assumed to have checked the signature already",
+          "createdAt": "2025-11-17T17:51:49Z",
+          "updatedAt": "2025-11-17T17:51:49Z"
+        },
+        {
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "body": "FWIW, I kinda like preverified, since it's short but also defends against a perception that the optimization is somehow less safe.",
+          "createdAt": "2025-11-17T18:31:16Z",
+          "updatedAt": "2025-11-17T18:31:16Z"
+        }
+      ]
     }
   ],
   "pulls": [
