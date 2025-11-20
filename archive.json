@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-18T02:04:16.154623+00:00",
+  "timestamp": "2025-11-20T02:02:35.595791+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2662,7 +2662,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-11-15T04:11:01Z",
-      "updatedAt": "2025-11-17T18:31:16Z",
+      "updatedAt": "2025-11-19T23:15:22Z",
       "closedAt": null,
       "comments": [
         {
@@ -2692,6 +2692,27 @@
           "body": "FWIW, I kinda like preverified, since it's short but also defends against a perception that the optimization is somehow less safe.",
           "createdAt": "2025-11-17T18:31:16Z",
           "updatedAt": "2025-11-17T18:31:16Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "(Wasn't excited about it anyway, but let's nix \"immediate certificates\" because it sounds way too much like \"intermediate certificates\". If we want to capture that, need another word.)",
+          "createdAt": "2025-11-19T21:45:35Z",
+          "updatedAt": "2025-11-19T21:45:35Z"
+        },
+        {
+          "author": "mcpherrinm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think \"Self-Contained\" is a good word.\n\nWhat about \"Landmark-relative certificate\"?",
+          "createdAt": "2025-11-19T22:01:53Z",
+          "updatedAt": "2025-11-19T22:01:53Z"
+        },
+        {
+          "author": "dconnolly",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Ooh, I like that. Self-contained is particularly nice.\n> \n> Some other misc ideas. (Not sure I like them better than yours, just tossing some more thoughts around):\n> * Immediate certificates to capture that you get the full certificates immediately.\n> * Preverified or prechecked certificates to capture that the reason they're small / not self-contained is that the client is assumed to have checked the signature already\n\ni like 'immediate' certs",
+          "createdAt": "2025-11-19T23:15:22Z",
+          "updatedAt": "2025-11-19T23:15:22Z"
         }
       ]
     }
