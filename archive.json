@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-20T02:02:35.595791+00:00",
+  "timestamp": "2025-11-23T02:24:32.269523+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2662,7 +2662,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-11-15T04:11:01Z",
-      "updatedAt": "2025-11-19T23:15:22Z",
+      "updatedAt": "2025-11-20T07:23:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -2713,6 +2713,13 @@
           "body": "> Ooh, I like that. Self-contained is particularly nice.\n> \n> Some other misc ideas. (Not sure I like them better than yours, just tossing some more thoughts around):\n> * Immediate certificates to capture that you get the full certificates immediately.\n> * Preverified or prechecked certificates to capture that the reason they're small / not self-contained is that the client is assumed to have checked the signature already\n\ni like 'immediate' certs",
           "createdAt": "2025-11-19T23:15:22Z",
           "updatedAt": "2025-11-19T23:15:22Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I agree that \"signatureless\" is bad, since although there is not a cryptographic signature, there is still an X.509 signature.\n\nMy proposal is\n- \"Cosigned certificate\", for one whose signature includes actual signatures\n- \"Proof-only certificate\", for one whose signatures does not include actual signatures",
+          "createdAt": "2025-11-20T07:23:50Z",
+          "updatedAt": "2025-11-20T07:23:50Z"
         }
       ]
     }
