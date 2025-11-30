@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-23T02:24:32.269523+00:00",
+  "timestamp": "2025-11-30T02:23:15.053969+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -9641,7 +9641,7 @@
       ],
       "body": "this was motivated by discussion in the PLANTS BoF today.  PQ signing algorithms are not the only additional pressure on log operators.",
       "createdAt": "2025-11-04T23:21:51Z",
-      "updatedAt": "2025-11-05T09:25:42Z",
+      "updatedAt": "2025-11-29T11:41:44Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dba1d0e3391701595d4bbc13a77dad1c30d4d3ed",
@@ -9666,6 +9666,13 @@
           "body": "Works for me! Not sure what the process looks like post-BoF but hopefully that'll become clear.",
           "createdAt": "2025-11-05T05:16:36Z",
           "updatedAt": "2025-11-05T05:16:36Z"
+        },
+        {
+          "author": "debcooley",
+          "authorAssociation": "NONE",
+          "body": "I think this update is fine.  (I'm looking to keep the scope of the charter pretty tight, but I think this update is fine).",
+          "createdAt": "2025-11-29T11:41:44Z",
+          "updatedAt": "2025-11-29T11:41:44Z"
         }
       ],
       "reviews": [
@@ -9705,7 +9712,7 @@
       ],
       "body": "Does this work for you @johngray-dev @ounsworth as an alternative to removing transparency earlier on?",
       "createdAt": "2025-11-05T09:29:03Z",
-      "updatedAt": "2025-11-05T09:30:19Z",
+      "updatedAt": "2025-11-29T11:39:40Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
@@ -9716,7 +9723,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "debcooley",
+          "authorAssociation": "NONE",
+          "body": "I like this update....",
+          "createdAt": "2025-11-29T11:39:40Z",
+          "updatedAt": "2025-11-29T11:39:40Z"
+        }
+      ],
       "reviews": []
     },
     {
@@ -9733,7 +9748,7 @@
       ],
       "body": "",
       "createdAt": "2025-11-05T16:54:37Z",
-      "updatedAt": "2025-11-07T07:37:17Z",
+      "updatedAt": "2025-11-29T11:38:15Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
@@ -9744,7 +9759,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "debcooley",
+          "authorAssociation": "NONE",
+          "body": "I like this update.\r\n",
+          "createdAt": "2025-11-29T11:38:15Z",
+          "updatedAt": "2025-11-29T11:38:15Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc7MDwzf",
