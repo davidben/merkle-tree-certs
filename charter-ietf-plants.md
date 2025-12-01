@@ -4,7 +4,7 @@ This is a draft charter for a new IETF working group. The working group does not
 
 ## PKI, Logs, And Tree Signatures (PLANTS)
 
-The goal of the PLANTS Working Group is to trim the costs of large post-quantum signatures on PKIs with Certificate Transparency (CT; RFC 6962 and RFC 9162), when used in interactive protocols like TLS (RFC 8446).
+The goal of the PLANTS Working Group is to trim the increasing costs of operating PKIs with Certificate Transparency (CT; RFC 6962 and RFC 9162), when used in interactive protocols like TLS (RFC 8446).
 
 Today, such applications apply two separate systems: a certification authority (CA) signs individual bindings between public keys and application identifiers (e.g. a DNS name), returning an X.509 certificate. CT logs then log entire certificates, returning signed certificate timestamps. The outputs of these two steps are presented to the relying party.
 
@@ -13,6 +13,8 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 * Each log entry contains an entire certificate, with public key and signature. Post-quantum overhead is multiplied across every entry, increasing the costs to log operators and the rest of the transparency ecosystem.
 
 * Relying parties are presented with signatures from the CA and CT logs. Post-quantum overhead is multiplied per signature, increasing the size and latency of the TLS handshake.
+
+Additionally, more entities are requesting certificates, and certificate validity windows are narrowing, both of which increase the overall size of a CT log, with corresponding costs for log operators.
 
 The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
 
