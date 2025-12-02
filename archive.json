@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-30T02:23:15.053969+00:00",
+  "timestamp": "2025-12-02T02:08:02.645789+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -9632,30 +9632,32 @@
       "id": "PR_kwDOJIBkVc6xhEyk",
       "title": "Additional motivation: reduce the cost of log operation",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/158",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "dkg",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [
         "charter"
       ],
       "body": "this was motivated by discussion in the PLANTS BoF today.  PQ signing algorithms are not the only additional pressure on log operators.",
       "createdAt": "2025-11-04T23:21:51Z",
-      "updatedAt": "2025-11-29T11:41:44Z",
+      "updatedAt": "2025-12-01T17:37:34Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "dba1d0e3391701595d4bbc13a77dad1c30d4d3ed",
       "headRepository": "dkg/merkle-tree-certs",
       "headRefName": "expand-motivation",
       "headRefOid": "b4980039971fa3ed615d4509f7a600ef4e35de60",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-12-01T17:37:34Z",
+      "mergedAt": "2025-12-01T17:37:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3174e3fb5652ff95921a91440475ea49e21988f3"
+      },
       "comments": [
         {
           "author": "dkg",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "there may be some additional motivations related to the costs of operating a CT monitor (not just the costs of operating a CT log), which i haven't included in this PR.  If anyone thinks those are motivating, feel free to include those in a separate PR :)",
           "createdAt": "2025-11-04T23:38:57Z",
           "updatedAt": "2025-11-04T23:38:57Z"
@@ -9703,7 +9705,7 @@
       "id": "PR_kwDOJIBkVc6xmd3C",
       "title": "charter: elaborate that private PKIs might not need transparency",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/159",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -9712,17 +9714,19 @@
       ],
       "body": "Does this work for you @johngray-dev @ounsworth as an alternative to removing transparency earlier on?",
       "createdAt": "2025-11-05T09:29:03Z",
-      "updatedAt": "2025-11-29T11:39:40Z",
+      "updatedAt": "2025-12-01T17:37:50Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "bas/charter-private-twaek",
       "headRefOid": "d7a7883de6a30cc56ba8323c22f9c0f7acf3c23b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-12-01T17:37:50Z",
+      "mergedAt": "2025-12-01T17:37:50Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "689783babc3a5e530bc1cfe7cb352db29ade8566"
+      },
       "comments": [
         {
           "author": "debcooley",
@@ -9739,7 +9743,7 @@
       "id": "PR_kwDOJIBkVc6xsz2i",
       "title": "charter: Not just ACME",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/160",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -9748,17 +9752,19 @@
       ],
       "body": "",
       "createdAt": "2025-11-05T16:54:37Z",
-      "updatedAt": "2025-11-29T11:38:15Z",
+      "updatedAt": "2025-12-01T17:38:03Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "2f1c8dd7b504ece7c32392583ada020a126f56f0",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "bas/delivery",
       "headRefOid": "303d2b008514a295cf751dc9c65f4e0479e3f360",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-12-01T17:38:03Z",
+      "mergedAt": "2025-12-01T17:38:03Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "2b31f3d41162227fa1fe389b3e970cc33bf27eb6"
+      },
       "comments": [
         {
           "author": "debcooley",
@@ -9835,7 +9841,7 @@
             "abbreviatedOid": "dad3231"
           },
           "author": "tfpauly",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2025-11-06T15:04:10Z",
