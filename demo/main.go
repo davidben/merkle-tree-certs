@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"flag"
@@ -9,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 
 	"golang.org/x/crypto/cryptobyte"
@@ -50,6 +53,15 @@ func tlogIndex(n int, partial bool) string {
 		n /= 1000
 	}
 	return s
+}
+
+func tlogOrigin(id TrustAnchorID) string {
+	return fmt.Sprintf("oid/1.3.6.1.4.1.%s", id)
+}
+
+func tlogCheckpointKeyID(id TrustAnchorID) [4]byte {
+	h := sha256.Sum256([]byte(tlogOrigin(id) + "\n\xffmtc-checkpoint/v1"))
+	return *(*[4]byte)(h[:])
 }
 
 func do() error {
@@ -231,7 +243,27 @@ func do() error {
 		}
 	}
 
-	// TODO: Also write a checkpoint in tlog-checkpoint format.
+	checkpointHash, err := issuanceLog.SubtreeHash(0, len(entries))
+	if err != nil {
+		panic(err)
+	}
+	var signedNote bytes.Buffer
+	fmt.Fprintf(&signedNote, "%s\n", tlogOrigin(config.LogID))
+	fmt.Fprintf(&signedNote, "%d\n", len(entries))
+	fmt.Fprintf(&signedNote, "%s\n\n", base64.StdEncoding.EncodeToString(checkpointHash[:]))
+	for i := range config.Cosigners {
+		cosigner := &config.Cosigners[i]
+		cosig, err := Cosign(cosigner, config.LogID, 0, len(entries), &checkpointHash)
+		if err != nil {
+			return err
+		}
+		keyID := tlogCheckpointKeyID(cosigner.CosignerID)
+		fmt.Fprintf(&signedNote, "\u2014 %s %s\n", tlogOrigin(cosigner.CosignerID), base64.StdEncoding.EncodeToString(slices.Concat(keyID[:], cosig)))
+	}
+	if err := os.WriteFile(filepath.Join(*flagOutDir, "checkpoint"), signedNote.Bytes(), 0644); err != nil {
+		return err
+	}
+
 	return nil
 }
 
