@@ -99,7 +99,8 @@ type SubjectConfig struct {
 type CertificateConfig struct {
 	// At most one of SubtreeStart/SubtreeEnd and Checkpoint may be specified.
 	// If SubtreeStart/SubtreeEnd is specified, that subtree is used. (Entries
-	// are one-indexed.)
+	// are zero-indexed, but there is always a null entry at zero, so they are
+	// effectively one-indexed.)
 	// If Checkpoint is used, the named checkpoint sequence is used.
 	SubtreeStart, SubtreeEnd int
 	Checkpoint               string
