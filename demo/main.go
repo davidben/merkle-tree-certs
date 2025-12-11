@@ -9,6 +9,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+
+	"golang.org/x/crypto/cryptobyte"
 )
 
 var (
@@ -22,6 +25,31 @@ type certificateInfo struct {
 	cosigners         []*CosignerConfig
 	// The number of certificate for the given index.
 	num int
+}
+
+func makeDirsAndWriteFile(name string, data []byte) error {
+	if err := os.MkdirAll(filepath.Dir(name), 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(name, data, 0644)
+}
+
+func tlogIndex(n int, partial bool) string {
+	if n < 0 {
+		panic("negative tlog index")
+	}
+	var s string
+	if partial {
+		s = fmt.Sprintf("%03d.p", n%1000)
+	} else {
+		s = fmt.Sprintf("%03d", n%1000)
+	}
+	n /= 1000
+	for n != 0 {
+		s = filepath.Join(fmt.Sprintf("x%03d", n%1000), s)
+		n /= 1000
+	}
+	return s
 }
 
 func do() error {
@@ -128,7 +156,7 @@ func do() error {
 	issuanceLog := NewMerkleTree(entries)
 
 	// Construct certificates.
-	if err := os.MkdirAll(*flagOutDir, 0750); err != nil {
+	if err := os.MkdirAll(*flagOutDir, 0755); err != nil {
 		log.Fatal(err)
 	}
 	for _, info := range certInfos {
@@ -145,7 +173,50 @@ func do() error {
 		}
 	}
 
-	// TODO: Also write out tiles and a checkpoint in tlog-checkpoint format.
+	// Write out the tree in tlog-tiles format.
+	tileDir := filepath.Join(*flagOutDir, "tile")
+
+	entryDir := filepath.Join(tileDir, "entries")
+	for i := 0; 256*i < len(entries); i++ {
+		bundle := cryptobyte.NewBuilder(nil)
+		for j := 256 * i; j < 256*(i+1) && j < len(entries); j++ {
+			bundle.AddUint16LengthPrefixed(func(child *cryptobyte.Builder) { child.AddBytes(entries[j]) })
+		}
+		var path string
+		if 256*(i+1) <= len(entries) {
+			path = filepath.Join(entryDir, tlogIndex(i, false))
+		} else {
+			path = filepath.Join(entryDir, tlogIndex(i, true), strconv.Itoa(len(entries)-256*i))
+		}
+		data, err := bundle.Bytes()
+		if err != nil {
+			return err
+		}
+		if err := makeDirsAndWriteFile(path, data); err != nil {
+			return err
+		}
+	}
+
+	for l := 0; l < len(issuanceLog.levels); l += 8 {
+		level := issuanceLog.levels[l]
+		for i := 0; 256*i < len(level); i++ {
+			var tile []byte
+			for j := 256 * i; j < 256*(i+1) && j < len(level); j++ {
+				tile = append(tile, level[j][:]...)
+			}
+			var path string
+			if 256*(i+1) <= len(level) {
+				path = filepath.Join(tileDir, strconv.Itoa(l/8), tlogIndex(i, false))
+			} else {
+				path = filepath.Join(tileDir, strconv.Itoa(l/8), tlogIndex(i, true), strconv.Itoa(len(level)-256*i))
+			}
+			if err := makeDirsAndWriteFile(path, tile); err != nil {
+				return err
+			}
+		}
+	}
+
+	// TODO: Also write a checkpoint in tlog-checkpoint format.
 	return nil
 }
 
