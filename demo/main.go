@@ -173,9 +173,9 @@ func do() error {
 	}
 	for _, info := range certInfos {
 		// TODO: A real CA would not generate fresh cosignatures for every
-		// certificate. // Rather it generate cosignatures for a small set of
-		// subtrees as it mints checkpoints. This tool is less opinionated about
-		// subtrees, so we would need to make a cosignature cache to simulate this.
+		// certificate. Rather it cosign subtrees as it checkpoints. This tool
+		// is less opinionated about subtrees, so we would need to make a
+		// cosignature cache to simulate this.
 		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
