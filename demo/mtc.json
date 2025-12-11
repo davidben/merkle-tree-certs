@@ -37,6 +37,7 @@
       "Checkpoints": ["fast"],
       "Certificates": [
         {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.2"]},
+        {"SubtreeStart": 8, "SubtreeEnd": 16, "Cosigners": ["32473.2.3"]},
         {"Checkpoint": "landmark"}
       ]
     },

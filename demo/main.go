@@ -160,17 +160,32 @@ func do() error {
 		log.Fatal(err)
 	}
 	for _, info := range certInfos {
-		// A real CA would not generate fresh cosignatures for every certificate.
-		// This tool does because it's a bit flexible
+		// TODO: A real CA would not generate fresh cosignatures for every
+		// certificate. // Rather it generate cosignatures for a small set of
+		// subtrees as it mints checkpoints. This tool is less opinionated about
+		// subtrees, so we would need to make a cosignature cache to simulate this.
 		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}
+
+		subtree, err := issuanceLog.SubtreeHash(info.start, info.end)
+		if err != nil {
+			return err
+		}
+
 		certPath := filepath.Join(*flagOutDir, fmt.Sprintf("cert_%d_%d.pem", info.index, info.num))
 		certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
 		if err := os.WriteFile(certPath, certPEM, 0644); err != nil {
 			return err
 		}
+
+		fmt.Printf("Wrote certificate for entry %d at %q.\n", info.index, certPath)
+		fmt.Printf("  Subtree [%d, %d) with hash %x\n", info.start, info.end, subtree[:])
+		for _, cosigner := range info.cosigners {
+			fmt.Printf("  Cosigned by %s\n", cosigner.CosignerID)
+		}
+		fmt.Printf("\n")
 	}
 
 	// Write out the tree in tlog-tiles format.
