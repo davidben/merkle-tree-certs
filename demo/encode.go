@@ -144,6 +144,7 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 		if hasSubjectAltName {
 			exts.AddASN1(cbasn1.SEQUENCE, func(ext *cryptobyte.Builder) {
 				ext.AddASN1ObjectIdentifier(oidSubjectAltName)
+				ext.AddASN1Boolean(true) // critical, needed if the subject is empty
 				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(names *cryptobyte.Builder) {
 						for _, dns := range entry.DNSNames {
