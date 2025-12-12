@@ -6,7 +6,7 @@ This is a draft charter for a new IETF working group. The working group does not
 
 The goal of the PLANTS Working Group is to trim the increasing costs of operating PKIs with Certificate Transparency (CT; RFC 6962 and RFC 9162), when used in interactive protocols like TLS (RFC 8446).
 
-Today, such applications apply two separate systems: a certification authority (CA) signs individual bindings between public keys and application identifiers (e.g. a DNS name), returning an X.509 certificate. CT logs then log entire certificates, returning signed certificate timestamps. The outputs of these two steps are presented to the relying party.
+Today, such applications apply two separate systems: a certification authority (CA) signs individual bindings between public keys and application identifiers (e.g., a DNS name), returning an X.509 certificate. CT logs then log entire certificates, returning signed certificate timestamps. The outputs of these two steps are presented to the relying party.
 
 Overhead from post-quantum signatures and keys will add significant costs in two ways:
 
@@ -16,7 +16,7 @@ Overhead from post-quantum signatures and keys will add significant costs in two
 
 Additionally, more entities are requesting certificates, and certificate validity windows are narrowing, both of which increase the overall size of a CT log, with corresponding costs for log operators.
 
-The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g. by signing Merkle Tree hashes.
+The PLANTS Working Group will define a mechanism that integrates log construction into certificate issuance, and reduces the amount of data in individual log entries and the TLS handshake. Integrating the log into certificate issuance enables techniques where one signature can cover multiple key/identifier bindings, e.g., by signing Merkle Tree hashes.
 
 The Working Group will initially put down roots and define the mechanisms needed to interoperably construct and consume certificates:
 
@@ -26,7 +26,7 @@ The Working Group will initially put down roots and define the mechanisms needed
 
 3. How the certificate constructions may be provisioned (with mechanisms including ACME (RFC 8555)) and used in TLS.
 
-As part of this work, the Working Group may extend PKIX (RFC 5280), e.g. with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
+As part of this work, the Working Group may extend PKIX (RFC 5280), e.g., with new extensions or signature algorithms. As appropriate, the PLANTS Working Group will liaise with the LAMPS Working Group to ensure adequate lighting for this work and help it grow. As needed, the Working Group may also define extensions to ACME and TLS to integrate its certificate constructions. In doing so, it is expected to liaise with the TLS and ACME Working Groups for cross-pollination.
 
 Though not the initial focus, the PLANTS Working Group may consider other properties of transparent PKIs to improve upon the status quo, such as auditing, monitoring, or revocation. If feasible concrete improvements are identified, the Working Group may recharter to seed secondary deliverables that build on its initial work.
 
