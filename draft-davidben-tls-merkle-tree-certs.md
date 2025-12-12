@@ -337,7 +337,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.
 
-3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this log only contains entries added by the CA:
+3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
 
    1. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
 
