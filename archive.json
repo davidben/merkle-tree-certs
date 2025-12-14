@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-11T02:18:21.682615+00:00",
+  "timestamp": "2025-12-14T02:24:49.597100+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10270,6 +10270,91 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 167,
+      "id": "PR_kwDOJIBkVc64jRBj",
+      "title": "Address part of \u00c9ric Vyncke's comments",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/167",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "charter"
+      ],
+      "body": "https://mailarchive.ietf.org/arch/msg/plants/h56f-ERetlQ2Qr_9q5V2FxIL_JI/",
+      "createdAt": "2025-12-12T11:38:56Z",
+      "updatedAt": "2025-12-12T17:29:01Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "e8435c23b6ea2c2d69bb19b4e23635b416242185",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/vyncke",
+      "headRefOid": "6f7e2f80584da818a9511cbb65efde8c6bc78ceb",
+      "closedAt": "2025-12-12T13:58:05Z",
+      "mergedAt": "2025-12-12T13:58:05Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "4e2d3f557f79e30685e9029569a541159c10cb40"
+      },
+      "comments": [
+        {
+          "author": "debcooley",
+          "authorAssociation": "NONE",
+          "body": "The first part (adding commas) is fine.  The second part, the PR pointed to something not in the charter....  The part Eric was talking about is in the second paragraph, second sentence and has this phrase, 'CT logs then log entire certificates,'  Where 'CT logs' is the noun and the second 'log' is the verb.  I'll take hints about how to fix that....",
+          "createdAt": "2025-12-12T16:12:04Z",
+          "updatedAt": "2025-12-12T16:12:04Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Ah yeah, that's awkward. How about https://github.com/davidben/merkle-tree-certs/pull/168?",
+          "createdAt": "2025-12-12T17:29:00Z",
+          "updatedAt": "2025-12-12T17:29:00Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7U50j1",
+          "commit": {
+            "abbreviatedOid": "6f7e2f8"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-12-12T13:57:50Z",
+          "updatedAt": "2025-12-12T13:57:50Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 168,
+      "id": "PR_kwDOJIBkVc64nI6j",
+      "title": "charter: Avoid using \"log\" as both a noun and a verb in the same sentence",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/168",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Strictly speaking, if you \"send\" the entire certificate, the log might only retain a part of the certificate, but the subsequent paragraph clarifies that the \"log entry\" contains the entire certificate, so I think that's fine.\r\n\r\n@debcooley, how's this look?",
+      "createdAt": "2025-12-12T17:28:49Z",
+      "updatedAt": "2025-12-12T17:28:49Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4e2d3f557f79e30685e9029569a541159c10cb40",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "log-noun-verb",
+      "headRefOid": "5351e0f150e9654ba321ce48bc7d5cc24a7aeaf8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
