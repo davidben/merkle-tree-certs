@@ -2,7 +2,7 @@
 title: Merkle Tree Certificates
 docname: draft-davidben-tls-merkle-tree-certs-latest
 submissiontype: IETF
-category: exp
+category: std
 number:
 date:
 consensus: true
