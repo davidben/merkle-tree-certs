@@ -4,14 +4,14 @@
 
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
-Intended status: Experimental                                 D. O'Brien
-Expires: 15 June 2026                                                   
+Intended status: Standards Track                              D. O'Brien
+Expires: 18 June 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        12 December 2025
+                                                        15 December 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 June 2026.
+   This Internet-Draft will expire on 18 June 2026.
 
 Copyright Notice
 
@@ -164,6 +164,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-06
      Since draft-davidben-tls-merkle-tree-certs-07
      Since draft-davidben-tls-merkle-tree-certs-08
+     Since draft-davidben-tls-merkle-tree-certs-09
    Authors' Addresses
 
 1.  Introduction
@@ -3646,6 +3647,12 @@ Since draft-davidben-tls-merkle-tree-certs-08
    *  Improvements to subtree definition
 
    *  Improvements to trust_anchors integration
+
+Since draft-davidben-tls-merkle-tree-certs-09
+
+   *  Editorial fixes
+
+   *  Set a more accurate intended status
 
 Authors' Addresses
 
