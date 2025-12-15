@@ -2,7 +2,7 @@
 title: Merkle Tree Certificates
 docname: draft-davidben-tls-merkle-tree-certs-latest
 submissiontype: IETF
-category: exp
+category: std
 number:
 date:
 consensus: true
@@ -2093,3 +2093,10 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Improvements to subtree definition
 
 - Improvements to `trust_anchors` integration
+
+## Since draft-davidben-tls-merkle-tree-certs-09
+{:numbered="false"}
+
+- Editorial fixes
+
+- Set a more accurate intended status
