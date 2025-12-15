@@ -164,6 +164,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-06
      Since draft-davidben-tls-merkle-tree-certs-07
      Since draft-davidben-tls-merkle-tree-certs-08
+     Since draft-davidben-tls-merkle-tree-certs-09
    Authors' Addresses
 
 1.  Introduction
@@ -3646,6 +3647,12 @@ Since draft-davidben-tls-merkle-tree-certs-08
    *  Improvements to subtree definition
 
    *  Improvements to trust_anchors integration
+
+Since draft-davidben-tls-merkle-tree-certs-09
+
+   *  Editorial fixes
+
+   *  Set a more accurate intended status
 
 Authors' Addresses
 
