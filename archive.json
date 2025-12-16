@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-14T02:24:49.597100+00:00",
+  "timestamp": "2025-12-16T02:18:40.663467+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10355,6 +10355,48 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 169,
+      "id": "PR_kwDOJIBkVc6488vl",
+      "title": "Switch intended status to match the draft charter",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/169",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "I just copy-pasted this from another document without thinking about this too hard two years ago.",
+      "createdAt": "2025-12-15T15:28:26Z",
+      "updatedAt": "2025-12-15T15:55:28Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4e2d3f557f79e30685e9029569a541159c10cb40",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "category",
+      "headRefOid": "97acee58abc9209c5f1dda7370c3e7322e4d6c26",
+      "closedAt": "2025-12-15T15:55:25Z",
+      "mergedAt": "2025-12-15T15:55:25Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "bb81561ecbc15264bf297696302a50a35accb3ce"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7VUP4j",
+          "commit": {
+            "abbreviatedOid": "97acee5"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-12-15T15:33:22Z",
+          "updatedAt": "2025-12-15T15:33:22Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
