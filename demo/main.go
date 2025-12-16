@@ -193,7 +193,7 @@ func do() error {
 		}
 
 		fmt.Printf("Wrote certificate for entry %d at %q.\n", info.index, certPath)
-		fmt.Printf("  Subtree [%d, %d) with hash %x\n", info.start, info.end, subtree[:])
+		fmt.Printf("  Subtree [%d, %d) with hash %s\n", info.start, info.end, base64.StdEncoding.EncodeToString(subtree[:]))
 		for _, cosigner := range info.cosigners {
 			fmt.Printf("  Cosigned by %s\n", cosigner.CosignerID)
 		}
