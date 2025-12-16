@@ -24,6 +24,7 @@ var (
 
 type certificateInfo struct {
 	entryConfig       *EntryConfig
+	certConfig        *CertificateConfig
 	index, start, end int
 	cosigners         []*CosignerConfig
 	// The number of certificate for the given index.
@@ -106,8 +107,9 @@ func do() error {
 			entryIdx := len(entries) - 1
 
 			// Schedule certificates.
-			for certNum, certConfig := range entryConfig.Certificates {
-				info := certificateInfo{index: entryIdx, entryConfig: entryConfig, num: certNum}
+			for certNum := range entryConfig.Certificates {
+				certConfig := &entryConfig.Certificates[certNum]
+				info := certificateInfo{index: entryIdx, entryConfig: entryConfig, certConfig: certConfig, num: certNum}
 				if certConfig.SubtreeEnd != 0 {
 					if len(certConfig.Checkpoint) != 0 {
 						return fmt.Errorf("both Checkpoint and SubtreeEnd specified in a certificate")
@@ -176,7 +178,7 @@ func do() error {
 		// certificate. Rather it cosign subtrees as it checkpoints. This tool
 		// is less opinionated about subtrees, so we would need to make a
 		// cosignature cache to simulate this.
-		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.index, info.start, info.end)
+		cert, err := CreateCertificate(issuanceLog, config.LogID, info.cosigners, info.entryConfig, info.certConfig, info.index, info.start, info.end)
 		if err != nil {
 			return err
 		}

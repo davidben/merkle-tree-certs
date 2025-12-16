@@ -106,7 +106,8 @@
       "Checkpoints": ["fast", "landmark"],
       "Certificates": [
         {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
-        {"Checkpoint": "landmark"}
+        {"Checkpoint": "landmark"},
+        {"Checkpoint": "landmark", "BitFlipProof": true}
       ]
     }
   ]

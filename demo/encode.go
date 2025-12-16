@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509/pkix"
 	"encoding/asn1"
+	"errors"
 	"math/bits"
 	"time"
 
@@ -210,7 +211,7 @@ func MarshalTBSCertificateLogEntry(issuer TrustAnchorID, entry *EntryConfig) ([]
 	return b.Bytes()
 }
 
-func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, index, start, end int) ([]byte, error) {
+func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners []*CosignerConfig, entry *EntryConfig, certConfig *CertificateConfig, index, start, end int) ([]byte, error) {
 	b := cryptobyte.NewBuilder(nil)
 	b.AddASN1(cbasn1.SEQUENCE, func(cert *cryptobyte.Builder) {
 		AddTBSCertificate(cert, issuer, index, entry)
@@ -220,6 +221,13 @@ func CreateCertificate(issuanceLog *MerkleTree, issuer TrustAnchorID, cosigners 
 			if err != nil {
 				certSig.SetError(err)
 				return
+			}
+			if certConfig.BitFlipProof {
+				if len(proof) == 0 {
+					certSig.SetError(errors.New("could not flip bit in empty proof"))
+					return
+				}
+				proof[0] ^= 1
 			}
 			subtree, err := issuanceLog.SubtreeHash(start, end)
 			if err != nil {
