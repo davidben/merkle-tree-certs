@@ -17,9 +17,10 @@ const (
 )
 
 var (
-	oidKeyUsage       = asn1.ObjectIdentifier{2, 5, 29, 15}
-	oidSubjectAltName = asn1.ObjectIdentifier{2, 5, 29, 17}
-	oidExtKeyUsage    = asn1.ObjectIdentifier{2, 5, 29, 37}
+	oidKeyUsage         = asn1.ObjectIdentifier{2, 5, 29, 15}
+	oidSubjectAltName   = asn1.ObjectIdentifier{2, 5, 29, 17}
+	oidBasicConstraints = asn1.ObjectIdentifier{2, 5, 29, 19}
+	oidExtKeyUsage      = asn1.ObjectIdentifier{2, 5, 29, 37}
 
 	oidMTCProofExperimental        = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 0}
 	oidRDNATrustAnchorIDExperiment = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 44363, 47, 1}
@@ -95,7 +96,8 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 	hasKeyUsage := entry.KeyUsage != 0
 	hasExtKeyUsage := len(entry.ExtKeyUsage) != 0
 	hasSubjectAltName := len(entry.DNSNames) != 0
-	if !hasKeyUsage && !hasExtKeyUsage && !hasSubjectAltName {
+	hasBasicConstraints := entry.IsCA != nil || entry.MaxPathLen != nil
+	if !hasKeyUsage && !hasExtKeyUsage && !hasSubjectAltName && !hasBasicConstraints {
 		return
 	}
 
@@ -149,6 +151,23 @@ func addExtensions(b *cryptobyte.Builder, entry *EntryConfig) {
 					extVal.AddASN1(cbasn1.SEQUENCE, func(names *cryptobyte.Builder) {
 						for _, dns := range entry.DNSNames {
 							addASN1ImplicitString(names, cbasn1.Tag(2).ContextSpecific(), []byte(dns))
+						}
+					})
+				})
+			})
+		}
+
+		if hasBasicConstraints {
+			exts.AddASN1(cbasn1.SEQUENCE, func(ext *cryptobyte.Builder) {
+				ext.AddASN1ObjectIdentifier(oidBasicConstraints)
+				ext.AddASN1Boolean(true)
+				ext.AddASN1(cbasn1.OCTET_STRING, func(extVal *cryptobyte.Builder) {
+					extVal.AddASN1(cbasn1.SEQUENCE, func(bc *cryptobyte.Builder) {
+						if entry.IsCA != nil && *entry.IsCA {
+							bc.AddASN1Boolean(true)
+						}
+						if entry.MaxPathLen != nil {
+							bc.AddASN1Int64(int64(*entry.MaxPathLen))
 						}
 					})
 				})

@@ -84,6 +84,22 @@
       "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
       "NotBefore": "2020-01-01T00:00:00Z",
       "NotAfter": "2030-12-31T23:59:59Z",
+      "Subject": {
+        "CommonName": "https://github.com/davidben/merkle-tree-certs/issues/146"
+      },
+      "DNSNames": ["e.example"],
+      "KeyUsage": ["CertSign"],
+      "IsCA": true,
+      "MaxPathLen": 5,
+      "Certificates": [
+        {"Checkpoint": "fast", "Cosigners": ["32473.2.1", "32473.2.3"]},
+        {"Checkpoint": "landmark"}
+      ]
+    },
+    {
+      "PublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyxiC16lts+SOL87OwHhGDzK9/dyUd7sM80jAf53VL+AV38HoHKpmA7LJoYLf4yVhcVleNcxufsAfcPueTLX0Vg==",
+      "NotBefore": "2020-01-01T00:00:00Z",
+      "NotAfter": "2030-12-31T23:59:59Z",
       "DNSNames": ["e.example"],
       "KeyUsage": ["DigitalSignature"],
       "ExtKeyUsage": ["ServerAuth"],

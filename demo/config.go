@@ -82,6 +82,8 @@ type EntryConfig struct {
 	DNSNames            []string
 	KeyUsage            KeyUsageConfig
 	ExtKeyUsage         []ExtKeyUsageConfig
+	IsCA                *bool
+	MaxPathLen          *int64
 	// A list of checkpoint sequence names that end at this entry. Every
 	// checkpoint sequence implicitly starts at 0.
 	Checkpoints []string
