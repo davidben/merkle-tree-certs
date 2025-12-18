@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-16T02:18:40.663467+00:00",
+  "timestamp": "2025-12-18T02:08:33.790332+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10397,6 +10397,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 170,
+      "id": "PR_kwDOJIBkVc65MVKD",
+      "title": "Add an initial tool for generating test data",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/170",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Some of the output has yet to be verified with an independent implementation and might not be correct:\r\n\r\n* The tlog-formatted log output\r\n* Cosignatures and their encoding\r\n\r\nBut hopefully this is a reasonable place to start.",
+      "createdAt": "2025-12-16T16:39:17Z",
+      "updatedAt": "2025-12-16T16:39:17Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "bb81561ecbc15264bf297696302a50a35accb3ce",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "demo",
+      "headRefOid": "92282dba2bf361c486dda5fe7606ef77abd2a1a0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
