@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-18T02:08:33.790332+00:00",
+  "timestamp": "2025-12-21T02:24:53.901160+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -7233,7 +7233,7 @@
       "id": "PR_kwDOJIBkVc6jhTJK",
       "title": "reword goals",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/123",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mcr",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -7242,18 +7242,26 @@
       ],
       "body": "",
       "createdAt": "2025-08-13T16:28:31Z",
-      "updatedAt": "2025-08-22T10:13:27Z",
+      "updatedAt": "2025-12-18T17:55:08Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "3af30e859a586106cb27912b7fd6369d743c799c",
       "headRepository": "mcr/merkle-tree-certs",
       "headRefName": "patch-1",
       "headRefOid": "f0cf37afa1c9c17c64ad70872e858fdf360b61dc",
-      "closedAt": null,
+      "closedAt": "2025-12-18T17:55:07Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing since the charter is being tracked elsewhere now.",
+          "createdAt": "2025-12-18T17:55:07Z",
+          "updatedAt": "2025-12-18T17:55:07Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc65xpVL",
@@ -10335,25 +10343,33 @@
       "id": "PR_kwDOJIBkVc64nI6j",
       "title": "charter: Avoid using \"log\" as both a noun and a verb in the same sentence",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/168",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Strictly speaking, if you \"send\" the entire certificate, the log might only retain a part of the certificate, but the subsequent paragraph clarifies that the \"log entry\" contains the entire certificate, so I think that's fine.\r\n\r\n@debcooley, how's this look?",
       "createdAt": "2025-12-12T17:28:49Z",
-      "updatedAt": "2025-12-12T17:28:49Z",
+      "updatedAt": "2025-12-18T17:54:54Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "4e2d3f557f79e30685e9029569a541159c10cb40",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "log-noun-verb",
       "headRefOid": "5351e0f150e9654ba321ce48bc7d5cc24a7aeaf8",
-      "closedAt": null,
+      "closedAt": "2025-12-18T17:54:54Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Closing since the charter is being tracked elsewhere now.",
+          "createdAt": "2025-12-18T17:54:54Z",
+          "updatedAt": "2025-12-18T17:54:54Z"
+        }
+      ],
       "reviews": []
     },
     {
