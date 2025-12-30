@@ -3518,9 +3518,10 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable,
-   Nick Harper, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi,
-   and Emily Stark for many valuable discussions and insights which led
-   to this document.  We wish to thank Mia Celeste in particular, whose
+   Nick Harper, Russ Housley, Dennis Jackson, Matt Mueller, Chris
+   Patton, Ryan Sleevi, and Emily Stark for many valuable discussions
+   and insights which led to this document, as well as feedback on the
+   document itself.  We wish to thank Mia Celeste in particular, whose
    implementation of an earlier draft revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
