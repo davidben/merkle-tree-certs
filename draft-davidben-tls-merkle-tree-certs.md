@@ -297,7 +297,7 @@ Signatureless certificate:
 In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates invert this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.
 
 ~~~aasvg
-+-- Certificate Authority -----+    +--  Authenticating Party ----+
++-- Certification Authority ---+    +--  Authenticating Party ----+
 |                              |    |                             |
 |  2. Validate request     <---+----+--  1. Request certificate   |
 |       |                      |    |                             |
@@ -360,7 +360,7 @@ A certificate with cosignatures is known as a *full certificate*. Analogous to X
 This same issuance process also produces a *signatureless certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable with up-to-date relying parties.
 
 ~~~aasvg
-+-- Certificate Authority -------+
++-- Certification Authority -----+
 |                                |  +-- Update Channel --+
 |    /\                          |  |                    |
 |   /  \  1. Allocate landmarks -+--+----------------+   |
@@ -943,7 +943,7 @@ TBSCertificateLogEntry  ::=  SEQUENCE  {
       subjectPublicKeyInfoHash OCTET STRING,
       issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
       subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions OPTIONAL }
+      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
 ~~~
 
 The `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields have the corresponding semantics as in {{Section 4.1.2 of !RFC5280}}, with the exception of `subjectPublicKeyInfoHash`. `subjectPublicKeyInfoHash` contains the hash of subject's public key as a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}). The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding. The `issuer` field MUST be the issuance log's log ID as an X.509 distinguished name, as described in {{log-ids}}.
@@ -1128,7 +1128,7 @@ For any given TBSCertificateLogEntry, there are multiple possible certificates t
 
 The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
-The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST match the corresponding fields of the TBSCertificateLogEntry. Per {{log-entries}}, this means `issuer` MUST be the issuance log's log ID as an X.509 distinguished name, as described in {{log-ids}}.
+The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, ``subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's log ID as an X.509 distinguished name, as described in {{log-ids}}.
 
 The TBSCertificate's `serialNumber` MUST contain the zero-based index of the TBSCertificateLogEntry in the log. {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number, but {{log-entries}} defines a `null_entry` type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.
 
@@ -1658,16 +1658,26 @@ IMPORTS
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
-  ATTRIBUTE
+  Extensions{}, ATTRIBUTE
   FROM PKIX-CommonTypes-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-pkixCommon-02(57) } ;
+      id-mod-pkixCommon-02(57) }
+  CertExtensions
+  FROM PKIX1Implicit-2009 -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkix1-implicit-02(59) }
+  Version, Name, Validity, UniqueIdentifier
+  FROM PKIX1Explicit-2009 -- in [RFC5912]
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-pkix1-explicit-02(51) }
   TrustAnchorID
   FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-trustAnchorIDs-2025(TBD) }
+      id-mod-trustAnchorIDs-2025(TBD) } ;
 
 TBSCertificateLogEntry  ::=  SEQUENCE  {
       version             [0]  EXPLICIT Version DEFAULT v1,
@@ -1677,7 +1687,7 @@ TBSCertificateLogEntry  ::=  SEQUENCE  {
       subjectPublicKeyInfoHash OCTET STRING,
       issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
       subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions OPTIONAL }
+      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
 
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
@@ -1977,7 +1987,7 @@ Publicly-exposed subtree cosigning endpoints MAY mitigate DoS in a variety of te
 
 This document stands on the shoulders of giants and builds upon decades of work in TLS authentication, X.509, and Certificate Transparency. The authors would like to thank all those who have contributed over the history of these protocols.
 
-The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable, Nick Harper, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
+The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable, Nick Harper, Russ Housley, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi, and Emily Stark for many valuable discussions and insights which led to this document, as well as feedback on the document itself. We wish to thank Mia Celeste in particular, whose implementation of an earlier draft revealed several pitfalls.
 
 The idea to mint tree heads infrequently was originally described by Richard Barnes in {{STH-Discipline}}. The size optimization in Merkle Tree Certificates is an application of this idea to the certificate itself.
 
@@ -2100,3 +2110,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Editorial fixes
 
 - Set a more accurate intended status
+
+- Fixes to ASN.1 module
