@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 18 June 2026                                                   
+Expires: 4 July 2026                                                    
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        15 December 2025
+                                                        31 December 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 June 2026.
+   This Internet-Draft will expire on 4 July 2026.
 
 Copyright Notice
 
@@ -358,7 +358,7 @@ Table of Contents
    is assembled from the result and proves the information is in the
    CA's log.
 
-   +-- Certificate Authority -----+    +--  Authenticating Party ----+
+   +-- Certification Authority ---+    +--  Authenticating Party ----+
    |                              |    |                             |
    |  2. Validate request     <---+----+--  1. Request certificate   |
    |       |                      |    |                             |
@@ -451,7 +451,7 @@ Table of Contents
    certificates are available after a short period of time and usable
    with up-to-date relying parties.
 
-   +-- Certificate Authority -------+
+   +-- Certification Authority -----+
    |                                |  +-- Update Channel --+
    |    /\                          |  |                    |
    |   /  \  1. Allocate landmarks -+--+----------------+   |
@@ -1180,7 +1180,7 @@ Table of Contents
          subjectPublicKeyInfoHash OCTET STRING,
          issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
          subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-         extensions          [3]  EXPLICIT Extensions OPTIONAL }
+         extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
 
    The version, issuer, validity, subject, issuerUniqueID,
    subjectUniqueID, and extensions fields have the corresponding
@@ -1550,10 +1550,13 @@ Table of Contents
    follows:
 
    The TBSCertificate's version, issuer, validity, subject,
-   issuerUniqueID, subjectUniqueID, and extensions MUST match the
-   corresponding fields of the TBSCertificateLogEntry.  Per Section 5.3,
-   this means issuer MUST be the issuance log's log ID as an X.509
-   distinguished name, as described in Section 5.2.
+   issuerUniqueID, subjectUniqueID, and extensions MUST be equal to the
+   corresponding fields of the TBSCertificateLogEntry.  If any of
+   issuerUniqueID, subjectUniqueID, or extensions is absent in the
+   TBSCertificateLogEntry, the corresponding field MUST be absent in the
+   TBSCertificate.  Per Section 5.3, this means issuer MUST be the
+   issuance log's log ID as an X.509 distinguished name, as described in
+   Section 5.2.
 
    The TBSCertificate's serialNumber MUST contain the zero-based index
    of the TBSCertificateLogEntry in the log.  Section 4.1.2.2 of
@@ -3024,16 +3027,26 @@ Appendix A.  ASN.1 Module
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-algorithmInformation-02(58) }
-     ATTRIBUTE
+     Extensions{}, ATTRIBUTE
      FROM PKIX-CommonTypes-2009 -- in [RFC5912]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
-         id-mod-pkixCommon-02(57) } ;
+         id-mod-pkixCommon-02(57) }
+     CertExtensions
+     FROM PKIX1Implicit-2009 -- in [RFC5912]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-pkix1-implicit-02(59) }
+     Version, Name, Validity, UniqueIdentifier
+     FROM PKIX1Explicit-2009 -- in [RFC5912]
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-pkix1-explicit-02(51) }
      TrustAnchorID
      FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
-         id-mod-trustAnchorIDs-2025(TBD) }
+         id-mod-trustAnchorIDs-2025(TBD) } ;
 
    TBSCertificateLogEntry  ::=  SEQUENCE  {
          version             [0]  EXPLICIT Version DEFAULT v1,
@@ -3043,7 +3056,7 @@ Appendix A.  ASN.1 Module
          subjectPublicKeyInfoHash OCTET STRING,
          issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
          subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-         extensions          [3]  EXPLICIT Extensions OPTIONAL }
+         extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
 
    id-alg-mtcProof OBJECT IDENTIFIER ::= {
        iso(1) identified-organization(3) dod(6) internet(1) security(5)
@@ -3505,9 +3518,10 @@ Acknowledgements
    contributed over the history of these protocols.
 
    The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable,
-   Nick Harper, Dennis Jackson, Matt Mueller, Chris Patton, Ryan Sleevi,
-   and Emily Stark for many valuable discussions and insights which led
-   to this document.  We wish to thank Mia Celeste in particular, whose
+   Nick Harper, Russ Housley, Dennis Jackson, Matt Mueller, Chris
+   Patton, Ryan Sleevi, and Emily Stark for many valuable discussions
+   and insights which led to this document, as well as feedback on the
+   document itself.  We wish to thank Mia Celeste in particular, whose
    implementation of an earlier draft revealed several pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
@@ -3653,6 +3667,8 @@ Since draft-davidben-tls-merkle-tree-certs-09
    *  Editorial fixes
 
    *  Set a more accurate intended status
+
+   *  Fixes to ASN.1 module
 
 Authors' Addresses
 
