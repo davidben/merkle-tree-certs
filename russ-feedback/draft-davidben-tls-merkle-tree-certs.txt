@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 3 July 2026                                                    
+Expires: 4 July 2026                                                    
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        30 December 2025
+                                                        31 December 2025
 
 
                         Merkle Tree Certificates
@@ -58,7 +58,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 July 2026.
+   This Internet-Draft will expire on 4 July 2026.
 
 Copyright Notice
 
@@ -1552,9 +1552,9 @@ Table of Contents
    The TBSCertificate's version, issuer, validity, subject,
    issuerUniqueID, subjectUniqueID, and extensions MUST be equal to the
    corresponding fields of the TBSCertificateLogEntry.  If any of
-   issuerUniqueID, ``subjectUniqueID, orextensionsis absent in the
+   issuerUniqueID, subjectUniqueID, or extensions is absent in the
    TBSCertificateLogEntry, the corresponding field MUST be absent in the
-   TBSCertificate.  Per {{log-entries}}, this meansissuer` MUST be the
+   TBSCertificate.  Per Section 5.3, this means issuer MUST be the
    issuance log's log ID as an X.509 distinguished name, as described in
    Section 5.2.
 

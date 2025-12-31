@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 3 July 2026</td>
+<td class="center">Expires 4 July 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-12-30" class="published">30 December 2025</time>
+<time datetime="2025-12-31" class="published">31 December 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-07-03">3 July 2026</time></dd>
+<dd class="expires"><time datetime="2026-07-04">4 July 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 July 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 July 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4252,7 +4252,7 @@ struct {
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-certificate-format" class="section-name selfRef">Certificate Format</a>
         </h3>
 <p id="section-6.1-1">The information is encoded in an X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> as follows:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, ``subjectUniqueID<code>, or </code>extensions<code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means </code>issuer` MUST be the issuance log's log ID as an X.509 distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.3</a>, this means <code>issuer</code> MUST be the issuance log's log ID as an X.509 distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> MUST contain the zero-based index of the TBSCertificateLogEntry in the log. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.2" class="relref">Section 4.1.2.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> forbids zero as a serial number, but <a href="#log-entries" class="auto internal xref">Section 5.3</a> defines a <code>null_entry</code> type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> MUST contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
