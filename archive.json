@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-21T02:24:53.901160+00:00",
+  "timestamp": "2026-01-01T02:31:53.792420+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10439,6 +10439,48 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 171,
+      "id": "PR_kwDOJIBkVc66_1OW",
+      "title": "Address feedback by Russ Housley",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/171",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Some inconsistencies between certificate authority and certification authority, fixes to the ASN.1 module.",
+      "createdAt": "2025-12-30T16:39:30Z",
+      "updatedAt": "2025-12-31T02:00:04Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "bb81561ecbc15264bf297696302a50a35accb3ce",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "russ-feedback",
+      "headRefOid": "5eef6a306a78b61cafd892017bdd6b1317566368",
+      "closedAt": "2025-12-31T02:00:01Z",
+      "mergedAt": "2025-12-31T02:00:01Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "e4854ee2017cfc2fa9a42e128eaf3b3d0b2f6730"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7XsxpC",
+          "commit": {
+            "abbreviatedOid": "6d5bae7"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-12-30T17:12:24Z",
+          "updatedAt": "2025-12-30T17:12:24Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
