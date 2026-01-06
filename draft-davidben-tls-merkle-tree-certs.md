@@ -932,7 +932,7 @@ struct {
 
 When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
 
-`tbs_cert_entry_data` contains the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below:
+`tbs_cert_entry_data` contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below. Equivalently, `tbs_cert_entry_data` contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in {{verifying-certificate-signatures}}.
 
 ~~~asn.1
 TBSCertificateLogEntry  ::=  SEQUENCE  {
@@ -1297,6 +1297,19 @@ When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6
 1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. The `hash` field of the MTCSubtree is set to `expected_subtree_hash`.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
+
+In this procedure, `entry_hash` can equivalently be computed in a single pass from the DER-encoded TBSCertificate, without storing the full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
+
+1. Initialize a hash instance.
+1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
+1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
+1. Write the octet 0x04 to the hash. This is an OCTET STRING identifer.
+1. Write the octet L to the hash, where L is the hash length. (This assumes L is at most 127.)
+1. Write H to the hash, where H is the hash of the `subjectPublicKeyInfo` field.
+1. Write the remainder of the TBSCertificate contents octets to the hash, starting just after the `subjectPublicKeyInfo` field.
+1. Finalize the hash and set `entry_hash` to the result.
+
+This is possible because the structure in {{log-entries}} omits the TBSCertificateLogEntry's identifier and length octets.
 
 ## Trusted Cosigners
 
@@ -2112,3 +2125,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Set a more accurate intended status
 
 - Fixes to ASN.1 module
+
+- Make log entry more friendly to single-pass verification
