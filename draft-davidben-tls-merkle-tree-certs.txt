@@ -5,13 +5,13 @@
 Network Working Group                                        D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 4 July 2026                                                    
+Expires: 10 July 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        31 December 2025
+                                                          6 January 2026
 
 
                         Merkle Tree Certificates
@@ -58,11 +58,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 July 2026.
+   This Internet-Draft will expire on 10 July 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1169,8 +1169,12 @@ Table of Contents
    consume the rest of the input.  A MerkleTreeCertEntry is expected to
    be decoded in contexts where the total length of the entry is known.
 
-   tbs_cert_entry_data contains the DER [X.690] encoding of a
-   TBSCertificateLogEntry, defined below:
+   tbs_cert_entry_data contains the contents octets (i.e. excluding the
+   initial identifier and length octets) of the DER [X.690] encoding of
+   a TBSCertificateLogEntry, defined below.  Equivalently,
+   tbs_cert_entry_data contains the DER encodings of each field of the
+   TBSCertificateLogEntry, concatenated.  This construction allows a
+   single-pass implementation in Section 7.2.
 
    TBSCertificateLogEntry  ::=  SEQUENCE  {
          version             [0]  EXPLICIT Version DEFAULT v1,
@@ -1938,6 +1942,34 @@ Table of Contents
    This procedure only replaces the signature verification portion of
    X.509 path validation.  The relying party MUST continue to perform
    other checks, such as checking expiry.
+
+   In this procedure, entry_hash can equivalently be computed in a
+   single pass from the DER-encoded TBSCertificate, without storing the
+   full TBSCertificateLogEntry or MerkleTreeCertEntry in memory:
+
+   1.  Initialize a hash instance.
+
+   2.  Write the big-endian, two-byte tbs_cert_entry value to the hash.
+
+   3.  Write the TBSCertificate contents octets to the hash, up to the
+       subjectPublicKeyInfo field.
+
+   4.  Write the octet 0x04 to the hash.  This is an OCTET STRING
+       identifer.
+
+   5.  Write the octet L to the hash, where L is the hash length.  (This
+       assumes L is at most 127.)
+
+   6.  Write H to the hash, where H is the hash of the
+       subjectPublicKeyInfo field.
+
+   7.  Write the remainder of the TBSCertificate contents octets to the
+       hash, starting just after the subjectPublicKeyInfo field.
+
+   8.  Finalize the hash and set entry_hash to the result.
+
+   This is possible because the structure in Section 5.3 omits the
+   TBSCertificateLogEntry's identifier and length octets.
 
 7.3.  Trusted Cosigners
 
@@ -3669,6 +3701,8 @@ Since draft-davidben-tls-merkle-tree-certs-09
    *  Set a more accurate intended status
 
    *  Fixes to ASN.1 module
+
+   *  Make log entry more friendly to single-pass verification
 
 Authors' Addresses
 
