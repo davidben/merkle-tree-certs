@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-01T02:31:53.792420+00:00",
+  "timestamp": "2026-01-08T02:22:01.179547+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2728,15 +2728,15 @@
       "id": "I_kwDOJIBkVc7bvLSe",
       "title": "Single-pass TBSCertificateLogEntry construction",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/164",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This didn't make the cut for the first experiment, but here's a very minor optimization we can do that might benefit some very constrained implementations.\n\nAlmost everyone just keeps their certificates as buffers in memory, but if your signature algorithm has a init/update/final API, and if you have a streaming X.509 parser you, in principle, today could avoid keeping the entire certificate around in memory. I think [BearSSL](https://bearssl.org/x509.html) might do this? (Not sure.)\n\nTBSCertificateLogEntry makes this impossible because the total SEQUENCE length prefix is not know until you've _at least_ gotten to the SubjectPublicKeyInfo, so you know how much shorter it is than the total TBSCertificate. Even if you did have the whole TBSCertificate available, you have to do some annoying math if you want to stream the data into your hash context, rather than making a new allocated copy.\n\nWe could fix both of these by saying `tbs_cert_entry_data` contains just the contents octets of the TBSCertificateLogEntry. That is, you omit the leading outermost tag and length. That allows you compute `entry_hash` in a single pass over the data:\n\n```\nh := hash.New()\nh.Update(tbs.version .. tbs.subject)\nh.Update({OCTET_STRING, hash.Size()}) // subjectPublicKeyInfoHash header\nh.Update(hash(tbs.subjectPublicKeyInfo))\nh.Update(tbs.issuerUniqueID .. tbs.extensions)\nentryHash := h.Final()\n```\n\nThe downside is that if you're implementing this with a bog-standard DER encoder, you have to add a tiny bit of extra code to parse back the tag and length prefix and skip a few bytes. But this is quite easy to do:\n\n```\nfunc SkipFirstHeader(b []byte) []byte {\n  // We can assume the tag is SEQUENCE and thus one byte. The\n  // length starts at the second byte.\n  l := b[1]\n  if l < 0x80 {\n    return b[2:]  // Single-byte length\n  }\n  return b[2+l&0x7f:]  // First byte tells you length of length\n}\n```",
       "createdAt": "2025-12-02T16:20:24Z",
-      "updatedAt": "2025-12-03T16:38:07Z",
-      "closedAt": null,
+      "updatedAt": "2026-01-06T16:33:14Z",
+      "closedAt": "2026-01-06T16:33:14Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -10194,25 +10194,42 @@
       "id": "PR_kwDOJIBkVc6234x2",
       "title": "Omit the outermost SEQUENCE header in TBSCertificateLogEntry",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/165",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Fixes #164. See #164 for motivation.\r\n\r\nThoughts? Worth doing?",
       "createdAt": "2025-12-03T16:36:11Z",
-      "updatedAt": "2025-12-03T16:43:59Z",
+      "updatedAt": "2026-01-06T16:33:16Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "2b31f3d41162227fa1fe389b3e970cc33bf27eb6",
+      "baseRefOid": "e4854ee2017cfc2fa9a42e128eaf3b3d0b2f6730",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "single-pass",
-      "headRefOid": "50f7031777be2ce0f73ed4ebcb2d0e5d15ac425d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "5aa375e9cf2a459ba5660048c74a31640d722784",
+      "closedAt": "2026-01-06T16:33:13Z",
+      "mergedAt": "2026-01-06T16:33:13Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "192a68b8eb5a4f68c640b0cd8d91ba1e519c76eb"
+      },
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Rebased and removed the initial experimentation carve-out. This change won't apply to the initial experiments, but those are already pinned to draft-07 / draft-08 / draft-09 (they're the same). It doesn't bump the experiment OIDs, but I don't think we need to: id-rdna-trustAnchorID hasn't changed. id-alg-mtcProof arguably has, but it's already the case that version \"negotiation\" has to be tied to choice of CA: a draft-09 CA cannot be allowed to emit a draft-10 proof.",
+          "createdAt": "2026-01-06T16:32:19Z",
+          "updatedAt": "2026-01-06T16:32:19Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Mostly using this change to grease the wheels on \"how do we avoid getting confused when the WG makes a wire-incompatible change, but we still have initial experiments pinned to an older state?\"",
+          "createdAt": "2026-01-06T16:33:05Z",
+          "updatedAt": "2026-01-06T16:33:05Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc7Swu-j",
