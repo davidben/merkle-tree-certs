@@ -657,14 +657,25 @@ Each entry in the log is a MerkleTreeCertEntry, defined with the TLS presentatio
 struct {} Empty;
 
 enum {
-    null_entry(0), tbs_cert_entry(1), (2^16-1)
+    null_entry(0), tbs_cert_entry(1), accumulated(2), (2^16-1)
 } MerkleTreeCertEntryType;
 
+enum {
+  (2^16-1)
+} AccumulatedType;
+
 struct {
+    uint64 accumulated_count;
     MerkleTreeCertEntryType type;
     select (type) {
        case null_entry: Empty;
+
        case tbs_cert_entry: opaque tbs_cert_entry_data[N];
+
+       case accumulated:
+         AccumulatedType accumulated_type;
+         select(accumulated_type) {}
+
        /* May be extended with future types. */
     }
 } MerkleTreeCertEntry;
@@ -687,6 +698,8 @@ TBSCertificateLogEntry  ::=  SEQUENCE  {
 ~~~
 
 The `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields have the corresponding semantics as in {{Section 4.1.2 of !RFC5280}}, with the exception of `subjectPublicKeyInfoHash`. `subjectPublicKeyInfoHash` contains the hash of subject's public key as a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}). The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding. The `issuer` field MUST be the issuance log's log ID as an X.509 distinguished name, as described in {{log-ids}}.
+
+When `type` is `accumulated`, the entry may contain metadata and other operational information that accumulates over the lifetime of the log. For example, future documents may define a new value for `AccumulatedType` that contains pointers to cryptographically secure indices of the log's contents. The `accumulated_count` field is populated for every log entry to contain the total number of `accumulated` log entries, counting the current log entry if it is also has an `accumulated` type.
 
 When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. Other entries MUST NOT use `null_entry`. `null_entry` exists to avoid zero serial numbers in the certificate format ({{certificate-format}}).
 
