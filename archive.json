@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-08T02:22:01.179547+00:00",
+  "timestamp": "2026-01-13T02:19:59.114895+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10498,6 +10498,61 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 172,
+      "id": "PR_kwDOJIBkVc68khPD",
+      "title": "Add accumulated log entry type",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/172",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-01-11T18:41:04Z",
+      "updatedAt": "2026-01-12T20:51:08Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "192a68b8eb5a4f68c640b0cd8d91ba1e519c76eb",
+      "headRepository": "Bren2010/merkle-tree-certs",
+      "headRefName": "brendan/accumulated",
+      "headRefOid": "181f7cd146eb5c47018e4ff897328db8bb41896b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Hmm, so purely mechanically, we can't add a field to the overall entry struct like this without updating the certificate format with the accumulated count. Otherwise the verifier cannot reconstruct things.\r\n\r\nDo you have an example of use that would need the count and two layers of extensibility? Naively I would have assumed one could just extend the top-level entry type when adding new kinds of entries, though that doesn't categorize things into accumulator and normal entries.",
+          "createdAt": "2026-01-11T19:05:57Z",
+          "updatedAt": "2026-01-11T19:05:57Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Do you have an example of use that would need the count and two layers of extensibility?\r\n\r\nThe purpose of the count is to make it easy to find the n^th or the most recent accumulator log entry, through something like binary search.\r\n\r\nTo kind of summarize the argument:\r\n- MTC transparency logs have a very very robust gossip mechanism: clients talk to a lot of servers that make claims about the state of the transparency log, which they can verify against their own view. Servers also talk to a lot of clients, and the client accepting the server's signatureless certificate means the client agrees with the server's view of the log.\r\n- Servers want to be able to monitor for mis-issued certificates related to their domain names. Downloading the entirety of every log from every CA is expensive, so most servers will use something like a Verifiable Index. Because the Verifiable Index is a separate log, the server also needs some gossip mechanism here to ensure that it has the same view of the Verifiable Index as everyone else.\r\n- So let's put the root hash of the Verifiable Index(es) into a log entry of the MTC transparency log. This way the server, which has its highly gossiped view of the MTC transparency log, can look at this log entry and know that everyone else sees this root hash for the Verifiable Index as well.\r\n- Using the counter to find the most recent accumulator log entry carries the guarantee that anyone else with your view of the MTC transparency log will get the same Verifiable Index root hashes. If you didn't have/use the counter, then you'd have to download a huge chunk of the log to find it, or trust someone to tell you where it is.\r\n\r\nI don't really want the second layer of extensibility, I just don't want to define the format for this object right now / in this document.\r\n\r\n> Hmm, so purely mechanically, we can't add a field to the overall entry struct like this without updating the certificate format with the accumulated count. Otherwise the verifier cannot reconstruct things.\r\n\r\nI can add the counter to `MTCProof` -- would that fix this?",
+          "createdAt": "2026-01-11T23:19:11Z",
+          "updatedAt": "2026-01-11T23:19:11Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "It'd be great to have a mechanism to bind important extensions such as verifiable indices. The present proposal is quite heavy handed though: the counter feels out of place on every `MerkleTreeCertEntry` and `MTCProof`.\r\n\r\nFew scattershot remarks:\r\n\r\n- Accepting a signatureless certificate confirms the view of the particular CA that issued the certificate between RP and AP for that landmark. That's maybe once a week. More importantly, the AP would like to know about all CAs that could've issued a cert for it. \r\n- Your proposal seems to  presume gossip of arbitrary tree heads, which would need to be curtailed for client privacy. Wouldn't  verifiable indices naturally move on a slower cadence like landmarks. (Although let me know if you have something faster in mind.)\r\n- Gossiping tree heads of landmarks of all CAs is quite a bit of data; certainly if the number of CAs doesn't decrease.\r\n- The TLS library API boundary which makes it hard to pass gossiped data (although we need to improve that API anyway, so it could be solvable.)\r\n- A natural place to commit to verifiable index tree heads is in the landmark checkpoint. And for consistency we could add an entry type for them.\r\n\r\nProbably just having the AP pull the landmark tree heads from multiple (mirrors of) root programs is simplest. It'd be nice though to have a distributed way to generate a log of all tree heads of all CAs (cf. CTNG broadcast protocol), so we'd have only one tree head to gossip, but it's not obvious at all how to make that work across root programs, and prevent bad behaviour if opening up completely. Perhaps the list is a better place than a PR to discuss this.",
+          "createdAt": "2026-01-12T18:40:36Z",
+          "updatedAt": "2026-01-12T18:40:36Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> Accepting a signatureless certificate confirms the view of the particular CA that issued the certificate between RP and AP for that landmark. That's maybe once a week. More importantly, the AP would like to know about all CAs that could've issued a cert for it.\r\n\r\nWhat goes into an accumulated log entry is TBD\r\n\r\n> Your proposal seems to presume gossip of arbitrary tree heads, which would need to be curtailed for client privacy. Wouldn't verifiable indices naturally move on a slower cadence like landmarks. (Although let me know if you have something faster in mind.)\r\n\r\nI'm only considering the gossip that happens when a server presents a signatureless certificate and the client accepts it. Arbitrary Verifiable Index tree heads may get put in the accumulated log entry, if that's what you mean.\r\n\r\n> - Gossiping tree heads of landmarks of all CAs is quite a bit of data; certainly if the number of CAs doesn't decrease.\r\n> - The TLS library API boundary which makes it hard to pass gossiped data (although we need to improve that API anyway, so it could be solvable.)\r\n\r\nI'm not proposing that either of these be done\r\n\r\n> - A natural place to commit to verifiable index tree heads is in the landmark checkpoint. And for consistency we could add an entry type for them.\r\n\r\nI haven't looked into how landmarks are defined yet, but I expect it's just an arbitrary demarcation. Which goes back to \"you need a trusted party to tell you what they are\", which is a different (weaker) security model than what this provides. With this, there are no trusted third parties. That seems worth it for 8 bytes!\r\n\r\n\r\n\r\n",
+          "createdAt": "2026-01-12T20:51:08Z",
+          "updatedAt": "2026-01-12T20:51:08Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
