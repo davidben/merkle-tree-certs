@@ -181,7 +181,7 @@ informative:
 
 --- abstract
 
-This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional signatureless optimization, which decreases the message size by avoiding signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.
+This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates public logging directly into the issuance process, similar to Certificate Transparency. This design reduces the overhead caused by short-lived certificates and large post-quantum signature algorithms while maintaining traditional security standards. Additionally, it offers an optional 'signatureless' mode that further decreases message size by removing signatures entirely for older certificates when validated by up-to-date relying parties.
 
 --- middle
 
