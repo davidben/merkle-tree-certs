@@ -241,36 +241,27 @@ Given two non-negative integers `a` and `b`, `a & b` refers to the non-negative 
 This document discusses the following roles:
 
 Authenticating party:
-: The party that authenticates itself in the protocol. In TLS, this is the side sending the Certificate and CertificateVerify message.
+: The party authenticating itself in the protocol. In TLS, this is the side sending the Certificate and CertificateVerify message.
 
 Certification authority (CA):
-: The service that issues certificates to the authenticating party, after performing some validation process on the certificate contents.
+: The service issuing certificates to the authenticating party, after performing some validation process on the certificate contents.
 
-Relying party:
-: The party to whom the authenticating party presents its identity. In TLS, this is the side receiving the Certificate and CertificateVerify message.
-
-Monitor:
-: Parties who watch logs for certificates of interest, analogous to the role in {{Section 8.2 of ?RFC9162}}.
+Cosigner:
+: A service that signs views of an issuance log, to assert correct operation and other properties.
 
 Issuance log:
 : A log, maintained by the CA, of everything issued by that CA.
 
-Cosigner:
-: A service that signs views of an issuance log, to assert correct operation and other properties about the entries.
+Monitor:
+: Parties who watch logs for certificates of interest, analogous to the role in {{Section 8.2 of ?RFC9162}}.
 
-Additionally, there are several terms used throughout this document to describe this proposal. This section provides an overview. They will be further defined and discussed in detail throughout the document.
+Relying party:
+: The party to whom the authenticating party presents its identity. In TLS, this is the side receiving the Certificate and CertificateVerify message.
+
+A number of proposal specifc terms are throughout this document to describe this proposal. This section provides an overview. These terms will be further defined and discussed in detail throughout the document.
 
 Checkpoint:
 : A description of the complete state of the log at some time.
-
-Entry:
-: An individual element of the log, describing information which the CA has validated and certified.
-
-Subtree:
-: A smaller Merkle Tree over a portion of the log, defined by an interior node of some snapshot of the log. Subtrees can be efficiently shown to be consistent with the whole log.
-
-Inclusion proof:
-: A sequence of hashes that efficiently proves some entry is contained in some checkpoint or subtree.
 
 Consistency proof:
 : A sequence of hashes that efficiently proves a checkpoint or subtree is contained within another checkpoint.
@@ -278,17 +269,26 @@ Consistency proof:
 Cosignature:
 : A signature from either the CA or other cosigner, over some checkpoint or subtree.
 
+Entry:
+: An individual element of the log, describing information which the CA has validated and certified.
+
+Full certificate:
+: A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
+
+Inclusion proof:
+: A sequence of hashes that efficiently proves some entry is contained in some checkpoint or subtree.
+
 Landmark:
 : One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.
 
 Landmark subtree:
 : A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and signatureless certificates.
 
-Full certificate:
-: A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
-
 Signatureless certificate:
 : An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.
+
+Subtree:
+: A smaller Merkle Tree over a portion of the log, defined by an interior node of some snapshot of the log. Subtrees can be efficiently shown to be consistent with the whole log.
 
 # Overview
 
