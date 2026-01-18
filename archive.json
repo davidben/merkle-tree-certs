@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-15T02:21:23.474109+00:00",
+  "timestamp": "2026-01-18T02:31:26.121847+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10511,13 +10511,13 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-01-13T21:46:43Z",
+      "updatedAt": "2026-01-17T02:08:14Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "192a68b8eb5a4f68c640b0cd8d91ba1e519c76eb",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "brendan/accumulated",
-      "headRefOid": "181f7cd146eb5c47018e4ff897328db8bb41896b",
+      "headRefOid": "473bfa2731435fb34af9b7388b09cccb4f49c2b2",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -10561,9 +10561,23 @@
         {
           "author": "Bren2010",
           "authorAssociation": "CONTRIBUTOR",
-          "body": "> The references to a better security model, etc., here, are hard for me to follow. Ultimately this PR doesn't provide a security improvement in itself, rather some secondary extension points on an already extensible system, with the aim that something not yet defined will improve security.\r\n\r\nWell, yes, but that's because you wanted monitoring to be a secondary deliverable. So it's not defined here. I'm happy to talk more about the security model I described in my first comment offline if you'd like?\r\n\r\n> AIUI, the root issue is that you dismiss the cosigner-based threat model of the, currently orthogonal, vindex work that the transparency.dev community is working on?\r\n\r\nI'm not dismissing it, but I think it's worth considering the security model of monitoring. What you seem to have in mind is a Verifiable Index system where the cosigners are unrelated to the webPKI. I'm loathe to add more trusted parties to the webPKI when it's so easy to avoid here.\r\n\r\n> Are you proposing that clients will see binary search and vindex proofs? If yes, this now much, much higher than 8 bytes\r\n\r\nIt's servers that do the binary search. They would do it as part of monitoring, so it would be offline. Browsers only see the extra 8 bytes.\r\n\r\n> If no, how does the monitor believe that the append log and the vindex contain the same information? It seems one needs to trust that someone is tailing the log for consistency, at which point it seems much more straightforward schemes are possible. For example, you could just say that all accumulations must be accurate, and you must put one at least one every 1024 entries, or whatever.\r\n\r\nYes, the assumption is already that some anonymous person is/will tail the log and check the vindex for correctness.\r\n\r\nThe core issue with doing it the way you say is authenticating negative results, i.e. when there are no accumulators. Because this is going in an extension point regardless, the CA can't be assumed to support it! So if you can just tell me \"there are no accumulators in this CA, fall back to the collusion-secure system\" and I have to trust you or download the whole log to prove you wrong -- that would seem to defeat the point. With a counter approach, if the counter is zero, then you know there are no accumulator log entries.\r\n\r\nI think it's also worth pointing out that what you're proposing is just a lot more operationally complicated. Like I mentioned, we'd need some way to convey to servers whether a CA supports this extension or not. But also, you have to commit upfront to this parameter of \"every 1024 entries\" or something, and accept edge cases where that may be way too frequent or infrequent. The counter approach adjusts nicely to changes in demand.\r\n\r\n> That is entry-type-dependent, so it's a little messy and maybe there's a discussion to be had about how best to structure an individual entry, but my feeling is we should start simple.\r\n\r\nMy goal here was of course to keep it very simple. CAs can hardcode the counter to be 0 until they actually support any accumulator types.\r\n\r\nI hope this helps. I think a call with either of you would actually be better than going to the mailing list but let me know :)",
+          "body": "> The references to a better security model, etc., here, are hard for me to follow. Ultimately this PR doesn't provide a security improvement in itself, rather some secondary extension points on an already extensible system, with the aim that something not yet defined will improve security.\r\n\r\nWell, yes, but that's because you wanted monitoring to be a secondary deliverable. So it's not defined here. I'm happy to talk more about the security model I described in my first comment offline if you'd like?\r\n\r\n> AIUI, the root issue is that you dismiss the cosigner-based threat model of the, currently orthogonal, vindex work that the transparency.dev community is working on?\r\n\r\nI'm not dismissing it, but I think it's worth considering the security model of monitoring. What you seem to have in mind is a Verifiable Index system where the cosigners are unrelated / orthogonal to CAs. I'm loath to add more trusted parties to the webPKI when it's so easy to avoid here.\r\n\r\n> Are you proposing that clients will see binary search and vindex proofs? If yes, this now much, much higher than 8 bytes\r\n\r\nIt's servers that do the binary search. They would do it as part of monitoring, so it would be offline. Browsers only see the extra 8 bytes.\r\n\r\n> If no, how does the monitor believe that the append log and the vindex contain the same information? It seems one needs to trust that someone is tailing the log for consistency, at which point it seems much more straightforward schemes are possible. For example, you could just say that all accumulations must be accurate, and you must put one at least one every 1024 entries, or whatever.\r\n\r\nYes, the assumption is already that some anonymous person is/will tail the log and check the vindex for correctness.\r\n\r\nThe core issue with doing it the way you say is authenticating negative results, i.e. when there are no accumulators. Because this is going in an extension point regardless, the CA can't be assumed to support it! So if you can just tell me \"there are no accumulators in this CA, fall back to the collusion-secure system\" and I have to trust you or download the whole log to prove you wrong -- that would seem to defeat the point. With a counter approach, if the counter is zero, then you know there are no accumulator log entries.\r\n\r\nI think it's also worth pointing out that what you're proposing is just a lot more operationally complicated. Like I mentioned, we'd need some way to convey to servers whether a CA supports this extension or not. But also, you have to commit upfront to this parameter of \"every 1024 entries\" or something, and accept edge cases where that may be way too frequent or infrequent. The counter approach adjusts nicely to changes in demand.\r\n\r\n> That is entry-type-dependent, so it's a little messy and maybe there's a discussion to be had about how best to structure an individual entry, but my feeling is we should start simple.\r\n\r\nMy goal here was of course to keep it very simple. CAs can hardcode the counter to be 0 until they actually support any accumulator types.\r\n\r\nI hope this helps the PR make more sense. I think a call with either of you would actually be better than going to the mailing list but let me know :)",
           "createdAt": "2026-01-13T21:46:43Z",
-          "updatedAt": "2026-01-13T21:46:43Z"
+          "updatedAt": "2026-01-15T16:22:01Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Am somewhat swamped right now (there's a reason we said to do these kinds of addons separately :-P), but real quick...\r\n\r\n> The core issue with doing it the way you say is authenticating negative results, i.e. when there are no accumulators. Because this is going in an extension point regardless, the CA can't be assumed to support it! So if you can just tell me \"there are no accumulators in this CA, fall back to the collusion-secure system\" and I have to trust you or download the whole log to prove you wrong -- that would seem to defeat the point. With a counter approach, if the counter is zero, then you know there are no accumulator log entries.\r\n\r\nI'm confused. Is that the only reason for this? Surely the verifier, as part of configuring all the known CAs and their keys, can simply configure whether the CA has promised to implement this extension or not.",
+          "createdAt": "2026-01-16T02:16:07Z",
+          "updatedAt": "2026-01-16T02:16:07Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think this is only true from a client perspective, servers just use whatever gets pushed down from ACME. So a server wouldn't necessarily trust all the CAs that it uses / have trustworthy sources of information about them. A server generally also wouldn't have a list of \"all\" CAs.\r\n\r\nIt's not relevant to this PR but building on the above point, I see monitoring working by either having all CAs aggregated into individual vindexes, or there being some kind of verifiable discovery step for all the CAs trusted by a particular client. You wouldn't want it to be the case that the server has to have it's own view of what CAs it thinks Samsung TV accepts, where an inaccurate/out-of-date view causes monitoring misses.",
+          "createdAt": "2026-01-17T02:08:14Z",
+          "updatedAt": "2026-01-17T02:08:14Z"
         }
       ],
       "reviews": []
