@@ -292,7 +292,7 @@ Subtree:
 
 # Overview
 
-In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates invert this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.
+In traditional Certificate Transparency (CT), a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs. Merkle Tree Certificates invert this process: the CA certifies information by logging it first, then submits the log to cosigners to verify the log's operation. A certificate is then assembled from these components to prove the information exists in the CA's log.
 
 ~~~aasvg
 +-- Certification Authority ---+    +--  Authenticating Party ----+
@@ -331,31 +331,31 @@ In Certificate Transparency, a CA first certifies information by signing it, the
 
 Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depicts this process.
 
-1. The authenticating party requests a certificate, e.g. over ACME {{?RFC8555}}
+1. Request: The authenticating party requests a certificate, e.g. over ACME {{?RFC8555}}
 
-2. The CA validates each incoming issuance request, e.g. with ACME challenges. From there, the process differs.
+2. Validation: The CA validates each incoming issuance request using a standard procedures such as ACME challenges. From there, the process differs.
 
-3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
+3. Logging: The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
 
    1. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
 
-   2. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
+   2. The CA signs a *checkpoint* to certify that the CA issued *every* entry in the Merkle Tree to that point ({{certification-authority-cosigners}}).
 
-   3. The CA additionally signs *subtrees* ({{subtrees}}) that together contain certificates added since the last checkpoint ({{arbitrary-intervals}}). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
+   3. The CA may also sign *subtrees* ({{subtrees}}) containing all certificates added since the last checkpoint ({{arbitrary-intervals}}). This optimization reduces inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
 
-4. The CA submits the new log state to *cosigners*. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.
+4. Cosigning: The CA submits the new log state to *cosigners*. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.
 
-5. The CA now has enough information to construct a certificate and give it to the authenticating party. A certificate contains:
+5. Issuance: The CA now has enough information to construct a certificate and give it to the authenticating party. A certificate contains:
 
    * The TBSCertificate being certified
    * An inclusion proof from the TBSCertificate to some subtree
    * Cosignatures from the CA and cosigners on the subtree
 
-6. As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.
+6. Monitoring: Monitors and mirrors asses the issuance log to ensure the CA is operated correctly.
 
-A certificate with cosignatures is known as a *full certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.
+A certificate with cosignatures is a *full certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties configure trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. Inclusion proofs prove TBSCertificates are part of subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. CT logs entire certificates, whereas the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures. These do not scale with public key or signature size.
 
-This same issuance process also produces a *signatureless certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable with up-to-date relying parties.
+This issuance process also produces a *signatureless certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable by up-to-date relying parties.
 
 ~~~aasvg
 +-- Certification Authority -----+
@@ -859,9 +859,9 @@ Two subtrees are needed because a single subtree may not be able to efficiently 
 
 This section defines the structure of an *issuance log*.
 
-An issuance log describes an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in {{Section 2.1 of !RFC9162}}.
+An issuance log is an append-only sequence of *entries* ({{log-entries}}), identified consecutively by an index value, starting from zero. Each entry represents a Merkel Tree {{Section 2.1 of !RFC9162}} the CA has certified.
 
-Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
+Unlike traditional Certificate Transparency (CT) logs defined in {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. Instead, the log only contains entries that the log operator (CA), chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
 A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements comitted to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
