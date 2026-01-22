@@ -8,7 +8,12 @@ date:
 consensus: true
 v: 3
 area: "Security"
+workgroup: "PLANTS Working Group"
 venue:
+  group: PLANTS
+  type: Working Group
+  mail: plants@ietf.org
+  arch: https://mailarchive.ietf.org/arch/browse/plants/
   github: "davidben/merkle-tree-certs"
   latest: "https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html"
 
