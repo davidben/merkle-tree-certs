@@ -2,16 +2,16 @@
 
 
 
-Network Working Group                                        D. Benjamin
+PLANTS Working Group                                         D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 10 July 2026                                                   
+Expires: 26 July 2026                                                   
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                          6 January 2026
+                                                         22 January 2026
 
 
                         Merkle Tree Certificates
@@ -40,6 +40,11 @@ About This Document
    found at https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-
    tree-certs/.
 
+   Discussion of this document takes place on the PLANTS Working Group
+   mailing list (mailto:plants@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/plants/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/plants/.
+
    Source for this draft and an issue tracker can be found at
    https://github.com/davidben/merkle-tree-certs.
 
@@ -58,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 July 2026.
+   This Internet-Draft will expire on 26 July 2026.
 
 Copyright Notice
 
