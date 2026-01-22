@@ -1,3 +1,7 @@
+This file used to carry a draft copy of the PLANTS charter. The PLANTS Working Group has since been [chartered](https://datatracker.ietf.org/doc/charter-ietf-plants/). This file is maintained for archival purposes, to avoid breaking URLs.
+
+---
+
 # Draft PLANTS Charter
 
 This is a draft charter for a new IETF working group. The working group does not yet exist, so references to the "PLANTS Working Group" are aspirational. Discussion at the [IETF PLANTS mailing list](https://mailman3.ietf.org/mailman3/lists/plants.ietf.org/).
