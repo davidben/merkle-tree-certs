@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-18T02:31:26.121847+00:00",
+  "timestamp": "2026-01-29T02:43:13.679820+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -759,15 +759,15 @@
       "id": "I_kwDOJIBkVc5iywfV",
       "title": "Evidence",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/23",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "When a CA issues an assertion, it could provide evidence for it. For instance, a (list of) serialised dnssec proof(s) for a ACME dns-01 challenge or CAA record, if that was used. Most validations are http-01 for which no proof can be produced, except perhaps a signature of an independent multi-path DCV service, if that becomes a thing. Is evidence of assertions in scope? I suppose not for an initial version.",
       "createdAt": "2023-04-06T13:53:29Z",
-      "updatedAt": "2025-06-21T14:16:26Z",
-      "closedAt": null,
+      "updatedAt": "2026-01-28T22:41:08Z",
+      "closedAt": "2026-01-28T22:41:08Z",
       "comments": [
         {
           "author": "bwesterb",
@@ -782,6 +782,13 @@
           "body": "Post-Photosynthesis triage: lots of things have changed, the general problem space still applies. Dunno if we specifically want it in this doc. (Initial testing phase is probably transitory enough to not need to be in this spec.)",
           "createdAt": "2025-06-21T14:16:26Z",
           "updatedAt": "2025-06-21T14:16:26Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "We ended up doing the funny bootstrap thing outside of the core MTC draft, since it's just a transitory, so I think we can close this for now.",
+          "createdAt": "2026-01-28T22:41:08Z",
+          "updatedAt": "2026-01-28T22:41:08Z"
         }
       ]
     },
