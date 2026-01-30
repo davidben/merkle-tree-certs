@@ -194,10 +194,8 @@ func MarshalNullEntry() []byte {
 	return []byte{byte(entryTypeNull >> 8), byte(entryTypeNull)}
 }
 
-func MarshalTBSCertificateLogEntry(issuer TrustAnchorID, entry *EntryConfig) ([]byte, error) {
-	b := cryptobyte.NewBuilder(nil)
-	b.AddUint16(entryTypeTBSCert)
-	b.AddASN1(cbasn1.SEQUENCE, func(tbs *cryptobyte.Builder) {
+func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, entry *EntryConfig) ([]byte, error) {
+	marshalContents := func(tbs *cryptobyte.Builder) {
 		addX509V3Version(tbs)
 		addIssuer(tbs, issuer)
 		addValidity(tbs, entry)
@@ -207,7 +205,14 @@ func MarshalTBSCertificateLogEntry(issuer TrustAnchorID, entry *EntryConfig) ([]
 			spkiHash.AddBytes(h[:])
 		})
 		addExtensions(tbs, entry)
-	})
+	}
+	b := cryptobyte.NewBuilder(nil)
+	b.AddUint16(entryTypeTBSCert)
+	if version >= VersionDavidben10 {
+		marshalContents(b)
+	} else {
+		b.AddASN1(cbasn1.SEQUENCE, marshalContents)
+	}
 	return b.Bytes()
 }
 
