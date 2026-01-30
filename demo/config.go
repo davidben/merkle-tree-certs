@@ -14,6 +14,49 @@ var (
 	oidServerAuth = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 3, 1}
 )
 
+type DraftVersion int
+
+// Support versions for as long as it is easy to support and useful. If we need
+// to remove one, older versions of the demo tool are always available.
+const (
+	VersionDavidben09 DraftVersion = iota
+	VersionDavidben10
+)
+
+func (v DraftVersion) String() string {
+	switch v {
+	case VersionDavidben09:
+		return "davidben-09"
+	case VersionDavidben10:
+		return "davidben-10"
+	}
+	panic(fmt.Sprintf("unknown version %d", v))
+}
+
+func (v *DraftVersion) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	var ok bool
+	*v, ok = DraftVersionFromString(s)
+	if !ok {
+		return fmt.Errorf("unknown version %q", s)
+	}
+	return nil
+}
+
+func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
+	switch s {
+	case "davidben-09":
+		return VersionDavidben09, true
+	case "davidben-10":
+		return VersionDavidben10, true
+	default:
+		return 0, false
+	}
+}
+
 type SignatureAlgorithm int
 
 const (
@@ -62,6 +105,7 @@ func (s *SignatureAlgorithm) UnmarshalJSON(data []byte) error {
 }
 
 type CAConfig struct {
+	Version   DraftVersion
 	LogID     TrustAnchorID
 	Cosigners []CosignerConfig
 	Entries   []EntryConfig

@@ -99,7 +99,7 @@ func do() error {
 			repeat = entryConfig.Repeat
 		}
 		for range repeat {
-			entry, err := MarshalTBSCertificateLogEntry(config.LogID, entryConfig)
+			entry, err := MarshalTBSCertificateLogEntry(config.Version, config.LogID, entryConfig)
 			if err != nil {
 				return err
 			}
