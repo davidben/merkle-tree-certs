@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-01-29T02:43:13.679820+00:00",
+  "timestamp": "2026-02-01T03:21:35.674400+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10443,24 +10443,26 @@
       "id": "PR_kwDOJIBkVc65MVKD",
       "title": "Add an initial tool for generating test data",
       "url": "https://github.com/davidben/merkle-tree-certs/pull/170",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Some of the output has yet to be verified with an independent implementation and might not be correct:\r\n\r\n* The tlog-formatted log output\r\n* Cosignatures and their encoding\r\n\r\nBut hopefully this is a reasonable place to start.",
       "createdAt": "2025-12-16T16:39:17Z",
-      "updatedAt": "2025-12-16T16:39:17Z",
+      "updatedAt": "2026-01-29T19:29:37Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "bb81561ecbc15264bf297696302a50a35accb3ce",
+      "baseRefOid": "6db5ba4b5cd5f3f886d733b1e2ea95a50bcd8696",
       "headRepository": "davidben/merkle-tree-certs",
       "headRefName": "demo",
-      "headRefOid": "92282dba2bf361c486dda5fe7606ef77abd2a1a0",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "0ab0cc5ddf948e0afd39e6e3056229d318b1ec79",
+      "closedAt": "2026-01-29T19:29:34Z",
+      "mergedAt": "2026-01-29T19:29:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "217ad1697b7bf53ae14ea40f5cd06c4617005625"
+      },
       "comments": [],
       "reviews": []
     },
@@ -10588,6 +10590,225 @@
         }
       ],
       "reviews": []
+    },
+    {
+      "number": 173,
+      "id": "PR_kwDOJIBkVc7Aa8k0",
+      "title": "Implement draft-davidben-10 in the demo tool",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/173",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Since draft-davidben-09 is what some prototypes are targetting, keep support in there by adding a \"Version\" field to the config file.",
+      "createdAt": "2026-01-30T15:32:20Z",
+      "updatedAt": "2026-01-31T11:32:33Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "demo-draft-10",
+      "headRefOid": "4f5e93a19328c778542fb152eaeff10dd75df23f",
+      "closedAt": "2026-01-31T11:32:33Z",
+      "mergedAt": "2026-01-31T11:32:33Z",
+      "mergedBy": "bwesterb",
+      "mergeCommit": {
+        "oid": "a3888d3b2d247f8be3cdd7823ede4f4e78d80112"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7edr7u",
+          "commit": {
+            "abbreviatedOid": "4f5e93a"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-01-31T11:32:22Z",
+          "updatedAt": "2026-01-31T11:32:22Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 174,
+      "id": "PR_kwDOJIBkVc7AdFAo",
+      "title": "Various minor fixes",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/174",
+      "state": "OPEN",
+      "author": "aww-aww",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-01-30T18:24:49Z",
+      "updatedAt": "2026-01-31T11:46:00Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
+      "headRepository": "aww-aww/merkle-tree-certs",
+      "headRefName": "aw-cleanup",
+      "headRefOid": "83f7caf92a42103eab5a21b71e281936c327188b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hi Andy, thanks for this. Majority of your _many_ edits are great and make things easier to read. But with quite a few you also change the meaning. We could pull those out if you like.",
+          "createdAt": "2026-01-31T11:46:00Z",
+          "updatedAt": "2026-01-31T11:46:00Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7eVkKh",
+          "commit": {
+            "abbreviatedOid": "83f7caf"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Thanks! I haven't gotten all the way through this PR yet, but flushing comments now. Some of the changes make sense, while others seem to make the text slightly wrong, which makes it a bit slow to go through.",
+          "createdAt": "2026-01-30T20:05:44Z",
+          "updatedAt": "2026-01-30T21:55:04Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "> Additionally, it offers an optional 'signatureless' mode that further decreases message size by removing signatures entirely for older certificates when validated by up-to-date relying parties.\n\nI think this changes the meaning of the sentence subtly in the wrong way. The base mechanism decreases the size of the *logs* but not the certificates[*]. (Well, cosignature negotiation might give some levers we can pull here, but broadly no.) The optional optimization decreases the size of the certificates.\n\n[*] Certificate used loosely. In CT with TLS sometimes the SCTs are sent next to the certificate, rather than directly in the certificate. I suspect that's why I said \"message size\", but that is a bit ambiguous.",
+              "createdAt": "2026-01-30T20:05:44Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 18,
+              "body": "> similar to Certificate Transparency\n\nThis could be read to mean that the integration is similar to CT, when it's really the public logging is similar to CT. Admittedly the old phrasing isn't great here either, but the new phrasing I think goes further in the ambiguous direction.",
+              "createdAt": "2026-01-30T20:06:41Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 39,
+              "body": "This loses the glue text, which seems important here? It's unclear when we've switched from talking about CT to talking about MTCs.",
+              "createdAt": "2026-01-30T20:13:00Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 34,
+              "body": "The second sentence seems to be a disconnected thought now. The first sentence says that the larger stuff increases total storage of CT logs. The second sentence now just says the number of entries will grow, but I think the lost glue text / paragraphing makes it harder to follow that:\n\n* The increase in log entries is a separate effect from the size of the larger cryptography material\n* Both together increase the total storage, which in turn increases operational costs\n\n(Is it still accurate to say that CT log costs scale with total storage period? Presumably there are some fixed costs as well. And some scaling factors may be more sensitive to total storage while others may be more sensitive to entry count. Others may be sensitive to latency.)",
+              "createdAt": "2026-01-30T20:15:35Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "Fixed-size seems wrong. The log entries are definitely variable-size. If you have more SANs, they'll be bigger, etc. It's only that they don't scale with the size of signatures and keys, as the original text says.\n\n\"hashes instead of full keys and signatures\" is also slightly misleading compared to the original text. Public keys are now hashes. There are no signatures in the entries.",
+              "createdAt": "2026-01-30T20:19:29Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 50,
+              "body": "I suppose \"brief\" is relative and depends on parameters. Is an hour \"brief\"?\n\nI think I prefer \"obtain\" over \"use\" because it takes time to obtain it in the first place. (Whether you can use it depends on other factors like the age of the client.)\n\nSimilar comment as in the abstract about \"further reducing\".",
+              "createdAt": "2026-01-30T20:21:23Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 79,
+              "body": "(Existing issue, so need to fix it here, but this one definition has broken the plural vs singular pattern.)",
+              "createdAt": "2026-01-30T20:22:31Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "Don't have strong feelings, but the old text was vaguely ordered in dependency order, so that things weren't introduced before what they referenced. (@devonobrien do you have preferences? I recall you had lots of feelings about how to define terms. \ud83d\ude04 )",
+              "createdAt": "2026-01-30T20:24:55Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 131,
+              "body": "Nit: We already define CT earlier in the document. Not sure if it's necessary to say \"traditional\" here because this is not CT but a different system.",
+              "createdAt": "2026-01-30T21:20:34Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 143,
+              "body": "I mean, you don't have to use standard procedures. It's really that MTC has no opinion on this.",
+              "createdAt": "2026-01-30T21:21:34Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 154,
+              "body": "I think we can s/may also sign/signs/\n\nYes, you can technically pick other subtrees or even the root and everything will still work. But the specification is currently prescriptive that this is what you do. (Possibly we should change that, but that's probably a different discussion.)",
+              "createdAt": "2026-01-30T21:23:31Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 167,
+              "body": "I assume \"asses\" was a typo. :-)",
+              "createdAt": "2026-01-30T21:23:58Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 167,
+              "body": "I'm unclear on what the aim of this change is. The callback to CT was to make it clear that this is the analogous operation. Also not sure what the mention of mirrors is for.",
+              "createdAt": "2026-01-30T21:35:35Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 170,
+              "body": "\"relying parties configure trusted cosigners\" is a bit ambiguous whether RPs have a list of trusted cosigners (correct) or RPs change the config of trusted cosigners (incorrect)\n\nThe latest couple sentence now reads a little roundabout to me now because it's missing the couple of glue words to say that the first clause is is comparing to CT, not expanding on the above. Agreed that the original text is also a bit odd, but I'm not sure the new text is in the right direction.",
+              "createdAt": "2026-01-30T21:36:19Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 173,
+              "body": "Nit: \"by\" vs \"with\" seem to subtly change the implied subject here. \"with\" means we're talking about authenticating parties who are using certificates with RPs. \"by\" means we're talking about the relying parties. But it's the authenticating party that interacts with certificate issuance, so I think \"with\" is better.",
+              "createdAt": "2026-01-30T21:40:16Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 182,
+              "body": "s/Merkel/Merkle/\n\nBut also the new text is just wrong. Entries do not represent Merkle Trees. They represent information (assertions) that the CA certifies. \"example.com has key 12345\" as an example assertion.\n\n(This text has to be careful to not say entries are certificates. Entries themselves are the TBSCertificate, or the information that the CA certifies.)\n\nBeyond that, the original text was trying to say that an issuance log is not just the sequence of entries but also the Merkle Tree structure built over it. And so it says that it is a Merkle Tree representation of those entries. (RFC 9162 similarly says a log is more than the [entries](https://www.rfc-editor.org/rfc/rfc9162.html#section-4-1).)",
+              "createdAt": "2026-01-30T21:40:34Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 185,
+              "body": "Ditto about \"traditional\"",
+              "createdAt": "2026-01-30T21:42:51Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            },
+            {
+              "originalPosition": 193,
+              "body": "Did you mean to replace the above paragraph? It looks like you've duplicated it.\n\nThat said, I don't believe this replacement text is correct. Take a look at X.680 and X.690. X.690 does not call that portion the \"Value\". It calls it the \"contents\". A \"value\" in ASN.1 is the abstract data value, not the contents octets. From X.680:\n\n> A data type (or type for short) is a category of information (for example, numeric, textual, still image or video information). A data value (or value for short) is an instance of such a type\n\nSince many folks work with ASN.1 without having read the formal spec and knowing the formal terminology, the original text has a parenthetical \"(i.e excluding ...)\" and another helper \"Equivalently, ...\". But I think the first definition should be the one that is precise: the contents octets of the DER-encoded TBSCertificateLogEntry.\n\nAlso {{verifying-certificate-signatures}} will expand to \"Section ???\". The new text doesn't work grammatically. It will say \"allows Section ??? in a single pass\" reads very strangely. The original text was written with the expansion in mind.",
+              "createdAt": "2026-01-30T21:52:03Z",
+              "updatedAt": "2026-01-30T21:55:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7edtbn",
+          "commit": {
+            "abbreviatedOid": "83f7caf"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-01-31T11:38:47Z",
+          "updatedAt": "2026-01-31T11:38:47Z",
+          "comments": [
+            {
+              "originalPosition": 221,
+              "body": "Change in meaning: cosigner doesn't know what's latest end index\u2014it just retains the one.",
+              "createdAt": "2026-01-31T11:38:47Z",
+              "updatedAt": "2026-01-31T11:38:47Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
