@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-02-01T03:21:35.674400+00:00",
+  "timestamp": "2026-02-03T02:50:00.783440+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10645,7 +10645,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-30T18:24:49Z",
-      "updatedAt": "2026-01-31T11:46:00Z",
+      "updatedAt": "2026-02-02T20:22:17Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "217ad1697b7bf53ae14ea40f5cd06c4617005625",
@@ -10663,6 +10663,13 @@
           "body": "Hi Andy, thanks for this. Majority of your _many_ edits are great and make things easier to read. But with quite a few you also change the meaning. We could pull those out if you like.",
           "createdAt": "2026-01-31T11:46:00Z",
           "updatedAt": "2026-01-31T11:46:00Z"
+        },
+        {
+          "author": "aww-aww",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Please yank anything that does not make sense. I tried to guess when things\r\nwere ambiguous to me, but it looks a number of the guesses went the wrong\r\ndirection.\r\n\r\nOn Sat, Jan 31, 2026 at 4:46\u202fAM Bas Westerbaan ***@***.***>\r\nwrote:\r\n\r\n> *bwesterb* left a comment (davidben/merkle-tree-certs#174)\r\n> <https://github.com/davidben/merkle-tree-certs/pull/174#issuecomment-3828213869>\r\n>\r\n> Hi Andy, thanks for this. Majority of your *many* edits are great and\r\n> make things easier to read. But with quite a few you also change the\r\n> meaning. We could pull those out if you like.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/davidben/merkle-tree-certs/pull/174#issuecomment-3828213869>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AAVF2B5BVCWPTBAR7FZXX6L4JSIY7AVCNFSM6AAAAACTO6QZHCVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZTQMRYGIYTGOBWHE>\r\n> .\r\n> You are receiving this because you authored the thread.Message ID:\r\n> ***@***.***>\r\n>\r\n",
+          "createdAt": "2026-02-02T20:22:17Z",
+          "updatedAt": "2026-02-02T20:22:17Z"
         }
       ],
       "reviews": [
