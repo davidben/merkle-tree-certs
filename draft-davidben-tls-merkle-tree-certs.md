@@ -1441,7 +1441,7 @@ A full certificate will generally be accepted by relying parties that trust the 
 
 A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
-A signatureless certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmarks}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_landmarks - 1`.
+A signatureless certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmarks}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a signatureless certificate SHOULD also be provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_landmarks - 1`.
 
 A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a signatureless certificate is compatible with the relying party.
 
@@ -1734,7 +1734,7 @@ This non-normative section describes how the Merkle Tree structure relates to th
 
 ## Binary Representations
 
-Within a Merkle Tree whose size is a power of two, the binary representation of an leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. {{fig-merkle-tree-bits-full}} demonstrates this in a Merkle Tree of size 8:
+Within a Merkle Tree whose size is a power of two, the binary representation of a leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. {{fig-merkle-tree-bits-full}} demonstrates this in a Merkle Tree of size 8:
 
 ~~~aasvg
        +----------------+
@@ -1759,7 +1759,7 @@ The binary representation of `4` is `0b100`. It is the left (0) child of `[4, 6)
 
 Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree `[start, end)`, the node's level is `BIT_WIDTH(end - start - 1)`.
 
-Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going to level 2 to level 1.
+Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are `0b100` and `0b110`, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going from level 2 to level 1.
 
 This can be generalized to arbitrary-sized Merkle Trees. {{fig-merkle-tree-bits-partial}} depicts a Merkle Tree of size 6:
 
@@ -1805,13 +1805,13 @@ In a tree of the next power of two size, the skipped nodes in this path are wher
 ~~~
 {: #fig-merkle-tree-bits-partial-comparison title="An example Merkle Tree of size 6, viewed as a subset of a tree of size 8"}
 
-Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
+Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is `0b100`. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a left child. However, at bit 1, `0b100` has not yet diverged from the last element, `0b101`. That instead indicates a skipped node, not a left child.
 
 ## Inclusion Proof Evaluation {#inclusion-proof-evaluation-explain}
 
-The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by staring from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
+The procedure in {{evaluating-a-subtree-inclusion-proof}} builds up a subtree hash in `r` by starting from `entry_hash` and iteratively hashing elements of `inclusion_proof` on the left or right. That means this procedure, when successful, must return *some* hash that contains `entry_hash`.
 
-Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes by based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start` (first number), and the last element has index `sn = end - start - 1` (second number).
+Treating `[start, end)` as a Merkle Tree of size `end - start`, the procedure hashes based on the path to `index`. Within this smaller Merkle Tree, it has index `fn = index - start` (first number), and the last element has index `sn = end - start - 1` (second number).
 
 Step 4 iterates through `inclusion_proof` and the paths to `fn` and `sn` in parallel. As the procedure right-shifts `fn` and `sn` and looks at the least-significant bit, it moves up the two paths, towards the root. When `sn` is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.
 
@@ -1921,7 +1921,7 @@ Steps 3 and 4 then skip to the starting node, described in {{consistency-proof-s
 
 Steps 5 and 6 initialize the hashes `fr` and `sr`:
 
-* In the first case above, `fn` will equal `sn` after truncation. Step 5 will then initialize the hashes to `node_hash` because consistency proof does not need to include the starting node.
+* In the first case above, `fn` will equal `sn` after truncation. Step 5 will then initialize the hashes to `node_hash` because the consistency proof does not need to include the starting node.
 
 * In the second case above, `fn` is less than `sn`. Step 6 will then initialize the hashes to the first value in the consistency proof.
 
