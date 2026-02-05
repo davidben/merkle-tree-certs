@@ -5,13 +5,13 @@
 PLANTS Working Group                                         D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 4 August 2026                                                  
+Expires: 9 August 2026                                                  
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         31 January 2026
+                                                         5 February 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 August 2026.
+   This Internet-Draft will expire on 9 August 2026.
 
 Copyright Notice
 
@@ -2275,8 +2275,8 @@ Table of Contents
    Section 6.3.1, and SHOULD be provisioned with this value.
    Additionally, relying parties that trust later landmarks may also be
    assumed to trust landmark L, so a signatureless certificate SHOULD
-   additionally provisioned with an additional trust anchor range whose
-   base is base_id, min is L, and max is L + max_landmarks - 1.
+   also be provisioned with an additional trust anchor range whose base
+   is base_id, min is L, and max is L + max_landmarks - 1.
 
    A relying party that has been configured with trusted subtrees
    (Section 7.4) derived from a set of landmarks SHOULD configure the
@@ -3124,7 +3124,7 @@ Appendix B.  Merkle Tree Structure
 B.1.  Binary Representations
 
    Within a Merkle Tree whose size is a power of two, the binary
-   representation of an leaf's index gives the path to that leaf.  The
+   representation of a leaf's index gives the path to that leaf.  The
    leaf is a left child if the least-significant bit is unset and a
    right child if it is set.  The next bit indicates the direction of
    the parent node, and so on.  Figure 12 demonstrates this in a Merkle
@@ -3163,8 +3163,8 @@ B.1.  Binary Representations
    leaf diverge.  For example, the bit representations of 4 and 6 are
    0b100 and 0b110, respectively.  The highest differing bit is bit 1.
    Bits 2 and up are the same between the two indices.  This indicates
-   that the paths from the root to leaves 4 and 6 diverge when going to
-   level 2 to level 1.
+   that the paths from the root to leaves 4 and 6 diverge when going
+   from level 2 to level 1.
 
    This can be generalized to arbitrary-sized Merkle Trees.  Figure 13
    depicts a Merkle Tree of size 6:
@@ -3224,19 +3224,19 @@ B.1.  Binary Representations
    when viewed from root to leaf.  In the example, the binary
    representation of 4 is 0b100.  While bit 0 and bit 1 are both unset,
    they manifest in the tree differently.  Bit 0 indicates that 4 is a
-   right child.  However, at bit 1, 0b100 has not yet diverged from the
+   left child.  However, at bit 1, 0b100 has not yet diverged from the
    last element, 0b101.  That instead indicates a skipped node, not a
    left child.
 
 B.2.  Inclusion Proof Evaluation
 
    The procedure in Section 4.3.2 builds up a subtree hash in r by
-   staring from entry_hash and iteratively hashing elements of
+   starting from entry_hash and iteratively hashing elements of
    inclusion_proof on the left or right.  That means this procedure,
    when successful, must return _some_ hash that contains entry_hash.
 
    Treating [start, end) as a Merkle Tree of size end - start, the
-   procedure hashes by based on the path to index.  Within this smaller
+   procedure hashes based on the path to index.  Within this smaller
    Merkle Tree, it has index fn = index - start (first number), and the
    last element has index sn = end - start - 1 (second number).
 
@@ -3403,8 +3403,8 @@ B.4.  Consistency Proof Verification
    Steps 5 and 6 initialize the hashes fr and sr:
 
    *  In the first case above, fn will equal sn after truncation.  Step
-      5 will then initialize the hashes to node_hash because consistency
-      proof does not need to include the starting node.
+      5 will then initialize the hashes to node_hash because the
+      consistency proof does not need to include the starting node.
 
    *  In the second case above, fn is less than sn.  Step 6 will then
       initialize the hashes to the first value in the consistency proof.

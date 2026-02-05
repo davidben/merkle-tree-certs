@@ -1047,11 +1047,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">January 2026</td>
+<td class="right">February 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 4 August 2026</td>
+<td class="center">Expires 9 August 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-01-31" class="published">31 January 2026</time>
+<time datetime="2026-02-05" class="published">5 February 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-04">4 August 2026</time></dd>
+<dd class="expires"><time datetime="2026-08-09">9 August 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4730,7 +4730,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-8.2-1">A full certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether the full certificate would be acceptable.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">A signatureless certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a signatureless certificate SHOULD additionally provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">A signatureless certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a signatureless certificate SHOULD also be provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <p id="section-8.2-5">A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD configure the <code>trust_anchors</code> extension to advertise the highest supported landmark in the set. The selection procedures defined in <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <a href="#extensions-to-trust-anchor-ids" class="auto internal xref">Section 8.1</a> will then correctly determine whether a signatureless certificate is compatible with the relying party.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
 <p id="section-8.2-6">When both a signatureless and full certificate are supported by a relying party, an authenticating party SHOULD preferentially use the signatureless certificate. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a signatureless certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 </section>
@@ -5310,7 +5310,7 @@ END
         <h3 id="name-binary-representations">
 <a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-binary-representations" class="section-name selfRef">Binary Representations</a>
         </h3>
-<p id="appendix-B.1-1">Within a Merkle Tree whose size is a power of two, the binary representation of an leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. <a href="#fig-merkle-tree-bits-full" class="auto internal xref">Figure 12</a> demonstrates this in a Merkle Tree of size 8:<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-1">Within a Merkle Tree whose size is a power of two, the binary representation of a leaf's index gives the path to that leaf. The leaf is a left child if the least-significant bit is unset and a right child if it is set. The next bit indicates the direction of the parent node, and so on. <a href="#fig-merkle-tree-bits-full" class="auto internal xref">Figure 12</a> demonstrates this in a Merkle Tree of size 8:<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-of-s"></span><div id="fig-merkle-tree-bits-full">
 <figure id="figure-12">
           <div id="appendix-B.1-2.1">
@@ -5427,7 +5427,7 @@ END
 </div>
 <p id="appendix-B.1-3">The binary representation of <code>4</code> is <code>0b100</code>. It is the left (0) child of <code>[4, 6)</code>, which is the left (0) child of <code>[4, 8)</code>, which is the right (1) child of <code>[0, 8)</code>.<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
 <p id="appendix-B.1-4">Each level in the tree corresponds to a bit position and can be correspondingly numbered, with 0 indicating the least-significant bit and the leaf level, and so on. In this numbering, a node's level can be determined as follows: if the node is a root of subtree <code>[start, end)</code>, the node's level is <code>BIT_WIDTH(end - start - 1)</code>.<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
-<p id="appendix-B.1-5">Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are <code>0b100</code> and <code>0b110</code>, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going to level 2 to level 1.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-5">Comparing two indices determines the relationship between two paths. The highest differing bit gives the level at which paths from root to leaf diverge. For example, the bit representations of 4 and 6 are <code>0b100</code> and <code>0b110</code>, respectively. The highest differing bit is bit 1. Bits 2 and up are the same between the two indices. This indicates that the paths from the root to leaves 4 and 6 diverge when going from level 2 to level 1.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
 <p id="appendix-B.1-6">This can be generalized to arbitrary-sized Merkle Trees. <a href="#fig-merkle-tree-bits-partial" class="auto internal xref">Figure 13</a> depicts a Merkle Tree of size 6:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
 <span id="name-an-example-merkle-tree-of-si"></span><div id="fig-merkle-tree-bits-partial">
 <figure id="figure-13">
@@ -5632,7 +5632,7 @@ END
 <a href="#name-an-example-merkle-tree-of-siz" class="selfRef">An example Merkle Tree of size 6, viewed as a subset of a tree of size 8</a>
           </figcaption></figure>
 </div>
-<p id="appendix-B.1-11">Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is <code>0b100</code>. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a right child. However, at bit 1, <code>0b100</code> has not yet diverged from the last element, <code>0b101</code>. That instead indicates a skipped node, not a left child.<a href="#appendix-B.1-11" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-11">Zero bits also indicate skipped nodes in paths that have not yet diverged from the rightmost edge (i.e. the path to the last element), when viewed from root to leaf. In the example, the binary representation of 4 is <code>0b100</code>. While bit 0 and bit 1 are both unset, they manifest in the tree differently. Bit 0 indicates that 4 is a left child. However, at bit 1, <code>0b100</code> has not yet diverged from the last element, <code>0b101</code>. That instead indicates a skipped node, not a left child.<a href="#appendix-B.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="inclusion-proof-evaluation-explain">
@@ -5640,8 +5640,8 @@ END
         <h3 id="name-inclusion-proof-evaluation">
 <a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-inclusion-proof-evaluation" class="section-name selfRef">Inclusion Proof Evaluation</a>
         </h3>
-<p id="appendix-B.2-1">The procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a> builds up a subtree hash in <code>r</code> by staring from <code>entry_hash</code> and iteratively hashing elements of <code>inclusion_proof</code> on the left or right. That means this procedure, when successful, must return <em>some</em> hash that contains <code>entry_hash</code>.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-B.2-2">Treating <code>[start, end)</code> as a Merkle Tree of size <code>end - start</code>, the procedure hashes by based on the path to <code>index</code>. Within this smaller Merkle Tree, it has index <code>fn = index - start</code> (first number), and the last element has index <code>sn = end - start - 1</code> (second number).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-1">The procedure in <a href="#evaluating-a-subtree-inclusion-proof" class="auto internal xref">Section 4.3.2</a> builds up a subtree hash in <code>r</code> by starting from <code>entry_hash</code> and iteratively hashing elements of <code>inclusion_proof</code> on the left or right. That means this procedure, when successful, must return <em>some</em> hash that contains <code>entry_hash</code>.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2">Treating <code>[start, end)</code> as a Merkle Tree of size <code>end - start</code>, the procedure hashes based on the path to <code>index</code>. Within this smaller Merkle Tree, it has index <code>fn = index - start</code> (first number), and the last element has index <code>sn = end - start - 1</code> (second number).<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
 <p id="appendix-B.2-3">Step 4 iterates through <code>inclusion_proof</code> and the paths to <code>fn</code> and <code>sn</code> in parallel. As the procedure right-shifts <code>fn</code> and <code>sn</code> and looks at the least-significant bit, it moves up the two paths, towards the root. When <code>sn</code> is zero, the procedure has reached the top of the tree. The procedure checks that the two iterations complete together.<a href="#appendix-B.2-3" class="pilcrow">¶</a></p>
 <p id="appendix-B.2-4">Iterating from level 0 up, <code>fn</code> and <code>sn</code> will initially be different. While they are different, step 4.2 hashes on the left or right based on the binary representation, as discussed in <a href="#binary-representations" class="auto internal xref">Appendix B.1</a>.<a href="#appendix-B.2-4" class="pilcrow">¶</a></p>
 <p id="appendix-B.2-5">Once <code>fn = sn</code>, the remainder of the path is on the right edge. At that point, the condition in step 4.2 is always true. It only incorporates proof entries on the left, once per set bit. Unset bits are skipped.<a href="#appendix-B.2-5" class="pilcrow">¶</a></p>
@@ -6084,7 +6084,7 @@ END
 <p id="appendix-B.4-5">Steps 5 and 6 initialize the hashes <code>fr</code> and <code>sr</code>:<a href="#appendix-B.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B.4-6.1">
-            <p id="appendix-B.4-6.1.1">In the first case above, <code>fn</code> will equal <code>sn</code> after truncation. Step 5 will then initialize the hashes to <code>node_hash</code> because consistency proof does not need to include the starting node.<a href="#appendix-B.4-6.1.1" class="pilcrow">¶</a></p>
+            <p id="appendix-B.4-6.1.1">In the first case above, <code>fn</code> will equal <code>sn</code> after truncation. Step 5 will then initialize the hashes to <code>node_hash</code> because the consistency proof does not need to include the starting node.<a href="#appendix-B.4-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="appendix-B.4-6.2">
             <p id="appendix-B.4-6.2.1">In the second case above, <code>fn</code> is less than <code>sn</code>. Step 6 will then initialize the hashes to the first value in the consistency proof.<a href="#appendix-B.4-6.2.1" class="pilcrow">¶</a></p>
