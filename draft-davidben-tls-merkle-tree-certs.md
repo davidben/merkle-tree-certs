@@ -463,7 +463,7 @@ If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end
 ~~~
 {: #fig-subtree-example title="Two example subtrees, one full and one partial"}
 
-Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained because `n` (13) is `end` (13).
+Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained (marked with =) because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained (marked with ~) because `n` (13) is `end` (13).
 
 ~~~aasvg
                 +-----------------------------+
