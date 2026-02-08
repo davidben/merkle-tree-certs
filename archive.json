@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-02-03T02:50:00.783440+00:00",
+  "timestamp": "2026-02-08T03:27:02.031904+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -10814,6 +10814,48 @@
               "updatedAt": "2026-01-31T11:38:47Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 175,
+      "id": "PR_kwDOJIBkVc7B18vc",
+      "title": "Fix small typos in draft",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/175",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-02-05T22:01:00Z",
+      "updatedAt": "2026-02-05T22:25:38Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a3888d3b2d247f8be3cdd7823ede4f4e78d80112",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lukevalenta-patch-1",
+      "headRefOid": "a5f9e7b122edee78cf5c234985e84943c9302652",
+      "closedAt": "2026-02-05T22:25:37Z",
+      "mergedAt": "2026-02-05T22:25:37Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "342f1acce6cda55815a488311c10869882f66176"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7gGZJm",
+          "commit": {
+            "abbreviatedOid": "a5f9e7b"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-05T22:25:30Z",
+          "updatedAt": "2026-02-05T22:25:30Z",
+          "comments": []
         }
       ]
     }
