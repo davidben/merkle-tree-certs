@@ -334,7 +334,7 @@ In Certificate Transparency, a CA first certifies information by signing it, the
   |  ...quorum of cosigners...   |
   +------------------------------+
 ~~~
-{: #fig-issuance-overview title="A diagram of the issuance architecture, detailed below"}
+{: #fig-issuance-overview title="A diagram of the MTC issuance architecture, detailed below"}
 
 Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depicts this process.
 
