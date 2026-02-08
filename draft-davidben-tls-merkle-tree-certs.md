@@ -305,7 +305,7 @@ In Certificate Transparency, a CA first certifies information by signing it, the
 +-- Certification Authority ---+    +--  Authenticating Party ----+
 |                              |    |                             |
 |  2. Validate request     <---+----+--  1. Request certificate   |
-|       |                      |    |                             |
+|       |                      |    |       issuance              |
 |       |                      |    |                             |
 |       V                      |    |                             |
 |                              |    |                             |
@@ -344,11 +344,11 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
 
-   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
+   a. The CA adds a TBSCertificateLogEntry ({{log-entries}}, abbreviated "tbscert entries" in the diagram) to its log, describing the information it is certifying.
 
-   2. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
+   b. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
 
-   3. The CA additionally signs *subtrees* ({{subtrees}}) that together contain certificates added since the last checkpoint ({{arbitrary-intervals}}). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
+   c. The CA additionally signs *subtrees* ({{subtrees}}) that together contain certificates added since the last checkpoint ({{arbitrary-intervals}}). This is an optimization to reduce inclusion proof sizes. A signed subtree certifies that the CA has issued *every* entry in the subtree.
 
 4. The CA submits the new log state to *cosigners*. Cosigners validate the log is append-only and optionally provide additional services, such as mirroring its contents. They cosign the CA's checkpoints and subtrees.
 
