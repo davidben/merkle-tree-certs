@@ -974,7 +974,7 @@ A cosigner computes a cosignature for a subtree in some log by signing a MTCSubt
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
-/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
+/* From Section 3.1 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID<1..2^8-1>;
 
 struct {
@@ -1539,7 +1539,7 @@ The separation between issuance logs and CA cosigners gives CAs additional flexi
 
 # Privacy Considerations
 
-The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
+The Privacy Considerations described in {{Section 8 of !I-D.ietf-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
 
 In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.
 
