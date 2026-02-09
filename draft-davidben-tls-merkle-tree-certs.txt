@@ -5,13 +5,13 @@
 PLANTS Working Group                                         D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 9 August 2026                                                  
+Expires: 13 August 2026                                                 
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         5 February 2026
+                                                         9 February 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 August 2026.
+   This Internet-Draft will expire on 13 August 2026.
 
 Copyright Notice
 
@@ -366,7 +366,7 @@ Table of Contents
    +-- Certification Authority ---+    +--  Authenticating Party ----+
    |                              |    |                             |
    |  2. Validate request     <---+----+--  1. Request certificate   |
-   |       |                      |    |                             |
+   |       |                      |    |       issuance              |
    |       |                      |    |                             |
    |       V                      |    |                             |
    |                              |    |                             |
@@ -395,7 +395,7 @@ Table of Contents
      |  ...quorum of cosigners...   |
      +------------------------------+
 
-      Figure 1: A diagram of the issuance architecture, detailed below
+    Figure 1: A diagram of the MTC issuance architecture, detailed below
 
    Merkle Tree Certificates are issued as follows.  Figure 1 depicts
    this process.
@@ -410,14 +410,15 @@ Table of Contents
        Unlike a CT log, this issuance log only contains entries added by
        the CA:
 
-       1.  The CA adds a TBSCertificateLogEntry (Section 5.3) to its
-           log, describing the information it is certifying.
+       a.  The CA adds a TBSCertificateLogEntry (Section 5.3,
+           abbreviated "tbscert entries" in the diagram) to its log,
+           describing the information it is certifying.
 
-       2.  The CA signs a _checkpoint_, which describes the current
+       b.  The CA signs a _checkpoint_, which describes the current
            state of the log.  A signed checkpoint certifies that the CA
            issued _every_ entry in the Merkle Tree (Section 5.5).
 
-       3.  The CA additionally signs _subtrees_ (Section 4) that
+       c.  The CA additionally signs _subtrees_ (Section 4) that
            together contain certificates added since the last checkpoint
            (Section 4.5).  This is an optimization to reduce inclusion
            proof sizes.  A signed subtree certifies that the CA has
@@ -585,9 +586,9 @@ Table of Contents
           Figure 3: Two example subtrees, one full and one partial
 
    Both subtrees are directly contained in a Merkle Tree of size 13,
-   depicted in Figure 4. [4, 8) is contained because, although n (13) is
-   not end (8), the subtree is full. [8, 13) is contained because n (13)
-   is end (13).
+   depicted in Figure 4. [4, 8) is contained (marked with double lines)
+   because, although n (13) is not end (8), the subtree is full. [8, 13)
+   is contained (marked with wavy lines) because n (13) is end (13).
 
                    +-----------------------------+
                    |            [0, 13)          |
@@ -1086,7 +1087,7 @@ Table of Contents
 
    A snapshot of the log is known as a _checkpoint_. A checkpoint is
    identified by its _tree size_, that is the number of elements
-   comitted to the log at the time.  Its contents can be described by
+   committed to the log at the time.  Its contents can be described by
    the Merkle Tree Hash (Section 2.1.1 of [RFC9162]) of entries zero
    through tree_size - 1.
 
@@ -2560,7 +2561,7 @@ Table of Contents
 
 11.  Privacy Considerations
 
-   The Privacy Considerations described in Section 9 of
+   The Privacy Considerations described in Section 8 of
    [I-D.ietf-tls-trust-anchor-ids] apply to its use with Merkle Tree
    Certificates.
 

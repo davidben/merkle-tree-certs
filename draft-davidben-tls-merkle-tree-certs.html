@@ -1051,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 9 August 2026</td>
+<td class="center">Expires 13 August 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-05" class="published">5 February 2026</time>
+<time datetime="2026-02-09" class="published">9 February 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-09">9 August 2026</time></dd>
+<dd class="expires"><time datetime="2026-08-13">13 August 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1134,7 +1134,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 13 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1632,7 +1632,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
       </h2>
 <p id="section-3-1">In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates invert this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<span id="name-a-diagram-of-the-issuance-a"></span><div id="fig-issuance-overview">
+<span id="name-a-diagram-of-the-mtc-issuan"></span><div id="fig-issuance-overview">
 <figure id="figure-1">
         <div id="section-3-2.1">
           <div class="alignLeft art-svg artwork" id="section-3-2.1.1">
@@ -1703,6 +1703,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
                 <text x="340" y="68">1.</text>
                 <text x="384" y="68">Request</text>
                 <text x="464" y="68">certificate</text>
+                <text x="388" y="84">issuance</text>
                 <text x="36" y="148">3.</text>
                 <text x="64" y="148">Add</text>
                 <text x="92" y="148">to</text>
@@ -1761,7 +1762,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 </div>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
-<a href="#name-a-diagram-of-the-issuance-a" class="selfRef">A diagram of the issuance architecture, detailed below</a>
+<a href="#name-a-diagram-of-the-mtc-issuan" class="selfRef">A diagram of the MTC issuance architecture, detailed below</a>
         </figcaption></figure>
 </div>
 <p id="section-3-3">Merkle Tree Certificates are issued as follows. <a href="#fig-issuance-overview" class="auto internal xref">Figure 1</a> depicts this process.<a href="#section-3-3" class="pilcrow">¶</a></p>
@@ -1774,9 +1775,9 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 </li>
         <li id="section-3-4.3">
           <p id="section-3-4.3.1">The CA operates an append-only <em>issuance log</em> (<a href="#issuance-logs" class="auto internal xref">Section 5</a>). Unlike a CT log, this issuance log only contains entries added by the CA:<a href="#section-3-4.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3-4.3.2">
+<ol start="1" type="a" class="normal type-a" id="section-3-4.3.2">
 <li id="section-3-4.3.2.1">
-              <p id="section-3-4.3.2.1.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) to its log, describing the information it is certifying.<a href="#section-3-4.3.2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-3-4.3.2.1.1">The CA adds a TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>, abbreviated "tbscert entries" in the diagram) to its log, describing the information it is certifying.<a href="#section-3-4.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-3-4.3.2.2">
               <p id="section-3-4.3.2.2.1">The CA signs a <em>checkpoint</em>, which describes the current state of the log. A signed checkpoint certifies that the CA issued <em>every</em> entry in the Merkle Tree (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>).<a href="#section-3-4.3.2.2.1" class="pilcrow">¶</a></p>
@@ -2080,7 +2081,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <a href="#name-two-example-subtrees-one-fu" class="selfRef">Two example subtrees, one full and one partial</a>
           </figcaption></figure>
 </div>
-<p id="section-4.2-3">Both subtrees are directly contained in a Merkle Tree of size 13, depicted in <a href="#fig-subtree-containment-example" class="auto internal xref">Figure 4</a>. <code>[4, 8)</code> is contained because, although <code>n</code> (13) is not <code>end</code> (8), the subtree is full. <code>[8, 13)</code> is contained because <code>n</code> (13) is <code>end</code> (13).<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Both subtrees are directly contained in a Merkle Tree of size 13, depicted in <a href="#fig-subtree-containment-example" class="auto internal xref">Figure 4</a>. <code>[4, 8)</code> is contained (marked with double lines) because, although <code>n</code> (13) is not <code>end</code> (8), the subtree is full. <code>[8, 13)</code> is contained (marked with wavy lines) because <code>n</code> (13) is <code>end</code> (13).<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <span id="name-a-merkle-tree-of-size-13"></span><div id="fig-subtree-containment-example">
 <figure id="figure-4">
           <div id="section-4.2-4.1">
@@ -3662,7 +3663,7 @@ def find_subtrees(start, end):
 <p id="section-5-1">This section defines the structure of an <em>issuance log</em>.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">An issuance log describes an append-only sequence of <em>entries</em> (<a href="#log-entries" class="auto internal xref">Section 5.3</a>), identified consecutively by an index value, starting from zero. Each entry is an assertion that the CA has certified. The entries in the issuance log are represented as a Merkle Tree, described in <span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1" class="relref">Section 2.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">Unlike <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements comitted to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-4">A snapshot of the log is known as a <em>checkpoint</em>. A checkpoint is identified by its <em>tree size</em>, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash (<span><a href="https://rfc-editor.org/rfc/rfc9162#section-2.1.1" class="relref">Section 2.1.1</a> of [<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>) of entries zero through <code>tree_size - 1</code>.<a href="#section-5-4" class="pilcrow">¶</a></p>
 <p id="section-5-5">Cosigners (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and one or more CA cosigners (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>).<a href="#section-5-5" class="pilcrow">¶</a></p>
 <div id="log-parameters">
 <section id="section-5.1">
@@ -4847,7 +4848,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-9" class="relref">Section 9</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">In particular, relying parties that share an update process for trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
