@@ -975,7 +975,7 @@ A cosigner computes a cosignature for a subtree in some log by signing a MTCSubt
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
-/* From Section 3.1 of draft-ietf-tls-trust-anchor-ids */
+/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
 opaque TrustAnchorID<1..2^8-1>;
 
 struct {
