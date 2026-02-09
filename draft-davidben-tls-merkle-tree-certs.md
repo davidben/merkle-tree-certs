@@ -305,7 +305,7 @@ In Certificate Transparency, a CA first certifies information by signing it, the
 +-- Certification Authority ---+    +--  Authenticating Party ----+
 |                              |    |                             |
 |  2. Validate request     <---+----+--  1. Request certificate   |
-|       |                      |    |                             |
+|       |                      |    |       issuance              |
 |       |                      |    |                             |
 |       V                      |    |                             |
 |                              |    |                             |
@@ -334,7 +334,7 @@ In Certificate Transparency, a CA first certifies information by signing it, the
   |  ...quorum of cosigners...   |
   +------------------------------+
 ~~~
-{: #fig-issuance-overview title="A diagram of the issuance architecture, detailed below"}
+{: #fig-issuance-overview title="A diagram of the MTC issuance architecture, detailed below"}
 
 Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depicts this process.
 
@@ -344,7 +344,8 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 3. The CA operates an append-only *issuance log* ({{issuance-logs}}). Unlike a CT log, this issuance log only contains entries added by the CA:
 
-   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}) to its log, describing the information it is certifying.
+   {: type="a"}
+   1. The CA adds a TBSCertificateLogEntry ({{log-entries}}, abbreviated "tbscert entries" in the diagram) to its log, describing the information it is certifying.
 
    2. The CA signs a *checkpoint*, which describes the current state of the log. A signed checkpoint certifies that the CA issued *every* entry in the Merkle Tree ({{certification-authority-cosigners}}).
 
@@ -463,7 +464,7 @@ If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end
 ~~~
 {: #fig-subtree-example title="Two example subtrees, one full and one partial"}
 
-Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained because `n` (13) is `end` (13).
+Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained (marked with double lines) because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained (marked with wavy lines) because `n` (13) is `end` (13).
 
 ~~~aasvg
                 +-----------------------------+
@@ -870,7 +871,7 @@ An issuance log describes an append-only sequence of *entries* ({{log-entries}})
 
 Unlike {{?RFC6962}} and {{?RFC9162}}, an issuance log does not have a public submission interface. The log only contains entries which the log operator, i.e. the CA, chose to add. As entries are added, the Merkle Tree is updated to be computed over the new sequence.
 
-A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements comitted to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
+A snapshot of the log is known as a *checkpoint*. A checkpoint is identified by its *tree size*, that is the number of elements committed to the log at the time. Its contents can be described by the Merkle Tree Hash ({{Section 2.1.1 of !RFC9162}}) of entries zero through `tree_size - 1`.
 
 Cosigners ({{cosigners}}) sign assertions about the state of the issuance log. A Merkle Tree CA operates a combination of an issuance log and one or more CA cosigners ({{certification-authority-cosigners}}) that authenticate the log state and certifies the contents. External cosigners may also be deployed to assert correct log operation or provide other services to relying parties ({{trusted-cosigners}}).
 
@@ -1539,7 +1540,7 @@ The separation between issuance logs and CA cosigners gives CAs additional flexi
 
 # Privacy Considerations
 
-The Privacy Considerations described in {{Section 9 of !I-D.ietf-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
+The Privacy Considerations described in {{Section 8 of !I-D.ietf-tls-trust-anchor-ids}} apply to its use with Merkle Tree Certificates.
 
 In particular, relying parties that share an update process for trusted subtrees ({{trusted-subtrees}}) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack {{?RFC6973}}. If the Merkle Tree CA trust anchors are sent unconditionally in `trust_anchors`, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.
 
