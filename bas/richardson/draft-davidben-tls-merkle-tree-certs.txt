@@ -5,13 +5,13 @@
 PLANTS Working Group                                         D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 12 August 2026                                                 
+Expires: 13 August 2026                                                 
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                         8 February 2026
+                                                         9 February 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 August 2026.
+   This Internet-Draft will expire on 13 August 2026.
 
 Copyright Notice
 
@@ -411,18 +411,18 @@ Table of Contents
        the CA:
 
        a.  The CA adds a TBSCertificateLogEntry (Section 5.3,
-       abbreviated "tbscert entries" in the diagram) to its log,
-       describing the information it is certifying.
+           abbreviated "tbscert entries" in the diagram) to its log,
+           describing the information it is certifying.
 
        b.  The CA signs a _checkpoint_, which describes the current
-       state of the log.  A signed checkpoint certifies that the CA
-       issued _every_ entry in the Merkle Tree (Section 5.5).
+           state of the log.  A signed checkpoint certifies that the CA
+           issued _every_ entry in the Merkle Tree (Section 5.5).
 
        c.  The CA additionally signs _subtrees_ (Section 4) that
-       together contain certificates added since the last checkpoint
-       (Section 4.5).  This is an optimization to reduce inclusion proof
-       sizes.  A signed subtree certifies that the CA has issued _every_
-       entry in the subtree.
+           together contain certificates added since the last checkpoint
+           (Section 4.5).  This is an optimization to reduce inclusion
+           proof sizes.  A signed subtree certifies that the CA has
+           issued _every_ entry in the subtree.
 
    4.  The CA submits the new log state to _cosigners_. Cosigners
        validate the log is append-only and optionally provide additional
@@ -586,9 +586,9 @@ Table of Contents
           Figure 3: Two example subtrees, one full and one partial
 
    Both subtrees are directly contained in a Merkle Tree of size 13,
-   depicted in Figure 4. [4, 8) is contained (marked with =) because,
-   although n (13) is not end (8), the subtree is full. [8, 13) is
-   contained (marked with ~) because n (13) is end (13).
+   depicted in Figure 4. [4, 8) is contained (marked with double lines)
+   because, although n (13) is not end (8), the subtree is full. [8, 13)
+   is contained (marked with wavy lines) because n (13) is end (13).
 
                    +-----------------------------+
                    |            [0, 13)          |
