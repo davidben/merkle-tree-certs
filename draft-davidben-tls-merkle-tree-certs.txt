@@ -1120,7 +1120,7 @@ Table of Contents
    Each issuance log is identified by a _log ID_, which is a trust
    anchor ID [I-D.ietf-tls-trust-anchor-ids].
 
-   An issuance log's log ID determines an X.509 distinguished name
+   An issuance log's log ID determines a PKIX distinguished name
    (Section 4.1.2.4 of [RFC5280]).  The distinguished name has a single
    relative distinguished name, which has a single attribute.  The
    attribute has type id-rdna-trustAnchorID, defined below:
@@ -1199,7 +1199,7 @@ Table of Contents
    of subject's public key as a SubjectPublicKeyInfo (Section 4.1.2.7 of
    [RFC5280]).  The hash uses the log's hash function (Section 5.1) and
    is computed over the SubjectPublicKeyInfo's DER [X.690] encoding.
-   The issuer field MUST be the issuance log's log ID as an X.509
+   The issuer field MUST be the issuance log's log ID as a PKIX
    distinguished name, as described in Section 5.2.
 
    When type is null_entry, the entry does not represent any
@@ -1565,7 +1565,7 @@ Table of Contents
    issuerUniqueID, subjectUniqueID, or extensions is absent in the
    TBSCertificateLogEntry, the corresponding field MUST be absent in the
    TBSCertificate.  Per Section 5.3, this means issuer MUST be the
-   issuance log's log ID as an X.509 distinguished name, as described in
+   issuance log's log ID as a PKIX distinguished name, as described in
    Section 5.2.
 
    The TBSCertificate's serialNumber MUST contain the zero-based index
@@ -3557,10 +3557,11 @@ Acknowledgements
 
    The authors additionally thank Bob Beck, Ryan Dickson, Aaron Gable,
    Nick Harper, Russ Housley, Dennis Jackson, Matt Mueller, Chris
-   Patton, Ryan Sleevi, and Emily Stark for many valuable discussions
-   and insights which led to this document, as well as feedback on the
-   document itself.  We wish to thank Mia Celeste in particular, whose
-   implementation of an earlier draft revealed several pitfalls.
+   Patton, Michael Richardson, Ryan Sleevi, and Emily Stark for many
+   valuable discussions and insights which led to this document, as well
+   as feedback on the document itself.  We wish to thank Mia Celeste in
+   particular, whose implementation of an earlier draft revealed several
+   pitfalls.
 
    The idea to mint tree heads infrequently was originally described by
    Richard Barnes in [STH-Discipline].  The size optimization in Merkle
