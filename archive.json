@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-02-08T03:27:02.031904+00:00",
+  "timestamp": "2026-02-10T03:19:55.567357+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2760,6 +2760,156 @@
           "updatedAt": "2025-12-03T16:38:07Z"
         }
       ]
+    },
+    {
+      "number": 176,
+      "id": "I_kwDOJIBkVc7pN8kI",
+      "title": "S/MIME considerations",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/176",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[Requested by Michael Richardson](https://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/)",
+      "createdAt": "2026-02-08T13:40:50Z",
+      "updatedAt": "2026-02-08T13:40:50Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 177,
+      "id": "I_kwDOJIBkVc7pOrHk",
+      "title": "Distinguishing no-issuance and stuck CAs",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/177",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "At the moment a CA that doesn't have anything to issue, and a CA that can't issue for some technical reason, look the same the outside. We could allow CAs to issue a `null_entry`, just to show it's capable to. Is that worthwhile?",
+      "createdAt": "2026-02-08T15:23:02Z",
+      "updatedAt": "2026-02-08T17:01:01Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Aren't they also indistinguishable today?  If some CA happens to get not requests for a week and logs nothing to CT, we can't tell if they're offline or lost their key or just aren't issuing.\n\nMTC does add new stuck CA failure modes, but I think they're actually pretty observable by seeing that witnesses and mirrors have locked to different views or whatever else.\n\nBut it also costs us absolutely nothing to allow null entries at any point in the log, so allowing it SGTM. I think we'd literally just delete a sentence.",
+          "createdAt": "2026-02-08T16:12:43Z",
+          "updatedAt": "2026-02-08T16:12:56Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, not saying that we should require CAs to periodically issue `null_entry`s, but it'd certainly be nice to have the option to set an alert on it for when you know a CA would.",
+          "createdAt": "2026-02-08T17:01:01Z",
+          "updatedAt": "2026-02-08T17:01:01Z"
+        }
+      ]
+    },
+    {
+      "number": 178,
+      "id": "I_kwDOJIBkVc7pOsbk",
+      "title": "How to handle inconsistent landmarks and/or recover from them",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/178",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-02-08T15:27:03Z",
+      "updatedAt": "2026-02-08T16:14:23Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "By inconsistent landmarks, do you mean that the positions are in different spots? I think you'd recover by just making them consistent and pushing out new trusted subtrees and/or certs. There isn't any enforced append-only property or anything.",
+          "createdAt": "2026-02-08T16:14:23Z",
+          "updatedAt": "2026-02-08T16:14:23Z"
+        }
+      ]
+    },
+    {
+      "number": 179,
+      "id": "I_kwDOJIBkVc7pOt5P",
+      "title": "Note PII concern about logging certs",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/179",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[Requested by Michael Richardson](https://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/)",
+      "createdAt": "2026-02-08T15:31:12Z",
+      "updatedAt": "2026-02-08T17:02:09Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Maybe we can just cite this?\nhttps://www.rfc-editor.org/rfc/rfc9162.html#name-leakage-of-dns-information",
+          "createdAt": "2026-02-08T16:15:47Z",
+          "updatedAt": "2026-02-08T16:15:47Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's yet another concern to cite as well I suppose.",
+          "createdAt": "2026-02-08T17:02:02Z",
+          "updatedAt": "2026-02-08T17:02:09Z"
+        }
+      ]
+    },
+    {
+      "number": 180,
+      "id": "I_kwDOJIBkVc7pOxiU",
+      "title": "Talk more about split world view between cosigners",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/180",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[Requested by Michael Richardson](https://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/)",
+      "createdAt": "2026-02-08T15:40:48Z",
+      "updatedAt": "2026-02-08T15:40:48Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 182,
+      "id": "I_kwDOJIBkVc7pZv2J",
+      "title": "Spell out how to process `landmarks` before passing to RP",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/182",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-02-09T11:13:18Z",
+      "updatedAt": "2026-02-09T11:13:18Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 183,
+      "id": "I_kwDOJIBkVc7paSE2",
+      "title": "Make subtree section easier to skip by adding some text to guide the reader and starting with properties first",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/183",
+      "state": "OPEN",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Cf. https://mailarchive.ietf.org/arch/msg/plants/MdvhfJSqd7iDFsglnroAMMXfzok/",
+      "createdAt": "2026-02-09T11:47:48Z",
+      "updatedAt": "2026-02-09T11:47:48Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -10855,6 +11005,137 @@
           "body": "",
           "createdAt": "2026-02-05T22:25:30Z",
           "updatedAt": "2026-02-05T22:25:30Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 181,
+      "id": "PR_kwDOJIBkVc7CTwG7",
+      "title": "Initial changes based on Michael Richardson's review",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/181",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-02-08T15:42:08Z",
+      "updatedAt": "2026-02-09T20:26:48Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "342f1acce6cda55815a488311c10869882f66176",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/richardson",
+      "headRefOid": "ea3e327e65fbe8152b7fe47877725f9ae969e747",
+      "closedAt": "2026-02-09T17:38:12Z",
+      "mergedAt": "2026-02-09T17:38:12Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b0085387a9c00d7405f3e1cc51d2debc7dd8f796"
+      },
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@davidben Fixed all issues you brought up.",
+          "createdAt": "2026-02-09T13:34:43Z",
+          "updatedAt": "2026-02-09T13:34:54Z"
+        },
+        {
+          "author": "nadimkobeissi",
+          "authorAssociation": "NONE",
+          "body": "This popped up on my feed and I read it as [Michael Richards](https://www.tvinsider.com/wp-content/uploads/2015/07/Seinfeld-Kramer-scaled.jpg), which conjured up interesting ideas on code review.\r\n\r\nSorry if this is spam -- thought I'd share the laugh.",
+          "createdAt": "2026-02-09T20:26:48Z",
+          "updatedAt": "2026-02-09T20:26:48Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7gxcXW",
+          "commit": {
+            "abbreviatedOid": "b290f75"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-09T04:09:06Z",
+          "updatedAt": "2026-02-09T04:14:39Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Markdown nitpick: This ends up making paragraphs that happen to start with \"a.\", \"b.\", etc. We want an ordered list that is styled with letters instead of numbers. I believe the syntax is to keep it with `1.` etc and instead stick `{: type=\"a\"}` right before the list, like this:\n\n```\n   {: type=\"a\"}\n   1. blah blah blah.\n   2. blah blah blah.\n   3. blah blah blah.\n```\n\n(`{: whatever}` is some kramdown-rfc syntax for setting random XML attributes and then the [rfcxml ol element](https://authors.ietf.org/en/rfcxml-vocabulary) has a type attribute.)",
+              "createdAt": "2026-02-09T04:09:06Z",
+              "updatedAt": "2026-02-09T04:14:39Z"
+            },
+            {
+              "originalPosition": 38,
+              "body": "Hmm. The ASCII art[*] gets turned into wavy lines in the HTML format. WDYT about \"(marked with double lines)\" and \"(marked with wavy lines)\"?\n\n[*] Ideally we'd use Unicode box-drawing characters, but https://github.com/martinthomson/aasvg/issues/9",
+              "createdAt": "2026-02-09T04:12:10Z",
+              "updatedAt": "2026-02-09T04:14:39Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "I think this was correct as-is?\nhttps://www.ietf.org/archive/id/draft-ietf-tls-trust-anchor-ids-02.html#section-4.1\n\n(The one below seems to indeed be section 8 though.)",
+              "createdAt": "2026-02-09T04:13:26Z",
+              "updatedAt": "2026-02-09T04:14:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7g-iN8",
+          "commit": {
+            "abbreviatedOid": "ea3e327"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-09T17:38:06Z",
+          "updatedAt": "2026-02-09T17:38:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 184,
+      "id": "PR_kwDOJIBkVc7CkqjO",
+      "title": "X.509 distinguished name -> PKIX distinguished name",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/184",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As suggested by Michael Richardson in\r\nhttps://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/",
+      "createdAt": "2026-02-09T20:56:36Z",
+      "updatedAt": "2026-02-09T22:07:19Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "b0085387a9c00d7405f3e1cc51d2debc7dd8f796",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "pkix-dn",
+      "headRefOid": "b5f26429f821683a5a7d9e7ecd910e1fda2ff30e",
+      "closedAt": "2026-02-09T22:07:16Z",
+      "mergedAt": "2026-02-09T22:07:16Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b70d927b65cf51f905159447e40a7cdac1aa0f44"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7hCv-i",
+          "commit": {
+            "abbreviatedOid": "b5f2642"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-09T21:54:55Z",
+          "updatedAt": "2026-02-09T21:54:55Z",
           "comments": []
         }
       ]
