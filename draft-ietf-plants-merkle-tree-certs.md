@@ -1,6 +1,6 @@
 ---
 title: Merkle Tree Certificates
-docname: draft-davidben-tls-merkle-tree-certs-latest
+docname: draft-ietf-plants-merkle-tree-certs-latest
 submissiontype: IETF
 category: std
 number:
@@ -8,14 +8,14 @@ date:
 consensus: true
 v: 3
 area: "Security"
-workgroup: "PLANTS Working Group"
+workgroup: "PKI, Logs, And Tree Signatures"
 venue:
-  group: PLANTS
-  type: Working Group
-  mail: plants@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/plants/
+  group: "PKI, Logs, And Tree Signatures"
+  type: "Working Group"
+  mail: "plants@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/plants"
   github: "davidben/merkle-tree-certs"
-  latest: "https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html"
+  latest: "https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
 
 author:
  -
@@ -191,8 +191,6 @@ This document describes Merkle Tree certificates, a new form of X.509 certificat
 --- middle
 
 # Introduction
-
-Authors' Note: This is an early draft of a proposal with many parts. We expect most details will change as the proposal evolves. This document has a concrete specification of these details, but this is only intended as a starting point, and to help convey the overall idea. The name of the draft says "tls" to keep continuity with earlier iterations of this work, but the protocol itself is not TLS-specific.
 
 In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) {{?RFC6962}} for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate {{APPLE-CT}} {{CHROME-CT}}, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.
 
@@ -2133,3 +2131,8 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Fixes to ASN.1 module
 
 - Make log entry more friendly to single-pass verification
+
+## Since draft-davidben-tls-merkle-tree-certs-10
+{:numbered="false"}
+
+- Adopted by working group
