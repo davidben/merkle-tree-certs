@@ -8,12 +8,12 @@ date:
 consensus: true
 v: 3
 area: "Security"
-workgroup: "PLANTS Working Group"
+workgroup: "PKI, Logs, And Tree Signatures"
 venue:
-  group: PLANTS
-  type: Working Group
-  mail: plants@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/plants/
+  group: "PKI, Logs, And Tree Signatures"
+  type: "Working Group"
+  mail: "plants@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/plants"
   github: "davidben/merkle-tree-certs"
   latest: "https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
 
