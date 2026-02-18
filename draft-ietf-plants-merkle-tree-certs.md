@@ -2137,7 +2137,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Adopted by working group
 
-## Since draft-ietf-plants-merkle-tree-certs-10
+## Since draft-ietf-plants-merkle-tree-certs-00
 {:numbered="false"}
 
 - Address editorial comments from WG adoption call
