@@ -2,20 +2,20 @@
 
 
 
-PLANTS Working Group                                         D. Benjamin
+PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 20 August 2026                                                 
+Expires: 22 August 2026                                                 
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        16 February 2026
+                                                        18 February 2026
 
 
                         Merkle Tree Certificates
-              draft-davidben-tls-merkle-tree-certs-latest
+               draft-ietf-plants-merkle-tree-certs-latest
 
 Abstract
 
@@ -35,15 +35,15 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-
+   https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-
    merkle-tree-certs.html.  Status information for this document may be
-   found at https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-
+   found at https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-
    tree-certs/.
 
-   Discussion of this document takes place on the PLANTS Working Group
-   mailing list (mailto:plants@ietf.org), which is archived at
-   https://mailarchive.ietf.org/arch/browse/plants/.  Subscribe at
-   https://www.ietf.org/mailman/listinfo/plants/.
+   Discussion of this document takes place on the PKI, Logs, And Tree
+   Signatures Working Group mailing list (mailto:plants@ietf.org), which
+   is archived at https://mailarchive.ietf.org/arch/browse/plants.
+   Subscribe at https://www.ietf.org/mailman/listinfo/plants/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/davidben/merkle-tree-certs.
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 August 2026.
+   This Internet-Draft will expire on 22 August 2026.
 
 Copyright Notice
 
@@ -170,17 +170,10 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-07
      Since draft-davidben-tls-merkle-tree-certs-08
      Since draft-davidben-tls-merkle-tree-certs-09
+     Since draft-davidben-tls-merkle-tree-certs-10
    Authors' Addresses
 
 1.  Introduction
-
-   Authors' Note: This is an early draft of a proposal with many parts.
-   We expect most details will change as the proposal evolves.  This
-   document has a concrete specification of these details, but this is
-   only intended as a starting point, and to help convey the overall
-   idea.  The name of the draft says "tls" to keep continuity with
-   earlier iterations of this work, but the protocol itself is not TLS-
-   specific.
 
    In Public Key Infrastructures (PKIs) that use Certificate
    Transparency (CT) [RFC6962] for a public logging requirement, an
@@ -3710,6 +3703,10 @@ Since draft-davidben-tls-merkle-tree-certs-09
    *  Fixes to ASN.1 module
 
    *  Make log entry more friendly to single-pass verification
+
+Since draft-davidben-tls-merkle-tree-certs-10
+
+   *  Adopted by working group
 
 Authors' Addresses
 

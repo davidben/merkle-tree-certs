@@ -14,7 +14,7 @@
        This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional signatureless optimization, which decreases the message size by avoiding signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
-<meta content="draft-davidben-tls-merkle-tree-certs-latest" name="ietf.draft">
+<meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.31.0
     Python 3.12.12
@@ -29,7 +29,7 @@
     requests 2.32.5
     wcwidth 0.3.0
 -->
-<link href="draft-davidben-tls-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-ietf-plants-merkle-tree-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">@font-face {
   font-family: 'Lora';
@@ -1052,7 +1052,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 20 August 2026</td>
+<td class="center">Expires 22 August 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1060,17 +1060,17 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">PLANTS Working Group</dd>
+<dd class="workgroup">PKI, Logs, And Tree Signatures</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-davidben-tls-merkle-tree-certs-latest</dd>
+<dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-16" class="published">16 February 2026</time>
+<time datetime="2026-02-18" class="published">18 February 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-20">20 August 2026</time></dd>
+<dd class="expires"><time datetime="2026-08-22">22 August 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,12 +1106,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html">https://davidben.github.io/merkle-tree-certs/draft-davidben-tls-merkle-tree-certs.html</a></span>.
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs/">https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        The latest revision of this draft can be found at <span><a href="https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html">https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-tree-certs/">https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-tree-certs/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        PLANTS Working Group mailing list (<span><a href="mailto:plants@ietf.org">mailto:plants@ietf.org</a></span>),
-        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/plants/">https://mailarchive.ietf.org/arch/browse/plants/</a></span>.
+        PKI, Logs, And Tree Signatures Working Group mailing list (<span><a href="mailto:plants@ietf.org">mailto:plants@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/plants">https://mailarchive.ietf.org/arch/browse/plants</a></span>.
         Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/plants/">https://www.ietf.org/mailman/listinfo/plants/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
         <span><a href="https://github.com/davidben/merkle-tree-certs">https://github.com/davidben/merkle-tree-certs</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
@@ -1135,7 +1135,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1467,6 +1467,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.10">
                 <p id="section-toc.1-1.19.2.10.1"><a href="#appendix-E.10" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tre-2" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-09</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.11">
+                <p id="section-toc.1-1.19.2.11.1"><a href="#appendix-E.11" class="auto internal xref"></a><a href="#name-since-draft-davidben-tls-merkle-tre-3" class="internal xref">Since draft-davidben-tls-merkle-tree-certs-10</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
@@ -1481,25 +1484,24 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Authors' Note: This is an early draft of a proposal with many parts. We expect most details will change as the proposal evolves. This document has a concrete specification of these details, but this is only intended as a starting point, and to help convey the overall idea. The name of the draft says "tls" to keep continuity with earlier iterations of this work, but the protocol itself is not TLS-specific.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate <span>[<a href="#APPLE-CT" class="cite xref">APPLE-CT</a>]</span> <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">Additionally, as PKIs transition to shorter-lived certificates <span>[<a href="#CABF-153" class="cite xref">CABF-153</a>]</span> <span>[<a href="#CABF-SC081" class="cite xref">CABF-SC081</a>]</span>, the number of entries in the log will grow.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">This achieves the following:<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-1">In Public Key Infrastructures (PKIs) that use Certificate Transparency (CT) <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> for a public logging requirement, an authenticating party must present Signed Certificate Timestamps (SCTs) alongside certificates. CT policies often require two or more SCTs per certificate <span>[<a href="#APPLE-CT" class="cite xref">APPLE-CT</a>]</span> <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, each of which carries a signature. These signatures are in addition to those in the certificate chain itself.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Current signature schemes can use as few as 32 bytes per key and 64 bytes per signature <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, but post-quantum replacements are much larger. For example, ML-DSA-44 <span>[<a href="#FIPS204" class="cite xref">FIPS204</a>]</span> uses 1,312 bytes per public key and 2,420 bytes per signature. ML-DSA-65 uses 1,952 bytes per public key and 3,309 bytes per signature. Even with a directly-trusted intermediate (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-7.5" class="relref">Section 7.5</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>), two SCTs and a leaf certificate signature adds 7,260 bytes of authentication overhead with ML-DSA-44 and 9,927 bytes with ML-DSA-65.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This increased overhead additionally impacts CT logs themselves. Most of a log's costs scale with the total storage size of the log. Each log entry contains both a public key, and a signature from the CA. With larger public keys and signatures, the size of each log entry will grow.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Additionally, as PKIs transition to shorter-lived certificates <span>[<a href="#CABF-153" class="cite xref">CABF-153</a>]</span> <span>[<a href="#CABF-SC081" class="cite xref">CABF-SC081</a>]</span>, the number of entries in the log will grow.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document introduces Merkle Tree certificates, a new form of X.509 certificate that integrates logging with certificate issuance. Each CA maintains a log of everything it issues, signing views of the log to assert it has issued the contents. The CA signature is combined with cosignatures from other parties who verify correct operation and optionally mirror the log. These signatures, together with an inclusion proof for an individual entry, constitute a certificate.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">This achieves the following:<a href="#section-1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-8.1">
-          <p id="section-1-8.1.1">Log entries do not scale with public key and signature sizes. Entries replace public keys with hashes and do not contain signatures, while preserving non-repudiability (<a href="#non-repudiation" class="auto internal xref">Section 12.4</a>).<a href="#section-1-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-1-7.1">
+          <p id="section-1-7.1.1">Log entries do not scale with public key and signature sizes. Entries replace public keys with hashes and do not contain signatures, while preserving non-repudiability (<a href="#non-repudiation" class="auto internal xref">Section 12.4</a>).<a href="#section-1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-8.2">
-          <p id="section-1-8.2.1">To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.<a href="#section-1-8.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-7.2">
+          <p id="section-1-7.2.1">To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-8.3">
-          <p id="section-1-8.3.1">After a processing delay, authenticating parties can obtain a second "signatureless" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-8.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-7.3">
+          <p id="section-1-7.3.1">After a processing delay, authenticating parties can obtain a second "signatureless" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-9"><a href="#overview" class="auto internal xref">Section 3</a> gives an overview of the system. <a href="#subtrees" class="auto internal xref">Section 4</a> describes a Merkle Tree primitive used by this system. <a href="#issuance-logs" class="auto internal xref">Section 5</a> describes the log structure. Finally, <a href="#certificates" class="auto internal xref">Section 6</a> and <a href="#relying-parties" class="auto internal xref">Section 7</a> describe how to construct and consume a Merkle Tree certificate.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-8"><a href="#overview" class="auto internal xref">Section 3</a> gives an overview of the system. <a href="#subtrees" class="auto internal xref">Section 4</a> describes a Merkle Tree primitive used by this system. <a href="#issuance-logs" class="auto internal xref">Section 5</a> describes the log structure. Finally, <a href="#certificates" class="auto internal xref">Section 6</a> and <a href="#relying-parties" class="auto internal xref">Section 7</a> describe how to construct and consume a Merkle Tree certificate.<a href="#section-1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -6430,6 +6432,18 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 </li>
           <li class="normal" id="appendix-E.10-1.4">
             <p id="appendix-E.10-1.4.1">Make log entry more friendly to single-pass verification<a href="#appendix-E.10-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="since-draft-davidben-tls-merkle-tree-certs-10">
+<section id="appendix-E.11">
+        <h3 id="name-since-draft-davidben-tls-merkle-tre-3">
+<a href="#name-since-draft-davidben-tls-merkle-tre-3" class="section-name selfRef">Since draft-davidben-tls-merkle-tree-certs-10</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.11-1.1">
+            <p id="appendix-E.11-1.1.1">Adopted by working group<a href="#appendix-E.11-1.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
