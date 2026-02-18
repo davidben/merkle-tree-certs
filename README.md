@@ -1,11 +1,13 @@
+<!-- regenerate: on (set to off if you edit this file) -->
+
 # Merkle Tree Certificates
 
-This is the working area for the individual Internet-Draft, "Merkle Tree Certificates".
+This is the working area for the IETF [PLANTS Working Group](https://datatracker.ietf.org/group/plants/documents/) Internet-Draft, "Merkle Tree Certificates".
 
-* [Editor's Copy](https://davidben.github.io/merkle-tree-certs/#go.draft-davidben-tls-merkle-tree-certs.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-davidben-tls-merkle-tree-certs)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-davidben-tls-merkle-tree-certs)
-* [Compare Editor's Copy to Individual Draft](https://davidben.github.io/merkle-tree-certs/#go.draft-davidben-tls-merkle-tree-certs.diff)
+* [Editor's Copy](https://davidben.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-tree-certs)
+* [Working Group Draft](https://datatracker.ietf.org/doc/html/draft-ietf-plants-merkle-tree-certs)
+* [Compare Editor's Copy to Working Group Draft](https://davidben.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.diff)
 
 
 ## Contributing
@@ -13,9 +15,8 @@ This is the working area for the individual Internet-Draft, "Merkle Tree Certifi
 See the
 [guidelines for contributions](https://github.com/davidben/merkle-tree-certs/blob/main/CONTRIBUTING.md).
 
-Contributions can be made by creating pull requests.
-The GitHub interface supports creating pull requests using the Edit (✏) button.
-
+The contributing file also has tips on how to make contributions, if you
+don't already know how to do that.
 
 ## Command Line Usage
 
