@@ -171,6 +171,7 @@ Table of Contents
      Since draft-davidben-tls-merkle-tree-certs-08
      Since draft-davidben-tls-merkle-tree-certs-09
      Since draft-davidben-tls-merkle-tree-certs-10
+     Since draft-ietf-plants-merkle-tree-certs-10
    Authors' Addresses
 
 1.  Introduction
@@ -3707,6 +3708,10 @@ Since draft-davidben-tls-merkle-tree-certs-09
 Since draft-davidben-tls-merkle-tree-certs-10
 
    *  Adopted by working group
+
+Since draft-ietf-plants-merkle-tree-certs-10
+
+   *  Address editorial comments from WG adoption call
 
 Authors' Addresses
 
