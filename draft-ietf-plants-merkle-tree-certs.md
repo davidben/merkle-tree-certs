@@ -892,7 +892,7 @@ An issuance log's log ID determines a PKIX distinguished name ({{Section 4.1.2.4
 ~~~asn.1
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD}
+    mechanisms(5) pkix(7) rdna(25) TBD }
 ~~~
 
 The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named `32473.1` would be represented in syntax of {{?RFC4514}} as:
@@ -934,25 +934,37 @@ struct {
 } MerkleTreeCertEntry;
 ~~~
 
+When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. Other entries MUST NOT use `null_entry`. `null_entry` exists to avoid zero serial numbers in the certificate format ({{certificate-format}}).
+
 When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
 
 `tbs_cert_entry_data` contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER {{X.690}} encoding of a TBSCertificateLogEntry, defined below. Equivalently, `tbs_cert_entry_data` contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in {{verifying-certificate-signatures}}.
 
 ~~~asn.1
-TBSCertificateLogEntry  ::=  SEQUENCE  {
-      version             [0]  EXPLICIT Version DEFAULT v1,
-      issuer                   Name,
-      validity                 Validity,
-      subject                  Name,
-      subjectPublicKeyInfoHash OCTET STRING,
-      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
+TBSCertificateLogEntry ::= SEQUENCE {
+    version                   [0] EXPLICIT Version DEFAULT v1,
+    issuer                        Name,
+    validity                      Validity,
+    subject                       Name,
+    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                      {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash      OCTET STRING,
+    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
+                                               OPTIONAL
+}
 ~~~
 
-The `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields have the corresponding semantics as in {{Section 4.1.2 of !RFC5280}}, with the exception of `subjectPublicKeyInfoHash`. `subjectPublicKeyInfoHash` contains the hash of subject's public key as a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}). The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding. The `issuer` field MUST be the issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
+The fields of a TBSCertificateLogEntry are defined as follows:
 
-When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. Other entries MUST NOT use `null_entry`. `null_entry` exists to avoid zero serial numbers in the certificate format ({{certificate-format}}).
+* `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
+
+* `subjectPublicKeyInfoAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
+
+* `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding. The `issuer` field MUST be the issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
+
+Note the subject's public key algorithm is incorporated into both `subjectPublicKeyInfoAlgorithm` and `subjectPublicKeyInfoHash`.
 
 MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
 
@@ -1136,14 +1148,14 @@ The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID
 
 The TBSCertificate's `serialNumber` MUST contain the zero-based index of the TBSCertificateLogEntry in the log. {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number, but {{log-entries}} defines a `null_entry` type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.
 
-The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
+The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
 The TBSCertificate's `signature` and the Certificate's `signatureAlgorithm` MUST contain an AlgorithmIdentifier whose `algorithm` is id-alg-mtcProof, defined below, and whose `parameters` is omitted.
 
 ~~~asn.1
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD}
+    mechanisms(5) pkix(7) algorithms(6) TBD }
 ~~~
 
 For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of `id-alg-mtcProof`.
@@ -1290,6 +1302,7 @@ When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
+   1. Set `subjectPublicKeyInfoAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
 1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
@@ -1307,9 +1320,10 @@ In this procedure, `entry_hash` can equivalently be computed in a single pass fr
 1. Initialize a hash instance.
 1. Write the big-endian, two-byte `tbs_cert_entry` value to the hash.
 1. Write the TBSCertificate contents octets to the hash, up to the `subjectPublicKeyInfo` field.
+1. Write the `subjectPublicKeyInfo`'s `algorithm` field to the hash.
 1. Write the octet 0x04 to the hash. This is an OCTET STRING identifer.
 1. Write the octet L to the hash, where L is the hash length. (This assumes L is at most 127.)
-1. Write H to the hash, where H is the hash of the `subjectPublicKeyInfo` field.
+1. Write H to the hash, where H is the hash of the entire `subjectPublicKeyInfo` field.
 1. Write the remainder of the TBSCertificate contents octets to the hash, starting just after the `subjectPublicKeyInfo` field.
 1. Finalize the hash and set `entry_hash` to the result.
 
@@ -1670,8 +1684,8 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM
-  FROM AlgorithmInformation-2009  -- in [RFC5912]
+  SIGNATURE-ALGORITHM, AlgorithmIdentifier{},
+  FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
@@ -1685,7 +1699,7 @@ IMPORTS
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-pkix1-implicit-02(59) }
-  Version, Name, Validity, UniqueIdentifier
+  Version, Name, Validity, UniqueIdentifier, PublicKeyAlgorithms
   FROM PKIX1Explicit-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -1696,32 +1710,36 @@ IMPORTS
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-trustAnchorIDs-2025(TBD) } ;
 
-TBSCertificateLogEntry  ::=  SEQUENCE  {
-      version             [0]  EXPLICIT Version DEFAULT v1,
-      issuer                   Name,
-      validity                 Validity,
-      subject                  Name,
-      subjectPublicKeyInfoHash OCTET STRING,
-      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
+TBSCertificateLogEntry ::= SEQUENCE {
+    version                   [0] EXPLICIT Version DEFAULT v1,
+    issuer                        Name,
+    validity                      Validity,
+    subject                       Name,
+    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                      {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash      OCTET STRING,
+    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
+                                               OPTIONAL
+}
 
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD}
+    mechanisms(5) pkix(7) algorithms(6) TBD }
 
 sa-mtcProof SIGNATURE-ALGORITHM ::= {
-   IDENTIFIER id-alg-mtcProof
-   PARAMS ARE absent
+    IDENTIFIER id-alg-mtcProof
+    PARAMS ARE absent
 }
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD}
+    mechanisms(5) pkix(7) rdna(25) TBD }
 
 at-trustAnchorID ATTRIBUTE ::= {
-   TYPE TrustAnchorID
-   IDENTIFIED BY id-rdna-trustAnchorID
+    TYPE TrustAnchorID
+    IDENTIFIED BY id-rdna-trustAnchorID
 }
 
 END
@@ -2141,3 +2159,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Address editorial comments from WG adoption call
+
+- Included subject public key algorithm in log entries
