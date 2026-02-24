@@ -3758,17 +3758,17 @@ struct {
 <div class="lang-asn.1 sourcecode" id="section-5.3-6">
 <pre>
 TBSCertificateLogEntry ::= SEQUENCE {
-    version                   [0] EXPLICIT Version DEFAULT v1,
-    issuer                        Name,
-    validity                      Validity,
-    subject                       Name,
-    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
-                                      {PublicKeyAlgorithms}},
-    subjectPublicKeyInfoHash      OCTET STRING,
-    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
-    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
-    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
-                                               OPTIONAL
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
 }
 </pre><a href="#section-5.3-6" class="pilcrow">¶</a>
 </div>
@@ -3778,13 +3778,13 @@ TBSCertificateLogEntry ::= SEQUENCE {
             <p id="section-5.3-8.1.1"><code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> have the same semantics as the corresponding TBSCertificate fields, defined in <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.<a href="#section-5.3-8.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.3-8.2">
-            <p id="section-5.3-8.2.1"><code>subjectPublicKeyInfoAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.3-8.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.3-8.2.1"><code>subjectPublicKeyAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.3-8.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.3-8.3">
             <p id="section-5.3-8.3.1"><code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding. The <code>issuer</code> field MUST be the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-5.3-8.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.3-9">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyInfoAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.3-9" class="pilcrow">¶</a></p>
+<p id="section-5.3-9">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.3-9" class="pilcrow">¶</a></p>
 <p id="section-5.3-10">MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a> and <a href="#new-log-entry-types" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4518,7 +4518,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
                 <p id="section-7.2-2.4.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li id="section-7.2-2.4.2.2">
-                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyInfoAlgorithm</code> to the <code>algorithm</code> field of the <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyAlgorithm</code> to the <code>algorithm</code> field of the <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
 </li>
               <li id="section-7.2-2.4.2.3">
                 <p id="section-7.2-2.4.2.3.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.3.1" class="pilcrow">¶</a></p>
@@ -5296,19 +5296,18 @@ IMPORTS
       id-mod-trustAnchorIDs-2025(TBD) } ;
 
 TBSCertificateLogEntry ::= SEQUENCE {
-    version                   [0] EXPLICIT Version DEFAULT v1,
-    issuer                        Name,
-    validity                      Validity,
-    subject                       Name,
-    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
-                                      {PublicKeyAlgorithms}},
-    subjectPublicKeyInfoHash      OCTET STRING,
-    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
-    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
-    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
-                                               OPTIONAL
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
 }
-
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) TBD }
