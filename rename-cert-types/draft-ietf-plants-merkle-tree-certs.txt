@@ -2311,7 +2311,7 @@ Table of Contents
    then serves the standalone certificate, constructed as described in
    Section 6.2.
 
-   The standalone certificate response SHOULD additionally carry a
+   The standalone certificate response SHOULD additionally carry an
    alternate URL for the landmark certificate, as described
    Section 7.4.2 of [RFC8555].  Before the landmark certificate is
    available, the alternate URL SHOULD return a HTTP 503 (Service
