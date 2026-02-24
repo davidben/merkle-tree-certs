@@ -1454,7 +1454,7 @@ When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients s
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-The standalone certificate response SHOULD additionally carry a alternate URL for the landmark certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark certificate, as described in {{landmark-certificates}} and serves it from the alternate URL.
+The standalone certificate response SHOULD additionally carry an alternate URL for the landmark certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark certificate, as described in {{landmark-certificates}} and serves it from the alternate URL.
 
 ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
 
