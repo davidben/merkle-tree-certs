@@ -942,17 +942,17 @@ When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume th
 
 ~~~asn.1
 TBSCertificateLogEntry ::= SEQUENCE {
-    version                   [0] EXPLICIT Version DEFAULT v1,
-    issuer                        Name,
-    validity                      Validity,
-    subject                       Name,
-    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
-                                      {PublicKeyAlgorithms}},
-    subjectPublicKeyInfoHash      OCTET STRING,
-    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
-    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
-    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
-                                               OPTIONAL
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
 }
 ~~~
 
@@ -960,11 +960,11 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
 
-* `subjectPublicKeyInfoAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
+* `subjectPublicKeyAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
 
 * `subjectPublicKeyInfoHash` contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function ({{log-parameters}}) and is computed over the SubjectPublicKeyInfo's DER {{X.690}} encoding. The `issuer` field MUST be the issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
 
-Note the subject's public key algorithm is incorporated into both `subjectPublicKeyInfoAlgorithm` and `subjectPublicKeyInfoHash`.
+Note the subject's public key algorithm is incorporated into both `subjectPublicKeyAlgorithm` and `subjectPublicKeyInfoHash`.
 
 MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See {{certification-authority-cosigners}} and {{new-log-entry-types}} for additional discussion.
 
@@ -1302,7 +1302,7 @@ When verifying the signature on an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. Construct a TBSCertificateLogEntry as follows:
    1. Copy the `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` fields from the TBSCertificate.
-   1. Set `subjectPublicKeyInfoAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
+   1. Set `subjectPublicKeyAlgorithm` to the `algorithm` field of the `subjectPublicKeyInfo`.
    1. Set `subjectPublicKeyInfoHash` to the hash of the DER encoding of `subjectPublicKeyInfo`.
 
 1. Construct a MerkleTreeCertEntry of type `tbs_cert_entry` with contents the TBSCertificateLogEntry. Let `entry_hash` be the hash of the entry, `MTH({entry}) = HASH(0x00 || entry)`, as defined in {{Section 2.1.1 of !RFC9162}}.
@@ -1711,19 +1711,18 @@ IMPORTS
       id-mod-trustAnchorIDs-2025(TBD) } ;
 
 TBSCertificateLogEntry ::= SEQUENCE {
-    version                   [0] EXPLICIT Version DEFAULT v1,
-    issuer                        Name,
-    validity                      Validity,
-    subject                       Name,
-    subjectPublicKeyInfoAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
-                                      {PublicKeyAlgorithms}},
-    subjectPublicKeyInfoHash      OCTET STRING,
-    issuerUniqueID            [1] IMPLICIT UniqueIdentifier OPTIONAL,
-    subjectUniqueID           [2] IMPLICIT UniqueIdentifier OPTIONAL,
-    extensions                [3] EXPLICIT Extensions{{CertExtensions}}
-                                               OPTIONAL
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
 }
-
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
     mechanisms(5) pkix(7) algorithms(6) TBD }
