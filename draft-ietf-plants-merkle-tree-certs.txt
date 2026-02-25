@@ -2389,7 +2389,7 @@ Table of Contents
 10.1.3.  Monitor Costs
 
    In a CT-based PKI, every log carries a potentially distinct subset of
-   active certificates, so monitors must check the contents of every CT
+   active certificates.  Monitors must check the contents of every CT
    log.  At the same time, certificates are commonly synchronized
    between CT logs.  As a result, a monitor will typically download each
    certificate multiple times, once for every log.  In Merkle Tree
@@ -2407,8 +2407,8 @@ Table of Contents
    In selecting trusted cosigners and cosigner requirements
    (Section 7.3), relying parties navigate a number of trade-offs:
 
-   A consistency-checking cosigner, such as [TLOG-WITNESS], is very
-   cheap to run, but does not guarantee durable logging, while a
+   A consistency-checking cosigner, such as [TLOG-WITNESS], is
+   inexpensive to run, but does not guarantee durable logging.  A
    mirroring cosigner is more expensive and may take longer to cosign
    structures.  Requiring a mirror signature provides stronger
    guarantees to the relying party, which in turn can reduce the
@@ -2477,8 +2477,8 @@ Table of Contents
    the unusual expiry, an updated relying party would not accept it
    anyway.
 
-   The log pruning process simply makes some resources unavailable, so
-   availability policies SHOULD constrain log pruning in the same way as
+   The log pruning process simply makes some resources unavailable.
+   Availability policies SHOULD constrain log pruning in the same way as
    general resource availability.  That is, if it would be a policy
    violation for the log to fail to serve a resource, it should also be
    a policy violation for the log to prune such that the resource is
