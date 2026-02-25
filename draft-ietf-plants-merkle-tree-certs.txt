@@ -1241,9 +1241,9 @@ Table of Contents
 
 5.4.1.  Signature Format
 
-   A cosigner computes a cosignature for a subtree in some log by
-   signing a MTCSubtreeSignatureInput, defined below using the TLS
-   presentation language (Section 3 of [RFC8446]):
+   A cosigner computes a cosignature for a subtree in a log by signing a
+   MTCSubtreeSignatureInput, defined below using the TLS presentation
+   language (Section 3 of [RFC8446]):
 
    opaque HashValue[HASH_SIZE];
 
@@ -1389,13 +1389,13 @@ Table of Contents
    could migrate to that new protocol without impacting certificate
    verification._
 
-   _That said, this is purely a starting point for describing the
-   design.  We expect the scope of this document, and other related
-   documents to adapt as the work evolves across the IETF, C2SP,
-   Certificate Transparency, and other communities.]]_
+   _This is purely a starting point for describing the design.  We
+   expect the scope of this document, and other related documents to
+   adapt as the work evolves across the IETF, C2SP, Certificate
+   Transparency, and other communities.]]_
 
-   Issuance logs are intended to be publicly accessible in some form, to
-   allow monitors to detect misissued certificates.
+   Issuance logs are intended to be publicly accessible to allow
+   monitors to detect misissued certificates.
 
    The access method does not affect certificate interoperability, so
    this document does not prescribe a specific protocol.  An individual
@@ -1415,9 +1415,9 @@ Table of Contents
 5.6.1.  Log Pruning
 
    Over time, an issuance log's entries will expire and likely be
-   replaced with certificate renewals.  As this happens, the total size
-   of the log grows, even if the unexpired subset remains fixed.  To
-   mitigate this, issuance logs MAY be _pruned_, as described in this
+   replaced as certificates are renewed.  As this happens, the total
+   size of the log grows, even if the unexpired subset remains fixed.
+   To mitigate this, issuance logs MAY be _pruned_, as described in this
    section.
 
    Pruning makes some prefix of the log unavailable, without changing
@@ -1807,7 +1807,7 @@ Table of Contents
        and no signatures.
 
    Before sending this certificate, the authenticating party SHOULD
-   obtain some application-protocol-specific signal that implies the
+   obtain an application-protocol-specific signal that implies the
    relying party has been configured with the corresponding landmark.
    (Section 7.4 defines how relying parties are configured.)  The trust
    anchor ID of the landmark may be used as an efficient identifier in
@@ -1857,7 +1857,7 @@ Table of Contents
    than the three ML-DSA-44 signatures necessary to include post-quantum
    SCTs.
 
-   The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is
+   Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is
    sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.
 
 7.  Relying Parties
@@ -2019,8 +2019,8 @@ Table of Contents
 
    Cosigner roles are extensible without changes to certificate
    verification itself.  Future specifications and individual
-   deployments MAY define other cosigner roles to incorporate into
-   relying party policies.
+   deployments MAY define other cosigner roles to incorporate in relying
+   party policies.
 
    Section 10.2 discusses additional deployment considerations in
    cosigner selection.
@@ -2103,7 +2103,7 @@ Table of Contents
    (e.g. via [TLOG-MIRROR]) are particularly vulnerable to this.  In
    this case, the indices of the missing entries will still be known, so
    relying parties can use this mechanism to revoke the unknown entries,
-   possibly as an initial, targeted mitigation before a complete CA
+   possibly as an initial, targeted mitigation before complete CA
    removal.
 
    When a CA is found to be untrustworthy, relying parties SHOULD remove
@@ -2485,12 +2485,12 @@ Table of Contents
    removed, and vice versa.
 
    PKIs that require mirror cosignatures (Section 7.3) can impose
-   minimal to no availability requirements on CAs, all without
-   compromising transparency goals.  If a CA never makes some entry
-   available, mirrors will be unable to update.  This will prevent
-   relying parties from accepting the undisclosed entries.  However, a
-   CA that is persistently unavailable may not offer sufficient benefit
-   to be used by authenticating parties or trusted by relying parties.
+   minimal to no availability requirements on CAs without compromising
+   transparency goals.  If a CA never makes an entry available, mirrors
+   will be unable to update.  This will prevent relying parties from
+   accepting the undisclosed entries.  However, a CA that is
+   persistently unavailable may not offer sufficient benefit to be used
+   by authenticating parties or trusted by relying parties.
 
    However, if a mirror's interface becomes unavailable, monitors may be
    unable to check for unauthorized issuance, if the entries are not
@@ -2501,7 +2501,7 @@ Table of Contents
    or by keeping mirrors up-to-date with each other.
 
    In PKIs that do not require mirroring cosigners, the CA's serving
-   endpoint is more crucial for monitors.  Such PKIs thus SHOULD set
+   endpoint is more crucial for monitors.  Such PKIs SHOULD set
    availability requirements on CAs.
 
    In each of these cases, availability failures can be mitigated by
@@ -2517,11 +2517,11 @@ Table of Contents
 
    To maximize coverage of the signatureless certificate optimization,
    authenticating parties performing routine renewal SHOULD request a
-   new Merkle Tree certificate some time before the previous Merkle Tree
-   certificate expires.  Renewing around 75% into the previous
-   certificate's lifetime is RECOMMENDED.  Authenticating parties
-   additionally SHOULD retain both the new and old certificates in the
-   certificate set until the old certificate expires.  As the new
+   new Merkle Tree certificate before the previous Merkle Tree
+   certificate expires.  Renewing around 75% of the way through the
+   previous certificate's lifetime is RECOMMENDED.  Authenticating
+   parties additionally SHOULD retain both the new and old certificates
+   in the certificate set until the old certificate expires.  As the new
    subtrees are delivered to relying parties, certificate negotiation
    will transition relying parties to the new certificate, while
    retaining the old certificate for relying parties that are not yet
@@ -2587,13 +2587,13 @@ Table of Contents
       checked ahead of time, when the trusted subtrees are
       predistributed (Section 7.4).
 
-   Given such a subtree hash, computed over entries that the CA
-   certified, it then must be computationally infeasible to construct an
-   entry not on this list, and some inclusion proof, such that inclusion
-   proof verification succeeds.  This requires using a collision-
-   resistant hash in the Merkle Tree construction.
+   Given a subtree hash computed over entries that the CA certified, it
+   must be computationally infeasible to construct an entry not on this
+   list, and an inclusion proof, such that inclusion proof verification
+   succeeds.  This requires using a collision-resistant hash in the
+   Merkle Tree construction.
 
-   Log entries contain public key hashes, so it must additionally be
+   Log entries contain public key hashes.  It must additionally be
    computationally infeasible to compute a public key whose hash matches
    the entry, other than the intended public key.  This also requires a
    collision-resistant hash.
@@ -2619,9 +2619,9 @@ Table of Contents
    different views to different parties.  However, each individual
    cosigner will only follow a single append-only view of the log
    history.  Provided the cosigners are correctly operated, relying
-   parties and monitors will observe consistent views between each
-   other.  Views that were not cosigned at all may not be detected, but
-   they also will not be accepted by relying parties.
+   parties and monitors will observe consistent views.  Views that were
+   not cosigned at all may not be detected, but they also will not be
+   accepted by relying parties.
 
    If the CA sends one view to some cosigners and another view to other
    cosigners, it is possible that multiple views will be accepted by
