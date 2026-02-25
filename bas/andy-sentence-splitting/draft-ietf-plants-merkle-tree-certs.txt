@@ -2413,9 +2413,9 @@ Table of Contents
    structures.  Requiring a mirror signature provides stronger
    guarantees to the relying party, which in turn can reduce the
    requirements on CAs (see Section 10.3), however it may cause
-   certificate issuance to take longer.  Mirrors are comparable to CT
-   logs, if not cheaper (see Section 10.1), so they may be appropriate
-   in PKIs where running CT logs is already viable.
+   certificate issuance to take longer.  That said, mirrors are
+   comparable to CT logs, if not cheaper (see Section 10.1), so they may
+   be appropriate in PKIs where running CT logs is already viable.
 
    Relying parties that require larger quorums of trusted cosigners can
    reduce the trust placed in any individual cosigner.  However, these
