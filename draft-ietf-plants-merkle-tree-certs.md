@@ -968,7 +968,7 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 ### Signature Format
 
-A cosigner computes a cosignature for a subtree in some log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
+A cosigner computes a cosignature for a subtree in a log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
@@ -1038,9 +1038,9 @@ If the CA operator additionally operates a traditional X.509 CA, that CA key MUS
 
 *For now, we avoid a normative reference to {{TLOG-TILES}} and also capture the fact that the certificate construction is independent of the choice of protocol. Similar to how the CT ecosystem is migrating to a tiled interface, were someone to improve on {{TLOG-TILES}}, a PKI could migrate to that new protocol without impacting certificate verification.*
 
-*That said, this is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]*
+*This is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]*
 
-Issuance logs are intended to be publicly accessible in some form, to allow monitors to detect misissued certificates.
+Issuance logs are intended to be publicly accessible to allow monitors to detect misissued certificates.
 
 The access method does not affect certificate interoperability, so this document does not prescribe a specific protocol. An individual issuance log MAY be published in any form, provided other parties in the PKI are able to consume it. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also {{log-availability}}.
 
@@ -1048,7 +1048,7 @@ For example, a log ecosystem could use {{TLOG-TILES}} to serve logs. {{TLOG-TILE
 
 ### Log Pruning
 
-Over time, an issuance log's entries will expire and likely be replaced with certificate renewals. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
+Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be *pruned*, as described in this section.
 
 Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. {{log-availability}} discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.
 
@@ -1242,7 +1242,7 @@ Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a si
 2. Determine the landmark's subtrees and select the one that contains the entry.
 3. Construct a certificate ({{certificate-format}}) using the selected subtree and no signatures.
 
-Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. ({{trusted-subtrees}} defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
 
 ## Size Estimates
 
@@ -1260,7 +1260,7 @@ Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 s
 
 If a new landmark is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
-The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
+Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
 # Relying Parties
 
@@ -1337,7 +1337,7 @@ To mitigate this, relying parties SHOULD ensure transparency by requiring a quor
 
 Relying parties MAY accept the same set of additional cosigners across issuance logs.
 
-Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate into relying party policies.
+Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.
 
 {{choosing-cosigners}} discusses additional deployment considerations in cosigner selection.
 
@@ -1367,7 +1367,7 @@ For each supported Merkle Tree CA, the relying party maintains a list of revoked
 
 When a relying party is first configured to trust a CA, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned ({{log-pruning}}). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.
 
-A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies ({{trusted-cosigners}}) do not require durable logging (e.g. via {{TLOG-MIRROR}}) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before a complete CA removal.
+A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies ({{trusted-cosigners}}) do not require durable logging (e.g. via {{TLOG-MIRROR}}) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.
 
 When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the {{SCTNotAfter}} mechanism used in some PKIs.
 
@@ -1514,11 +1514,11 @@ If historical data is not available to verify the retention period, such as info
 
 The log pruning process simply makes some resources unavailable, so availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.
 
-PKIs that require mirror cosignatures ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs, all without compromising transparency goals. If a CA never makes some entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
+PKIs that require mirror cosignatures ({{trusted-cosigners}}) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.
 
 However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.
 
-In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs thus SHOULD set availability requirements on CAs.
+In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.
 
 In each of these cases, availability failures can be mitigated by revoking the unavailable entries by index, as described in {{revocation-by-index}}, likely as a first step in a broader distrust.
 
@@ -1526,7 +1526,7 @@ In each of these cases, availability failures can be mitigated by revoking the u
 
 When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.
 
-To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate some time before the previous Merkle Tree certificate expires. Renewing around 75% into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.
+To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate before the previous Merkle Tree certificate expires. Renewing around 75% of the way through the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.
 
 The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.
 
@@ -1552,9 +1552,9 @@ A key security requirement of any PKI scheme is that relying parties only accept
 
 * In signatureless certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
 
-Given such a subtree hash, computed over entries that the CA certified, it then must be computationally infeasible to construct an entry not on this list, and some inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.
+Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.
 
-Log entries contain public key hashes, so it must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.
+Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.
 
 ## Transparency
 
@@ -1562,7 +1562,7 @@ The transparency mechanisms in this document do not prevent a CA from issuing an
 
 Compared to Certificate Transparency, some of the responsibilities of a log have moved to the CA. All signatures generated by the CA in this system are assertions about some view of the CA's issuance log. However, a CA does not need to function correctly to ensure transparency properties. Relying parties are expected to require a quorum of additional cosigners, which together enforce properties of the log ({{trusted-cosigners}}) and prevent or detect CA misbehavior:
 
-A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views between each other. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.
+A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.
 
 If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the inconsistent indices ({{revocation-by-index}}), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.
 
