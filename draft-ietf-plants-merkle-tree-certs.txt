@@ -2342,8 +2342,8 @@ Table of Contents
    properties of such designs.
 
    Unlike a CT log, an issuance log does not have public submission
-   APIs.  Log entries are only added by the CA directly.  The costs are
-   thus expected to scale with the CA's own operations.
+   APIs.  Log entries are only added by the CA directly.  Costs are thus
+   expected to scale with the CA's own issuance.
 
    A CA only needs to produce a digital signature for every checkpoint,
    rather than for every certificate.  The lower signature rate
@@ -2384,7 +2384,7 @@ Table of Contents
    exceeds the mirror's capacity, that does not impact the mirror's
    copies of other CAs.  Mirrors also do not need to defend against a
    client uploading a large number of existing certificates all at once.
-   Submissions are also naturally batched and serialized.
+   Submissions are naturally batched and serialized.
 
 10.1.3.  Monitor Costs
 
@@ -2418,9 +2418,9 @@ Table of Contents
    be appropriate in PKIs where running CT logs is already viable.
 
    Relying parties that require larger quorums of trusted cosigners can
-   reduce the trust placed in any individual cosigner.  However, these
-   larger quorums result in larger, more expensive full certificates.
-   The cost of this will depend on how frequently the signatureless
+   reduce the trust placed in any individual cosigner.  However, larger
+   quorums result in larger, more expensive full certificates.  The cost
+   of full certificates will depend on how frequently the signatureless
    optimization occurs in a given PKI.  Conversely, relying parties that
    require smaller quorums have smaller full certificates, but place
    more trust in their cosigners.
@@ -2446,10 +2446,11 @@ Table of Contents
    visible to monitors.
 
    As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish
-   availability policies, adhered to by trusted CAs and mirrors, and
-   enforced by relying party vendors as a condition of trust.  Exact
-   availability policies for these services are out of scope for this
-   document, but this section provides some general guidance.
+   availability policies.  These policies SHOULD be adhered to by
+   trusted CAs and mirrors, and enforced by relying party vendors as a
+   condition of trust.  Exact availability policies for these services
+   are out of scope for this document, but this section provides some
+   general guidance.
 
    Availability policies SHOULD specify how long an entry must be made
    available, before a CA or mirror is permitted to prune the entry.  It
