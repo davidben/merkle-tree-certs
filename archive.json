@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-02-17T02:50:04.500045+00:00",
+  "timestamp": "2026-02-26T02:46:59.441919+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -11191,6 +11191,437 @@
           "body": "",
           "createdAt": "2026-02-16T16:01:46Z",
           "updatedAt": "2026-02-16T16:01:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 186,
+      "id": "PR_kwDOJIBkVc7GCM8V",
+      "title": "Include the SPKI algorithm in log entries",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/186",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "While this makes log entries bigger, the modern tlog-based API compresses runs of 256 entries together, so they should gzip fairly well.\r\n\r\nIncluding the algorithm can allow folks to more easily monitor the status of an algorithm transition, and flag some misconfigurations. For example, a PQ-incapable server might ask both a classical and PQ CA to sign its classical key. But a PQ-capable server should ask a classical CA to sign the classical key and a PQ CA to sign its PQ key.\r\n\r\nCloses #76",
+      "createdAt": "2026-02-24T20:28:23Z",
+      "updatedAt": "2026-02-25T13:34:12Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2026e904b4e44863e76fc5f31009ece8a798eac5",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "log-pkey-alg",
+      "headRefOid": "d750987a52b2033ceb995bbab802db23b6b51656",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> Should we mention algorithm in this line?\r\n>\r\n>> When hashing subjectPublicKeyInfo, either hash the observed BER encoding, or reparse the structure with a conforming DER parser and fail verification if invalid.\r\n\r\nI *think* it's okay without? This bit is talking about non-malleability. It is both necessary and sufficient to capture the SPKI encoding in the hash. At that point, you've already locked in the SPKI encoding and having the algorithm elsewhere doesn't matter.",
+          "createdAt": "2026-02-24T23:59:16Z",
+          "updatedAt": "2026-02-24T23:59:16Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7lhOId",
+          "commit": {
+            "abbreviatedOid": "0c87255"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Should we mention algorithm in this line?\n\n> When hashing `subjectPublicKeyInfo`, either hash the observed BER encoding, or reparse the structure with a conforming DER parser and fail verification if invalid.\n",
+          "createdAt": "2026-02-24T21:41:23Z",
+          "updatedAt": "2026-02-24T21:44:43Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "subjectPublicKeyAlgorithm \u2260 subjectPublicKeyInfoAlgorithm",
+              "createdAt": "2026-02-24T21:41:23Z",
+              "updatedAt": "2026-02-24T21:44:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7li4hz",
+          "commit": {
+            "abbreviatedOid": "0c87255"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-24T23:57:58Z",
+          "updatedAt": "2026-02-24T23:57:58Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Whoops. Made the rest of them match subjectPublicKeyAlgorithm. Not sure if the \"info\" is doing anything here and subjectPublicKeyAlgorithm is shorter.",
+              "createdAt": "2026-02-24T23:57:58Z",
+              "updatedAt": "2026-02-24T23:57:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7lvBKY",
+          "commit": {
+            "abbreviatedOid": "d750987"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-25T13:34:12Z",
+          "updatedAt": "2026-02-25T13:34:12Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 187,
+      "id": "PR_kwDOJIBkVc7GCg6M",
+      "title": "Rename to standalone and landmark certificates",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/187",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #163",
+      "createdAt": "2026-02-24T20:51:24Z",
+      "updatedAt": "2026-02-25T02:04:06Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2026e904b4e44863e76fc5f31009ece8a798eac5",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "rename-cert-types",
+      "headRefOid": "8a7dd2e26b38566c08d892dadbdf5dd9267714ea",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> on a tangent, the terminology section got me wondering if a standalone cert would ever present an inclusion proof to a not-landmark subtree. That seems analogous to signing an end certificate with the root certificate.\r\n\r\nI expect inclusion proof to non-landmark subtree to be the default case for standalone certs. :-) Part of the point of a standalone cert is to that you can get a cert immediately (imagine having to rekey in a hurry). That means you don't want to wait for a landmark.\r\n\r\nThe way I've imagined this is that you have two checkpoint feeds, a fast one and a slow (landmark) one. Your fast one runs about as fast as you're able to generate signatures and ping witnesses/mirrors. Let's say that's every 30 seconds. So every 30 seconds, you mint a new fast checkpoint, and collect cosigs. Then you can generate standalone certificates based on the subtree(s) between the last fast checkpoint and the current one. If you look at it funny, this is kind of like a batch signing scheme.\r\n\r\nThen there's a slow feed of checkpoints which is every couple of hours (the landmarks). Now, you *could* use that feed to generate standalone certs too, but there's not much point. You may as well use the fast feed. The only reason for the slow feed is so the total number of live checkpoints is small and predistributable. So we use those to generate the landmark certificates, without cosignatures.",
+          "createdAt": "2026-02-25T00:07:52Z",
+          "updatedAt": "2026-02-25T00:07:52Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> Your fast one runs about as fast as you're able to generate signatures and ping witnesses/mirrors.\r\n\r\nhandwave handwave unless we decide to lightly throttle those for the sake of better auditing, as in Section 5.2 of [this paper](https://eprint.iacr.org/2025/556.pdf), but not the priority to solve right now. \ud83d\ude04 ",
+          "createdAt": "2026-02-25T00:12:08Z",
+          "updatedAt": "2026-02-25T00:12:23Z"
+        },
+        {
+          "author": "initsecret",
+          "authorAssociation": "NONE",
+          "body": "I really like the amortization of signature cost model, it\u2019s how I explain this to myself. \r\n\r\nGood point on fast re-keying, I wasn\u2019t thinking of that case. I\u2019m on a bus and can\u2019t do math[^1], but have y\u2019all run numbers on this. I feel like there\u2019s a tension here between landmark epoch lengths and efficiency. \r\n\r\n[^1]: unrelated facts :3 ",
+          "createdAt": "2026-02-25T02:04:06Z",
+          "updatedAt": "2026-02-25T02:04:06Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7lgj8Z",
+          "commit": {
+            "abbreviatedOid": "cfd0825"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-24T21:04:48Z",
+          "updatedAt": "2026-02-24T21:04:48Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7lgmvF",
+          "commit": {
+            "abbreviatedOid": "cfd0825"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-24T21:06:54Z",
+          "updatedAt": "2026-02-24T21:06:54Z",
+          "comments": [
+            {
+              "originalPosition": 229,
+              "body": "```suggestion\nThe standalone certificate response SHOULD additionally carry an alternate URL for the landmark certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark certificate, as described in {{landmark-certificates}} and serves it from the alternate URL.\n```",
+              "createdAt": "2026-02-24T21:06:54Z",
+              "updatedAt": "2026-02-24T21:06:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7lgs2q",
+          "commit": {
+            "abbreviatedOid": "cfd0825"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I really like this edit. It makes the relationship between landmark certificates and landmark tree sizes very clear.",
+          "createdAt": "2026-02-24T21:11:25Z",
+          "updatedAt": "2026-02-24T21:11:44Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7li2t9",
+          "commit": {
+            "abbreviatedOid": "8a7dd2e"
+          },
+          "author": "initsecret",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "reads well to me.\n\non a tangent, the terminology section got me wondering if a standalone cert would ever present an inclusion proof to a _not_-landmark subtree. That seems analogous to signing an end certificate with the root certificate.",
+          "createdAt": "2026-02-24T23:54:46Z",
+          "updatedAt": "2026-02-24T23:54:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 188,
+      "id": "PR_kwDOJIBkVc7GDWFm",
+      "title": "Suggestions by @aww-aww 1: grammatical fixes",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/188",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From #174",
+      "createdAt": "2026-02-24T21:54:41Z",
+      "updatedAt": "2026-02-25T00:03:25Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "2026e904b4e44863e76fc5f31009ece8a798eac5",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/andy-grammar-fixes",
+      "headRefOid": "e45242f45f3bf1ffa3f5f41e78d308f06f79dd0f",
+      "closedAt": "2026-02-25T00:03:24Z",
+      "mergedAt": "2026-02-25T00:03:24Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "7151c7d02b99b6c5bf7972240f425b3cbd54cd73"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7li6Ab",
+          "commit": {
+            "abbreviatedOid": "e45242f"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-25T00:00:33Z",
+          "updatedAt": "2026-02-25T00:00:33Z",
+          "comments": [
+            {
+              "originalPosition": 32,
+              "body": "This does slightly change the meaning, but I think both meanings are fine.",
+              "createdAt": "2026-02-25T00:00:33Z",
+              "updatedAt": "2026-02-25T00:00:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7li6Y8",
+          "commit": {
+            "abbreviatedOid": "e45242f"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-25T00:01:14Z",
+          "updatedAt": "2026-02-25T00:01:14Z",
+          "comments": [
+            {
+              "originalPosition": 32,
+              "body": "(Whoops, meant to queue this up, please hold.)",
+              "createdAt": "2026-02-25T00:01:14Z",
+              "updatedAt": "2026-02-25T00:01:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7li7LR",
+          "commit": {
+            "abbreviatedOid": "e45242f"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-25T00:02:34Z",
+          "updatedAt": "2026-02-25T00:03:15Z",
+          "comments": [
+            {
+              "originalPosition": 95,
+              "body": "Also a slight meaning change, but new meaning works too. :-)\n\n(I originally meant it in the sense of \"yes, there is a transform and that makes it not obvious, but it's fine\".)",
+              "createdAt": "2026-02-25T00:02:34Z",
+              "updatedAt": "2026-02-25T00:03:15Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 189,
+      "id": "PR_kwDOJIBkVc7GMJkw",
+      "title": "Editorial tightening, split out from #174",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/189",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Credit: Andy Warner @aww-aww \r\nSplit out from #174",
+      "createdAt": "2026-02-25T10:52:06Z",
+      "updatedAt": "2026-02-25T13:25:49Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7151c7d02b99b6c5bf7972240f425b3cbd54cd73",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/andy-editorial-tightening",
+      "headRefOid": "95d1849ad7488f18c37bff0983026dca51dc114e",
+      "closedAt": "2026-02-25T13:25:49Z",
+      "mergedAt": "2026-02-25T13:25:49Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "6ebecf3978b5d6834920c2aff0f6ec6c10e100a4"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7lu2J-",
+          "commit": {
+            "abbreviatedOid": "95d1849"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-25T13:25:41Z",
+          "updatedAt": "2026-02-25T13:25:41Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 190,
+      "id": "PR_kwDOJIBkVc7GP5v_",
+      "title": "Split run-on sentences for readability, split out from #174",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/190",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Credit: Andy Warner @aww-aww (#174)",
+      "createdAt": "2026-02-25T14:34:00Z",
+      "updatedAt": "2026-02-25T15:17:21Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6ebecf3978b5d6834920c2aff0f6ec6c10e100a4",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/andy-sentence-splitting",
+      "headRefOid": "f83f00273c40e84f2cc01930d3095c45dc00cedf",
+      "closedAt": "2026-02-25T15:17:20Z",
+      "mergedAt": "2026-02-25T15:17:20Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "2d35380047b587f84025dd06842cb24040a8fd6b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7lwWuI",
+          "commit": {
+            "abbreviatedOid": "039d8f2"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-02-25T14:34:50Z",
+          "updatedAt": "2026-02-25T14:34:50Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "I do like the \"that said\". Reverting.",
+              "createdAt": "2026-02-25T14:34:50Z",
+              "updatedAt": "2026-02-25T14:34:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7lxZZy",
+          "commit": {
+            "abbreviatedOid": "f83f002"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-25T15:17:13Z",
+          "updatedAt": "2026-02-25T15:17:13Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 191,
+      "id": "PR_kwDOJIBkVc7GP__n",
+      "title": "Clarity improvements, split out from #174",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/191",
+      "state": "MERGED",
+      "author": "bwesterb",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Credit: Andy Warner @aww-aww #174",
+      "createdAt": "2026-02-25T14:40:04Z",
+      "updatedAt": "2026-02-25T15:18:43Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6ebecf3978b5d6834920c2aff0f6ec6c10e100a4",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "bas/andy-clarity-improvements",
+      "headRefOid": "0e26a0aefca04a2096c0bb90883ea6415bb881cd",
+      "closedAt": "2026-02-25T15:18:43Z",
+      "mergedAt": "2026-02-25T15:18:43Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "96de61e332bbb14558dff95e692af2306e1d763c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7lxbk1",
+          "commit": {
+            "abbreviatedOid": "0e26a0a"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-02-25T15:18:36Z",
+          "updatedAt": "2026-02-25T15:18:36Z",
           "comments": []
         }
       ]
