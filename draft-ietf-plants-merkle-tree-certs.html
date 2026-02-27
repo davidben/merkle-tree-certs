@@ -3703,7 +3703,7 @@ def find_subtrees(start, end):
 <pre>
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD}
+    mechanisms(5) pkix(7) rdna(25) TBD }
 </pre><a href="#section-5.2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-5.2-4">The attribute's value is a RELATIVE-OID containing the trust anchor ID's ASN.1 representation. For example, the distinguished name for a log named <code>32473.1</code> would be represented in syntax of <span>[<a href="#RFC4514" class="cite xref">RFC4514</a>]</span> as:<a href="#section-5.2-4" class="pilcrow">¶</a></p>
@@ -3753,24 +3753,40 @@ struct {
 } MerkleTreeCertEntry;
 </pre><a href="#section-5.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-5.3-3">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
-<p id="section-5.3-4"><code>tbs_cert_entry_data</code> contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding of a TBSCertificateLogEntry, defined below. Equivalently, <code>tbs_cert_entry_data</code> contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
-<div class="lang-asn.1 sourcecode" id="section-5.3-5">
+<p id="section-5.3-3">When <code>type</code> is <code>null_entry</code>, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type <code>null_entry</code>. Other entries MUST NOT use <code>null_entry</code>. <code>null_entry</code> exists to avoid zero serial numbers in the certificate format (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>).<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3-4">When <code>type</code> is <code>tbs_cert_entry</code>, <code>N</code> is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-5"><code>tbs_cert_entry_data</code> contains the contents octets (i.e. excluding the initial identifier and length octets) of the DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding of a TBSCertificateLogEntry, defined below. Equivalently, <code>tbs_cert_entry_data</code> contains the DER encodings of each field of the TBSCertificateLogEntry, concatenated. This construction allows a single-pass implementation in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+<div class="lang-asn.1 sourcecode" id="section-5.3-6">
 <pre>
-TBSCertificateLogEntry  ::=  SEQUENCE  {
-      version             [0]  EXPLICIT Version DEFAULT v1,
-      issuer                   Name,
-      validity                 Validity,
-      subject                  Name,
-      subjectPublicKeyInfoHash OCTET STRING,
-      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
-</pre><a href="#section-5.3-5" class="pilcrow">¶</a>
+TBSCertificateLogEntry ::= SEQUENCE {
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
+}
+</pre><a href="#section-5.3-6" class="pilcrow">¶</a>
 </div>
-<p id="section-5.3-6">The <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields have the corresponding semantics as in <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, with the exception of <code>subjectPublicKeyInfoHash</code>. <code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key as a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>). The hash uses the log's hash function (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding. The <code>issuer</code> field MUST be the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
-<p id="section-5.3-7">When <code>type</code> is <code>null_entry</code>, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type <code>null_entry</code>. Other entries MUST NOT use <code>null_entry</code>. <code>null_entry</code> exists to avoid zero serial numbers in the certificate format (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>).<a href="#section-5.3-7" class="pilcrow">¶</a></p>
-<p id="section-5.3-8">MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a> and <a href="#new-log-entry-types" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.3-8" class="pilcrow">¶</a></p>
+<p id="section-5.3-7">The fields of a TBSCertificateLogEntry are defined as follows:<a href="#section-5.3-7" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.3-8.1">
+            <p id="section-5.3-8.1.1"><code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> have the same semantics as the corresponding TBSCertificate fields, defined in <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.<a href="#section-5.3-8.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-8.2">
+            <p id="section-5.3-8.2.1"><code>subjectPublicKeyAlgorithm</code> describes the algorithm of the subject's public key. It is constructed identically to the <code>algorithm</code> field of a SubjectPublicKeyInfo (<span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.7" class="relref">Section 4.1.2.7</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>).<a href="#section-5.3-8.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.3-8.3">
+            <p id="section-5.3-8.3.1"><code>subjectPublicKeyInfoHash</code> contains the hash of subject's public key, encoded as a SubjectPublicKeyInfo. The hash uses the log's hash function (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>) and is computed over the SubjectPublicKeyInfo's DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span> encoding. The <code>issuer</code> field MUST be the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-5.3-8.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.3-9">Note the subject's public key algorithm is incorporated into both <code>subjectPublicKeyAlgorithm</code> and <code>subjectPublicKeyInfoHash</code>.<a href="#section-5.3-9" class="pilcrow">¶</a></p>
+<p id="section-5.3-10">MerkleTreeCertEntry is an extensible structure. Future documents may define new values for MerkleTreeCertEntryType, with corresponding semantics. See <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a> and <a href="#new-log-entry-types" class="auto internal xref">Section 12.5</a> for additional discussion.<a href="#section-5.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cosigners">
@@ -4268,13 +4284,13 @@ struct {
 <p id="section-6.1-1">The information is encoded in an X.509 Certificate <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> as follows:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">The TBSCertificate's <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, or <code>extensions</code> is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per <a href="#log-entries" class="auto internal xref">Section 5.3</a>, this means <code>issuer</code> MUST be the issuance log's log ID as a PKIX distinguished name, as described in <a href="#log-ids" class="auto internal xref">Section 5.2</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.1-3">The TBSCertificate's <code>serialNumber</code> MUST contain the zero-based index of the TBSCertificateLogEntry in the log. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.2.2" class="relref">Section 4.1.2.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> forbids zero as a serial number, but <a href="#log-entries" class="auto internal xref">Section 5.3</a> defines a <code>null_entry</code> type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">The TBSCertificate's <code>subjectPublicKeyInfo</code> contains the specified public key. Its <code>algorithm</code> field MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyAlgorithm</code>. Its hash MUST match the TBSCertificateLogEntry's <code>subjectPublicKeyInfoHash</code>.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">The TBSCertificate's <code>signature</code> and the Certificate's <code>signatureAlgorithm</code> MUST contain an AlgorithmIdentifier whose <code>algorithm</code> is id-alg-mtcProof, defined below, and whose <code>parameters</code> is omitted.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <div class="lang-asn.1 sourcecode" id="section-6.1-6">
 <pre>
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD}
+    mechanisms(5) pkix(7) algorithms(6) TBD }
 </pre><a href="#section-6.1-6" class="pilcrow">¶</a>
 </div>
 <p id="section-6.1-7">For initial experimentation, early implementations of this design will use the OID 1.3.6.1.4.1.44363.47.0 instead of <code>id-alg-mtcProof</code>.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
@@ -4503,7 +4519,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
                 <p id="section-7.2-2.4.2.1.1">Copy the <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields from the TBSCertificate.<a href="#section-7.2-2.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li id="section-7.2-2.4.2.2">
-                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+                <p id="section-7.2-2.4.2.2.1">Set <code>subjectPublicKeyAlgorithm</code> to the <code>algorithm</code> field of the <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-7.2-2.4.2.3">
+                <p id="section-7.2-2.4.2.3.1">Set <code>subjectPublicKeyInfoHash</code> to the hash of the DER encoding of <code>subjectPublicKeyInfo</code>.<a href="#section-7.2-2.4.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
@@ -4533,19 +4552,22 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
             <p id="section-7.2-5.3.1">Write the TBSCertificate contents octets to the hash, up to the <code>subjectPublicKeyInfo</code> field.<a href="#section-7.2-5.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-5.4">
-            <p id="section-7.2-5.4.1">Write the octet 0x04 to the hash. This is an OCTET STRING identifer.<a href="#section-7.2-5.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-5.4.1">Write the <code>subjectPublicKeyInfo</code>'s <code>algorithm</code> field to the hash.<a href="#section-7.2-5.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-5.5">
-            <p id="section-7.2-5.5.1">Write the octet L to the hash, where L is the hash length. (This assumes L is at most 127.)<a href="#section-7.2-5.5.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-5.5.1">Write the octet 0x04 to the hash. This is an OCTET STRING identifer.<a href="#section-7.2-5.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-5.6">
-            <p id="section-7.2-5.6.1">Write H to the hash, where H is the hash of the <code>subjectPublicKeyInfo</code> field.<a href="#section-7.2-5.6.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-5.6.1">Write the octet L to the hash, where L is the hash length. (This assumes L is at most 127.)<a href="#section-7.2-5.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-5.7">
-            <p id="section-7.2-5.7.1">Write the remainder of the TBSCertificate contents octets to the hash, starting just after the <code>subjectPublicKeyInfo</code> field.<a href="#section-7.2-5.7.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-5.7.1">Write H to the hash, where H is the hash of the entire <code>subjectPublicKeyInfo</code> field.<a href="#section-7.2-5.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-5.8">
-            <p id="section-7.2-5.8.1">Finalize the hash and set <code>entry_hash</code> to the result.<a href="#section-7.2-5.8.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-5.8.1">Write the remainder of the TBSCertificate contents octets to the hash, starting just after the <code>subjectPublicKeyInfo</code> field.<a href="#section-7.2-5.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-7.2-5.9">
+            <p id="section-7.2-5.9.1">Finalize the hash and set <code>entry_hash</code> to the result.<a href="#section-7.2-5.9.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-7.2-6">This is possible because the structure in <a href="#log-entries" class="auto internal xref">Section 5.3</a> omits the TBSCertificateLogEntry's identifier and length octets.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
@@ -5248,8 +5270,8 @@ DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 
 IMPORTS
-  SIGNATURE-ALGORITHM
-  FROM AlgorithmInformation-2009  -- in [RFC5912]
+  SIGNATURE-ALGORITHM, AlgorithmIdentifier{},
+  FROM AlgorithmInformation-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-algorithmInformation-02(58) }
@@ -5263,7 +5285,7 @@ IMPORTS
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-pkix1-implicit-02(59) }
-  Version, Name, Validity, UniqueIdentifier
+  Version, Name, Validity, UniqueIdentifier, PublicKeyAlgorithms
   FROM PKIX1Explicit-2009 -- in [RFC5912]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -5274,32 +5296,35 @@ IMPORTS
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-trustAnchorIDs-2025(TBD) } ;
 
-TBSCertificateLogEntry  ::=  SEQUENCE  {
-      version             [0]  EXPLICIT Version DEFAULT v1,
-      issuer                   Name,
-      validity                 Validity,
-      subject                  Name,
-      subjectPublicKeyInfoHash OCTET STRING,
-      issuerUniqueID      [1]  IMPLICIT UniqueIdentifier OPTIONAL,
-      subjectUniqueID     [2]  IMPLICIT UniqueIdentifier OPTIONAL,
-      extensions          [3]  EXPLICIT Extensions{{CertExtensions}} OPTIONAL }
-
+TBSCertificateLogEntry ::= SEQUENCE {
+    version               [0] EXPLICIT Version DEFAULT v1,
+    issuer                    Name,
+    validity                  Validity,
+    subject                   Name,
+    subjectPublicKeyAlgorithm AlgorithmIdentifier{PUBLIC-KEY,
+                                  {PublicKeyAlgorithms}},
+    subjectPublicKeyInfoHash  OCTET STRING,
+    issuerUniqueID        [1] IMPLICIT UniqueIdentifier OPTIONAL,
+    subjectUniqueID       [2] IMPLICIT UniqueIdentifier OPTIONAL,
+    extensions            [3] EXPLICIT Extensions{{CertExtensions}}
+                                           OPTIONAL
+}
 id-alg-mtcProof OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) TBD}
+    mechanisms(5) pkix(7) algorithms(6) TBD }
 
 sa-mtcProof SIGNATURE-ALGORITHM ::= {
-   IDENTIFIER id-alg-mtcProof
-   PARAMS ARE absent
+    IDENTIFIER id-alg-mtcProof
+    PARAMS ARE absent
 }
 
 id-rdna-trustAnchorID OBJECT IDENTIFIER ::= {
     iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) rdna(25) TBD}
+    mechanisms(5) pkix(7) rdna(25) TBD }
 
 at-trustAnchorID ATTRIBUTE ::= {
-   TYPE TrustAnchorID
-   IDENTIFIED BY id-rdna-trustAnchorID
+    TYPE TrustAnchorID
+    IDENTIFIED BY id-rdna-trustAnchorID
 }
 
 END
@@ -6472,6 +6497,9 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 <ul class="normal">
 <li class="normal" id="appendix-E.13-1.1">
             <p id="appendix-E.13-1.1.1">Renamed full certificate to standalone certificate, signatureless certificate to landmark certificate.<a href="#appendix-E.13-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.13-1.2">
+            <p id="appendix-E.13-1.2.1">Included subject public key algorithm in log entries<a href="#appendix-E.13-1.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
