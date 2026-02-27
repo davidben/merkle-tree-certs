@@ -2142,4 +2142,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 - Address editorial comments from WG adoption call
 
+## Since draft-ietf-plants-merkle-tree-certs-01
+{:numbered="false"}
+
 - Renamed full certificate to standalone certificate, signatureless certificate to landmark certificate.
