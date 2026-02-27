@@ -135,6 +135,14 @@ func tbsCertLogEntryFromCert(cert *x509.Certificate) []byte {
 			addX509Time(val, cert.NotAfter)
 		})
 		tbs.AddBytes(cert.RawSubject)
+		// Parse out the algorithm.
+		spki := cryptobyte.String(cert.RawSubjectPublicKeyInfo)
+		var spkiContents, spkiAlg cryptobyte.String
+		if !spki.ReadASN1(&spkiContents, cbasn1.SEQUENCE) ||
+			!spkiContents.ReadASN1Element(&spkiAlg, cbasn1.SEQUENCE) {
+			panic("could not parse SPKI")
+		}
+		tbs.AddBytes(spkiAlg)
 		hash := sha256.Sum256(cert.RawSubjectPublicKeyInfo)
 		tbs.AddASN1OctetString(hash[:])
 		tbs.AddASN1(cbasn1.Tag(3).Constructed().ContextSpecific(), func(exts *cryptobyte.Builder) {
