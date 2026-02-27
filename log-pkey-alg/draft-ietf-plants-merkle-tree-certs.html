@@ -11,7 +11,7 @@
 <meta content="Luke Valenta" name="author">
 <meta content="Filippo Valsorda" name="author">
 <meta content="
-       This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional signatureless optimization, which decreases the message size by avoiding signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
+       This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates. 
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
 <meta content="draft-ietf-plants-merkle-tree-certs-latest" name="ietf.draft">
@@ -1052,7 +1052,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 28 August 2026</td>
+<td class="center">Expires 31 August 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-24" class="published">24 February 2026</time>
+<time datetime="2026-02-27" class="published">27 February 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-28">28 August 2026</time></dd>
+<dd class="expires"><time datetime="2026-08-31">31 August 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1098,7 +1098,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Merkle Tree Certificates</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional signatureless optimization, which decreases the message size by avoiding signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document describes Merkle Tree certificates, a new form of X.509 certificates which integrate public logging of the certificate, in the style of Certificate Transparency. The integrated design reduces logging overhead in the face of both shorter-lived certificates and large post-quantum signature algorithms, while still achieving comparable security properties to traditional X.509 and Certificate Transparency. Merkle Tree certificates additionally admit an optional size optimization that avoids signatures altogether, at the cost of only applying to up-to-date relying parties and older certificates.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1135,7 +1135,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 28 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 31 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1263,19 +1263,19 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-certificate-format" class="internal xref">Certificate Format</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-full-certificates" class="internal xref">Full Certificates</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-standalone-certificates" class="internal xref">Standalone Certificates</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-signatureless-certificates" class="internal xref">Signatureless Certificates</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-landmark-certificates" class="internal xref">Landmark Certificates</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmarks" class="internal xref">Landmarks</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-landmark-tree-sizes" class="internal xref">Landmark Tree Sizes</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
                     <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-allocating-landmarks" class="internal xref">Allocating Landmarks</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
-                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-constructing-signatureless-" class="internal xref">Constructing Signatureless Certificates</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-constructing-landmark-certi" class="internal xref">Constructing Landmark Certificates</a></p>
 </li>
                 </ul>
 </li>
@@ -1473,6 +1473,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.12">
                 <p id="section-toc.1-1.19.2.12.1"><a href="#appendix-E.12" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-mer" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-00</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.13">
+                <p id="section-toc.1-1.19.2.13.1"><a href="#appendix-E.13" class="auto internal xref"></a><a href="#name-since-draft-ietf-plants-merk" class="internal xref">Since draft-ietf-plants-merkle-tree-certs-01</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
@@ -1501,7 +1504,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-7.2.1">To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-7.3">
-          <p id="section-1-7.3.1">After a processing delay, authenticating parties can obtain a second "signatureless" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-7.3.1">After a processing delay, authenticating parties can obtain a second "landmark" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-1-8"><a href="#overview" class="auto internal xref">Section 3</a> gives an overview of the system. <a href="#subtrees" class="auto internal xref">Section 4</a> describes a Merkle Tree primitive used by this system. <a href="#issuance-logs" class="auto internal xref">Section 5</a> describes the log structure. Finally, <a href="#certificates" class="auto internal xref">Section 6</a> and <a href="#relying-parties" class="auto internal xref">Section 7</a> describe how to construct and consume a Merkle Tree certificate.<a href="#section-1-8" class="pilcrow">¶</a></p>
@@ -1609,20 +1612,20 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <dd class="break"></dd>
 <dt id="section-2.1-4.13">Landmark:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.14">
-            <p id="section-2.1-4.14.1">One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for signatureless certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.14.1">One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for landmark certificates.<a href="#section-2.1-4.14.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-4.15">Landmark subtree:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.16">
-            <p id="section-2.1-4.16.1">A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and signatureless certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-4.16.1">A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and landmark certificates.<a href="#section-2.1-4.16.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.1-4.17">Full certificate:</dt>
+<dt id="section-2.1-4.17">Standalone certificate:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.18">
             <p id="section-2.1-4.18.1">A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.<a href="#section-2.1-4.18.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-2.1-4.19">Signatureless certificate:</dt>
+<dt id="section-2.1-4.19">Landmark certificate:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-4.20">
             <p id="section-2.1-4.20.1">An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.<a href="#section-2.1-4.20.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1814,9 +1817,9 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-3-4.6.1">As in Certificate Transparency, monitors observe the issuance log to ensure the CA is operated correctly.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-3-5">A certificate with cosignatures is known as a <em>full certificate</em>. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) structures, which do not scale with public key or signature size.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">This same issuance process also produces a <em>signatureless certificate</em>. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Signatureless certificates are available after a short period of time and usable with up-to-date relying parties.<a href="#section-3-6" class="pilcrow">¶</a></p>
-<span id="name-a-diagram-of-signatureless-"></span><div id="fig-signatureless-overview">
+<p id="section-3-5">A certificate with cosignatures is known as a <em>standalone certificate</em>. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) structures, which do not scale with public key or signature size.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">This same issuance process also produces a <em>landmark certificate</em>. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Landmark certificates are available after a short period of time and usable with up-to-date relying parties.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<span id="name-a-diagram-of-landmark-certi"></span><div id="fig-landmark-cert-overview">
 <figure id="figure-2">
         <div id="section-3-7.1">
           <div class="alignLeft art-svg artwork" id="section-3-7.1.1">
@@ -1868,17 +1871,15 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
                 <text x="216" y="84">landmarks</text>
                 <text x="44" y="148">2.</text>
                 <text x="76" y="148">Make</text>
-                <text x="152" y="148">signatureless</text>
+                <text x="132" y="148">landmark</text>
+                <text x="188" y="148">cert</text>
                 <text x="316" y="148">3.</text>
                 <text x="372" y="148">Distribute</text>
-                <text x="76" y="164">cert</text>
-                <text x="116" y="164">from</text>
-                <text x="172" y="164">landmark</text>
                 <text x="376" y="164">landmarks</text>
                 <text x="92" y="196">Authenticating</text>
                 <text x="176" y="196">Party</text>
-                <text x="72" y="228">signatureless</text>
-                <text x="148" y="228">cert</text>
+                <text x="52" y="228">landmark</text>
+                <text x="108" y="228">cert</text>
                 <text x="64" y="244">tbscert</text>
                 <text x="364" y="244">Up-to-date</text>
                 <text x="420" y="244">RP</text>
@@ -1890,8 +1891,8 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
                 <text x="404" y="260">hashes</text>
                 <text x="336" y="276">trusted</text>
                 <text x="408" y="276">cosigners</text>
-                <text x="36" y="308">full</text>
-                <text x="76" y="308">cert</text>
+                <text x="60" y="308">standalone</text>
+                <text x="124" y="308">cert</text>
                 <text x="64" y="324">tbscert</text>
                 <text x="360" y="324">Unupdated</text>
                 <text x="412" y="324">RP</text>
@@ -1914,16 +1915,16 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 </div>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-a-diagram-of-signatureless-" class="selfRef">A diagram of signatureless certificate construction and usage, detailed below</a>
+<a href="#name-a-diagram-of-landmark-certi" class="selfRef">A diagram of landmark certificate construction and usage, detailed below</a>
         </figcaption></figure>
 </div>
-<p id="section-3-8">Signatureless certificates are constructed and used as follows. <a href="#fig-signatureless-overview" class="auto internal xref">Figure 2</a> depicts this process.<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-8">Landmark certificates are constructed and used as follows. <a href="#fig-landmark-cert-overview" class="auto internal xref">Figure 2</a> depicts this process.<a href="#section-3-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3-9">
 <li id="section-3-9.1">
-          <p id="section-3-9.1.1">Periodically, the tree size of the CA's most recent checkpoint is designated as a <em>landmark</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and signatureless certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.1.1">Periodically, the tree size of the CA's most recent checkpoint is designated as a <em>landmark</em>. This determines <em>landmark subtrees</em>, which are common points of reference between relying parties and landmark certificates.<a href="#section-3-9.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.2">
-          <p id="section-3-9.2.1">Once some landmark includes the TBSCertificate, the signatureless certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.2.1">Once some landmark includes the TBSCertificate, the landmark certificate is constructed with:<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-9.2.2.1">
               <p id="section-3-9.2.2.1.1">The TBSCertificate being certified<a href="#section-3-9.2.2.1.1" class="pilcrow">¶</a></p>
@@ -1937,7 +1938,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
           <p id="section-3-9.3.1">In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.<a href="#section-3-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-9.4">
-          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the signatureless certificate. Otherwise, it presents a full certificate. The authenticating party may also select between several signatureless certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
+          <p id="section-3-9.4.1">During the application protocol, such as TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, if the relying party already supports the landmark subtree, the authenticating party can present the landmark certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark certificates, as described in <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>.<a href="#section-3-9.4.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
@@ -3802,7 +3803,7 @@ TBSCertificateLogEntry ::= SEQUENCE {
           <h4 id="name-signature-format">
 <a href="#section-5.4.1" class="section-number selfRef">5.4.1. </a><a href="#name-signature-format" class="section-name selfRef">Signature Format</a>
           </h4>
-<p id="section-5.4.1-1">A cosigner computes a cosignature for a subtree in some log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.4.1-1">A cosigner computes a cosignature for a subtree in a log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language (<span><a href="https://rfc-editor.org/rfc/rfc8446#section-3" class="relref">Section 3</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>):<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-5.4.1-2">
 <pre>
 opaque HashValue[HASH_SIZE];
@@ -3890,9 +3891,9 @@ struct {
 <a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-publishing-logs" class="section-name selfRef">Publishing Logs</a>
         </h3>
 <p id="section-5.6-1"><em>[[NOTE: This section is written to avoid depending on a specific serving protocol. The current expectation is that a Web PKI deployment would derive from <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, to match the direction of Certificate Transparency and pick up improvements made there.</em><a href="#section-5.6-1" class="pilcrow">¶</a></p>
-<p id="section-5.6-2"><em>For now, we avoid a normative reference on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> and also capture the fact that the certificate construction is independent of the choice of protocol. Similar to how the CT ecosystem is migrating to a tiled interface, were someone to improve on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, a PKI could migrate to that new protocol without impacting certificate verification.</em><a href="#section-5.6-2" class="pilcrow">¶</a></p>
-<p id="section-5.6-3"><em>That said, this is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]</em><a href="#section-5.6-3" class="pilcrow">¶</a></p>
-<p id="section-5.6-4">Issuance logs are intended to be publicly accessible in some form, to allow monitors to detect misissued certificates.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
+<p id="section-5.6-2"><em>For now, we avoid a normative reference to <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> and also capture the fact that the certificate construction is independent of the choice of protocol. Similar to how the CT ecosystem is migrating to a tiled interface, were someone to improve on <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, a PKI could migrate to that new protocol without impacting certificate verification.</em><a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<p id="section-5.6-3"><em>This is purely a starting point for describing the design. We expect the scope of this document, and other related documents to adapt as the work evolves across the IETF, C2SP, Certificate Transparency, and other communities.]]</em><a href="#section-5.6-3" class="pilcrow">¶</a></p>
+<p id="section-5.6-4">Issuance logs are intended to be publicly accessible to allow monitors to detect misissued certificates.<a href="#section-5.6-4" class="pilcrow">¶</a></p>
 <p id="section-5.6-5">The access method does not affect certificate interoperability, so this document does not prescribe a specific protocol. An individual issuance log MAY be published in any form, provided other parties in the PKI are able to consume it. Relying parties SHOULD define log serving requirements, including the allowed protocols and expected availability, as part of their policies on which CAs to support. See also <a href="#log-availability" class="auto internal xref">Section 10.3</a>.<a href="#section-5.6-5" class="pilcrow">¶</a></p>
 <p id="section-5.6-6">For example, a log ecosystem could use <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> to serve logs. <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span> improves on <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> and <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> by exposing the log as a collection of cacheable, immutable "tiles". This works well with a variety of common HTTP <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> serving architectures. It also allows log clients to request arbitrary tree nodes, so log clients can fetch the structures described in <a href="#subtrees" class="auto internal xref">Section 4</a>.<a href="#section-5.6-6" class="pilcrow">¶</a></p>
 <div id="log-pruning">
@@ -3900,7 +3901,7 @@ struct {
           <h4 id="name-log-pruning">
 <a href="#section-5.6.1" class="section-number selfRef">5.6.1. </a><a href="#name-log-pruning" class="section-name selfRef">Log Pruning</a>
           </h4>
-<p id="section-5.6.1-1">Over time, an issuance log's entries will expire and likely be replaced with certificate renewals. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be <em>pruned</em>, as described in this section.<a href="#section-5.6.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.6.1-1">Over time, an issuance log's entries will expire and likely be replaced as certificates are renewed. As this happens, the total size of the log grows, even if the unexpired subset remains fixed. To mitigate this, issuance logs MAY be <em>pruned</em>, as described in this section.<a href="#section-5.6.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-2">Pruning makes some prefix of the log unavailable, without changing the tree structure. It may be used to reduce the serving cost of long-lived logs, where any entries have long expired. <a href="#log-availability" class="auto internal xref">Section 10.3</a> discusses policies on when pruning may be permitted. This section discusses how it is done and the impact on log structure.<a href="#section-5.6.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-3">An issuance log is pruned by updating its <em>minimum index</em> parameter (<a href="#log-parameters" class="auto internal xref">Section 5.1</a>). The minimum index is the index of the first log entry that the log publishes. (See <a href="#publishing-logs" class="auto internal xref">Section 5.6</a>.) It MUST be less than or equal to the tree size of the log's current checkpoint, and also satisfy any availability policies set by relying parties who trust the CA.<a href="#section-5.6.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.6.1-4">An entry is said to be <em>available</em> if its index is greater than or equal to the minimum index. A checkpoint is said to be available if its tree size is greater than the minimum index. A subtree <code>[start, end)</code> is said to be available if <code>end</code> is greater than the minimum index.<a href="#section-5.6.1-4" class="pilcrow">¶</a></p>
@@ -4274,7 +4275,7 @@ struct {
           <p id="section-6-2.4.1">Zero or more signatures (<a href="#cosigners" class="auto internal xref">Section 5.4</a>) over the subtree, which together satisfy relying party requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>)<a href="#section-6-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-3">For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. <a href="#certificate-format" class="auto internal xref">Section 6.1</a> defines how the certificate is constructed based on those choices. <a href="#full-certificates" class="auto internal xref">Section 6.2</a> and <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> define two profiles of Merkle Tree Certificates, full certificates and signatureless certificates, and how to select the subtree and signatures for them.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-3">For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. <a href="#certificate-format" class="auto internal xref">Section 6.1</a> defines how the certificate is constructed based on those choices. <a href="#standalone-certificates" class="auto internal xref">Section 6.2</a> and <a href="#landmark-certificates" class="auto internal xref">Section 6.3</a> define two profiles of Merkle Tree Certificates, standalone certificates and landmark certificates, and how to select the subtree and signatures for them.<a href="#section-6-3" class="pilcrow">¶</a></p>
 <div id="certificate-format">
 <section id="section-6.1">
         <h3 id="name-certificate-format">
@@ -4315,12 +4316,12 @@ struct {
 <p id="section-6.1-11">The MTCProof is encoded into the <code>signatureValue</code> with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.<a href="#section-6.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="full-certificates">
+<div id="standalone-certificates">
 <section id="section-6.2">
-        <h3 id="name-full-certificates">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-full-certificates" class="section-name selfRef">Full Certificates</a>
+        <h3 id="name-standalone-certificates">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-standalone-certificates" class="section-name selfRef">Standalone Certificates</a>
         </h3>
-<p id="section-6.2-1">A <em>full certificate</em> is a Merkle Tree certificate which contains sufficient signatures to allow a relying party to trust the choice of subtree, without any predistributed information beyond the cosigner(s) parameters. Full certificates can be issued without significant processing delay.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">A <em>standalone certificate</em> is a Merkle Tree certificate which contains sufficient signatures to allow a relying party to trust the choice of subtree, without any predistributed information beyond the cosigner(s) parameters. Standalone certificates can be issued without significant processing delay.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 <p id="section-6.2-2">When issuing a certificate, the CA first adds the TBSCertificateLogEntry to its issuance log. It then schedules a job to construct a checkpoint and collect cosignatures. The job proceeds as follows:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.2-3">
 <li id="section-6.2-3.1">
@@ -4348,18 +4349,18 @@ struct {
 <p id="section-6.2-7">This document does not place any requirements on how frequently this job runs. More frequent runs results in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of <span>[<a href="#AuditingRevisited" class="cite xref">AuditingRevisited</a>]</span>, though this document does not define such a system.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="signatureless-certificates">
+<div id="landmark-certificates">
 <section id="section-6.3">
-        <h3 id="name-signatureless-certificates">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-signatureless-certificates" class="section-name selfRef">Signatureless Certificates</a>
+        <h3 id="name-landmark-certificates">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-landmark-certificates" class="section-name selfRef">Landmark Certificates</a>
         </h3>
-<p id="section-6.3-1">A <em>signatureless certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Signatureless certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding full certificate alongside any signatureless certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<div id="landmarks">
+<p id="section-6.3-1">A <em>landmark certificate</em> is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark certificate, and use some application-protocol-specific mechanism to select between the two. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses such a mechanism for TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<div id="landmark-tree-sizes">
 <section id="section-6.3.1">
-          <h4 id="name-landmarks">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmarks" class="section-name selfRef">Landmarks</a>
+          <h4 id="name-landmark-tree-sizes">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-landmark-tree-sizes" class="section-name selfRef">Landmark Tree Sizes</a>
           </h4>
-<p id="section-6.3.1-1">A signatureless certificate is constructed based on a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a signatureless certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-1">A landmark certificate is constructed based on a <em>landmark sequence</em>, which is a sequence of <em>landmarks</em>. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a landmark certificate with minimizing the size of the relying party's predistributed state.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-2">A landmark sequence has the following fixed parameters:<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-3.1">
@@ -4415,12 +4416,12 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-6.3.2-3">To ensure that only active landmarks contain unexpired certificates, set <code>max_landmarks</code> to <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="constructing-signatureless-certificates">
+<div id="constructing-landmark-certificates">
 <section id="section-6.3.3">
-          <h4 id="name-constructing-signatureless-">
-<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-constructing-signatureless-" class="section-name selfRef">Constructing Signatureless Certificates</a>
+          <h4 id="name-constructing-landmark-certi">
+<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-constructing-landmark-certi" class="section-name selfRef">Constructing Landmark Certificates</a>
           </h4>
-<p id="section-6.3.3-1">Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a signatureless certificate is constructed as follows:<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.3-1">Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark certificate is constructed as follows:<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.3.3-2">
 <li id="section-6.3.3-2.1">
               <p id="section-6.3.3-2.1.1">Wait for the first landmark to be allocated that contains the entry.<a href="#section-6.3.3-2.1.1" class="pilcrow">¶</a></p>
@@ -4432,7 +4433,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
               <p id="section-6.3.3-2.3.1">Construct a certificate (<a href="#certificate-format" class="auto internal xref">Section 6.1</a>) using the selected subtree and no signatures.<a href="#section-6.3.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.3-3">Before sending this certificate, the authenticating party SHOULD obtain some application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.3-3">Before sending this certificate, the authenticating party SHOULD obtain an application-protocol-specific signal that implies the relying party has been configured with the corresponding landmark. (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a> defines how relying parties are configured.) The trust anchor ID of the landmark may be used as an efficient identifier in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-6.3.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4442,7 +4443,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-size-estimates">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-size-estimates" class="section-name selfRef">Size Estimates</a>
         </h3>
-<p id="section-6.4-1">The inclusion proofs in full and signatureless certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">The inclusion proofs in standalone and landmark certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <p id="section-6.4-2">Some organizations have published statistics which can be used to estimate this rate for the Web PKI. As of June 9th, 2025:<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4-3.1">
@@ -4456,9 +4457,9 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 </li>
         </ul>
 <p id="section-6.4-4">The current issuance rate across the Web PKI may not necessarily be representative of the Web PKI after a transition to short-lived certificates. Assuming a certificate lifetime of 7 days, and that subscribers will update their certificates 75% of the way through their lifetime (see <a href="#certificate-renewal" class="auto internal xref">Section 10.4</a>), every certificate will be reissued every 126 hours. This gives issuance rate estimates of around 4,400,000 certificates per hour and 17,000,000 certificates per hour, for the first two values above. Note the larger estimate is across all CAs, while subtrees would only span one CA.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
-<p id="section-6.4-5">Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, full certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Full certificates additionally must carry a sufficient set of signatures to meet relying party requirements.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
-<p id="section-6.4-6">If a new landmark is allocated every hour, signatureless certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
-<p id="section-6.4-7">The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.<a href="#section-6.4-7" class="pilcrow">¶</a></p>
+<p id="section-6.4-5">Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
+<p id="section-6.4-6">If a new landmark is allocated every hour, landmark certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.<a href="#section-6.4-6" class="pilcrow">¶</a></p>
+<p id="section-6.4-7">Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.<a href="#section-6.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4500,10 +4501,10 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-verifying-certificate-signa">
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-verifying-certificate-signa" class="section-name selfRef">Verifying Certificate Signatures</a>
         </h3>
-<p id="section-7.2-1">When verifying the signature on an X.509 certificate (Step (a)(1) of <span><a href="https://rfc-editor.org/rfc/rfc5280#section-6.1.3" class="relref">Section 6.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-1">When verifying the signature of an X.509 certificate (Step (a)(1) of <span><a href="https://rfc-editor.org/rfc/rfc5280#section-6.1.3" class="relref">Section 6.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>) whose issuer is a Merkle Tree CA, the relying party performs the following procedure:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7.2-2">
 <li id="section-7.2-2.1">
-            <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-alg-mtcProof</code> with omitted parameters. If either check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-2.1.1">Check that the TBSCertificate's <code>signature</code> field is <code>id-alg-mtcProof</code> with omitted parameters. If this check fails, abort this process and fail verification.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-7.2-2.2">
             <p id="section-7.2-2.2.1">Decode the <code>signatureValue</code> as an MTCProof, as described in <a href="#certificate-format" class="auto internal xref">Section 6.1</a>.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
@@ -4592,11 +4593,11 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-7.3-5">Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. If the CA is transitioning from an old to new key, the relying party SHOULD accept both until certificates that predate the new key expire. This is analogous to the signature in a traditional X.509 certificate.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
-<p id="section-7.3-6">While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refuse to publish some entries.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
-<p id="section-7.3-7">To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a> discusses mitigations for this. Alternatively, a relying party MAY require cosigners that serve a copy of the log, in addition to enforcing a consistent view. For example, <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> describes a "mirror" cosigner role.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
+<p id="section-7.3-5">Relying parties SHOULD ensure authenticity by requiring a signature from the most recent CA cosigner key. If the CA is transitioning from an old to new key, the relying party SHOULD accept both keys until certificates that predate the new key expire. This is analogous to the signature in a traditional X.509 certificate.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-6">While a CA signature is sufficient to prove a subtree came from the CA, this is not enough to ensure the certificate is visible to monitors. A misbehaving CA might not operate the log correctly, either presenting inconsistent versions of the log to relying parties and monitors, or refusing to publish some entries.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
+<p id="section-7.3-7">To mitigate this, relying parties SHOULD ensure transparency by requiring a quorum of signatures from additional cosigners. At minimum, these cosigners SHOULD enforce a consistent view of the log. For example, <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describes a lightweight "witness" cosigner role that checks this with consistency proofs. This is not sufficient to ensure durable logging. <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a> discusses mitigations for this. Alternatively, a relying party MAY require that cosigners serve a copy of the log, in addition to enforcing a consistent view. For example, <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> describes a "mirror" cosigner role.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
 <p id="section-7.3-8">Relying parties MAY accept the same set of additional cosigners across issuance logs.<a href="#section-7.3-8" class="pilcrow">¶</a></p>
-<p id="section-7.3-9">Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate into relying party policies.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
+<p id="section-7.3-9">Cosigner roles are extensible without changes to certificate verification itself. Future specifications and individual deployments MAY define other cosigner roles to incorporate in relying party policies.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
 <p id="section-7.3-10"><a href="#choosing-cosigners" class="auto internal xref">Section 10.2</a> discusses additional deployment considerations in cosigner selection.<a href="#section-7.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4605,7 +4606,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         <h3 id="name-trusted-subtrees">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-trusted-subtrees" class="section-name selfRef">Trusted Subtrees</a>
         </h3>
-<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept signatureless certificates (<a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>. The relying party configures these as trusted subtrees, allowing it to accept landmark certificates (<a href="#landmark-certificates" class="auto internal xref">Section 6.3</a>) constructed against those subtrees.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <p id="section-7.4-2">Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see <a href="#cosigners" class="auto internal xref">Section 5.4</a>) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 <p id="section-7.4-3">This criteria can be checked given:<a href="#section-7.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -4629,7 +4630,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </ul>
 <p id="section-7.4-5">[[TODO: The subtree consistency proofs have many nodes in common. It is possible to define a single "bulk consistency proof" that verifies all the hashes at once, but it's a lot more complex.]]<a href="#section-7.4-5" class="pilcrow">¶</a></p>
 <p id="section-7.4-6">This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in <span>[<a href="#CHROMIUM" class="cite xref">CHROMIUM</a>]</span> and <span>[<a href="#FIREFOX" class="cite xref">FIREFOX</a>]</span>. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.<a href="#section-7.4-6" class="pilcrow">¶</a></p>
-<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a signatureless certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-7">The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. <a href="#use-in-tls" class="auto internal xref">Section 8</a> discusses how to do this in TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revocation-by-index">
@@ -4639,7 +4640,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
         </h3>
 <p id="section-7.5-1">For each supported Merkle Tree CA, the relying party maintains a list of revoked ranges of indices. This allows a relying party to efficiently revoke entries of an issuance log, even if the contents are not necessarily known. This may be used to mitigate the security consequences of misbehavior by a CA, or other parties in the ecosystem.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
 <p id="section-7.5-2">When a relying party is first configured to trust a CA, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
-<p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before a complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
 <p id="section-7.5-4">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4656,7 +4657,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
           <p id="section-8-2.1.1">Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-8-2.2">
-          <p id="section-8-2.2.1">Whether the authenticating party should send a full or signatureless certificate<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-8-2.2.1">Whether the authenticating party should send a standalone or landmark certificate<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-8-2.3">
           <p id="section-8-2.3.1">What the relying party should communicate to the authenticating party to help it make this decision<a href="#section-8-2.3.1" class="pilcrow">¶</a></p>
@@ -4756,12 +4757,12 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
         <h3 id="name-using-trust-anchor-ids">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-using-trust-anchor-ids" class="section-name selfRef">Using Trust Anchor IDs</a>
         </h3>
-<p id="section-8.2-1">A full certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a full certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether the full certificate would be acceptable.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-1">A standalone certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a standalone certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether the standalone certificate would be acceptable.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<p id="section-8.2-3">A full certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">A signatureless certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmarks" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a signatureless certificate SHOULD also be provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
-<p id="section-8.2-5">A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD configure the <code>trust_anchors</code> extension to advertise the highest supported landmark in the set. The selection procedures defined in <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <a href="#extensions-to-trust-anchor-ids" class="auto internal xref">Section 8.1</a> will then correctly determine whether a signatureless certificate is compatible with the relying party.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
-<p id="section-8.2-6">When both a signatureless and full certificate are supported by a relying party, an authenticating party SHOULD preferentially use the signatureless certificate. A signatureless certificate asserts the same information as its full counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a signatureless certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">A landmark certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a landmark certificate SHOULD also be provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-5">A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD configure the <code>trust_anchors</code> extension to advertise the highest supported landmark in the set. The selection procedures defined in <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <a href="#extensions-to-trust-anchor-ids" class="auto internal xref">Section 8.1</a> will then correctly determine whether a landmark certificate is compatible with the relying party.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">When both a landmark and standalone certificate are supported by a relying party, an authenticating party SHOULD preferentially use the landmark certificate. A landmark certificate asserts the same information as its standalone counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a landmark certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -4772,9 +4773,9 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-acme-extensions" class="section-name selfRef">ACME Extensions</a>
       </h2>
 <p id="section-9-1">This section describes how to issue Merkle Tree certificates using ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for full and signatureless certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the full certificate, constructed as described in <a href="#full-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">The full certificate response SHOULD additionally carry a alternate URL for the signatureless certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the signatureless certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a signatureless certificate, as described in <a href="#signatureless-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-2">When downloading the certificate (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-12.5.1" class="relref">Section 12.5.1</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. <a href="#use-in-tls" class="auto internal xref">Section 8</a> decribes the trust anchor ID assignments for standalone and landmark certificates.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in <a href="#standalone-certificates" class="auto internal xref">Section 6.2</a>.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-4">The standalone certificate response SHOULD additionally carry an alternate URL for the landmark certificate, as described <span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>. Before the landmark certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-10.2.3" class="relref">Section 10.2.3</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark certificate, as described in <a href="#landmark-certificates" class="auto internal xref">Section 6.3</a> and serves it from the alternate URL.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <p id="section-9-5">ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.<a href="#section-9-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4793,9 +4794,9 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
           <h4 id="name-certification-authority-cost">
 <a href="#section-10.1.1" class="section-number selfRef">10.1.1. </a><a href="#name-certification-authority-cost" class="section-name selfRef">Certification Authority Costs</a>
           </h4>
-<p id="section-10.1.1-1">While Merkle Tree certificates expects CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-1">While Merkle Tree certificates expect CAs to operate logs, the costs of these logs are expected to be much lower than a CT log from <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>:<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-2"><a href="#publishing-logs" class="auto internal xref">Section 5.6</a> does not constrain the API to the one defined in <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span> or <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>. If the PKI uses a tile-based protocol, such as <span>[<a href="#TLOG-TILES" class="cite xref">TLOG-TILES</a>]</span>, the issuance log benefits from the improved caching properties of such designs.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. The costs are thus expected to scale with the CA's own operations.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-10.1.1-3">Unlike a CT log, an issuance log does not have public submission APIs. Log entries are only added by the CA directly. Costs are thus expected to scale with the CA's own issuance.<a href="#section-10.1.1-3" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-4">A CA only needs to produce a digital signature for every checkpoint, rather than for every certificate. The lower signature rate requirements could allow more secure and/or economical key storage choices.<a href="#section-10.1.1-4" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-5">Individual entries are kept small and do not scale with public key or signature sizes. This mitigates growth from post-quantum algorithms. Public keys in entries are replaced with fixed-sized hashes. There are no signatures in entries themselves, and only signatures on the very latest checkpoint are retained. Every new checkpoint completely subsumes the old checkpoint, so there is no need to retain older signatures. Likewise, a subtree is only signed if contained in another signed checkpoint.<a href="#section-10.1.1-5" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-6">Log pruning (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>) allows a long-lived log to serve only the more recent entries, scaling with the size of the retention window, rather than the log's total lifetime.<a href="#section-10.1.1-6" class="pilcrow">¶</a></p>
@@ -4808,7 +4809,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-10.1.2" class="section-number selfRef">10.1.2. </a><a href="#name-cosigner-costs" class="section-name selfRef">Cosigner Costs</a>
           </h4>
 <p id="section-10.1.2-1">The costs of cosigners vary by cosigner role. A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, requires very little state and can be run with low cost.<a href="#section-10.1.2-1" class="pilcrow">¶</a></p>
-<p id="section-10.1.2-2">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs comparable roles as CT logs, but several of the cost-saving properties in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a> also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are also naturally batched and serialized.<a href="#section-10.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-10.1.2-2">A mirroring cosigner, such as <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>, performs a role comparable to CT logs, but several of the cost-saving properties in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a> also apply: improved protocols, smaller entries, less frequent signatures, and log pruning. While a mirror does need to accommodate another party's (the CA's) growth rate, it grows only from new issuances from that one CA. If one CA's issuance rate exceeds the mirror's capacity, that does not impact the mirror's copies of other CAs. Mirrors also do not need to defend against a client uploading a large number of existing certificates all at once. Submissions are naturally batched and serialized.<a href="#section-10.1.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitor-costs">
@@ -4816,7 +4817,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
           <h4 id="name-monitor-costs">
 <a href="#section-10.1.3" class="section-number selfRef">10.1.3. </a><a href="#name-monitor-costs" class="section-name selfRef">Monitor Costs</a>
           </h4>
-<p id="section-10.1.3-1">In a CT-based PKI, every log carries a potentially distinct subset of active certificates, so monitors must check the contents of every CT log. At the same time, certificates are commonly synchronized between CT logs. As a result, a monitor will typically download each certificate multiple times, once for every log. In Merkle Tree Certificates, each entry appears in exactly one log. A relying party might require a log to be covered by a quorum of mirrors, but each mirror is cryptographically verified to serve the same contents. Once a monitor has obtained some entry from one mirror, it does not need to download it from the others.<a href="#section-10.1.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.1.3-1">In a CT-based PKI, every log carries a potentially distinct subset of active certificates. Monitors must check the contents of every CT log. At the same time, certificates are commonly synchronized between CT logs. As a result, a monitor will typically download each certificate multiple times, once for every log. In Merkle Tree Certificates, each entry appears in exactly one log. A relying party might require a log to be covered by a quorum of mirrors, but each mirror is cryptographically verified to serve the same contents. Once a monitor has obtained some entry from one mirror, it does not need to download it from the others.<a href="#section-10.1.3-1" class="pilcrow">¶</a></p>
 <p id="section-10.1.3-2">In addition to downloading each entry only once, the entries themselves are smaller, as discussed in <a href="#certification-authority-costs" class="auto internal xref">Section 10.1.1</a>.<a href="#section-10.1.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4828,8 +4829,8 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-choosing-cosigners" class="section-name selfRef">Choosing Cosigners</a>
         </h3>
 <p id="section-10.2-1">In selecting trusted cosigners and cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>), relying parties navigate a number of trade-offs:<a href="#section-10.2-1" class="pilcrow">¶</a></p>
-<p id="section-10.2-2">A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, is very cheap to run, but does not guarantee durable logging, while a mirroring cosigner is more expensive and may take longer to cosign structures. Requiring a mirror signature provides stronger guarantees to the relying party, which in turn can reduce the requirements on CAs (see <a href="#log-availability" class="auto internal xref">Section 10.3</a>), however it may cause certificate issuance to take longer. That said, mirrors are comparable to CT logs, if not cheaper (see <a href="#operational-costs" class="auto internal xref">Section 10.1</a>), so they may be appropriate in PKIs where running CT logs is already viable.<a href="#section-10.2-2" class="pilcrow">¶</a></p>
-<p id="section-10.2-3">Relying parties that require larger quorums of trusted cosigners can reduce the trust placed in any individual cosigner. However, these larger quorums result in larger, more expensive full certificates. The cost of this will depend on how frequently the signatureless optimization occurs in a given PKI. Conversely, relying parties that require smaller quorums have smaller full certificates, but place more trust in their cosigners.<a href="#section-10.2-3" class="pilcrow">¶</a></p>
+<p id="section-10.2-2">A consistency-checking cosigner, such as <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span>, is inexpensive to run, but does not guarantee durable logging. A mirroring cosigner is more expensive and may take longer to cosign structures. Requiring a mirror signature provides stronger guarantees to the relying party, which in turn can reduce the requirements on CAs (see <a href="#log-availability" class="auto internal xref">Section 10.3</a>), however it may cause certificate issuance to take longer. That said, mirrors are comparable to CT logs, if not cheaper (see <a href="#operational-costs" class="auto internal xref">Section 10.1</a>), so they may be appropriate in PKIs where running CT logs is already viable.<a href="#section-10.2-2" class="pilcrow">¶</a></p>
+<p id="section-10.2-3">Relying parties that require larger quorums of trusted cosigners can reduce the trust placed in any individual cosigner. However, larger quorums result in larger, more expensive standalone certificates. The cost of standalone certificates will depend on how frequently the landmark optimization occurs in a given PKI. Conversely, relying parties that require smaller quorums have smaller standalone certificates, but place more trust in their cosigners.<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 <p id="section-10.2-4">Relying party policies also impact monitor operation. If a relying party accepts any one of three cosigners, monitors SHOULD check the checkpoints of all three. Otherwise, a malicious CA may send different split views to different cosigners. More generally, monitors SHOULD check the checkpoints in the union of all cosigners trusted by all supported relying parties. This is an efficient check because, if the CA is operating correctly, all cosigners will observe the same tree. Thus the monitor only needs to check consistency proofs between the checkpoints, and check the log contents themselves once. Monitors MAY also rely on other parties in the transparency ecosystem to perform this check.<a href="#section-10.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4839,14 +4840,14 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-log-availability" class="section-name selfRef">Log Availability</a>
         </h3>
 <p id="section-10.3-1">CAs and mirrors are expected to serve their log contents over HTTP. It is possible for the contents to be unavailable, either due to temporary service outage or because the log has been pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). If some resources are unavailable, they may not be visible to monitors.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
-<p id="section-10.3-2">As in CT, PKIs which deploy Merkle Tree certificates SHOULD establish availability policies, adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
+<p id="section-10.3-2">As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish availability policies. These policies SHOULD be adhered to by trusted CAs and mirrors, and enforced by relying party vendors as a condition of trust. Exact availability policies for these services are out of scope for this document, but this section provides some general guidance.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
 <p id="section-10.3-3">Availability policies SHOULD specify how long an entry must be made available, before a CA or mirror is permitted to prune the entry. It is RECOMMENDED to define this using a <em>retention period</em>, which is some time after the entry has expired. In such a policy, an entry could only be pruned if it, and all preceding entries, have already expired for the retention period. Policies MAY opt to set different retention periods between CAs and mirrors. Permitting limited log retention is analogous to the CT practice of temporal sharding <span>[<a href="#CHROME-CT" class="cite xref">CHROME-CT</a>]</span>, except that a pruned issuance log remains compatible with older, unupdated relying parties.<a href="#section-10.3-3" class="pilcrow">¶</a></p>
 <p id="section-10.3-4">Such policies impact monitors. If the retention period is, e.g. 6 months, this means that monitors are expected to check entries of interest within 6 months. It also means that a new monitor may only be aware of a 6 month history of entries issued for a particular domain.<a href="#section-10.3-4" class="pilcrow">¶</a></p>
 <p id="section-10.3-5">If historical data is not available to verify the retention period, such as information in another mirror or a trusted summary of expiration dates of entries, it may not be possible to confirm correct behavior. This is mitigated by the revocation process described in <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>: if a CA were to prune a forward-dated entry and, in the 6 months when the entry was available, no monitor noticed the unusual expiry, an updated relying party would not accept it anyway.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
-<p id="section-10.3-6">The log pruning process simply makes some resources unavailable, so availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
-<p id="section-10.3-7">PKIs that require mirror cosignatures (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) can impose minimal to no availability requirements on CAs, all without compromising transparency goals. If a CA never makes some entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA which is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
+<p id="section-10.3-6">The log pruning process simply makes some resources unavailable. Availability policies SHOULD constrain log pruning in the same way as general resource availability. That is, if it would be a policy violation for the log to fail to serve a resource, it should also be a policy violation for the log to prune such that the resource is removed, and vice versa.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
+<p id="section-10.3-7">PKIs that require mirror cosignatures (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) can impose minimal to no availability requirements on CAs without compromising transparency goals. If a CA never makes an entry available, mirrors will be unable to update. This will prevent relying parties from accepting the undisclosed entries. However, a CA that is persistently unavailable may not offer sufficient benefit to be used by authenticating parties or trusted by relying parties.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <p id="section-10.3-8">However, if a mirror's interface becomes unavailable, monitors may be unable to check for unauthorized issuance, if the entries are not available in another mirror. This does compromise transparency goals. As such, availability policies SHOULD set availability expectations on mirrors. This can also be mitigated by using multiple mirrors, either directly enforced in cosigner requirements, or by keeping mirrors up-to-date with each other.<a href="#section-10.3-8" class="pilcrow">¶</a></p>
-<p id="section-10.3-9">In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs thus SHOULD set availability requirements on CAs.<a href="#section-10.3-9" class="pilcrow">¶</a></p>
+<p id="section-10.3-9">In PKIs that do not require mirroring cosigners, the CA's serving endpoint is more crucial for monitors. Such PKIs SHOULD set availability requirements on CAs.<a href="#section-10.3-9" class="pilcrow">¶</a></p>
 <p id="section-10.3-10">In each of these cases, availability failures can be mitigated by revoking the unavailable entries by index, as described in <a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>, likely as a first step in a broader distrust.<a href="#section-10.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4855,10 +4856,10 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
         <h3 id="name-certificate-renewal">
 <a href="#section-10.4" class="section-number selfRef">10.4. </a><a href="#name-certificate-renewal" class="section-name selfRef">Certificate Renewal</a>
         </h3>
-<p id="section-10.4-1">When an authenticating party requests a certificate, the signatureless certificate will not be available until the next landmark is ready. From there, the signatureless certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
-<p id="section-10.4-2">To maximize coverage of the signatureless certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate some time before the previous Merkle Tree certificate expires. Renewing around 75% into the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.<a href="#section-10.4-2" class="pilcrow">¶</a></p>
+<p id="section-10.4-1">When an authenticating party requests a certificate, the landmark certificate will not be available until the next landmark is ready. From there, the landmark certificate will not be available until relying parties receive new trusted subtrees.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
+<p id="section-10.4-2">To maximize coverage of the landmark certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate before the previous Merkle Tree certificate expires. Renewing around 75% of the way through the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.<a href="#section-10.4-2" class="pilcrow">¶</a></p>
 <p id="section-10.4-3">The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.<a href="#section-10.4-3" class="pilcrow">¶</a></p>
-<p id="section-10.4-4">If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a full certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new signatureless certificate is available and relying parties are updated.<a href="#section-10.4-4" class="pilcrow">¶</a></p>
+<p id="section-10.4-4">If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a standalone certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new landmark certificate is available and relying parties are updated.<a href="#section-10.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multiple-ca-keys">
@@ -4876,7 +4877,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to its use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">The Privacy Considerations described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-8" class="relref">Section 8</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> apply to their use with Merkle Tree Certificates.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">In particular, relying parties that share an update process for trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) will fetch the same stream of updates. However, updates may reach different users at different times, resulting in some variation across users. This variation may contribute to a fingerprinting attack <span>[<a href="#RFC6973" class="cite xref">RFC6973</a>]</span>. If the Merkle Tree CA trust anchors are sent unconditionally in <code>trust_anchors</code>, this variation will be passively observable. If they are sent conditionally, e.g. with the DNS mechanism, the trust anchor list will require active probing.<a href="#section-11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4893,14 +4894,14 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-12.1-1">A key security requirement of any PKI scheme is that relying parties only accept assertions that were certified by a trusted certification authority. Merkle Tree certificates achieve this by ensuring the relying party only accepts authentic subtree hashes:<a href="#section-12.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.1-2.1">
-            <p id="section-12.1-2.1.1">In full certificates, the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) are expected to include some signature by the CA's cosigner. The CA's cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>) is defined to certify the contents of every checkpoint and subtree that it signs.<a href="#section-12.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-12.1-2.1.1">In standalone certificates, the relying party's cosigner requirements (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) are expected to include some signature by the CA's cosigner. The CA's cosigner (<a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a>) is defined to certify the contents of every checkpoint and subtree that it signs.<a href="#section-12.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-12.1-2.2">
-            <p id="section-12.1-2.2.1">In signatureless certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>).<a href="#section-12.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-12.1-2.2.1">In landmark certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>).<a href="#section-12.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-12.1-3">Given such a subtree hash, computed over entries that the CA certified, it then must be computationally infeasible to construct an entry not on this list, and some inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
-<p id="section-12.1-4">Log entries contain public key hashes, so it must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.<a href="#section-12.1-4" class="pilcrow">¶</a></p>
+<p id="section-12.1-3">Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
+<p id="section-12.1-4">Log entries contain public key hashes. It must additionally be computationally infeasible to compute a public key whose hash matches the entry, other than the intended public key. This also requires a collision-resistant hash.<a href="#section-12.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="transparency">
@@ -4910,7 +4911,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
         </h3>
 <p id="section-12.2-1">The transparency mechanisms in this document do not prevent a CA from issuing an unauthorized certificate. Rather, they provide comparable security properties as Certificate Transparency <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span> in ensuring that all certificates are either rejected by relying parties, or visible to monitors and, in particular, the subject of the certificate.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
 <p id="section-12.2-2">Compared to Certificate Transparency, some of the responsibilities of a log have moved to the CA. All signatures generated by the CA in this system are assertions about some view of the CA's issuance log. However, a CA does not need to function correctly to ensure transparency properties. Relying parties are expected to require a quorum of additional cosigners, which together enforce properties of the log (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) and prevent or detect CA misbehavior:<a href="#section-12.2-2" class="pilcrow">¶</a></p>
-<p id="section-12.2-3">A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views between each other. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
+<p id="section-12.2-3">A CA might violate the append-only property of its log and present different views to different parties. However, each individual cosigner will only follow a single append-only view of the log history. Provided the cosigners are correctly operated, relying parties and monitors will observe consistent views. Views that were not cosigned at all may not be detected, but they also will not be accepted by relying parties.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
 <p id="section-12.2-4">If the CA sends one view to some cosigners and another view to other cosigners, it is possible that multiple views will be accepted by relying parties. However, in that case monitors will observe that cosigners do not match each other. Relying parties can then react by revoking the inconsistent indices (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), and likely removing the CA. If the cosigners are mirrors, the underlying entries in both views will also be visible.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
 <p id="section-12.2-5">A CA might correctly construct its log, but refuse to serve some unauthorized entry, e.g. by feigning an outage or pruning the log outside the retention policy (<a href="#log-availability" class="auto internal xref">Section 10.3</a>). If the relying party requires cosignatures from trusted mirrors, the entry will either be visible to monitors in the mirrors, or have never reached a mirror. In the latter case, the entry will not have been cosigned, so the relying party would not accept it. If the relying party accepts log views without a trusted mirror, the unauthorized entry may not be available. However, the existence of <em>some</em> entry at that index will be visible, so monitors will know the CA is failing to present an entry. Relying parties can then react by revoking the undisclosed entries by index (<a href="#revocation-by-index" class="auto internal xref">Section 7.5</a>), and likely removing the CA.<a href="#section-12.2-5" class="pilcrow">¶</a></p>
 </section>
@@ -4940,7 +4941,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-12.5" class="section-number selfRef">12.5. </a><a href="#name-new-log-entry-types" class="section-name selfRef">New Log Entry Types</a>
         </h3>
 <p id="section-12.5-1">MerkleTreeCertEntry (<a href="#log-entries" class="auto internal xref">Section 5.3</a>) is extensible and permits protocol extensions to define new formats for the CA to certify. This means older CAs, cosigners, relying parties, and monitors might interact with new entries:<a href="#section-12.5-1" class="pilcrow">¶</a></p>
-<p id="section-12.5-2"><a href="#log-entries" class="auto internal xref">Section 5.3</a> and <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a> forbid a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 can never sign an unrecognized X.509 extension.<a href="#section-12.5-2" class="pilcrow">¶</a></p>
+<p id="section-12.5-2"><a href="#log-entries" class="auto internal xref">Section 5.3</a> and <a href="#certification-authority-cosigners" class="auto internal xref">Section 5.5</a> forbid a CA from logging or signing entries that it does not recognize. A CA cannot faithfully claim to certify information if it does not understand it. This is analogous to how a correctly-operated X.509 CA can never sign an unrecognized X.509 extension.<a href="#section-12.5-2" class="pilcrow">¶</a></p>
 <p id="section-12.5-3">External cosigners may or may not interact with the unrecognized entries. <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span> and <span>[<a href="#TLOG-WITNESS" class="cite xref">TLOG-WITNESS</a>]</span> describe cosigners whose roles do not interpret the contents of log entries. New entry types MAY be added without updating them. If a cosigner role does interpret a log entry, it MUST define how it interacts with unknown ones.<a href="#section-12.5-3" class="pilcrow">¶</a></p>
 <p id="section-12.5-4">If a relying party trusts an issuance log, but the issuance log contains an unrecognized entry, the entry will not cause it to accept an unexpected certificate. In <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a>, the relying party constructs the MerkleTreeCertEntry that it expects. The unrecognized entry will have a different <code>type</code> value, so the proof will never succeed, assuming the underlying hash function remains collision-resistant.<a href="#section-12.5-4" class="pilcrow">¶</a></p>
 <p id="section-12.5-5">If a monitor observes an entry with unknown type, it may not be able to determine if it is of interest. For example, it may be unable to tell whether it covers some relevant DNS name. Until the monitor is updated to reflect the current state of the PKI, the monitor may be unable to detect all misissued certificates.<a href="#section-12.5-5" class="pilcrow">¶</a></p>
@@ -4953,7 +4954,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <a href="#section-12.6" class="section-number selfRef">12.6. </a><a href="#name-certificate-malleability" class="section-name selfRef">Certificate Malleability</a>
         </h3>
 <p id="section-12.6-1">An ASN.1 structure like X.509’s Certificate is an abstract data type that is independent of its serialization. There are multiple encoding rules for ASN.1. Commonly, protocols use DER <span>[<a href="#X.690" class="cite xref">X.690</a>]</span>, such as <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. This aligns with <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.1.1.3" class="relref">Section 4.1.1.3</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>, which says X.509 signatures are computed over the DER-encoded TBSCertificate. After signature verification, applications can assume the DER-encoded TBSCertificate is not malleable.<a href="#section-12.6-1" class="pilcrow">¶</a></p>
-<p id="section-12.6-2">While the signature verification process in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:<a href="#section-12.6-2" class="pilcrow">¶</a></p>
+<p id="section-12.6-2">When the signature verification process in <a href="#verifying-certificate-signatures" class="auto internal xref">Section 7.2</a> first transforms the TBSCertificate into a TBSCertificateLogEntry, it preserves this non-malleability. There is a unique valid DER encoding for every abstract TBSCertificate structure, so malleability of the DER-encoded TBSCertificate reduces to malleability of the TBSCertificate value:<a href="#section-12.6-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.6-3.1">
             <p id="section-12.6-3.1.1">The <code>version</code>, <code>issuer</code>, <code>validity</code>, <code>subject</code>, <code>issuerUniqueID</code>, <code>subjectUniqueID</code>, and <code>extensions</code> fields are copied from the TBSCertificate to the TBSCertificateLogEntry unmodified, so they are directly authenticated by the inclusion proof.<a href="#section-12.6-3.1.1" class="pilcrow">¶</a></p>
@@ -4988,8 +4989,8 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 </li>
         </ul>
 <p id="section-12.6-7">These additional checks are redundant in X.509 implementations that use a conforming DER parser.<a href="#section-12.6-7" class="pilcrow">¶</a></p>
-<p id="section-12.6-8"><a href="#log-entries" class="auto internal xref">Section 5.3</a> requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates is new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.<a href="#section-12.6-8" class="pilcrow">¶</a></p>
-<p id="section-12.6-9">The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tree Certificates, similar to ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.<a href="#section-12.6-9" class="pilcrow">¶</a></p>
+<p id="section-12.6-8"><a href="#log-entries" class="auto internal xref">Section 5.3</a> requires that the TBSCertificateLogEntry in a MerkleTreeCertEntry be DER-encoded, so applying a stricter parser will be compatible with conforming CAs. While these existing non-conforming implementations may be unable to switch to a DER parser due to compatibility concerns, Merkle Tree Certificates are new, so there is no existing deployment of malformed BER-encoded TBSCertificateLogEntry structures.<a href="#section-12.6-8" class="pilcrow">¶</a></p>
+<p id="section-12.6-9">The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tree Certificates, similar to an ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.<a href="#section-12.6-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -6485,8 +6486,20 @@ final version of this document.<a href="#appendix-E-1.1.1" class="pilcrow">¶</a
 <li class="normal" id="appendix-E.12-1.1">
             <p id="appendix-E.12-1.1.1">Address editorial comments from WG adoption call<a href="#appendix-E.12-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-E.12-1.2">
-            <p id="appendix-E.12-1.2.1">Included subject public key algorithm in log entries<a href="#appendix-E.12-1.2.1" class="pilcrow">¶</a></p>
+        </ul>
+</section>
+</div>
+<div id="since-draft-ietf-plants-merkle-tree-certs-01">
+<section id="appendix-E.13">
+        <h3 id="name-since-draft-ietf-plants-merk">
+<a href="#name-since-draft-ietf-plants-merk" class="section-name selfRef">Since draft-ietf-plants-merkle-tree-certs-01</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="appendix-E.13-1.1">
+            <p id="appendix-E.13-1.1.1">Renamed full certificate to standalone certificate, signatureless certificate to landmark certificate.<a href="#appendix-E.13-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="appendix-E.13-1.2">
+            <p id="appendix-E.13-1.2.1">Included subject public key algorithm in log entries<a href="#appendix-E.13-1.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
