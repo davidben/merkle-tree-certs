@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 28 August 2026                                                 
+Expires: 31 August 2026                                                 
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                        24 February 2026
+                                                        27 February 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 August 2026.
+   This Internet-Draft will expire on 31 August 2026.
 
 Copyright Notice
 
@@ -1242,9 +1242,9 @@ Table of Contents
 
 5.4.1.  Signature Format
 
-   A cosigner computes a cosignature for a subtree in some log by
-   signing a MTCSubtreeSignatureInput, defined below using the TLS
-   presentation language (Section 3 of [RFC8446]):
+   A cosigner computes a cosignature for a subtree in a log by signing a
+   MTCSubtreeSignatureInput, defined below using the TLS presentation
+   language (Section 3 of [RFC8446]):
 
    opaque HashValue[HASH_SIZE];
 
@@ -1383,20 +1383,20 @@ Table of Contents
    deployment would derive from [TLOG-TILES], to match the direction of
    Certificate Transparency and pick up improvements made there._
 
-   _For now, we avoid a normative reference on [TLOG-TILES] and also
+   _For now, we avoid a normative reference to [TLOG-TILES] and also
    capture the fact that the certificate construction is independent of
    the choice of protocol.  Similar to how the CT ecosystem is migrating
    to a tiled interface, were someone to improve on [TLOG-TILES], a PKI
    could migrate to that new protocol without impacting certificate
    verification._
 
-   _That said, this is purely a starting point for describing the
-   design.  We expect the scope of this document, and other related
-   documents to adapt as the work evolves across the IETF, C2SP,
-   Certificate Transparency, and other communities.]]_
+   _This is purely a starting point for describing the design.  We
+   expect the scope of this document, and other related documents to
+   adapt as the work evolves across the IETF, C2SP, Certificate
+   Transparency, and other communities.]]_
 
-   Issuance logs are intended to be publicly accessible in some form, to
-   allow monitors to detect misissued certificates.
+   Issuance logs are intended to be publicly accessible to allow
+   monitors to detect misissued certificates.
 
    The access method does not affect certificate interoperability, so
    this document does not prescribe a specific protocol.  An individual
@@ -1416,9 +1416,9 @@ Table of Contents
 5.6.1.  Log Pruning
 
    Over time, an issuance log's entries will expire and likely be
-   replaced with certificate renewals.  As this happens, the total size
-   of the log grows, even if the unexpired subset remains fixed.  To
-   mitigate this, issuance logs MAY be _pruned_, as described in this
+   replaced as certificates are renewed.  As this happens, the total
+   size of the log grows, even if the unexpired subset remains fixed.
+   To mitigate this, issuance logs MAY be _pruned_, as described in this
    section.
 
    Pruning makes some prefix of the log unavailable, without changing
@@ -1807,7 +1807,7 @@ Table of Contents
        and no signatures.
 
    Before sending this certificate, the authenticating party SHOULD
-   obtain some application-protocol-specific signal that implies the
+   obtain an application-protocol-specific signal that implies the
    relying party has been configured with the corresponding landmark.
    (Section 7.4 defines how relying parties are configured.)  The trust
    anchor ID of the landmark may be used as an efficient identifier in
@@ -1857,7 +1857,7 @@ Table of Contents
    than the three ML-DSA-44 signatures necessary to include post-quantum
    SCTs.
 
-   The proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is
+   Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is
    sufficient for subtrees of up to 2^32 (4,294,967,296) certificates.
 
 7.  Relying Parties
@@ -1893,12 +1893,12 @@ Table of Contents
 
 7.2.  Verifying Certificate Signatures
 
-   When verifying the signature on an X.509 certificate (Step (a)(1) of
+   When verifying the signature of an X.509 certificate (Step (a)(1) of
    Section 6.1.3 of [RFC5280]) whose issuer is a Merkle Tree CA, the
    relying party performs the following procedure:
 
    1.  Check that the TBSCertificate's signature field is id-alg-
-       mtcProof with omitted parameters.  If either check fails, abort
+       mtcProof with omitted parameters.  If this check fails, abort
        this process and fail verification.
 
    2.  Decode the signatureValue as an MTCProof, as described in
@@ -1993,15 +1993,15 @@ Table of Contents
 
    Relying parties SHOULD ensure authenticity by requiring a signature
    from the most recent CA cosigner key.  If the CA is transitioning
-   from an old to new key, the relying party SHOULD accept both until
-   certificates that predate the new key expire.  This is analogous to
-   the signature in a traditional X.509 certificate.
+   from an old to new key, the relying party SHOULD accept both keys
+   until certificates that predate the new key expire.  This is
+   analogous to the signature in a traditional X.509 certificate.
 
    While a CA signature is sufficient to prove a subtree came from the
    CA, this is not enough to ensure the certificate is visible to
    monitors.  A misbehaving CA might not operate the log correctly,
    either presenting inconsistent versions of the log to relying parties
-   and monitors, or refuse to publish some entries.
+   and monitors, or refusing to publish some entries.
 
    To mitigate this, relying parties SHOULD ensure transparency by
    requiring a quorum of signatures from additional cosigners.  At
@@ -2010,7 +2010,7 @@ Table of Contents
    cosigner role that checks this with consistency proofs.  This is not
    sufficient to ensure durable logging.  Section 7.5 discusses
    mitigations for this.  Alternatively, a relying party MAY require
-   cosigners that serve a copy of the log, in addition to enforcing a
+   that cosigners serve a copy of the log, in addition to enforcing a
    consistent view.  For example, [TLOG-MIRROR] describes a "mirror"
    cosigner role.
 
@@ -2019,8 +2019,8 @@ Table of Contents
 
    Cosigner roles are extensible without changes to certificate
    verification itself.  Future specifications and individual
-   deployments MAY define other cosigner roles to incorporate into
-   relying party policies.
+   deployments MAY define other cosigner roles to incorporate in relying
+   party policies.
 
    Section 10.2 discusses additional deployment considerations in
    cosigner selection.
@@ -2103,7 +2103,7 @@ Table of Contents
    (e.g. via [TLOG-MIRROR]) are particularly vulnerable to this.  In
    this case, the indices of the missing entries will still be known, so
    relying parties can use this mechanism to revoke the unknown entries,
-   possibly as an initial, targeted mitigation before a complete CA
+   possibly as an initial, targeted mitigation before complete CA
    removal.
 
    When a CA is found to be untrustworthy, relying parties SHOULD remove
@@ -2332,7 +2332,7 @@ Table of Contents
 
 10.1.1.  Certification Authority Costs
 
-   While Merkle Tree certificates expects CAs to operate logs, the costs
+   While Merkle Tree certificates expect CAs to operate logs, the costs
    of these logs are expected to be much lower than a CT log from
    [RFC6962] or [RFC9162]:
 
@@ -2342,8 +2342,8 @@ Table of Contents
    properties of such designs.
 
    Unlike a CT log, an issuance log does not have public submission
-   APIs.  Log entries are only added by the CA directly.  The costs are
-   thus expected to scale with the CA's own operations.
+   APIs.  Log entries are only added by the CA directly.  Costs are thus
+   expected to scale with the CA's own issuance.
 
    A CA only needs to produce a digital signature for every checkpoint,
    rather than for every certificate.  The lower signature rate
@@ -2375,8 +2375,8 @@ Table of Contents
    cosigner, such as [TLOG-WITNESS], requires very little state and can
    be run with low cost.
 
-   A mirroring cosigner, such as [TLOG-MIRROR], performs comparable
-   roles as CT logs, but several of the cost-saving properties in
+   A mirroring cosigner, such as [TLOG-MIRROR], performs a role
+   comparable to CT logs, but several of the cost-saving properties in
    Section 10.1.1 also apply: improved protocols, smaller entries, less
    frequent signatures, and log pruning.  While a mirror does need to
    accommodate another party's (the CA's) growth rate, it grows only
@@ -2384,12 +2384,12 @@ Table of Contents
    exceeds the mirror's capacity, that does not impact the mirror's
    copies of other CAs.  Mirrors also do not need to defend against a
    client uploading a large number of existing certificates all at once.
-   Submissions are also naturally batched and serialized.
+   Submissions are naturally batched and serialized.
 
 10.1.3.  Monitor Costs
 
    In a CT-based PKI, every log carries a potentially distinct subset of
-   active certificates, so monitors must check the contents of every CT
+   active certificates.  Monitors must check the contents of every CT
    log.  At the same time, certificates are commonly synchronized
    between CT logs.  As a result, a monitor will typically download each
    certificate multiple times, once for every log.  In Merkle Tree
@@ -2407,8 +2407,8 @@ Table of Contents
    In selecting trusted cosigners and cosigner requirements
    (Section 7.3), relying parties navigate a number of trade-offs:
 
-   A consistency-checking cosigner, such as [TLOG-WITNESS], is very
-   cheap to run, but does not guarantee durable logging, while a
+   A consistency-checking cosigner, such as [TLOG-WITNESS], is
+   inexpensive to run, but does not guarantee durable logging.  A
    mirroring cosigner is more expensive and may take longer to cosign
    structures.  Requiring a mirror signature provides stronger
    guarantees to the relying party, which in turn can reduce the
@@ -2418,9 +2418,9 @@ Table of Contents
    be appropriate in PKIs where running CT logs is already viable.
 
    Relying parties that require larger quorums of trusted cosigners can
-   reduce the trust placed in any individual cosigner.  However, these
-   larger quorums result in larger, more expensive standalone
-   certificates.  The cost of this will depend on how frequently the
+   reduce the trust placed in any individual cosigner.  However, larger
+   quorums result in larger, more expensive standalone certificates.
+   The cost of standalone certificates will depend on how frequently the
    landmark optimization occurs in a given PKI.  Conversely, relying
    parties that require smaller quorums have smaller standalone
    certificates, but place more trust in their cosigners.
@@ -2445,11 +2445,12 @@ Table of Contents
    (Section 5.6.1).  If some resources are unavailable, they may not be
    visible to monitors.
 
-   As in CT, PKIs which deploy Merkle Tree certificates SHOULD establish
-   availability policies, adhered to by trusted CAs and mirrors, and
-   enforced by relying party vendors as a condition of trust.  Exact
-   availability policies for these services are out of scope for this
-   document, but this section provides some general guidance.
+   As in CT, PKIs that deploy Merkle Tree certificates SHOULD establish
+   availability policies.  These policies SHOULD be adhered to by
+   trusted CAs and mirrors, and enforced by relying party vendors as a
+   condition of trust.  Exact availability policies for these services
+   are out of scope for this document, but this section provides some
+   general guidance.
 
    Availability policies SHOULD specify how long an entry must be made
    available, before a CA or mirror is permitted to prune the entry.  It
@@ -2477,20 +2478,20 @@ Table of Contents
    the unusual expiry, an updated relying party would not accept it
    anyway.
 
-   The log pruning process simply makes some resources unavailable, so
-   availability policies SHOULD constrain log pruning in the same way as
+   The log pruning process simply makes some resources unavailable.
+   Availability policies SHOULD constrain log pruning in the same way as
    general resource availability.  That is, if it would be a policy
    violation for the log to fail to serve a resource, it should also be
    a policy violation for the log to prune such that the resource is
    removed, and vice versa.
 
    PKIs that require mirror cosignatures (Section 7.3) can impose
-   minimal to no availability requirements on CAs, all without
-   compromising transparency goals.  If a CA never makes some entry
-   available, mirrors will be unable to update.  This will prevent
-   relying parties from accepting the undisclosed entries.  However, a
-   CA which is persistently unavailable may not offer sufficient benefit
-   to be used by authenticating parties or trusted by relying parties.
+   minimal to no availability requirements on CAs without compromising
+   transparency goals.  If a CA never makes an entry available, mirrors
+   will be unable to update.  This will prevent relying parties from
+   accepting the undisclosed entries.  However, a CA that is
+   persistently unavailable may not offer sufficient benefit to be used
+   by authenticating parties or trusted by relying parties.
 
    However, if a mirror's interface becomes unavailable, monitors may be
    unable to check for unauthorized issuance, if the entries are not
@@ -2501,7 +2502,7 @@ Table of Contents
    or by keeping mirrors up-to-date with each other.
 
    In PKIs that do not require mirroring cosigners, the CA's serving
-   endpoint is more crucial for monitors.  Such PKIs thus SHOULD set
+   endpoint is more crucial for monitors.  Such PKIs SHOULD set
    availability requirements on CAs.
 
    In each of these cases, availability failures can be mitigated by
@@ -2517,11 +2518,11 @@ Table of Contents
 
    To maximize coverage of the landmark certificate optimization,
    authenticating parties performing routine renewal SHOULD request a
-   new Merkle Tree certificate some time before the previous Merkle Tree
-   certificate expires.  Renewing around 75% into the previous
-   certificate's lifetime is RECOMMENDED.  Authenticating parties
-   additionally SHOULD retain both the new and old certificates in the
-   certificate set until the old certificate expires.  As the new
+   new Merkle Tree certificate before the previous Merkle Tree
+   certificate expires.  Renewing around 75% of the way through the
+   previous certificate's lifetime is RECOMMENDED.  Authenticating
+   parties additionally SHOULD retain both the new and old certificates
+   in the certificate set until the old certificate expires.  As the new
    subtrees are delivered to relying parties, certificate negotiation
    will transition relying parties to the new certificate, while
    retaining the old certificate for relying parties that are not yet
@@ -2556,7 +2557,7 @@ Table of Contents
 11.  Privacy Considerations
 
    The Privacy Considerations described in Section 8 of
-   [I-D.ietf-tls-trust-anchor-ids] apply to its use with Merkle Tree
+   [I-D.ietf-tls-trust-anchor-ids] apply to their use with Merkle Tree
    Certificates.
 
    In particular, relying parties that share an update process for
@@ -2588,13 +2589,13 @@ Table of Contents
       ahead of time, when the trusted subtrees are predistributed
       (Section 7.4).
 
-   Given such a subtree hash, computed over entries that the CA
-   certified, it then must be computationally infeasible to construct an
-   entry not on this list, and some inclusion proof, such that inclusion
-   proof verification succeeds.  This requires using a collision-
-   resistant hash in the Merkle Tree construction.
+   Given a subtree hash computed over entries that the CA certified, it
+   must be computationally infeasible to construct an entry not on this
+   list, and an inclusion proof, such that inclusion proof verification
+   succeeds.  This requires using a collision-resistant hash in the
+   Merkle Tree construction.
 
-   Log entries contain public key hashes, so it must additionally be
+   Log entries contain public key hashes.  It must additionally be
    computationally infeasible to compute a public key whose hash matches
    the entry, other than the intended public key.  This also requires a
    collision-resistant hash.
@@ -2620,9 +2621,9 @@ Table of Contents
    different views to different parties.  However, each individual
    cosigner will only follow a single append-only view of the log
    history.  Provided the cosigners are correctly operated, relying
-   parties and monitors will observe consistent views between each
-   other.  Views that were not cosigned at all may not be detected, but
-   they also will not be accepted by relying parties.
+   parties and monitors will observe consistent views.  Views that were
+   not cosigned at all may not be detected, but they also will not be
+   accepted by relying parties.
 
    If the CA sends one view to some cosigners and another view to other
    cosigners, it is possible that multiple views will be accepted by
@@ -2699,7 +2700,7 @@ Table of Contents
    Section 5.3 and Section 5.5 forbid a CA from logging or signing
    entries that it does not recognize.  A CA cannot faithfully claim to
    certify information if it does not understand it.  This is analogous
-   to how a correctly-operated X.509 can never sign an unrecognized
+   to how a correctly-operated X.509 CA can never sign an unrecognized
    X.509 extension.
 
    External cosigners may or may not interact with the unrecognized
@@ -2738,7 +2739,7 @@ Table of Contents
    encoded TBSCertificate.  After signature verification, applications
    can assume the DER-encoded TBSCertificate is not malleable.
 
-   While the signature verification process in Section 7.2 first
+   When the signature verification process in Section 7.2 first
    transforms the TBSCertificate into a TBSCertificateLogEntry, it
    preserves this non-malleability.  There is a unique valid DER
    encoding for every abstract TBSCertificate structure, so malleability
@@ -2803,12 +2804,12 @@ Table of Contents
    MerkleTreeCertEntry be DER-encoded, so applying a stricter parser
    will be compatible with conforming CAs.  While these existing non-
    conforming implementations may be unable to switch to a DER parser
-   due to compatibility concerns, Merkle Tree Certificates is new, so
+   due to compatibility concerns, Merkle Tree Certificates are new, so
    there is no existing deployment of malformed BER-encoded
    TBSCertificateLogEntry structures.
 
    The above only ensures the TBSCertificate portion is non-malleable.
-   In Merkle Tree Certificates, similar to ECDSA X.509 signature, the
+   In Merkle Tree Certificates, similar to an ECDSA X.509 signature, the
    signature value is malleable.  Multiple MTCProof structures may prove
    a single TBSCertificate structure.  Additionally, in all X.509-based
    protocols, a BER-based parser for the outer, unsigned Certificate
