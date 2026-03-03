@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-01T03:17:45.254210+00:00",
+  "timestamp": "2026-03-03T02:50:41.548007+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -866,7 +866,7 @@
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2025-06-21T14:18:16Z",
+      "updatedAt": "2026-03-01T23:26:23Z",
       "closedAt": null,
       "comments": [
         {
@@ -882,6 +882,13 @@
           "body": "Post-Photosynthesis triage: Leaving this open to track adding some text about how to recover from policy violations",
           "createdAt": "2025-06-21T14:18:16Z",
           "updatedAt": "2025-06-21T14:18:16Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "(Still need to write it up, but some of us have been noodling over a \"log generation\" design to allow CAs to non-destructively cycle to a new log when an existing log goes wrong.)",
+          "createdAt": "2026-03-01T23:26:23Z",
+          "updatedAt": "2026-03-01T23:26:23Z"
         }
       ]
     },
@@ -2910,6 +2917,22 @@
       "body": "Cf. https://mailarchive.ietf.org/arch/msg/plants/MdvhfJSqd7iDFsglnroAMMXfzok/",
       "createdAt": "2026-02-09T11:47:48Z",
       "updatedAt": "2026-02-09T11:47:48Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 192,
+      "id": "I_kwDOJIBkVc7u7cT0",
+      "title": "Split out an architecture document",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/192",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Overview\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
+      "createdAt": "2026-03-01T23:29:28Z",
+      "updatedAt": "2026-03-01T23:29:28Z",
       "closedAt": null,
       "comments": []
     }
