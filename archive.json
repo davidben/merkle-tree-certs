@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-03T02:50:41.548007+00:00",
+  "timestamp": "2026-03-05T02:46:42.849690+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2930,9 +2930,9 @@
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
-      "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Overview\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
+      "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Most of Overview section\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
       "createdAt": "2026-03-01T23:29:28Z",
-      "updatedAt": "2026-03-01T23:29:28Z",
+      "updatedAt": "2026-03-03T19:25:59Z",
       "closedAt": null,
       "comments": []
     }
