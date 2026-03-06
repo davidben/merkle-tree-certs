@@ -1048,11 +1048,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Merkle Tree Certificates</td>
-<td class="right">February 2026</td>
+<td class="right">March 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Benjamin, et al.</td>
-<td class="center">Expires 31 August 2026</td>
+<td class="center">Expires 7 September 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-plants-merkle-tree-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-27" class="published">27 February 2026</time>
+<time datetime="2026-03-06" class="published">6 March 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-08-31">31 August 2026</time></dd>
+<dd class="expires"><time datetime="2026-09-07">7 September 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 31 August 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -4367,7 +4367,7 @@ struct {
               <p id="section-6.3.1-3.1.1"><code>base_id</code>: An OID arc for trust anchor IDs of individual landmarks<a href="#section-6.3.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.2">
-              <p id="section-6.3.1-3.2.1"><code>max_landmarks</code>: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.3.1-3.2.1"><code>max_active_landmarks</code>: A positive integer, describing the maximum number of landmarks that may contain unexpired certificates at any time<a href="#section-6.3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.3.1-3.3">
               <p id="section-6.3.1-3.3.1"><code>landmark_url</code>: Some URL to fetch the current list of landmarks<a href="#section-6.3.1-3.3.1" class="pilcrow">¶</a></p>
@@ -4376,9 +4376,9 @@ struct {
 <p id="section-6.3.1-4">Landmarks are numbered consecutively from zero. Each landmark has a trust anchor ID, determined by appending the landmark number to <code>base_id</code>. For example, the trust anchor ID for landmark 42 of a sequence with <code>base_id</code> of <code>32473.1</code> would be <code>32473.1.42</code>.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-5">Each landmark specifies a tree size. The first landmark, numbered zero, is always a tree size of zero. The sequence of tree sizes MUST be append-only and strictly monotonically increasing.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-6">Landmarks determine <em>landmark subtrees</em>: for each landmark, other than number zero, let <code>tree_size</code> be the landmark's tree size and <code>prev_tree_size</code> be that of the previous landmark. As described in <a href="#arbitrary-intervals" class="auto internal xref">Section 4.5</a>, select the one or two subtrees that cover <code>[prev_tree_size, tree_size)</code>. Each of those subtrees is a landmark subtree. Landmark zero has no landmark subtrees.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-7">The most recent <code>max_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-8">It is RECOMMENDED that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.3.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-9">Relying parties will locally retain up to <code>2 * max_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure above, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_landmarks</code> of 168. The client state is then 336 hashes, or 10,752 bytes with SHA-256.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-7">The most recent <code>max_active_landmarks</code> landmarks are said to be <em>active</em>. Landmarks MUST be allocated such that, at any given time, only active landmarks contain unexpired certificates. The active landmark subtrees are those determined by the active landmarks. There are at most <code>2 * max_active_landmarks</code> active landmark subtrees at any time. Every unexpired entry will be contained in one or more landmark subtree, or between the last landmark subtree and the latest checkpoint. Active landmark subtrees are predistributed to the relying party as trusted subtrees, as described in <a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>.<a href="#section-6.3.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-8">It is RECOMMENDED that landmarks be allocated following the procedure described in <a href="#allocating-landmarks" class="auto internal xref">Section 6.3.2</a>. If landmarks are allocated incorrectly (e.g. past landmarks change, or <code>max_active_landmarks</code> is inaccurate), there are no security consequences, but some older certificates may fail to validate.<a href="#section-6.3.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-9">Relying parties will locally retain up to <code>2 * max_active_landmarks</code> hashes (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) per CA, so <code>max_active_landmarks</code> should be set to balance the delay between landmarks and the amount of state the relying party must maintain. Using the recommended procedure below, a CA with a maximum certificate lifetime of 7 days, allocating a landmark every hour, will have a <code>max_active_landmarks</code> of 169. The client state is then 338 hashes, or 10,816 bytes with SHA-256.<a href="#section-6.3.1-9" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-10"><code>landmark_url</code> MUST serve a resource with <code>Content-Type: text/plain; charset=utf-8</code> and the following lines. Each line MUST be terminated by a newline character (U+000A):<a href="#section-6.3.1-10" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-11.1">
@@ -4386,7 +4386,7 @@ struct {
 This line MUST satisfy the following, otherwise it is invalid:<a href="#section-6.3.1-11.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3.1-11.1.2.1">
-                  <p id="section-6.3.1-11.1.2.1.1"><code>num_active_landmarks &lt;= max_landmarks</code><a href="#section-6.3.1-11.1.2.1.1" class="pilcrow">¶</a></p>
+                  <p id="section-6.3.1-11.1.2.1.1"><code>num_active_landmarks &lt;= max_active_landmarks</code><a href="#section-6.3.1-11.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-6.3.1-11.1.2.2">
                   <p id="section-6.3.1-11.1.2.2.1"><code>num_active_landmarks &lt;= last_landmark</code><a href="#section-6.3.1-11.1.2.2.1" class="pilcrow">¶</a></p>
@@ -4413,7 +4413,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
               <p id="section-6.3.2-2.2.1">At most once per time interval, append the latest checkpoint tree size to the landmark sequence if it is greater than the last landmark's tree size.<a href="#section-6.3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-6.3.2-3">To ensure that only active landmarks contain unexpired certificates, set <code>max_landmarks</code> to <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-3">To ensure that only active landmarks contain unexpired certificates, set <code>max_active_landmarks</code> to <code>ceil(max_cert_lifetime / time_between_landmarks) + 1</code>, where <code>max_cert_lifetime</code> is the CA's maximum certificate lifetime. The <code>+ 1</code> accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than <code>ceil(max_cert_lifetime / time_between_landmarks)</code> alone would bound.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="constructing-landmark-certificates">
@@ -4760,7 +4760,7 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-8.2-1">A standalone certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a standalone certificate has a trust anchor ID of the corresponding log ID (<a href="#log-ids" class="auto internal xref">Section 5.2</a>). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-02#section-3.2" class="relref">Section 3.2</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>. Authenticating and relying parties SHOULD use the <code>trust_anchors</code> extension to determine whether the standalone certificate would be acceptable.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">[[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 <p id="section-8.2-3">A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">A landmark certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a landmark certificate SHOULD also be provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">A landmark certificate, defined against landmark number <code>L</code>, has a trust anchor ID of <code>base_id</code>, concatenated with <code>L</code>, as described in <a href="#landmark-tree-sizes" class="auto internal xref">Section 6.3.1</a>, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark <code>L</code>, so a landmark certificate SHOULD also be provisioned with an additional trust anchor range whose <code>base</code> is <code>base_id</code>, <code>min</code> is <code>L</code>, and <code>max</code> is <code>L + max_active_landmarks - 1</code>.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <p id="section-8.2-5">A relying party that has been configured with trusted subtrees (<a href="#trusted-subtrees" class="auto internal xref">Section 7.4</a>) derived from a set of landmarks SHOULD configure the <code>trust_anchors</code> extension to advertise the highest supported landmark in the set. The selection procedures defined in <span>[<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span> and <a href="#extensions-to-trust-anchor-ids" class="auto internal xref">Section 8.1</a> will then correctly determine whether a landmark certificate is compatible with the relying party.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
 <p id="section-8.2-6">When both a landmark and standalone certificate are supported by a relying party, an authenticating party SHOULD preferentially use the landmark certificate. A landmark certificate asserts the same information as its standalone counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a landmark certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 </section>
