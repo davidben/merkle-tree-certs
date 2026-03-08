@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-05T02:46:42.849690+00:00",
+  "timestamp": "2026-03-08T02:50:29.401375+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -11322,7 +11322,7 @@
       "labels": [],
       "body": "Closes #163",
       "createdAt": "2026-02-24T20:51:24Z",
-      "updatedAt": "2026-02-27T19:37:40Z",
+      "updatedAt": "2026-03-05T15:34:19Z",
       "baseRepository": "davidben/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "96de61e332bbb14558dff95e692af2306e1d763c",
@@ -11417,6 +11417,26 @@
           "createdAt": "2026-02-24T23:54:46Z",
           "updatedAt": "2026-02-24T23:54:46Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7oT8t0",
+          "commit": {
+            "abbreviatedOid": "0ba41e8"
+          },
+          "author": "aww-aww",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-05T15:34:19Z",
+          "updatedAt": "2026-03-05T15:34:19Z",
+          "comments": [
+            {
+              "originalPosition": 276,
+              "body": "nit: s/,/and/",
+              "createdAt": "2026-03-05T15:34:19Z",
+              "updatedAt": "2026-03-05T15:34:19Z"
+            }
+          ]
         }
       ]
     },
@@ -11651,6 +11671,48 @@
           "body": "",
           "createdAt": "2026-02-25T15:18:36Z",
           "updatedAt": "2026-02-25T15:18:36Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 193,
+      "id": "PR_kwDOJIBkVc7IhGNq",
+      "title": "Rename 'max_landmarks' to 'max_active_landmarks' for clarity, and fix example",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/193",
+      "state": "MERGED",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "* Rename `max_landmarks` to `max_active_landmarks` for clarity, since CAs also need to keep one 'inactive' landmark around in the landmark sequence, and that could lead to implementation confusion.\r\n* Fix example of setting max landmarks. The formula in the recommended procedure for allocating landmarks is `max_landmarks = ceil(max_cert_lifetime / time_between_landmarks) + 1`. The `+ 1` accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than `ceil(max_cert_lifetime / time_between_landmarks)` alone would bound.\r\n\r\n  For example, say we have:\r\n\r\n      time_between_landmarks: 1, giving time intervals [0,1), [1,2), [2,3)\r\n      max_cert_lifetime: 3\r\n      landmarks at times: 0.99, 1, 2, 3\r\n\r\n  The landmark at time 0.99 could contain certs that don't expire until time 3.99. Thus, we need to keep all 4 landmarks active.",
+      "createdAt": "2026-03-06T14:25:38Z",
+      "updatedAt": "2026-03-06T18:33:37Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "44f7abccc9a61aacaa611036d3cdd0ac68eac7de",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "lvalenta/max-active-landmarks",
+      "headRefOid": "df35b3e0c13ae6afaa06ca4abbf58934a404a2d2",
+      "closedAt": "2026-03-06T18:33:37Z",
+      "mergedAt": "2026-03-06T18:33:37Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "0d5dfe448a6dbdd2243d260e3e3f7dd9a6e27433"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7oxoUK",
+          "commit": {
+            "abbreviatedOid": "df35b3e"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Ah yeah that's a better name.",
+          "createdAt": "2026-03-06T18:33:26Z",
+          "updatedAt": "2026-03-06T18:33:26Z",
           "comments": []
         }
       ]
