@@ -21,6 +21,8 @@ type DraftVersion int
 const (
 	VersionDavidben09 DraftVersion = iota
 	VersionDavidben10
+	VersionPlants01
+	VersionPlants02
 )
 
 func (v DraftVersion) String() string {
@@ -29,6 +31,10 @@ func (v DraftVersion) String() string {
 		return "davidben-09"
 	case VersionDavidben10:
 		return "davidben-10"
+	case VersionPlants01:
+		return "plants-01"
+	case VersionPlants02:
+		return "plants-02"
 	}
 	panic(fmt.Sprintf("unknown version %d", v))
 }
@@ -52,6 +58,11 @@ func DraftVersionFromString(s string) (v DraftVersion, ok bool) {
 		return VersionDavidben09, true
 	case "davidben-10":
 		return VersionDavidben10, true
+	case "plants-01":
+		return VersionPlants01, true
+	case "plants-02":
+		return VersionPlants02, true
+
 	default:
 		return 0, false
 	}

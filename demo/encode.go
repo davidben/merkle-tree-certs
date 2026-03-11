@@ -200,6 +200,19 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 		addIssuer(tbs, issuer)
 		addValidity(tbs, entry)
 		addSubject(tbs, entry)
+		// Starting draft-plants-02, the public key algorithm is included in
+		// the entry.
+		if version >= VersionPlants02 {
+			spki := cryptobyte.String(entry.PublicKey)
+			var seq, alg cryptobyte.String
+			if !spki.ReadASN1(&seq, cbasn1.SEQUENCE) ||
+				!spki.Empty() ||
+				!seq.ReadASN1Element(&alg, cbasn1.SEQUENCE) {
+				tbs.SetError(errors.New("could not parse public key"))
+				return
+			}
+			tbs.AddBytes(alg)
+		}
 		tbs.AddASN1(cbasn1.OCTET_STRING, func(spkiHash *cryptobyte.Builder) {
 			h := sha256.Sum256(entry.PublicKey)
 			spkiHash.AddBytes(h[:])
@@ -208,6 +221,7 @@ func MarshalTBSCertificateLogEntry(version DraftVersion, issuer TrustAnchorID, e
 	}
 	b := cryptobyte.NewBuilder(nil)
 	b.AddUint16(entryTypeTBSCert)
+	// Starting draft-davidben-10, the SEQUENCE wrapper is omitted.
 	if version >= VersionDavidben10 {
 		marshalContents(b)
 	} else {
