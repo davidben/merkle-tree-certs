@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-08T02:50:29.401375+00:00",
+  "timestamp": "2026-03-12T02:48:11.022118+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2933,6 +2933,22 @@
       "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Most of Overview section\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
       "createdAt": "2026-03-01T23:29:28Z",
       "updatedAt": "2026-03-03T19:25:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 194,
+      "id": "I_kwDOJIBkVc7xl7Zf",
+      "title": "Account for max cert lifetimes changing over time",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/194",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Over time, a CA's maximum lifetime for new issuance may change. See if we can write our recommended landmark allocation scheme to account for this. (The time between landmarks should get rescaled with the max cert lifetime, I think.)",
+      "createdAt": "2026-03-10T17:39:50Z",
+      "updatedAt": "2026-03-10T17:39:58Z",
       "closedAt": null,
       "comments": []
     }
@@ -11713,6 +11729,61 @@
           "body": "Ah yeah that's a better name.",
           "createdAt": "2026-03-06T18:33:26Z",
           "updatedAt": "2026-03-06T18:33:26Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 195,
+      "id": "PR_kwDOJIBkVc7JkW1s",
+      "title": "Update the demo tool for plants-02",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/195",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Between plants-01 and plants-02, we have one wire format change, which is to include the public key algorithm in the log entry.\r\n\r\nAlso add a plants-01 version. plants-01 is identical to davidben-10, but plants-01 is probably a better name for it.",
+      "createdAt": "2026-03-11T03:16:21Z",
+      "updatedAt": "2026-03-11T04:08:28Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "0d5dfe448a6dbdd2243d260e3e3f7dd9a6e27433",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "demo-draft-02",
+      "headRefOid": "a225c817c49a967bbcbe911375cc6f30bf42d9c2",
+      "closedAt": "2026-03-11T04:08:26Z",
+      "mergedAt": "2026-03-11T04:08:26Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3139899cb51a10cf9a4d55ff22269d8d7bb6660b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7qC4kD",
+          "commit": {
+            "abbreviatedOid": "a225c81"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-11T03:20:53Z",
+          "updatedAt": "2026-03-11T03:20:53Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7qC5jT",
+          "commit": {
+            "abbreviatedOid": "a225c81"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-11T03:22:06Z",
+          "updatedAt": "2026-03-11T03:22:06Z",
           "comments": []
         }
       ]
