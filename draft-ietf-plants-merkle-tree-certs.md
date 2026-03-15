@@ -27,7 +27,8 @@ author:
  -
     ins: "D. O'Brien"
     name: "Devon O'Brien"
-    email: devon.obrien@gmail.com
+    organization: "Apple Inc."
+    email: asymmetric@apple.com
 
  -
     ins: "B.E. Westerbaan"
