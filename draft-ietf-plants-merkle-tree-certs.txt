@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 16 September 2026                                    Apple Inc.
+Expires: 17 September 2026                                    Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           15 March 2026
+                                                           16 March 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 September 2026.
+   This Internet-Draft will expire on 17 September 2026.
 
 Copyright Notice
 
@@ -1060,7 +1060,7 @@ Table of Contents
    +-----+ +-----+ +-----+ +-----+  |
      / \     / \     / \     / \    |
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
-   |0| |1| |2| |3| |4| |4| |6| |7| |8|
+   |0| |1| |2| |3| |4| |5| |6| |7| |8|
    +-+ +-+ +-+ +-+ +-+ +-+ +-+ +=+ +=+
 
       Figure 10: An example showing an inefficient choice of a single
