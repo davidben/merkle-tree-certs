@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-17T02:48:23.637641+00:00",
+  "timestamp": "2026-03-19T02:56:14.980782+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2932,9 +2932,17 @@
       "labels": [],
       "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Most of Overview section\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
       "createdAt": "2026-03-01T23:29:28Z",
-      "updatedAt": "2026-03-03T19:25:59Z",
+      "updatedAt": "2026-03-17T16:08:41Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Another thing to perhaps touch on in the architecture doc is the interaction of MTCs with offline trust anchors.\n\nMTC CAs are similar to intermediate issuing CAs, with online keys. However, many CA operators keep their root keys offline in air-gapped environments. How does that interact with MTCs? Do we do away with offline keys altogether since the issuing keys become de-facto trust anchors anyway?\n\nI suppose you could have an offline key sign the software update that the ships the online trust anchors to relying parties. Not sure if others have thought deeply about this yet.\n\n(Notably, MTC's built-in batch signing is great for slow-but-online HSMs.)",
+          "createdAt": "2026-03-17T16:08:41Z",
+          "updatedAt": "2026-03-17T16:08:41Z"
+        }
+      ]
     },
     {
       "number": 194,
@@ -2951,6 +2959,30 @@
       "updatedAt": "2026-03-10T17:39:58Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 199,
+      "id": "I_kwDOJIBkVc7zuk-G",
+      "title": "Cosigner negotiation",
+      "url": "https://github.com/davidben/merkle-tree-certs/issues/199",
+      "state": "OPEN",
+      "author": "lukevalenta",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "RPs might have disjoint sets of cosigners, so we should have cosigner negotiation in the TLS handshake to allow APs to send only the required cosignatures in standalone certificates.\n\n(I didn't see an existing ticket tracking this yet.)",
+      "createdAt": "2026-03-17T14:49:45Z",
+      "updatedAt": "2026-03-17T14:52:35Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Cf. https://github.com/tlswg/tls-trust-anchor-ids/issues/54",
+          "createdAt": "2026-03-17T14:52:35Z",
+          "updatedAt": "2026-03-17T14:52:35Z"
+        }
+      ]
     }
   ],
   "pulls": [
