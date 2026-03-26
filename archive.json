@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-22T03:13:47.103296+00:00",
+  "timestamp": "2026-03-26T03:18:38.339501+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2956,9 +2956,31 @@
       "labels": [],
       "body": "Over time, a CA's maximum lifetime for new issuance may change. See if we can write our recommended landmark allocation scheme to account for this. (The time between landmarks should get rescaled with the max cert lifetime, I think.)",
       "createdAt": "2026-03-10T17:39:50Z",
-      "updatedAt": "2026-03-10T17:39:58Z",
+      "updatedAt": "2026-03-24T16:29:14Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "> The time between landmarks should get rescaled with the max cert lifetime, I think.\n\nIt's a little trickier than that. There's history involved. As an extreme example, say a CA goes from 1 year certs to 1 week certs, and is targeting 100 active landmarks at a time.\n\nAt those parameters, when certs last a year, you should mint a new landmark every 3.7 days. When they last a week, it's every 1.7 hours. However, right when you switch, if you immediately switch your landmark rare to 1 landmark / 1.7 hours, you'll get much more than 100 active landmarks because that landmark from 1 year ago will still be around. I.e. you have to consider the age of the oldest certificate that is still active.\n\n(TBH if the rate is changing _that_ quickly at once, you probably make a new landmark sequence or something.)",
+          "createdAt": "2026-03-24T13:24:07Z",
+          "updatedAt": "2026-03-24T13:24:07Z"
+        },
+        {
+          "author": "devonobrien",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Depending on the fate of log generations, I wonder if this is something we'd like to align on this pattern as well. Realizing that clients do have a hard cap on the amount of storage / MTCA state they can hold on to at a given time, I don't think it's a desirable property to have landmark distance or effective cert lifetime changing without clear ecosystem signaling at a minimum, and possibly even relying party root program analogs' scrutiny and consensus.\n\nMore broadly, if generations _do_ become part of the design, I think we should enumerate all the situations or operational changes to MTCAs that can or should warrant a generation bump (and I can file an issue to that effect if it's helpful).",
+          "createdAt": "2026-03-24T16:02:04Z",
+          "updatedAt": "2026-03-24T16:02:04Z"
+        },
+        {
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@davidben  In your example, you'd initially issue a landmark every 3-4 days. If you know you'll want to reduce lifetime ahead of time, you can temporarily change the rate: issue one every 10 days: that'll slowly build up a buffer. Not quite sure if that'll be enough in practice.",
+          "createdAt": "2026-03-24T16:29:14Z",
+          "updatedAt": "2026-03-24T16:29:14Z"
+        }
+      ]
     },
     {
       "number": 199,
