@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-26T03:18:38.339501+00:00",
+  "timestamp": "2026-04-02T03:16:50.548015+00:00",
   "repo": "davidben/merkle-tree-certs",
   "labels": [
     {
@@ -2671,15 +2671,15 @@
       "id": "I_kwDOJIBkVc7YPsWE",
       "title": "Consider better names for full and signatureless certificate",
       "url": "https://github.com/davidben/merkle-tree-certs/issues/163",
-      "state": "CLOSED",
+      "state": "OPEN",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-11-15T04:11:01Z",
-      "updatedAt": "2026-02-27T19:37:39Z",
-      "closedAt": "2026-02-27T19:37:39Z",
+      "updatedAt": "2026-03-31T20:56:34Z",
+      "closedAt": null,
       "comments": [
         {
           "author": "davidben",
@@ -2736,6 +2736,13 @@
           "body": "I agree that \"signatureless\" is bad, since although there is not a cryptographic signature, there is still an X.509 signature.\n\nMy proposal is\n- \"Cosigned certificate\", for one whose signature includes actual signatures\n- \"Proof-only certificate\", for one whose signatures does not include actual signatures",
           "createdAt": "2025-11-20T07:23:50Z",
           "updatedAt": "2025-11-20T07:23:50Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "Reopening since there's more discussion on the thread. Landmark => landmark-relative seems to be getting some steam.",
+          "createdAt": "2026-03-31T20:56:34Z",
+          "updatedAt": "2026-03-31T20:56:34Z"
         }
       ]
     },
@@ -2798,7 +2805,7 @@
       "labels": [],
       "body": "At the moment a CA that doesn't have anything to issue, and a CA that can't issue for some technical reason, look the same the outside. We could allow CAs to issue a `null_entry`, just to show it's capable to. Is that worthwhile?",
       "createdAt": "2026-02-08T15:23:02Z",
-      "updatedAt": "2026-02-08T17:01:01Z",
+      "updatedAt": "2026-03-31T22:48:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -2814,6 +2821,20 @@
           "body": "Yeah, not saying that we should require CAs to periodically issue `null_entry`s, but it'd certainly be nice to have the option to set an alert on it for when you know a CA would.",
           "createdAt": "2026-02-08T17:01:01Z",
           "updatedAt": "2026-02-08T17:01:01Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Is this resolved by MTC CAs creating a new signed checkpoint at the same tree size as the previous checkpoint?",
+          "createdAt": "2026-03-31T20:50:03Z",
+          "updatedAt": "2026-03-31T20:50:03Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "body": "I guess it depends on why the CA is stuck. Refreshing the timestamp on your last checkpoint demonstrates that you can generate signatures. But if you want to prove that your log can still move forward, you probably need to actually move the log forward.",
+          "createdAt": "2026-03-31T22:48:00Z",
+          "updatedAt": "2026-03-31T22:48:00Z"
         }
       ]
     },
@@ -12009,6 +12030,46 @@
           "body": "",
           "createdAt": "2026-03-20T13:29:46Z",
           "updatedAt": "2026-03-20T13:29:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 201,
+      "id": "PR_kwDOJIBkVc7PEf3E",
+      "title": "Landmark certificate => landmark-relative certificate",
+      "url": "https://github.com/davidben/merkle-tree-certs/pull/201",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Third time's the charm? Closes #163",
+      "createdAt": "2026-03-31T21:21:16Z",
+      "updatedAt": "2026-04-01T12:48:52Z",
+      "baseRepository": "davidben/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "7fecd363ca8274b464fa9a585964d9818f919322",
+      "headRepository": "davidben/merkle-tree-certs",
+      "headRefName": "landmark-relative",
+      "headRefOid": "96f1e210dc9114dea3ff9927cc90d9d715887285",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7xChhH",
+          "commit": {
+            "abbreviatedOid": "96f1e21"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-01T12:48:52Z",
+          "updatedAt": "2026-04-01T12:48:52Z",
           "comments": []
         }
       ]
