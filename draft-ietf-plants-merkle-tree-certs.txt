@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 17 September 2026                                    Apple Inc.
+Expires: 4 October 2026                                       Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           16 March 2026
+                                                            2 April 2026
 
 
                         Merkle Tree Certificates
@@ -34,11 +34,11 @@ About This Document
 
    This note is to be removed before publishing as an RFC.
 
-   The latest revision of this draft can be found at
-   https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-
-   merkle-tree-certs.html.  Status information for this document may be
-   found at https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-
-   tree-certs/.
+   The latest revision of this draft can be found at https://ietf-
+   plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-
+   certs.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-tree-
+   certs/.
 
    Discussion of this document takes place on the PKI, Logs, And Tree
    Signatures Working Group mailing list (mailto:plants@ietf.org), which
@@ -46,7 +46,7 @@ About This Document
    Subscribe at https://www.ietf.org/mailman/listinfo/plants/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/davidben/merkle-tree-certs.
+   https://github.com/ietf-plants-wg/merkle-tree-certs.
 
 Status of This Memo
 
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 September 2026.
+   This Internet-Draft will expire on 4 October 2026.
 
 Copyright Notice
 
@@ -2904,9 +2904,9 @@ Table of Contents
    [I-D.ietf-tls-trust-anchor-ids]
               Beck, B., Benjamin, D., O'Brien, D., and K. Nekritz, "TLS
               Trust Anchor Identifiers", Work in Progress, Internet-
-              Draft, draft-ietf-tls-trust-anchor-ids-02, 15 September
-              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              tls-trust-anchor-ids-02>.
+              Draft, draft-ietf-tls-trust-anchor-ids-03, 19 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+              trust-anchor-ids-03>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
