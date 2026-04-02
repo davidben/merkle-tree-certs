@@ -14,8 +14,8 @@ venue:
   type: "Working Group"
   mail: "plants@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/plants"
-  github: "davidben/merkle-tree-certs"
-  latest: "https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
+  github: "ietf-plants-wg/merkle-tree-certs"
+  latest: "https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
 
 author:
  -

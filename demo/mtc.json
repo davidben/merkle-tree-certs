@@ -86,7 +86,7 @@
       "NotBefore": "2020-01-01T00:00:00Z",
       "NotAfter": "2030-12-31T23:59:59Z",
       "Subject": {
-        "CommonName": "https://github.com/davidben/merkle-tree-certs/issues/146"
+        "CommonName": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/146"
       },
       "DNSNames": ["e.example"],
       "KeyUsage": ["CertSign"],

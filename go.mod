@@ -1,4 +1,4 @@
-module github.com/davidben/merkle-tree-certs
+module github.com/ietf-plants-wg/merkle-tree-certs
 
 go 1.25.5
 
