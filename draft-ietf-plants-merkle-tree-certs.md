@@ -169,6 +169,13 @@ informative:
     author:
       org: C2SP
 
+  TLOG-COSIGNATURE:
+    title: Transparency Log Cosignatures
+    target: https://c2sp.org/tlog-cosignature
+    date: April 2026
+    author:
+      org: C2SP
+
   # TODO: Remove these when the "Extensions to Tiled Transparency Logs" section is removed.
   TLOG-CHECKPOINT:
     title: Transparency Log Checkpoints
@@ -981,39 +988,58 @@ A single cosigner, with a single cosigner ID and public key, MAY generate cosign
 
 ### Signature Format
 
-A cosigner computes a cosignature for a subtree in a log by signing a MTCSubtreeSignatureInput, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
+A cosigner computes a cosignature for a subtree in a log by signing a CosignedMessage, defined below using the TLS presentation language ({{Section 3 of !RFC8446}}):
 
 ~~~tls-presentation
 opaque HashValue[HASH_SIZE];
 
-/* From Section 4.1 of draft-ietf-tls-trust-anchor-ids */
-opaque TrustAnchorID<1..2^8-1>;
-
 struct {
-    TrustAnchorID log_id;
+    uint8 label[12] = "subtree/v1\n\0";
+    opaque cosigner_name<1..2^8-1>;
+    uint64 timestamp;
+    opaque log_origin<1..2^8-1>;
     uint64 start;
     uint64 end;
-    HashValue hash;
-} MTCSubtree;
-
-struct {
-    uint8 label[16] = "mtc-subtree/v1\n\0";
-    TrustAnchorID cosigner_id;
-    MTCSubtree subtree;
-} MTCSubtreeSignatureInput;
+    HashValue subtree_hash;
+} CosignedMessage;
 ~~~
 
-`log_id` MUST be the issuance log's ID ({{log-ids}}), in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}). `start` and `end` MUST define a valid subtree of the log, and `hash` MUST be the subtree's hash value in the cosigner's view of the log. The `label` is a fixed prefix for domain separation. Its value MUST be the string `mtc-subtree/v1`, followed by a newline (U+000A), followed by a zero byte (U+0000). `cosigner_id` MUST be the cosigner ID, in its binary representation.
+This signature format is designed to be compatible with the ML-DSA-44 signature construction in {{TLOG-COSIGNATURE}}.
 
-The resulting signature is known as a *subtree signature*. When `start` is zero, the resulting signature describes the checkpoint with tree size `end` and is also known as a *checkpoint signature*.
+`label` is a fixed prefix for domain separation. Its value MUST be the string `subtree/v1`, followed by a newline (U+000A), followed by a zero byte (U+0000).
 
-For each supported log, a cosigner retains its checkpoint signature with the largest `end`. This is known as the cosigner's *current* checkpoint. If the cosigner's current checkpoint has tree size `tree_size`, it MUST NOT generate a signature for a subtree `[start, end)` if `start > 0` and `end > tree_size`. That is, a cosigner can only sign a non-checkpoint subtree if it is contained in its current checkpoint. In a correctly-operated cosigner, every signature made by the cosigner can be proven consistent with its current checkpoint with a subtree consistency proof ({{subtree-consistency-proofs}}). As a consequence, a cosigner that signs a subtree is held responsible for all the entries in the tree of size matching the subtree end, even if the corresponding checkpoint is erroneously unavailable.
+`cosigner_name` and `log_origin`, are computed from the cosigner ID and the issuance log's ID ({{log-ids}}), respectively. They contain the concatenation of:
 
-Before signing a subtree, the cosigner MUST ensure that `hash` is consistent with its log state. Different cosigner roles may obtain this assurance differently. For example, a cosigner may compute the hash from its saved log state (e.g. if it is the log operator or maintains a copy of the log) or by verifying a subtree consistency proof ({{subtree-consistency-proofs}}) from its current checkpoint. When a cosigner signs a subtree, it is held responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements.
+* The nine bytes: 0x6f, 0x69, 0x64, 0x2f, 0x2b, 0x06, 0x01, 0x04, 0x01
+* The trust anchor ID's binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}})
 
-Cosigners SHOULD publish their current checkpoint, along with the checkpoint signature.
+This is equivalent to the concatenation of:
 
-[[TODO: CT and tlog put timestamps in checkpoint signatures. Do we want them here? In CT and tlog, the timestamps are monotonically increasing as the log progresses, but we also sign subtrees. We can separate subtree and checkpoint signatures, with timestamps only in the latter, but it's unclear if there is any benefit to this.]]
+* The four-character ASCII string "oid/"
+* The contents octets (i.e. excluding the initial identifier and length octets) of the DER encoding of the trust anchor ID as an OBJECT IDENTIFIER.
+
+For example, the trust anchor ID 32473.1 would be encoded as:
+
+~~~
+0x6f, 0x69, 0x64, 0x2f, 0x2b, 0x06, 0x01, 0x04,
+0x01, 0x81, 0xfd, 0x59, 0x01
+~~~
+
+`start` and `end` MUST define a valid subtree of the log, and `subtree_hash` MUST be the subtree's hash value in the cosigner's view of the log.
+
+`timestamp`, if non-zero, indicates both that the signature was produced at the time, and that `end` is the size of largest consistent tree the cosigner has observed for the log. If `timestamp` is zero, no statement is made about signing time or the largest such tree. If `start` is non-zero, `timestamp` MUST be zero.
+
+The resulting signature is known as a *subtree signature*. When `start` is zero, the resulting signature describes the checkpoint with tree size `end` and is also known as a *checkpoint signature*. All subtree signatures used in this document's certificate construction ({{certificate-format}}) have a `timestamp` of zero.
+
+Before signing a subtree of some log, the cosigner MUST ensure that `subtree_hash` is consistent with its view of the log. Different cosigner roles may obtain this assurance differently. For example:
+
+* A cosigner may maintain a full copy of the log, e.g. if it's the log operator. The cosigner can then compute `subtree_hash` from this copy.
+
+* A cosigner may maintain the hash of the largest consistent tree observed by the log. The cosigner can then check `subtree_hash` with a subtree consistency proof ({{subtree-consistency-proofs}}).
+
+In both cases, the cosigner MUST ensure that, as it updates its view of the log, the old and new views are consistent. For example, {{TLOG-WITNESS}} defines a cosigner that checks consistency proofs ({{Section 2.1.4 of !RFC9162}}) between the two views.
+
+When a cosigner signs a subtree, it is held separately responsible *both* for the subtree being consistent with its other signatures, *and* for the cosigner-specific additional statements. That is, if a cosigner signs an inconsistent subtree, it is held responsible for its additional statements on all entries in the inconsistent subtree, even if some other signed subtree exists that asserts different entries.
 
 ### Signature Algorithms
 
@@ -1179,7 +1205,7 @@ struct {
 } MTCProof;
 ~~~
 
-`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}.
+`start` and `end` MUST contain the corresponding parameters of the chosen subtree. `inclusion_proof` MUST contain a subtree inclusion proof ({{subtree-inclusion-proofs}}) for the log entry and the subtree. `signatures` contains the chosen subtree signatures. In each signature, `cosigner_id` contains the cosigner ID ({{cosigners}}) in its binary representation ({{Section 3 of !I-D.ietf-tls-trust-anchor-ids}}), and `signature` contains the signature value as described in {{signature-format}}. The `timestamp` field used when computing the signature MUST be zero.
 
 The MTCProof is encoded into the `signatureValue` with no additional ASN.1 wrapping. The most significant bit of the first octet of the signature value SHALL become the first bit of the bit string, and so on through the least significant bit of the last octet of the signature value, which SHALL become the last bit of the bit string.
 
@@ -1312,7 +1338,7 @@ When verifying the signature of an X.509 certificate (Step (a)(1) of {{Section 6
 
 1. If `[start, end)` matches a trusted subtree ({{trusted-subtrees}}), check that `expected_subtree_hash` is equal to the trusted subtree's hash. Return success if it matches and failure if it does not.
 
-1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. The `hash` field of the MTCSubtree is set to `expected_subtree_hash`.
+1. Otherwise, check that the MTCProof's `signatures` contain a sufficient set of valid signatures from cosigners to satisfy the relying party's cosigner requirements ({{trusted-cosigners}}). Unrecognized cosigners MUST be ignored. Signatures are verified as described in {{signature-format}}. The `subtree_hash` field of the CosignedMessage is set to `expected_subtree_hash`. The `timestamp` field is set to zero.
 
 This procedure only replaces the signature verification portion of X.509 path validation. The relying party MUST continue to perform other checks, such as checking expiry.
 
@@ -1972,13 +1998,7 @@ Each note signature has a key name of the cosigner name. The signature's key ID 
 key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 ~~~
 
-A subtree whose `start` is zero can also be represented as a checkpoint {{TLOG-CHECKPOINT}}. A corresponding subtree signature can be represented as a note signature using a key ID computed as follows:
-
-~~~pseudocode
-key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-checkpoint/v1")[:4]
-~~~
-
-The only difference between the two forms is the implicit transformation from the signed note text to the MTCSubtree structure.
+[[TODO: This makes more sense on the C2SP side, at which point C2SP can allocate a more idiomatic key ID construction.]]
 
 ## Requesting Subtree Signatures
 
@@ -2173,3 +2193,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Renamed landmark certificate to landmark-relative certificate
 
 - Relaxed restrictions on `null_entry`
+
+- Use a tlog-compatible signature scheme for ease of deployment
