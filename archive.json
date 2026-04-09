@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-05T03:29:20.062298+00:00",
+  "timestamp": "2026-04-09T03:18:37.120785+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -463,7 +463,7 @@
       "labels": [],
       "body": "Filing this to capture TODO in the doc",
       "createdAt": "2023-03-22T20:58:34Z",
-      "updatedAt": "2025-06-21T14:12:03Z",
+      "updatedAt": "2026-04-08T12:43:31Z",
       "closedAt": null,
       "comments": [
         {
@@ -486,6 +486,13 @@
           "body": "Photosynthesis update: still think profile sets make sense for other uses, but for specifically full vs signatureless certificates in the new formulation, probably actually want the same order because it's one issuance event. Maybe a Retry-After or something on the certificate URL or multiple certificate URLs.",
           "createdAt": "2025-06-21T14:12:03Z",
           "updatedAt": "2025-06-21T14:12:03Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "See https://mailarchive.ietf.org/arch/msg/acme/uBEYIiJNAUyw7KKPq6xFO1MlXhM/ for the latest discussions on ACME.",
+          "createdAt": "2026-04-08T12:43:31Z",
+          "updatedAt": "2026-04-08T12:43:31Z"
         }
       ]
     },
@@ -3033,6 +3040,51 @@
           "body": "Cf. https://github.com/tlswg/tls-trust-anchor-ids/issues/54",
           "createdAt": "2026-03-17T14:52:35Z",
           "updatedAt": "2026-03-17T14:52:35Z"
+        }
+      ]
+    },
+    {
+      "number": 202,
+      "id": "I_kwDOJIBkVc78BbHY",
+      "title": "HTTP 503 isn't quite right for pending landmark",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/202",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Watson Ladd points out:\n\n> I'm not sure 503 is the right error code for the landmark-relative cert in ACME: a 400 series code would make more sense given that some are about resource conditions. There isn't one that fits though. 503 may complicate infrastructure monitoring as it is usually a server problem you want to worry about.\n\nhttps://mailarchive.ietf.org/arch/msg/plants/-Q5kuTg9HQUTcbkv8ybIndgqj5U/",
+      "createdAt": "2026-04-08T22:59:42Z",
+      "updatedAt": "2026-04-08T23:36:43Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'd love to use 425 Too Early, because the name is a great fit, but the technical and accepted semantics of that status code are very different.\n\nMaybe 204 No Content, since part of the semantics of that are \"but you should take a look at the headers\"?",
+          "createdAt": "2026-04-08T23:21:34Z",
+          "updatedAt": "2026-04-08T23:21:34Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There's also 404 since that's allowed to be for temporarily not found.\n\nWhichever the status code, do you think it warrants a different header in that case? (I see ACME also has this error system. I've no idea if that's appropriate here.)\n\nWe could go another direction altogether and add a new field to the order object like \"refreshAfter\" that means \"re-fetch the order after this time, I might have a more awesome certificate URL for you\". (Probably still using the alternates system because you still need both certs, but with a new URL that includes the alternate.)",
+          "createdAt": "2026-04-08T23:31:42Z",
+          "updatedAt": "2026-04-08T23:31:42Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "That's a good point, it should almost certainly be accompanied by an ACME problem document. Which would preclude 204.",
+          "createdAt": "2026-04-08T23:35:27Z",
+          "updatedAt": "2026-04-08T23:35:27Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I kinda warming to the order.refreshAfter idea. It also has the nice property that an unaware client will cleanly ignore it. And we're not adding a weird landmark-specific URL field. It the same certificate URL, just maybe the order will get more awesome with time.",
+          "createdAt": "2026-04-08T23:36:43Z",
+          "updatedAt": "2026-04-08T23:36:43Z"
         }
       ]
     }
