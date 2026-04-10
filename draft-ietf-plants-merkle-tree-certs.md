@@ -1706,7 +1706,7 @@ IMPORTS
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-pkix1-explicit-02(51) }
   TrustAnchorID
-  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-trustAnchorIDs-2025(TBD) } ;
