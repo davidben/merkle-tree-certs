@@ -1467,8 +1467,8 @@ When both a landmark and standalone certificate are supported by a relying party
 
 A successful ACME {{!RFC8555}} order ends in the "valid" state, at which point the certificates are available for download and the order object is completed. However, in cases such as landmark-relative Merkle Tree certificate, the order may be in a partially complete state where both:
 
-* Some complete set of certificates are available for download, and the ACME client can begin deploying certificates
-* Additional optional certificates may be available later
+* some complete set of certificates are available for download, and the ACME client can begin deploying certificates; and
+* additional optional certificates may be available later.
 
 To support such cases, this section defines an ACME order extension which indicates the order is in a valid, but *updatable* state:
 
@@ -1485,9 +1485,9 @@ This section describes how to use ACME and updatable ACME orders to issue Merkle
 
 ACME clients and servers used with Merkle Tree certificates SHOULD support:
 
-* Certificate properties ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}})
-* Updatable orders ({{updatable-acme-orders}})
-* Alternate certificates chains ({{Section 7.4.2 of !RFC8555}})
+* certificate properties ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}});
+* updatable orders ({{updatable-acme-orders}}); and
+* alternate certificates chains ({{Section 7.4.2 of !RFC8555}}).
 
 These are used together as follows:
 
