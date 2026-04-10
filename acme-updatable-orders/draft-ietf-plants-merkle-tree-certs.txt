@@ -2333,10 +2333,10 @@ Table of Contents
    Merkle Tree certificate, the order may be in a partially complete
    state where both:
 
-   *  Some complete set of certificates are available for download, and
-      the ACME client can begin deploying certificates
+   *  some complete set of certificates are available for download, and
+      the ACME client can begin deploying certificates; and
 
-   *  Additional optional certificates may be available later
+   *  additional optional certificates may be available later.
 
    To support such cases, this section defines an ACME order extension
    which indicates the order is in a valid, but _updatable_ state:
@@ -2371,12 +2371,12 @@ Table of Contents
    ACME clients and servers used with Merkle Tree certificates SHOULD
    support:
 
-   *  Certificate properties (Section 6 of
-      [I-D.ietf-tls-trust-anchor-ids])
+   *  certificate properties (Section 6 of
+      [I-D.ietf-tls-trust-anchor-ids]);
 
-   *  Updatable orders (Section 9.1)
+   *  updatable orders (Section 9.1); and
 
-   *  Alternate certificates chains (Section 7.4.2 of [RFC8555])
+   *  alternate certificates chains (Section 7.4.2 of [RFC8555]).
 
    These are used together as follows:
 

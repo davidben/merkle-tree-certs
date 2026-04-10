@@ -4795,10 +4795,10 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-9.1-1">A successful ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> order ends in the "valid" state, at which point the certificates are available for download and the order object is completed. However, in cases such as landmark-relative Merkle Tree certificate, the order may be in a partially complete state where both:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-9.1-2.1">
-            <p id="section-9.1-2.1.1">Some complete set of certificates are available for download, and the ACME client can begin deploying certificates<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-9.1-2.1.1">some complete set of certificates are available for download, and the ACME client can begin deploying certificates; and<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-9.1-2.2">
-            <p id="section-9.1-2.2.1">Additional optional certificates may be available later<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-9.1-2.2.1">additional optional certificates may be available later.<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-9.1-3">To support such cases, this section defines an ACME order extension which indicates the order is in a valid, but <em>updatable</em> state:<a href="#section-9.1-3" class="pilcrow">¶</a></p>
@@ -4823,13 +4823,13 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-9.2-2">ACME clients and servers used with Merkle Tree certificates SHOULD support:<a href="#section-9.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-9.2-3.1">
-            <p id="section-9.2-3.1.1">Certificate properties (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-03#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>)<a href="#section-9.2-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-9.2-3.1.1">certificate properties (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-03#section-6" class="relref">Section 6</a> of [<a href="#I-D.ietf-tls-trust-anchor-ids" class="cite xref">I-D.ietf-tls-trust-anchor-ids</a>]</span>);<a href="#section-9.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-9.2-3.2">
-            <p id="section-9.2-3.2.1">Updatable orders (<a href="#updatable-acme-orders" class="auto internal xref">Section 9.1</a>)<a href="#section-9.2-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-9.2-3.2.1">updatable orders (<a href="#updatable-acme-orders" class="auto internal xref">Section 9.1</a>); and<a href="#section-9.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-9.2-3.3">
-            <p id="section-9.2-3.3.1">Alternate certificates chains (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>)<a href="#section-9.2-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-9.2-3.3.1">alternate certificates chains (<span><a href="https://rfc-editor.org/rfc/rfc8555#section-7.4.2" class="relref">Section 7.4.2</a> of [<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>).<a href="#section-9.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-9.2-4">These are used together as follows:<a href="#section-9.2-4" class="pilcrow">¶</a></p>
