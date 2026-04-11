@@ -1463,15 +1463,43 @@ When both a landmark and standalone certificate are supported by a relying party
 
 # ACME Extensions
 
-This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
+## Updatable ACME Orders
+
+A successful ACME {{!RFC8555}} order ends in the "valid" state, at which point the certificates are available for download and the order object is completed. However, in cases such as landmark-relative Merkle Tree certificate, the order may be in a partially complete state where both:
+
+* some complete set of certificates are available for download, and the ACME client can begin deploying certificates; and
+* additional optional certificates may be available later.
+
+To support such cases, this section defines a new ACME order field:
+
+`updatable` (optional, boolean):
+: If present and true, this indicates the order, which MUST be in the "valid" state, is updatable and MAY be fetched again to receive newer state, such as a newer "certificate" URL.
+
+When an order has a usable set of certificates available but may be updated in the future, the ACME server SHOULD set the order to the "valid" state, with the `updatable` field set to true. HTTP responses for the order SHOULD include a Retry-After header field ({{Section 10.2.3 of !RFC9110}}) to suggest a polling interval to the client. After the final update to the order, the server SHOULD set the `updatable` field to false, indicating that the order is fully complete. ACME certificate resources are immutable, so, when updating the contents or response headers of a certificate, the ACME server MUST assign a new URL and update the order's `certificate` field.
+
+Updated orders SHOULD continue to serve a complete set of certificates, without assuming that the ACME client already received the previous set. For example, if an ACME server updates an order to serve an additional alternate certificate chain ({{Section 7.4.2 of !RFC8555}}), the original certificate chain SHOULD continue to be served through the updated order, unless the ACME server intends for the client to no longer use the original certificate chain.
+
+A client that receives an updatable order SHOULD send an ACME POST-as-GET request ({{Section 6.3 of !RFC8555}}) after the time given in the Retry-After header field ({{Section 10.2.3 of !RFC9110}}) of the response, if any. If the updated order contains a different `certificate` URL, the client SHOULD repeat downloading the certificates ({{Section 7.4.2 of !RFC8555}}) and replace the previously-downloaded certificates from this order. The client SHOULD repeat this process until the `updatable` field is no longer true.
+
+## Using ACME with Merkle Tree Certificates
+
+This section describes how to use ACME and updatable ACME orders to issue Merkle Tree certificates.
+
+ACME clients and servers used with Merkle Tree certificates SHOULD support:
+
+* certificate properties ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}});
+* updatable orders ({{updatable-acme-orders}}); and
+* alternate certificates chains ({{Section 7.4.2 of !RFC8555}}).
+
+These are used together as follows:
 
 When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
-When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
+When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}. If the ACME server supports landmark-relative certificates, it SHOULD return an updatable order ({{updatable-acme-orders}}) and set the Retry-After header field to an estimate of when the landmark-relative certificate will be available.
 
-The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}} and serves it from the alternate URL.
+When the landmark-relative certificate is available, the ACME server updates the order with a new `certificate` URL. The new URL SHOULD continue to serve the standalone certificate, but it SHOULD now additionally carry an alternate URL ({{Section 7.4.2 of !RFC8555}}) for the landmark-relative certificate. The alternate URL SHOULD serve trust anchor ID information as above.
 
-ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
+In normal operation, an ACME client will first observe the order only serving a standalone certificate, and later the updated order serving both certificates. However, if the certificate is issued shortly before a landmark is allocated, the landmark-relative certificate will be available very soon after the standalone certificate. Depending on timing, an ACME client might then only observe the updated order. Such a client depends on the updated order serving a complete set certificates, not just the newly-added ones.
 
 # Deployment Considerations
 
@@ -1670,6 +1698,14 @@ IANA is requested to add the following entry to the "SMI Security for PKIX Relat
 | Decimal | Description           | References |
 |---------|-----------------------|------------|
 | TBD     | id-rdna-trustAnchorID | [this-RFC] |
+
+## ACME Order Object Fields
+
+IANA is requested to add the following entry to the "ACME Order Object Fields" registry {{?RFC8555}}:
+
+| Field Name | Field Type | Configurable | References |
+|------------|------------|--------------|------------|
+| updatable  | boolean    | false        | [this-RFC] |
 
 --- back
 
@@ -2173,3 +2209,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 - Renamed landmark certificate to landmark-relative certificate
 
 - Relaxed restrictions on `null_entry`
+
+- Revised ACME integration to pattern after the ACME "processing" state
