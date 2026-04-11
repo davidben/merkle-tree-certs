@@ -4,16 +4,16 @@
 
 This is the working area for the IETF [PLANTS Working Group](https://datatracker.ietf.org/group/plants/documents/) Internet-Draft, "Merkle Tree Certificates".
 
-* [Editor's Copy](https://davidben.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.html)
+* [Editor's Copy](https://ietf-plants-wg.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-ietf-plants-merkle-tree-certs)
 * [Working Group Draft](https://datatracker.ietf.org/doc/html/draft-ietf-plants-merkle-tree-certs)
-* [Compare Editor's Copy to Working Group Draft](https://davidben.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.diff)
+* [Compare Editor's Copy to Working Group Draft](https://ietf-plants-wg.github.io/merkle-tree-certs/#go.draft-ietf-plants-merkle-tree-certs.diff)
 
 
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/davidben/merkle-tree-certs/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/ietf-plants-wg/merkle-tree-certs/blob/main/CONTRIBUTING.md).
 
 The contributing file also has tips on how to make contributions, if you
 don't already know how to do that.

@@ -14,8 +14,8 @@ venue:
   type: "Working Group"
   mail: "plants@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/plants"
-  github: "davidben/merkle-tree-certs"
-  latest: "https://davidben.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
+  github: "ietf-plants-wg/merkle-tree-certs"
+  latest: "https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html"
 
 author:
  -
@@ -209,7 +209,7 @@ This achieves the following:
 
 * To bound growth, long-expired entries can be pruned from logs and mirrors without interrupting existing clients. This allows log sizes to scale by retention policies, not the lifetime of the log, even as certificate lifetimes decrease.
 
-* After a processing delay, authenticating parties can obtain a second "landmark" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.
+* After a processing delay, authenticating parties can obtain a second "landmark-relative" certificate for the same log entry. This second certificate is an optional size optimization that avoids the need for any signatures, assuming an up-to-date client that has some predistributed log information.
 
 {{overview}} gives an overview of the system. {{subtrees}} describes a Merkle Tree primitive used by this system. {{issuance-logs}} describes the log structure. Finally, {{certificates}} and {{relying-parties}} describe how to construct and consume a Merkle Tree certificate.
 
@@ -285,15 +285,15 @@ Cosignature:
 : A signature from either the CA or other cosigner, over some checkpoint or subtree.
 
 Landmark:
-: One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for landmark certificates.
+: One of an infrequent subset of tree sizes that can be used to predistribute trusted subtrees to relying parties for landmark-relative certificates.
 
 Landmark subtree:
-: A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and landmark certificates.
+: A subtree determined by a landmark. Landmark subtrees are common points of reference between relying parties and landmark-relative certificates.
 
 Standalone certificate:
 : A certificate containing an inclusion proof to some subtree, and several cosignatures over that subtree.
 
-Landmark certificate:
+Landmark-relative certificate:
 : An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.
 
 # Overview
@@ -362,7 +362,7 @@ Merkle Tree Certificates are issued as follows. {{fig-issuance-overview}} depict
 
 A certificate with cosignatures is known as a *standalone certificate*. Analogous to X.509 trust anchors and trusted CT logs, relying parties are configured with trusted cosigners ({{trusted-cosigners}}) that allow them to accept Merkle Tree certificates. The inclusion proof proves the TBSCertificate is part of some subtree, and cosignatures from trusted cosigners prove the subtree was certified by the CA and available to monitors. Where CT logs entire certificates, the issuance log's entries are smaller TBSCertificateLogEntry ({{log-entries}}) structures, which do not scale with public key or signature size.
 
-This same issuance process also produces a *landmark certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Landmark certificates are available after a short period of time and usable with up-to-date relying parties.
+This same issuance process also produces a *landmark-relative certificate*. This is an optional, optimized certificate that avoids all cosignatures, including the CA signature. Landmark-relative certificates are available after a short period of time and usable with up-to-date relying parties.
 
 ~~~aasvg
 +-- Certification Authority -----+
@@ -372,12 +372,12 @@ This same issuance process also produces a *landmark certificate*. This is an op
 |  +----+                  |     |  |                |   |
 +--------------------------+-----+  +----------------+---+
                            |                         |
-    2. Make landmark cert  |          3. Distribute  |
-                           |              landmarks  |
+ 2. Make landmark-relative |           3. Distribute |
+    cert                   |              landmarks  |
                            V                         |
 +-- Authenticating Party --------+                   |
 |                                |                   |
-| landmark cert                  |                   V
+| landmark-relative cert         |                   V
 |   tbscert                      |  +-- Up-to-date RP -----+
 |   inclusion proof to landmark -+->| landmark hashes      |
 |                                |  | trusted cosigners    |
@@ -390,20 +390,20 @@ This same issuance process also produces a *landmark certificate*. This is an op
 +--------------------------------+
                      4. Select certificate by RP
 ~~~
-{: #fig-landmark-cert-overview title="A diagram of landmark certificate construction and usage, detailed below"}
+{: #fig-landmark-cert-overview title="A diagram of landmark-relative certificate construction and usage, detailed below"}
 
-Landmark certificates are constructed and used as follows. {{fig-landmark-cert-overview}} depicts this process.
+Landmark-relative certificates are constructed and used as follows. {{fig-landmark-cert-overview}} depicts this process.
 
-1. Periodically, the tree size of the CA's most recent checkpoint is designated as a *landmark*. This determines *landmark subtrees*, which are common points of reference between relying parties and landmark certificates.
+1. Periodically, the tree size of the CA's most recent checkpoint is designated as a *landmark*. This determines *landmark subtrees*, which are common points of reference between relying parties and landmark-relative certificates.
 
-2. Once some landmark includes the TBSCertificate, the landmark certificate is constructed with:
+2. Once some landmark includes the TBSCertificate, the landmark-relative certificate is constructed with:
 
    * The TBSCertificate being certified
    * An inclusion proof from the TBSCertificate to a landmark subtree
 
 3. In the background, landmark subtrees are predistributed to relying parties, with cosignatures checked against relying party requirements. This occurs periodically in the background, separate from the application protocol.
 
-4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the landmark certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark certificates, as described in {{certificate-renewal}}.
+4. During the application protocol, such as TLS {{?RFC8446}}, if the relying party already supports the landmark subtree, the authenticating party can present the landmark-relative certificate. Otherwise, it presents a standalone certificate. The authenticating party may also select between several landmark-relative certificates, as described in {{certificate-renewal}}.
 
 # Subtrees
 
@@ -1139,7 +1139,7 @@ This section defines how to construct Merkle Tree Certificates, which are X.509 
 * A subtree ({{subtrees}}) that contains the log entry
 * Zero or more signatures ({{cosigners}}) over the subtree, which together satisfy relying party requirements ({{trusted-cosigners}})
 
-For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. {{certificate-format}} defines how the certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark certificates, and how to select the subtree and signatures for them.
+For any given TBSCertificateLogEntry, there are multiple possible certificates that may prove the entry is certified by the CA and publicly logged, varying by choice of subtree and signatures. {{certificate-format}} defines how the certificate is constructed based on those choices. {{standalone-certificates}} and {{landmark-relative-certificates}} define two profiles of Merkle Tree Certificates, standalone certificates and landmark-relative certificates, and how to select the subtree and signatures for them.
 
 ## Certificate Format
 
@@ -1204,13 +1204,13 @@ A cosigner MAY expose a private interface for the CA, to reduce denial-of-servic
 
 This document does not place any requirements on how frequently this job runs. More frequent runs results in lower issuance delay, but higher signing overhead. It is RECOMMENDED that CAs run at most one instance of this job at a time, starting the next instance after the previous one completes. A single run collects signatures for all entries since the most recent checkpoint, so there is little benefit to overlapping them. Less frequent runs may also aid relying parties that wish to directly audit signatures, as described in Section 5.2 of {{AuditingRevisited}}, though this document does not define such a system.
 
-## Landmark Certificates
+## Landmark-Relative Certificates
 
-A *landmark certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC8446}}.
+A *landmark-relative certificate* is a Merkle Tree certificate which contains no signatures and instead assumes the relying party had predistributed information about which subtrees were trusted. Landmark-relative certificates are an optional size optimization. They require a processing delay to construct, and only work in a sufficiently up-to-date relying party. Authenticating parties thus SHOULD deploy a corresponding standalone certificate alongside any landmark-relative certificate, and use some application-protocol-specific mechanism to select between the two. {{use-in-tls}} discusses such a mechanism for TLS {{!RFC8446}}.
 
 ### Landmark Tree Sizes
 
-A landmark certificate is constructed based on a *landmark sequence*, which is a sequence of *landmarks*. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a landmark certificate with minimizing the size of the relying party's predistributed state.
+A landmark-relative certificate is constructed based on a *landmark sequence*, which is a sequence of *landmarks*. Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates. Landmarks SHOULD be allocated by the CA, but they can also be allocated by some other coordinating party. It is possible, but NOT RECOMMENDED, for multiple landmark sequences to exist per CA. Landmarks are allocated to balance minimizing the delay in obtaining a landmark-relative certificate with minimizing the size of the relying party's predistributed state.
 
 A landmark sequence has the following fixed parameters:
 
@@ -1247,9 +1247,9 @@ It is RECOMMENDED that landmarks be allocated using the following procedure:
 
 To ensure that only active landmarks contain unexpired certificates, set `max_active_landmarks` to `ceil(max_cert_lifetime / time_between_landmarks) + 1`, where `max_cert_lifetime` is the CA's maximum certificate lifetime. The `+ 1` accounts for landmarks not allocated at the exact start of their time interval, which can push certificate expiry one interval further than `ceil(max_cert_lifetime / time_between_landmarks)` alone would bound.
 
-### Constructing Landmark Certificates
+### Constructing Landmark-Relative Certificates
 
-Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark certificate is constructed as follows:
+Given a TBSCertificateLogEntry in the issuance log and a landmark sequence, a landmark-relative certificate is constructed as follows:
 
 1. Wait for the first landmark to be allocated that contains the entry.
 2. Determine the landmark's subtrees and select the one that contains the entry.
@@ -1259,7 +1259,7 @@ Before sending this certificate, the authenticating party SHOULD obtain an appli
 
 ## Size Estimates
 
-The inclusion proofs in standalone and landmark certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.
+The inclusion proofs in standalone and landmark-relative certificates scale logarithmically with the size of the subtree. These sizes can be estimated with the CA's issuance rate. The byte counts below assume the issuance log's hash function is SHA-256.
 
 Some organizations have published statistics which can be used to estimate this rate for the Web PKI. As of June 9th, 2025:
 
@@ -1271,7 +1271,7 @@ The current issuance rate across the Web PKI may not necessarily be representati
 
 Using the per-CA short lifetime estimate, if the CA mints a checkpoint every 2 seconds, standalone certificate subtrees will span around 2,500 certificates, leading to 12 hashes in the inclusion proof, or 384 bytes. Standalone certificates additionally must carry a sufficient set of signatures to meet relying party requirements.
 
-If a new landmark is allocated every hour, landmark certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
+If a new landmark is allocated every hour, landmark-relative certificate subtrees will span around 4,400,000 certificates, leading to 23 hashes in the inclusion proof, giving an inclusion proof size of 736 bytes, with no signatures. This is significantly smaller than a single ML-DSA-44 signature, 2,420 bytes, and almost ten times smaller than the three ML-DSA-44 signatures necessary to include post-quantum SCTs.
 
 Proof sizes grow logarithmically, so 32 hashes, or 1024 bytes, is sufficient for subtrees of up to 2<sup>32</sup> (4,294,967,296) certificates.
 
@@ -1358,7 +1358,7 @@ Cosigner roles are extensible without changes to certificate verification itself
 
 ## Trusted Subtrees
 
-As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in {{landmark-tree-sizes}}. The relying party configures these as trusted subtrees, allowing it to accept landmark certificates ({{landmark-certificates}}) constructed against those subtrees.
+As an optional optimization, a relying party MAY incorporate a periodically updated, predistributed list of active landmark subtrees, determined as described in {{landmark-tree-sizes}}. The relying party configures these as trusted subtrees, allowing it to accept landmark-relative certificates ({{landmark-relative-certificates}}) constructed against those subtrees.
 
 Before configuring the subtrees as trusted, the relying party MUST obtain assurance that each subtree is consistent with checkpoints observed by a sufficient set of cosigners (see {{cosigners}}) to meet its cosigner requirements. It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.
 
@@ -1374,7 +1374,7 @@ This criteria can be checked given:
 
 This document does not prescribe how relying parties obtain this information. A relying party MAY, for example, use an application-specific update service, such as the services described in {{CHROMIUM}} and {{FIREFOX}}. If the relying party considers the service sufficiently trusted (e.g. if the service provides the trust anchor list or certificate validation software), it MAY trust the update service to perform these checks.
 
-The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
+The relying party SHOULD incorporate its trusted subtree configuration in application-protocol-specific certificate selection mechanisms, to allow an authenticating party to select a landmark-relative certificate. The trust anchor IDs of the landmarks may be used as efficient identifiers in the application protocol. {{use-in-tls}} discusses how to do this in TLS {{!RFC8446}}.
 
 ## Revocation by Index
 
@@ -1391,7 +1391,7 @@ When a CA is found to be untrustworthy, relying parties SHOULD remove trust in t
 Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions such as subjectAltName are unmodified in Merkle Tree certificates. They apply to TLS-based applications as in a traditional X.509 certificate. The primary new considerations for use in TLS are:
 
 * Whether the authenticating party should send a certificate from one Merkle Tree CA, another Merkle Tree CA, or a traditional X.509 CA
-* Whether the authenticating party should send a standalone or landmark certificate
+* Whether the authenticating party should send a standalone or landmark-relative certificate
 * What the relying party should communicate to the authenticating party to help it make this decision
 
 Certificate selection in TLS, described in {{Section 4.4.2.2 and Section 4.4.2.3 of !RFC8446}}, incorporates both explicit relying-party-provided information in the ClientHello and CertificateRequest messages and implicit deployment-specific assumptions. This section describes a RECOMMENDED integration of Merkle Tree certificates into TLS trust anchor IDs ({{!I-D.ietf-tls-trust-anchor-ids}}), but applications MAY use application-specific criteria in addition to, or instead of, this recommendation.
@@ -1455,21 +1455,21 @@ A standalone certificate will generally be accepted by relying parties that trus
 
 A standalone certificate MAY also be sent without explicit relying party trust signals, however doing so means the authenticating party implicitly assumes the relying party trusts the issuing CA. This may be viable if, for example, the CA is relatively ubiquitous among supported relying parties.
 
-A landmark certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmark-tree-sizes}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a landmark certificate SHOULD also be provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_active_landmarks - 1`.
+A landmark-relative certificate, defined against landmark number `L`, has a trust anchor ID of `base_id`, concatenated with `L`, as described in {{landmark-tree-sizes}}, and SHOULD be provisioned with this value. Additionally, relying parties that trust later landmarks may also be assumed to trust landmark `L`, so a landmark-relative certificate SHOULD also be provisioned with an additional trust anchor range whose `base` is `base_id`, `min` is `L`, and `max` is `L + max_active_landmarks - 1`.
 
-A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a landmark certificate is compatible with the relying party.
+A relying party that has been configured with trusted subtrees ({{trusted-subtrees}}) derived from a set of landmarks SHOULD configure the `trust_anchors` extension to advertise the highest supported landmark in the set. The selection procedures defined in {{!I-D.ietf-tls-trust-anchor-ids}} and {{!extensions-to-trust-anchor-ids}} will then correctly determine whether a landmark-relative certificate is compatible with the relying party.
 
-When both a landmark and standalone certificate are supported by a relying party, an authenticating party SHOULD preferentially use the landmark certificate. A landmark certificate asserts the same information as its standalone counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a landmark certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
+When both a landmark and standalone certificate are supported by a relying party, an authenticating party SHOULD preferentially use the landmark-relative certificate. A landmark-relative certificate asserts the same information as its standalone counterpart, but is expected to be smaller. An authenticating party SHOULD NOT send a landmark-relative certificate without a signal that the relying party trusts the corresponding landmark subtree. Even if the relying party is assumed to trust the issuing CA, the relying party may not have sufficiently up-to-date trusted subtrees.
 
 # ACME Extensions
 
 This section describes how to issue Merkle Tree certificates using ACME {{!RFC8555}}.
 
-When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark certificates.
+When downloading the certificate ({{Section 7.4.2 of !RFC8555}}), ACME clients supporting Merkle Tree certificates SHOULD send "application/pem-certificate-chain-with-properties" in their Accept header ({{Section 12.5.1 of !RFC9110}}). ACME servers issuing Merkle Tree certificates SHOULD then respond with that content type and include trust anchor ID information as described in {{Section 6 of !I-D.ietf-tls-trust-anchor-ids}}. {{use-in-tls}} decribes the trust anchor ID assignments for standalone and landmark-relative certificates.
 
 When processing an order for a Merkle Tree certificate, the ACME server moves the order to the "valid" state once the corresponding entry is sequenced in the issuance log. The order's certificate URL then serves the standalone certificate, constructed as described in {{standalone-certificates}}.
 
-The standalone certificate response SHOULD additionally carry an alternate URL for the landmark certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark certificate, as described in {{landmark-certificates}} and serves it from the alternate URL.
+The standalone certificate response SHOULD additionally carry an alternate URL for the landmark-relative certificate, as described {{Section 7.4.2 of !RFC8555}}. Before the landmark-relative certificate is available, the alternate URL SHOULD return a HTTP 503 (Service Unavailable) response, with a Retry-After header ({{Section 10.2.3 of !RFC9110}}) estimating when the certificate will become available. Once the next landmark is allocated, the ACME server constructs a landmark-relative certificate, as described in {{landmark-relative-certificates}} and serves it from the alternate URL.
 
 ACME clients supporting Merkle Tree certificates SHOULD support fetching alternate chains. If an alternate chain returns an HTTP 503 with a Retry-After header, as described above, the client SHOULD retry the request at the specified time.
 
@@ -1539,13 +1539,13 @@ In each of these cases, availability failures can be mitigated by revoking the u
 
 ## Certificate Renewal
 
-When an authenticating party requests a certificate, the landmark certificate will not be available until the next landmark is ready. From there, the landmark certificate will not be available until relying parties receive new trusted subtrees.
+When an authenticating party requests a certificate, the landmark-relative certificate will not be available until the next landmark is ready. From there, the landmark-relative certificate will not be available until relying parties receive new trusted subtrees.
 
-To maximize coverage of the landmark certificate optimization, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate before the previous Merkle Tree certificate expires. Renewing around 75% of the way through the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.
+To maximize coverage of landmark-relative certificates, authenticating parties performing routine renewal SHOULD request a new Merkle Tree certificate before the previous Merkle Tree certificate expires. Renewing around 75% of the way through the previous certificate's lifetime is RECOMMENDED. Authenticating parties additionally SHOULD retain both the new and old certificates in the certificate set until the old certificate expires. As the new subtrees are delivered to relying parties, certificate negotiation will transition relying parties to the new certificate, while retaining the old certificate for relying parties that are not yet updated.
 
 The above also applies if the authenticating party is performing a routine key rotation alongside the routine renewal. In this case, certificate negotiation would pick the key as part of the certificate selection. This slightly increases the lifetime of the old key but maintains the size optimization continuously.
 
-If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a standalone certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new landmark certificate is available and relying parties are updated.
+If the service is rotating keys in response to a key compromise, this option is not appropriate. Instead, the service SHOULD immediately discard the old key and request a standalone certificate and the revocation of the previous certificate. This will interrupt the size optimization until the new landmark-relative certificate is available and relying parties are updated.
 
 ## Multiple CA Keys
 
@@ -1565,7 +1565,7 @@ A key security requirement of any PKI scheme is that relying parties only accept
 
 * In standalone certificates, the relying party's cosigner requirements ({{trusted-cosigners}}) are expected to include some signature by the CA's cosigner. The CA's cosigner ({{certification-authority-cosigners}}) is defined to certify the contents of every checkpoint and subtree that it signs.
 
-* In landmark certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
+* In landmark-relative certificates, the cosigner requirements are checked ahead of time, when the trusted subtrees are predistributed ({{trusted-subtrees}}).
 
 Given a subtree hash computed over entries that the CA certified, it must be computationally infeasible to construct an entry not on this list, and an inclusion proof, such that inclusion proof verification succeeds. This requires using a collision-resistant hash in the Merkle Tree construction.
 
@@ -1706,7 +1706,7 @@ IMPORTS
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-pkix1-explicit-02(51) }
   TrustAnchorID
-  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+  FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
       id-mod-trustAnchorIDs-2025(TBD) } ;
@@ -2169,5 +2169,7 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 
 ## Since draft-ietf-plants-merkle-tree-certs-02
 {:numbered="false"}
+
+- Renamed landmark certificate to landmark-relative certificate
 
 - Relaxed restrictions on `null_entry`
