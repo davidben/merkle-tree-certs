@@ -3844,6 +3844,9 @@ Since draft-ietf-plants-merkle-tree-certs-02
 
    *  Renamed landmark certificate to landmark-relative certificate
 
+   *  Revised ACME integration to pattern after the ACME "processing"
+      state
+
 Authors' Addresses
 
    David Benjamin
