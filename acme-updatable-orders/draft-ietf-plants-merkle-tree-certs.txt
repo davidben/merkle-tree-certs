@@ -1173,9 +1173,9 @@ Table of Contents
 
    When type is null_entry, the entry does not represent any
    information.  The entry at index zero of every issuance log MUST be
-   of type null_entry.  Other entries MUST NOT use null_entry.
-   null_entry exists to avoid zero serial numbers in the certificate
-   format (Section 6.1).
+   of type null_entry.  This avoids zero serial numbers in the
+   certificate format (Section 6.1).  Other entries MAY have type
+   null_entry.
 
    When type is tbs_cert_entry, N is the number of bytes needed to
    consume the rest of the input.  A MerkleTreeCertEntry is expected to
@@ -1585,8 +1585,8 @@ Table of Contents
 
    The TBSCertificate's serialNumber MUST contain the zero-based index
    of the TBSCertificateLogEntry in the log.  Section 4.1.2.2 of
-   [RFC5280] forbids zero as a serial number, but Section 5.3 defines a
-   null_entry type for use in entry zero, so the index will be positive.
+   [RFC5280] forbids zero as a serial number, but Section 5.3 reserves
+   entry zero with a null_entry type, so the index will be positive.
    This encoding is intended to avoid implementation errors by having
    the serial numbers and indices off by one.
 
@@ -2338,18 +2338,12 @@ Table of Contents
 
    *  additional optional certificates may be available later.
 
-   To support such cases, this section defines the following ACME order
-   fields:
+   To support such cases, this section defines a new ACME order field:
 
    updatable (optional, boolean):  If present and true, this indicates
       the order, which MUST be in the "valid" state, is updatable and
       MAY be fetched again to receive newer state, such as a newer
       "certificate" URL.
-
-   lastUpdated (optional, string):  If present, the time that either the
-      order, or a certificate served via the order's certificate URL,
-      was last updated.  The time is represented in the date format
-      defined in [RFC3339].
 
    When an order has a usable set of certificates available but may be
    updated in the future, the ACME server SHOULD set the order to the
@@ -2358,18 +2352,27 @@ Table of Contents
    (Section 10.2.3 of [RFC9110]) to suggest a polling interval to the
    client.  After the final update to the order, the server SHOULD set
    the updatable field to false, indicating that the order is fully
-   complete.  When updating an order or certificate, an ACME server
-   implementing this extension MUST set the order's lastUpdated field to
-   the time of the update.
+   complete.  ACME certificate resources are immutable, so, when
+   updating the contents or response headers of a certificate, the ACME
+   server MUST assign a new URL and update the order's certificate
+   field.
+
+   Updated orders SHOULD continue to serve a complete set of
+   certificates, without assuming that the ACME client already received
+   the previous set.  For example, if an ACME server updates an order to
+   serve an additional alternate certificate chain (Section 7.4.2 of
+   [RFC8555]), the original certificate chain SHOULD continue to be
+   served through the updated order, unless the ACME server intends for
+   the client to no longer use the original certificate chain.
 
    A client that receives an updatable order SHOULD send an ACME POST-
    as-GET request (Section 6.3 of [RFC8555]) after the time given in the
    Retry-After header field (Section 10.2.3 of [RFC9110]) of the
-   response, if any.  If the updated order contains a new lastUpdated
-   value, the client SHOULD repeat downloading the certificates
-   (Section 7.4.2 of [RFC8555]) and replace the previously-downloaded
-   certificates.  The client SHOULD repeat this process until the
-   updatable field is no longer true.
+   response, if any.  If the updated order contains a different
+   certificate URL, the client SHOULD repeat downloading the
+   certificates (Section 7.4.2 of [RFC8555]) and replace the previously-
+   downloaded certificates from this order.  The client SHOULD repeat
+   this process until the updatable field is no longer true.
 
 9.2.  Using ACME with Merkle Tree Certificates
 
@@ -2407,11 +2410,11 @@ Table of Contents
    relative certificate will be available.
 
    When the landmark-relative certificate is available, the ACME server
-   updates the order to serve new certificates.  The order's certificate
-   URL SHOULD continue to serve the standalone certificate, but it
-   SHOULD now additionally carry an alternate URL (Section 7.4.2 of
-   [RFC8555]) for the landmark-relative certificate.  The alternate URL
-   SHOULD include trust anchor ID information as above.
+   updates the order with a new certificate URL.  The new URL SHOULD
+   continue to serve the standalone certificate, but it SHOULD now
+   additionally carry an alternate URL (Section 7.4.2 of [RFC8555]) for
+   the landmark-relative certificate.  The alternate URL SHOULD serve
+   trust anchor ID information as above.
 
    In normal operation, an ACME client will first observe the order only
    serving a standalone certificate, and later the updated order serving
@@ -2961,15 +2964,13 @@ Table of Contents
    IANA is requested to add the following entry to the "ACME Order
    Object Fields" registry [RFC8555]:
 
-         +=============+============+==============+============+
-         | Field Name  | Field Type | Configurable | References |
-         +=============+============+==============+============+
-         | updatable   | boolean    | false        | [this-RFC] |
-         +-------------+------------+--------------+------------+
-         | lastUpdated | string     | false        | [this-RFC] |
-         +-------------+------------+--------------+------------+
+          +============+============+==============+============+
+          | Field Name | Field Type | Configurable | References |
+          +============+============+==============+============+
+          | updatable  | boolean    | false        | [this-RFC] |
+          +------------+------------+--------------+------------+
 
-                                 Table 4
+                                  Table 4
 
 14.  References
 
@@ -2997,10 +2998,6 @@ Table of Contents
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
-
-   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
-              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
-              <https://www.rfc-editor.org/rfc/rfc3339>.
 
    [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
               10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
@@ -3192,7 +3189,7 @@ Appendix A.  ASN.1 Module
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-pkix1-explicit-02(51) }
      TrustAnchorID
-     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-trustAnchorIDs-2025(TBD) } ;
@@ -3843,6 +3840,8 @@ Since draft-ietf-plants-merkle-tree-certs-01
 Since draft-ietf-plants-merkle-tree-certs-02
 
    *  Renamed landmark certificate to landmark-relative certificate
+
+   *  Relaxed restrictions on null_entry
 
    *  Revised ACME integration to pattern after the ACME "processing"
       state
