@@ -2209,3 +2209,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Renamed landmark certificate to landmark-relative certificate
+
+- Revised ACME integration to pattern after the ACME "processing" state
