@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 12 October 2026                                      Apple Inc.
+Expires: 13 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           10 April 2026
+                                                           11 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 October 2026.
+   This Internet-Draft will expire on 13 October 2026.
 
 Copyright Notice
 
@@ -2338,27 +2338,35 @@ Table of Contents
 
    *  additional optional certificates may be available later.
 
-   To support such cases, this section defines an ACME order extension
-   which indicates the order is in a valid, but _updatable_ state:
+   To support such cases, this section defines the following ACME order
+   fields:
 
    updatable (optional, boolean):  If present and true, this indicates
       the order, which MUST be in the "valid" state, is updatable and
       MAY be fetched again to receive newer state, such as a newer
       "certificate" URL.
 
-   An ACME server SHOULD set an order to the "valid" state, with the
-   updatable field set to true, if certificates are available, but the
-   order may be updated in the future.  The HTTP response SHOULD include
-   a Retry-After header field (Section 10.2.3 of [RFC9110]) to suggest a
-   polling interval to the client.  After the final update to the order,
-   the server SHOULD set the updatable field to false, indicating that
-   the order is fully complete.
+   lastUpdated (optional, string):  If present, the time that either the
+      order, or a certificate served via the order's certificate URL,
+      was last updated.  The time is represented in the date format
+      defined in [RFC3339].
+
+   When an order has a usable set of certificates available but may be
+   updated in the future, the ACME server SHOULD set the order to the
+   "valid" state, with the updatable field set to true.  HTTP responses
+   for the order SHOULD include a Retry-After header field
+   (Section 10.2.3 of [RFC9110]) to suggest a polling interval to the
+   client.  After the final update to the order, the server SHOULD set
+   the updatable field to false, indicating that the order is fully
+   complete.  When updating an order or certificate, an ACME server
+   implementing this extension MUST set the order's lastUpdated field to
+   the time of the update.
 
    A client that receives an updatable order SHOULD send an ACME POST-
    as-GET request (Section 6.3 of [RFC8555]) after the time given in the
    Retry-After header field (Section 10.2.3 of [RFC9110]) of the
-   response, if any.  If the updated order contains a different
-   "certificate" URL, the client SHOULD download the new certificates
+   response, if any.  If the updated order contains a new lastUpdated
+   value, the client SHOULD repeat downloading the certificates
    (Section 7.4.2 of [RFC8555]) and replace the previously-downloaded
    certificates.  The client SHOULD repeat this process until the
    updatable field is no longer true.
@@ -2399,11 +2407,20 @@ Table of Contents
    relative certificate will be available.
 
    When the landmark-relative certificate is available, the ACME server
-   updates the order with a new certificate URL.  The new certificate
+   updates the order to serve new certificates.  The order's certificate
    URL SHOULD continue to serve the standalone certificate, but it
-   SHOULD additionally carry an alternate URL (Section 7.4.2 of
+   SHOULD now additionally carry an alternate URL (Section 7.4.2 of
    [RFC8555]) for the landmark-relative certificate.  The alternate URL
    SHOULD include trust anchor ID information as above.
+
+   In normal operation, an ACME client will first observe the order only
+   serving a standalone certificate, and later the updated order serving
+   both certificates.  However, if the certificate is issued shortly
+   before a landmark is allocated, the landmark-relative certificate
+   will be available very soon after the standalone certificate.
+   Depending on timing, an ACME client might then only observe the
+   updated order.  Such a client depends on the updated order serving a
+   complete set certificates, not just the newly-added ones.
 
 10.  Deployment Considerations
 
@@ -2944,13 +2961,15 @@ Table of Contents
    IANA is requested to add the following entry to the "ACME Order
    Object Fields" registry [RFC8555]:
 
-          +============+============+==============+============+
-          | Field Name | Field Type | Configurable | References |
-          +============+============+==============+============+
-          | updatable  | boolean    | false        | [this-RFC] |
-          +------------+------------+--------------+------------+
+         +=============+============+==============+============+
+         | Field Name  | Field Type | Configurable | References |
+         +=============+============+==============+============+
+         | updatable   | boolean    | false        | [this-RFC] |
+         +-------------+------------+--------------+------------+
+         | lastUpdated | string     | false        | [this-RFC] |
+         +-------------+------------+--------------+------------+
 
-                                  Table 4
+                                 Table 4
 
 14.  References
 
@@ -2978,6 +2997,10 @@ Table of Contents
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <https://www.rfc-editor.org/rfc/rfc3339>.
 
    [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
               10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
