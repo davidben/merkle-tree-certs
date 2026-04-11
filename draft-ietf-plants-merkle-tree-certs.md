@@ -935,7 +935,7 @@ struct {
 } MerkleTreeCertEntry;
 ~~~
 
-When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. Other entries MUST NOT use `null_entry`. `null_entry` exists to avoid zero serial numbers in the certificate format ({{certificate-format}}).
+When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. This avoids zero serial numbers in the certificate format ({{certificate-format}}). Other entries MAY have type `null_entry`.
 
 When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
 
@@ -1147,7 +1147,7 @@ The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
 The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
 
-The TBSCertificate's `serialNumber` MUST contain the zero-based index of the TBSCertificateLogEntry in the log. {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number, but {{log-entries}} defines a `null_entry` type for use in entry zero, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.
+The TBSCertificate's `serialNumber` MUST contain the zero-based index of the TBSCertificateLogEntry in the log. {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number, but {{log-entries}} reserves entry zero with a `null_entry` type, so the index will be positive. This encoding is intended to avoid implementation errors by having the serial numbers and indices off by one.
 
 The TBSCertificate's `subjectPublicKeyInfo` contains the specified public key. Its `algorithm` field MUST match the TBSCertificateLogEntry's `subjectPublicKeyAlgorithm`. Its hash MUST match the TBSCertificateLogEntry's `subjectPublicKeyInfoHash`.
 
@@ -2171,3 +2171,5 @@ In draft-04, there is no fast issuance mode. In draft-05, frequent, non-landmark
 {:numbered="false"}
 
 - Renamed landmark certificate to landmark-relative certificate
+
+- Relaxed restrictions on `null_entry`
