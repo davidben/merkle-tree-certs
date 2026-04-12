@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 11 October 2026                                      Apple Inc.
+Expires: 14 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                            9 April 2026
+                                                           12 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 October 2026.
+   This Internet-Draft will expire on 14 October 2026.
 
 Copyright Notice
 
@@ -1170,9 +1170,9 @@ Table of Contents
 
    When type is null_entry, the entry does not represent any
    information.  The entry at index zero of every issuance log MUST be
-   of type null_entry.  Other entries MUST NOT use null_entry.
-   null_entry exists to avoid zero serial numbers in the certificate
-   format (Section 6.1).
+   of type null_entry.  This avoids zero serial numbers in the
+   certificate format (Section 6.1).  Other entries MAY have type
+   null_entry.
 
    When type is tbs_cert_entry, N is the number of bytes needed to
    consume the rest of the input.  A MerkleTreeCertEntry is expected to
@@ -1283,7 +1283,7 @@ Table of Contents
    byte (U+0000).
 
    cosigner_name and log_origin, are computed from the cosigner ID and
-   the issuance log's ID (Section 5.2), respectively.  The contain the
+   the issuance log's ID (Section 5.2), respectively.  They contain the
    concatenation of:
 
    *  The nine bytes: 0x6f, 0x69, 0x64, 0x2f, 0x2b, 0x06, 0x01, 0x04,
@@ -1602,8 +1602,8 @@ Table of Contents
 
    The TBSCertificate's serialNumber MUST contain the zero-based index
    of the TBSCertificateLogEntry in the log.  Section 4.1.2.2 of
-   [RFC5280] forbids zero as a serial number, but Section 5.3 defines a
-   null_entry type for use in entry zero, so the index will be positive.
+   [RFC5280] forbids zero as a serial number, but Section 5.3 reserves
+   entry zero with a null_entry type, so the index will be positive.
    This encoding is intended to avoid implementation errors by having
    the serial numbers and indices off by one.
 
@@ -3132,7 +3132,7 @@ Appendix A.  ASN.1 Module
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-pkix1-explicit-02(51) }
      TrustAnchorID
-     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-ancohor-ids]
+     FROM TrustAnchorIDs-2025 -- in [I-D.ietf-tls-trust-anchor-ids]
        { iso(1) identified-organization(3) dod(6) internet(1)
          security(5) mechanisms(5) pkix(7) id-mod(0)
          id-mod-trustAnchorIDs-2025(TBD) } ;
@@ -3777,6 +3777,8 @@ Since draft-ietf-plants-merkle-tree-certs-01
 Since draft-ietf-plants-merkle-tree-certs-02
 
    *  Renamed landmark certificate to landmark-relative certificate
+
+   *  Relaxed restrictions on null_entry
 
    *  Use a tlog-compatible signature scheme for ease of deployment
 
