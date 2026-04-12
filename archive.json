@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-09T03:18:37.120785+00:00",
+  "timestamp": "2026-04-12T03:36:35.779228+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3055,7 +3055,7 @@
       "labels": [],
       "body": "Watson Ladd points out:\n\n> I'm not sure 503 is the right error code for the landmark-relative cert in ACME: a 400 series code would make more sense given that some are about resource conditions. There isn't one that fits though. 503 may complicate infrastructure monitoring as it is usually a server problem you want to worry about.\n\nhttps://mailarchive.ietf.org/arch/msg/plants/-Q5kuTg9HQUTcbkv8ybIndgqj5U/",
       "createdAt": "2026-04-08T22:59:42Z",
-      "updatedAt": "2026-04-08T23:36:43Z",
+      "updatedAt": "2026-04-09T04:48:56Z",
       "closedAt": null,
       "comments": [
         {
@@ -3085,6 +3085,13 @@
           "body": "I kinda warming to the order.refreshAfter idea. It also has the nice property that an unaware client will cleanly ignore it. And we're not adding a weird landmark-specific URL field. It the same certificate URL, just maybe the order will get more awesome with time.",
           "createdAt": "2026-04-08T23:36:43Z",
           "updatedAt": "2026-04-08T23:36:43Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Whichever the status code, do you think it warrants a different header in that case? (I see ACME also has this error system. I've no idea if that's appropriate here.)\n\nAh interesting. ACME actually already uses Retry-After on 200 responses, so that bridge has already been crossed:\n\n>  \"processing\": The certificate is being issued.  Send a POST-as-GET request after the time given in the Retry-After header field of the response, if any.",
+          "createdAt": "2026-04-09T04:48:56Z",
+          "updatedAt": "2026-04-09T04:48:56Z"
         }
       ]
     }
@@ -12046,24 +12053,26 @@
       "id": "PR_kwDOJIBkVc7LwmPS",
       "title": "Relax restrictions on null_entry",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/200",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "While mostly pointless, adding random null_entry types in the middle of a log isn't harmful, per se. We restricted because we didn't have a reason, but it might be useful if:\r\n\r\n- A CA wishes to do a periodic health check on any external cosigners it works with.\r\n\r\n- A monitoring ecosystem wants the CA to append to a log with *at least* some frequency.\r\n\r\nRealistically, the CA probably has enough issuance rate to make both of these moot but, eh, we may as well have one less restriction, and then people don't have to think about this.",
       "createdAt": "2026-03-19T06:27:48Z",
-      "updatedAt": "2026-03-20T13:29:46Z",
+      "updatedAt": "2026-04-11T00:37:00Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "7fecd363ca8274b464fa9a585964d9818f919322",
+      "baseRefOid": "840683eee1612fe0d7675396934ffcc204dba260",
       "headRepository": "ietf-plants-wg/merkle-tree-certs",
       "headRefName": "null-entry-unrestrict",
-      "headRefOid": "ba284cbefaf455394b96138624d497277e17179d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "dfe56cd33d78a929903fc1b5350e68af183bfca2",
+      "closedAt": "2026-04-11T00:36:55Z",
+      "mergedAt": "2026-04-11T00:36:55Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf"
+      },
       "comments": [
         {
           "author": "davidben",
@@ -12140,6 +12149,588 @@
           "body": "",
           "createdAt": "2026-04-01T12:48:52Z",
           "updatedAt": "2026-04-01T12:48:52Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 203,
+      "id": "PR_kwDOJIBkVc7RUGv6",
+      "title": "Another spelling of the ACME integration",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/203",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Instead of messing with the URL, this other idea proposes to update the ACME order object, using a very similar flow as the ACME \"processing\" state.\r\n\r\nFixes #202\r\n\r\n@aarongable WDYT?",
+      "createdAt": "2026-04-10T02:16:37Z",
+      "updatedAt": "2026-04-12T02:50:47Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "acme-updatable-orders",
+      "headRefOid": "c53b6d728d9a86c309b6b988680093d77498f167",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7zs5vX",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T09:23:42Z",
+          "updatedAt": "2026-04-10T09:23:42Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "This can also be used to reanchor the standalone cert to the landmark. Do we want to mention it?",
+              "createdAt": "2026-04-10T09:23:42Z",
+              "updatedAt": "2026-04-10T09:23:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zs53p",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-10T09:23:47Z",
+          "updatedAt": "2026-04-10T09:23:47Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zv-4T",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T11:59:54Z",
+          "updatedAt": "2026-04-10T11:59:55Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Right, I think we want ACME clients to be able to serve three certs:\r\n\r\n1) The original standalone cert, for its short inclusion proof.\r\n2) The landmark-relative cert, for the landmark optimization.\r\n3) The landmark-anchored standalone cert (option (2) but with signatures), for the server storage optimization.\r\n\r\nThe ACME server only needs to make (1) and (3) available, since option (2) can be derived from option (3) at TLS handshake time by stripping the signatures.",
+              "createdAt": "2026-04-10T11:59:55Z",
+              "updatedAt": "2026-04-10T11:59:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zwOh0",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "bwesterb",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T12:13:26Z",
+          "updatedAt": "2026-04-10T12:13:27Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Deriving (2) from (3) requires some intelligence on the ACME client side.",
+              "createdAt": "2026-04-10T12:13:26Z",
+              "updatedAt": "2026-04-10T12:13:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zw3uV",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T12:45:16Z",
+          "updatedAt": "2026-04-10T12:45:16Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Hehehe, this did occur to me but probably how/whether to mention reanchoring can be a separate change.\r\n\r\nI'm not actually sure ACME should reanchor, at least not automatically. The reanchored certificate is bigger. It's mostly a trade-off for really big deployments that don't want to store both certs. I guess it could be a separate profile that the ACME server offers? Or it could be something that big deployments assemble themselves.",
+              "createdAt": "2026-04-10T12:45:16Z",
+              "updatedAt": "2026-04-10T12:45:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zxQl1",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T13:01:10Z",
+          "updatedAt": "2026-04-10T13:01:10Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Makes sense. I suppose \"really big deployments\" can just get the landmark subtrees the same way that RPs do.",
+              "createdAt": "2026-04-10T13:01:10Z",
+              "updatedAt": "2026-04-10T13:01:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7zyIXj",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-10T13:36:49Z",
+          "updatedAt": "2026-04-10T13:36:49Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7z0hlq",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T15:17:01Z",
+          "updatedAt": "2026-04-10T15:17:01Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Offering the reanchored cert feels like a perfect use of the link rel=alternate mechanism that already exists. They're both available at the same time, but only some clients will want it.",
+              "createdAt": "2026-04-10T15:17:01Z",
+              "updatedAt": "2026-04-10T15:17:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7z1xrQ",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T16:10:17Z",
+          "updatedAt": "2026-04-10T16:22:14Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "editorial:\n```suggestion\n* some complete set of certificates are available for download, and the ACME client can begin deploying certificates; and\n* additional optional certificates may be available later.\n```",
+              "createdAt": "2026-04-10T16:10:17Z",
+              "updatedAt": "2026-04-10T16:22:14Z"
+            },
+            {
+              "originalPosition": 32,
+              "body": "```suggestion\n* certificate properties ({{Section 6 of !I-D.ietf-tls-trust-anchor-ids}});\n* updatable orders ({{updatable-acme-orders}}); and\n* alternate certificates chains ({{Section 7.4.2 of !RFC8555}}).\n```",
+              "createdAt": "2026-04-10T16:12:08Z",
+              "updatedAt": "2026-04-10T16:22:14Z"
+            },
+            {
+              "originalPosition": 41,
+              "body": "There are two possible axes of change when an Order is updated:\n- Does the certificate URL change?\n- Do the contents of the certificate URL change?\n\nI think this PR has selected the worst quadrant of that 2x2 grid.\n\nIf the URL doesn't change and the contents don't change, that's just ACME today.\n\nIf the URL doesn't change but the contents _do_ change, that's a little confusing (since URLs should generally point to static resources, and presumably the old standalone cert would have to be moved to a different alternate URL) but at least it would match the behavior established by ACME STAR.\n\nIf the URL changes but the contents don't change, as you've proposed here... what happens to that original URL? Should the CA still honor it? Why are we allocating two different unique identifiers for the same cert? Is the URL change just to indicate to the client that a diff has actually happened? If so, that should instead be conveyed via a `lastUpdated` field or something like that.\n\nIf the URL changes and the contents also change, that makes the most sense to me. We have a new certificate, here's the new URL and contents, and if you want the old one again it's still accessible via link rel=alternate. I don't have concerns about clients getting confused -- if it is sufficiently updated to poll an `updateable` order, it can also be smart enough to follow the alternate links.",
+              "createdAt": "2026-04-10T16:21:46Z",
+              "updatedAt": "2026-04-10T16:22:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7z2YNI",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T16:33:17Z",
+          "updatedAt": "2026-04-10T16:33:17Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "The contents change in that the response headers are different, and that's part of the HTTP response, cached, etc. Though you're right the response body hasn't changed.\r\n\r\nWe *could* decide the landmark cert is the first one and the (presumably already downloaded) standalone cert is the alternate, which the client could then recognize, but then we risk another problem:\r\n\r\nSuppose an alternates-naive client requests a cert. And it happens that a landmark was just about to be allocated. The client takes long enough to that actually as soon as it first sees the order, both certs are available. CA puts standalone second per this... but now the client *only* deploys the landmark cert and has a problem.",
+              "createdAt": "2026-04-10T16:33:17Z",
+              "updatedAt": "2026-04-10T16:33:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7z4Txg",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-10T18:08:38Z",
+          "updatedAt": "2026-04-10T18:08:39Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Ah sorry I replied in a hurry (very hectic day) and missed some of what you wrote:\r\n\r\n> If the URL changes but the contents don't change, as you've proposed here... what happens to that original URL? Should the CA still honor it?\r\n\r\nProbably. At least briefly because there might be a race condition between the two requests.\r\n\r\n(Mostly I assumed the extra URL wasn't too expensive but I could be wrong. I mean it could be as simple as a cache-busting query parameter on the same URL.)\r\n\r\n> Why are we allocating two different unique identifiers for the same cert? Is the URL change just to indicate to the client that a diff has actually happened? If so, that should instead be conveyed via a lastUpdated field or something like that.\r\n\r\nAh sure. URL + lastUpdated works for me too. I do think it's worth preserving the invariant that the first URL is the more default (standalone) certificate, and that we *somehow* signal a change to the client, but that works too! I'll update (hah) that later today.\r\n\r\n",
+              "createdAt": "2026-04-10T18:08:39Z",
+              "updatedAt": "2026-04-10T18:08:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7z9hpG",
+          "commit": {
+            "abbreviatedOid": "4ebaead"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T00:33:54Z",
+          "updatedAt": "2026-04-11T00:33:54Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "> Ah sure. URL + lastUpdated works for me too. I do think it's worth preserving the invariant that the first URL is the more default (standalone) certificate, and that we somehow signal a change to the client, but that works too! I'll update (hah) that later today.\r\n\r\nDone. How's this?",
+              "createdAt": "2026-04-11T00:33:54Z",
+              "updatedAt": "2026-04-11T00:34:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70AL6x",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T11:42:11Z",
+          "updatedAt": "2026-04-11T11:42:12Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "If update adds landmark-relative certificate, then no certificate should be replaced. Trying to replace existing standalone certificate with landmark-relative one is highly likely to cause errors, and even replacing existing landmark-relative one is likely to degrade performance. What the client should do in this case is adding a new landmark-relative certificate to the line (and cleaning up any expired ones).\n\nThe only situations that I can come up with where replacing existing certificates would make sense is if more preferred alternative (landmark-relative certificates are **not** alternates) appears, or if certificate lifespan is extended (ACME STAR).",
+              "createdAt": "2026-04-11T11:42:12Z",
+              "updatedAt": "2026-04-11T11:42:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70ANyq",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T11:53:41Z",
+          "updatedAt": "2026-04-11T11:53:41Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "\"alternate\" is not correct relation for this case (one can not use landmark-relative certificate instead of standalone one, one gets errors if one tries that).\n\nAdditionally, RFC 8555 says: \"certificate resources are immutable once issuance is complete\". ACME STAR does not change that, it defines its own resource.",
+              "createdAt": "2026-04-11T11:53:41Z",
+              "updatedAt": "2026-04-11T11:53:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70AVqu",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T12:37:44Z",
+          "updatedAt": "2026-04-11T12:37:45Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "The updated order is still expected to serve the standalone certificate, and is still expected to serve the standalone certificate first (see the section immediately following this one). The last paragraph explains why this is important.",
+              "createdAt": "2026-04-11T12:37:45Z",
+              "updatedAt": "2026-04-11T12:37:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70AWRm",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T12:41:28Z",
+          "updatedAt": "2026-04-11T12:41:29Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "> \"alternate\" is not correct relation for this case (one can not use landmark-relative certificate instead of standalone one, one gets errors if one tries that).\r\n\r\nAlternate is the relation used in RFC 8555. See https://www.rfc-editor.org/rfc/rfc8555.html#section-7.4.2\r\n\r\nRFC 8555 specifically uses the example of using alternates to describe paths to different trust anchors. That sounds like an exactly analogous situation. The alternates are not, a priori, substitutable with each other because they work in different relying parties. Likewise, the difference between a landmark-relative and standalone certificate is that they work in different relying parties.\r\n\r\nPerhaps RFC 8555 should not have used alternate as the relation, but I think that ship has sailed. \ud83e\udd37 \r\n\r\n> Additionally, RFC 8555 says: \"certificate resources are immutable once issuance is complete\". ACME STAR does not change that, it defines its own resource.\r\n\r\nAh good call. The original version of this PR said you updated the URL, but I switched it to this after @aarongable's comments above. Given that, it sounds like we should go back to the previous version and ask that ACME servers mint new URLs when they update the set.",
+              "createdAt": "2026-04-11T12:41:29Z",
+              "updatedAt": "2026-04-11T12:41:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70AZJv",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T12:57:04Z",
+          "updatedAt": "2026-04-11T12:57:05Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "(Running around a bit this morning but later today I'll update this to also make the general section clear that you're expected to always serve a complete set of certificates.)",
+              "createdAt": "2026-04-11T12:57:04Z",
+              "updatedAt": "2026-04-11T12:57:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70Ajs_",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T13:30:41Z",
+          "updatedAt": "2026-04-11T13:30:41Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Well, for RFC 8555, the intention is that the ACME client chooses one, so in sense these are alternates. That is not the case with standalone/landmark-relative certificates.\r\n\r\nAdditionally, web linking RFC recommends that relations with highly application-specific meaning should be named accordingly. I think this relation has very application-specific meaning.",
+              "createdAt": "2026-04-11T13:30:41Z",
+              "updatedAt": "2026-04-11T13:30:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70Amh2",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T13:38:21Z",
+          "updatedAt": "2026-04-11T13:38:21Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Serving a complete set might not be an option, as the old landmark-relative certificate can still be valid, but have different keys. That certificate should be retained until it expires.",
+              "createdAt": "2026-04-11T13:38:21Z",
+              "updatedAt": "2026-04-11T13:38:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70BDHf",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T15:31:45Z",
+          "updatedAt": "2026-04-11T15:31:46Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Right, the old landmark-relative certificate came from a different order and is not in scope for replacement here. This text is talking about replacing the certificates from *this* order.\r\n\r\nIt's also true that optimal server behavior is to retain the previous order until it expires, but that's external to an individual ACME order.",
+              "createdAt": "2026-04-11T15:31:46Z",
+              "updatedAt": "2026-04-11T15:31:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70CcFl",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T22:03:24Z",
+          "updatedAt": "2026-04-11T22:03:24Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "> (Running around a bit this morning but later today I'll update this to also make the general section clear that you're expected to always serve a complete set of certificates.)\r\n\r\nDone",
+              "createdAt": "2026-04-11T22:03:24Z",
+              "updatedAt": "2026-04-11T22:03:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70CdyD",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-11T22:12:43Z",
+          "updatedAt": "2026-04-11T22:12:44Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "> Ah good call. The original version of this PR said you updated the URL, but I switched it to this after @aarongable's comments above. Given that, it sounds like we should go back to the previous version and ask that ACME servers mint new URLs when they update the set.\r\n\r\nI've updated and switched this back.\r\n\r\n> Well, for RFC 8555, the intention is that the ACME client chooses one, so in sense these are alternates. That is not the case with standalone/landmark-relative certificates.\r\n\r\nHmm. The text in RFC 8555 says:\r\n\r\n> The server MAY provide one or more link relation header fields\r\n>    [[RFC8288](https://www.rfc-editor.org/rfc/rfc8288)] with relation \"alternate\".  Each such field SHOULD express\r\n>   an alternative certificate chain starting with the same end-entity\r\n>   certificate.  This can be used to express paths to various trust\r\n>   anchors.  Clients can fetch these alternates and use their own\r\n>   heuristics to decide which is optimal.\r\n\r\nI read this to mean that the client fetches both alternates and then uses \"heuristics\" to decide which to use in any given TLS connection. (And then TAI aims to fix these heuristics into something well-defined.)\r\n\r\nIf I understand you right, you read this to mean that the client fetches both alternates and uses \"heuristics\" to decide which to install and which to throw away, never to be used at all.\r\n\r\nI agree that, by your read, this feature is inappropriate to use for any kind of multi-certificate story and we'd need something else. However, it seems that to me that the second version makes for a pretty useless feature! I was not involved when ACME was being standardized, so I cannot say what was the \"intention\". Perhaps @aarongable would have some insight.\r\n\r\n> Additionally, web linking RFC recommends that relations with highly application-specific meaning should be named accordingly. I think this relation has very application-specific meaning.\r\n\r\nI do not think this needs to be that application-specific, or rather not MTC-specific. The general primitive we have here and in quite a lot of PKI scenarios is:\r\n\r\n* ACME server gives you multiple certificate chains that together cover the certificate request\r\n* You might get multiple certificate chains to meet relying party variability, you might get them because some chains are smaller + less generally useful (omit cross-signs, landmark-relative, depend on a smaller signature algorithm, etc.)\r\n* ACME server gives you enough information, in some well-defined format, that you can toss it into your TLS server and dispatch the right cert to the right RP (CertificatePropertyList)\r\n\r\nWhether that's `alternate` or a new relation depends on the question above. If ACME defined `alternate` to be the first interpretation, this all seems perfectly fine. In that outcome, perhaps ACME should have named it something else, but I don't think it'd be worth renaming now. If ACME defined `alternate` to be the second interpretation then, yeah, we should pick another word. Meh.",
+              "createdAt": "2026-04-11T22:12:43Z",
+              "updatedAt": "2026-04-11T22:14:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70DHbt",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T02:50:47Z",
+          "updatedAt": "2026-04-12T02:50:47Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Forgot to mention, updated version also makes it clear that replacement is only within the scope of this one order.\r\n\r\nIn particular, I think you misunderstood what I meant by \"complete set\". When I said \"complete set\" I meant \"a set of certificates that satisfies this client's order. The client asked for \"give me newly-issued certificates, for this key, that work with RPs that trust this CA\". Serving just a landmark certificate, as you suggested in the first comment would not be a complete set and was never what this PR was suggesting. Valid responses to the order are standalone or standalone+landmark-relative. The old landmark-relative certificate has nothing to do with *this* order and as you note may not have the same key, so they should not be served here. No one was suggesting that they be served here.\r\n\r\nThe AP may well want to retain the old landmark-relative certificate from the previous order. That is outside of the scope of one ACME order. The reason we need a complete set for *this order* is explained later in the PR, discussing a race condition. From there, the reason we need replacement is that, if you are serving standalone+landmark, you don't want the AP to end up with two copies of the _same_ standalone certificate.\r\n\r\nThis mechanism also allows things like the ACME server updating the CertificatePropertyList for a certificate once it has more information on bulk-ID inclusions, etc. That is another case where we need replacement.\r\n\r\n(Think this thread is resolved, but I'll wait for your reply in case there's still a disconnect.)",
+              "createdAt": "2026-04-12T02:50:47Z",
+              "updatedAt": "2026-04-12T02:52:27Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 204,
+      "id": "PR_kwDOJIBkVc7RgpOD",
+      "title": "Clarify issuer field in TBSCertificateLogEntry",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/204",
+      "state": "OPEN",
+      "author": "CBonnell",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "- Removed `issuer` from \"as-is\" list of fields\r\n- Fixed formatting of `issuer` description. Also changed PKIX to X.500 to align with RFC 5280.",
+      "createdAt": "2026-04-10T16:32:41Z",
+      "updatedAt": "2026-04-11T00:39:28Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "906f3a2ed9d1515c53f1f006dc0f7b646211c497",
+      "headRepository": "CBonnell/merkle-tree-certs",
+      "headRefName": "patch-1",
+      "headRefOid": "49943ef1da31c4a47fd05ca49f348cf1f66f1b5d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "CBonnell",
+          "authorAssociation": "NONE",
+          "body": "I can add X.500 as an informative reference, or can do that as another PR. Thoughts?",
+          "createdAt": "2026-04-10T16:36:30Z",
+          "updatedAt": "2026-04-10T16:36:30Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7z9jDq",
+          "commit": {
+            "abbreviatedOid": "49943ef"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks!",
+          "createdAt": "2026-04-11T00:38:52Z",
+          "updatedAt": "2026-04-11T00:39:28Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "[There was feedback](https://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/) on the list to call this a \"PKIX distinguished name\" instead of \"X.50[09] distinguished name\". I have no horse in this race, but I guess we like to say PKIX instead? I've no idea.",
+              "createdAt": "2026-04-11T00:38:52Z",
+              "updatedAt": "2026-04-11T00:39:28Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 205,
+      "id": "PR_kwDOJIBkVc7Rjj5H",
+      "title": "Fix typo in TrustAnchorIDs reference",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/205",
+      "state": "MERGED",
+      "author": "dan-mcdonald",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-04-10T19:55:01Z",
+      "updatedAt": "2026-04-11T00:34:34Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "906f3a2ed9d1515c53f1f006dc0f7b646211c497",
+      "headRepository": "dan-mcdonald/merkle-tree-certs",
+      "headRefName": "typo-ancohor",
+      "headRefOid": "f5ce0e10c40ba6ea3b1436b188e07990ca60c55d",
+      "closedAt": "2026-04-11T00:34:34Z",
+      "mergedAt": "2026-04-11T00:34:34Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "840683eee1612fe0d7675396934ffcc204dba260"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc7z9hxE",
+          "commit": {
+            "abbreviatedOid": "f5ce0e1"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks!",
+          "createdAt": "2026-04-11T00:34:22Z",
+          "updatedAt": "2026-04-11T00:34:22Z",
           "comments": []
         }
       ]
