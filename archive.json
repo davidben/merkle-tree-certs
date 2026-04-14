@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-12T03:36:35.779228+00:00",
+  "timestamp": "2026-04-14T03:32:14.531529+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -2814,15 +2814,15 @@
       "id": "I_kwDOJIBkVc7pOrHk",
       "title": "Distinguishing no-issuance and stuck CAs",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/177",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "At the moment a CA that doesn't have anything to issue, and a CA that can't issue for some technical reason, look the same the outside. We could allow CAs to issue a `null_entry`, just to show it's capable to. Is that worthwhile?",
       "createdAt": "2026-02-08T15:23:02Z",
-      "updatedAt": "2026-03-31T22:48:00Z",
-      "closedAt": null,
+      "updatedAt": "2026-04-13T01:46:15Z",
+      "closedAt": "2026-04-13T01:46:15Z",
       "comments": [
         {
           "author": "davidben",
@@ -2851,6 +2851,20 @@
           "body": "I guess it depends on why the CA is stuck. Refreshing the timestamp on your last checkpoint demonstrates that you can generate signatures. But if you want to prove that your log can still move forward, you probably need to actually move the log forward.",
           "createdAt": "2026-03-31T22:48:00Z",
           "updatedAt": "2026-03-31T22:48:00Z"
+        },
+        {
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "body": "The timestamp is a positive assertion of lack of growth, yeah? That seems useful.\n\nIf your CA is borked and you're unable to issue, that seems intellectually interesting, but of no obvious value to other folks in the ecosystem. The high order bit (that they're not issuing) is probably good enough.",
+          "createdAt": "2026-04-12T22:39:24Z",
+          "updatedAt": "2026-04-12T22:39:24Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I've also merged the PR to relax the restrictions on `null_entry` because, eh, may as well. Probably can close this as some combination of \"there are ways to do a health check\" and \"do we care?\". :-)",
+          "createdAt": "2026-04-13T01:46:15Z",
+          "updatedAt": "2026-04-13T01:46:15Z"
         }
       ]
     },
@@ -2993,7 +3007,7 @@
       "labels": [],
       "body": "Over time, a CA's maximum lifetime for new issuance may change. See if we can write our recommended landmark allocation scheme to account for this. (The time between landmarks should get rescaled with the max cert lifetime, I think.)",
       "createdAt": "2026-03-10T17:39:50Z",
-      "updatedAt": "2026-03-24T16:29:14Z",
+      "updatedAt": "2026-04-13T05:46:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -3016,6 +3030,20 @@
           "body": "@davidben  In your example, you'd initially issue a landmark every 3-4 days. If you know you'll want to reduce lifetime ahead of time, you can temporarily change the rate: issue one every 10 days: that'll slowly build up a buffer. Not quite sure if that'll be enough in practice.",
           "createdAt": "2026-03-24T16:29:14Z",
           "updatedAt": "2026-03-24T16:29:14Z"
+        },
+        {
+          "author": "jdeblasio",
+          "authorAssociation": "NONE",
+          "body": "Whether or not we want this in the spec is one question, but operationally in the web PKI I'm going to do everything I can to ensure we never have to do this within a single log. We're rotating keys and trees frequently enough that I think we have more straightforward means of dealing with it.",
+          "createdAt": "2026-04-12T22:31:42Z",
+          "updatedAt": "2026-04-12T22:31:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yeah, this seems like a good use of something like log generations, or some other kind of reset. Trying to landmark rate right with memory sounds a headache.",
+          "createdAt": "2026-04-13T05:46:25Z",
+          "updatedAt": "2026-04-13T05:46:25Z"
         }
       ]
     },
@@ -3031,7 +3059,7 @@
       "labels": [],
       "body": "RPs might have disjoint sets of cosigners, so we should have cosigner negotiation in the TLS handshake to allow APs to send only the required cosignatures in standalone certificates.\n\n(I didn't see an existing ticket tracking this yet.)",
       "createdAt": "2026-03-17T14:49:45Z",
-      "updatedAt": "2026-03-17T14:52:35Z",
+      "updatedAt": "2026-04-13T18:03:05Z",
       "closedAt": null,
       "comments": [
         {
@@ -3040,6 +3068,62 @@
           "body": "Cf. https://github.com/tlswg/tls-trust-anchor-ids/issues/54",
           "createdAt": "2026-03-17T14:52:35Z",
           "updatedAt": "2026-03-17T14:52:35Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "Furthermore, log cosigners can be rotated, which can cause certificates to be unusable. And if cosigners can have group identifiers, certificates can be unusable due to not having any supported algorithms.\n",
+          "createdAt": "2026-04-12T13:37:36Z",
+          "updatedAt": "2026-04-12T13:37:36Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@ilaril I think you may be assuming a very different model of cosigner than is actually is in MTC.\n\nFirst, the cosigner definition includes the signature algorithm. This is not like X.509 where one signer can be used with multiple algorithms. You cannot trust a cosigner without supporting that signature algorithm. That means saying \"I support cosigner X\" includes \"I support X's signature algorithm\". Indeed the individual cosignatures in the certificate *don't even specify the signature algorithm*. This is intentional. If you know the cosigner, you know the signature algorithm and can verify the signature. If you don't, you ignore the cosignature and don't care what it was.\n\nIf a system were to rotate cosigners, the expectations is it would make a new one but *continue to have the old one sign it*. (Rotation is about switching which one new RPs trust.) Cosigners act like SCTs. You collect as many of them as you need, based on the union of the RPs you need to support. RPs ignore the ones that don't want. Of course, sending extra ones uses bytes, but...\n\n1. In the long run, hopefully landmark-relative certificates will be used most of the time, reducing the size pressure on the slow path.\n\n2. Unlike SCTs, we didn't embed them in the TBSCertificate. They are in the signature field and malleable. When we talk about cosigner negotiation, we mean designing a way for the server to *optionally* (remember sending them all works) delete the ones the RP doesn't want.\n\nNow, ideally we would just have cosigner negotiation. But until we do, we can always lean on how CT operates. Every CT-enforcing client in the Web PKI today shuts off CT enforcement if it's config is more than 10 weeks stale. That bounds how old of clients you have to union in your SCT collection.\n\nAnalogously, until we have a clear cosigner negotiation story, every transparency-enforcing client in an MTC PKI should shut off non-CA cosigner enforcement when too stale. That gives you a similar bound.\n\nIs this ideal? No, it makes it hard to use a lot of the full operational flexibility of MTC cosigners. And shutting off transparency enforcement on a timer is terrible. That's why we have issues open for cosigner negotiation. But it's what CT is experienced with today. We pay a horrible RP shut-off timer, but that makes it much much more bounded than the CA-level problem.\n\nOnce cosigner negotiation is designed, we can remove the staleness check in clients that implement their part of it, because now you can collect negotiable cosigs for those clients. We'll need to design that transition when it comes, accounting for old and new servers, but since it always works to send all of them, I think we can ensure things keep working. ",
+          "createdAt": "2026-04-12T15:31:27Z",
+          "updatedAt": "2026-04-12T15:34:36Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(Re group IDs, I plan to update that PR to explain what's going on there a bit better but am on a plane right now. I suspect we're not talking about the same thing.)",
+          "createdAt": "2026-04-12T15:47:49Z",
+          "updatedAt": "2026-04-12T15:47:55Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> [@ilaril](https://github.com/ilaril) I think you may be assuming a very different model of cosigner than is actually is in MTC.\n\nI actually have two different models of cosigners. I think one is what the MTC model looks in practice, and the other is very different from it.\n\n> First, the cosigner definition includes the signature algorithm. This is not like X.509 where one signer can be used with multiple algorithms. You cannot trust a cosigner without supporting that signature algorithm. \n\nYes, trusting individual cosigner implies supporting its algorithm. But trusting group of cosigners does not.\n\n> If a system were to rotate cosigners, the expectations is it would make a new one but _continue to have the old one sign it_. (Rotation is about switching which one new RPs trust.) \n\nI would expect the old cosigner to be eventually dropped. Draft-ietf-plants-merkle-tree-certs-02 says \"until relying parties are all updated\" (I think that is rather optimistic).\n\n> Now, ideally we would just have cosigner negotiation. But until we do, we can always lean on how CT operates. Every CT-enforcing client in the Web PKI today shuts off CT enforcement if it's config is more than 10 weeks stale. That bounds how old of clients you have to union in your SCT collection.\n\nThat kind of thing does not help if RP has missed complete primary log key rotation.\n \n> Is this ideal? No, it makes it hard to use a lot of the full operational flexibility of MTC cosigners. And shutting off transparency enforcement on a timer is terrible. That's why we have issues open for cosigner negotiation. But it's what CT is experienced with today. We pay a horrible RP shut-off timer, but that makes it much much more bounded than the CA-level problem.\n\nI do not think why CT can do that applies to MTC.\n\n> Once cosigner negotiation is designed, we can remove the staleness check in clients that implement their part of it, because now you can collect negotiable cosigs for those clients. We'll need to design that transition when it comes, accounting for old and new servers, but since it always works to send all of them, I think we can ensure things keep working.\n\nI think the biggest issue here is that MTC is poor match to the TAI model. Cosigner negotiation without constraints looks fairly easy problem (even if one throws in some complications). But in TAI model, it looks crazy hard.\n",
+          "createdAt": "2026-04-12T16:49:17Z",
+          "updatedAt": "2026-04-12T16:49:17Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Yes, trusting individual cosigner implies supporting its algorithm. But trusting group of cosigners does not.\n\nI mean, trust a group of cosigners does not imply anything right now. The group stuff is barely written down at all, and how it might apply to cosigner negotiation is definitely not yet written down. :-)\n\nCosigner negotiation, because we can start with the CT-like approach, is I think mostly a problem for later. I do very much want it solved and have random half-baked thoughts on it, but they're only half-baked and I have limited bandwidth. Though it sounds like you're very interested in this, and have some thoughts, so this is great!\n\nThe groups thing was mostly targeting:\n* Condensing the ID space for negotiating landmark-relative certificates (no cosigners to worry about)\n* Reducing and perhaps eliminating the need for the DNS scheme, when looking at specifically lists of trust anchors\n\nIn both of these, I don't see why we'd treat a group of trust anchors vs individual ones as dramatically different. It's still the case that you shouldn't compress with a group unless you (more-or-less) support everything in group. I say more-or-less because there's _some_ room for sloppiness with the retry scheme, but I also don't think it's a good idea to lean on it too much. New signature algorithms also just don't get added that often. We change the keys we trust much more often.\n\nBetween all that, I wouldn't expect there to be much need to add separate constraints.\n\n> I would expect the old cosigner to be eventually dropped. Draft-ietf-plants-merkle-tree-certs-02 says \"until relying parties are all updated\" (I think that is rather optimistic).\n\nIt is indeed optimistic. I expect this \"until\" to be quite long for most PKIs. (Though not all! Some PKIs have very up-to-date RPs.)\n\nBut, in the meantime, MTC lets you sign with both keys for basically as long as you like. The security value of rotating keys is to change what the RP trusts, and this is sufficient to do that. Yes, the CA has to do a little more work to sign with both keys in parallel, but there is no security cost to just signing both for a very long time. That \"until\" is only there to acknowledge that, yeah, *at some point* folks will *eventually* abandon the old RPs.\n\nThe draft mentions all this because this is interesting new capability, relative to today's story where we basically do not rotate root keys ever. That doesn't mean CAs are expected to quickly stop signing with both keys, or that we want to rotate so frequently that you build up a bunch of them. There's still a cost, especially before the ecosystem can drop the unnecessary keys. Would we use it instead of just getting everyone to negotiate at the level of CAs? \ud83e\udd37 \n\n> That kind of thing [CT's stale client behavior] does not help if RP has missed complete primary log key rotation.\n\nRight, like I said, that was just about the non-CA cosigners. But this reduces the problem to just the primary signature, which makes it look more like the regular X.509 picture. (We'd been talking elsewhere about how MTC and regular X.509 actually are here.) MTC gives you the _added_ option of signing with both keys, but otherwise all the same solutions as before apply.\n\n> I do not think why CT can do that applies to MTC.\n\nOh?  Perhaps I'm missing something. What aspect are you concerned about? SCTs and MTC _non-CA_ cosignatures seem quite analogous to me. (Of course one should not shut off enforcement of the CA cosignature!) Certainly, when we think about the relying party policies, they've been basically analogous.\n\nIf anything, the MTC ones seem _more_ robust because mirrors and witnesses are simpler to run than CT logs. A lot of failures that would sink a CT logs today are moved to the CA side and can just bump a log generation (once that's written down...). We also wouldn't need to shard the cosigners by year, like we do with CT logs today.\n\n> I think the biggest issue here is that MTC is poor match to the TAI model. Cosigner negotiation without constraints looks fairly easy problem (even if one throws in some complications). But in TAI model, it looks crazy hard.\n\nOh? What is your easy proposal? What do you think is a poor match? This sounds like we're talking about our mental versions of various unwritten ideas. It'd certainly be a lot less confusing for me to talk about more concrete things. \ud83d\ude06",
+          "createdAt": "2026-04-12T17:47:34Z",
+          "updatedAt": "2026-04-12T17:48:05Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "> > Yes, trusting individual cosigner implies supporting its algorithm. But trusting group of cosigners does not.\n> \n> I mean, trust a group of cosigners does not imply anything right now. The group stuff is barely written down at all, and how it might apply to cosigner negotiation is definitely not yet written down. :-)\n\nWell, it might be a bad idea after all.\n\n> Cosigner negotiation, because we can start with the CT-like approach, is I think mostly a problem for later. I do very much want it solved and have random half-baked thoughts on it, but they're only half-baked and I have limited bandwidth. Though it sounds like you're very interested in this, and have some thoughts, so this is great!\n\nUnfortunately, those start at model different from TAI.\n\n>     * Reducing and perhaps eliminating the need for the DNS scheme, when looking at specifically lists of trust anchors\n\nI do not think that is possible, unfortunately.\n \n> In both of these, I don't see why we'd treat a group of trust anchors vs individual ones as dramatically different. It's still the case that you shouldn't compress with a group unless you (more-or-less) support everything in group. \n\nWith sufficient data, AP can filter by signature_algorithms_cert.\n\n> > I would expect the old cosigner to be eventually dropped. Draft-ietf-plants-merkle-tree-certs-02 says \"until relying parties are all updated\" (I think that is rather optimistic).\n> \n> It is indeed optimistic. I expect this \"until\" to be quite long for most PKIs. (Though not all! Some PKIs have very up-to-date RPs.)\n\nWell, it would be fine for algorithm updates, as those can drag for really long. I think the last major one took a decade. :-)\n\n> > That kind of thing [CT's stale client behavior] does not help if RP has missed complete primary log key rotation.\n> \n> Right, like I said, that was just about the non-CA cosigners. But this reduces the problem to just the primary signature, which makes it look more like the regular X.509 picture. (We'd been talking elsewhere about how MTC and regular X.509 actually are here.) MTC gives you the _added_ option of signing with both keys, but otherwise all the same solutions as before apply.\n\nI think the added capabilities of MTC here are most interesting in context of algorithm updates.\n\n\n> If anything, the MTC ones seem _more_ robust because mirrors and witnesses are simpler to run than CT logs. A lot of failures that would sink a CT logs today are moved to the CA side and can just bump a log generation (once that's written down...). We also wouldn't need to shard the cosigners by year, like we do with CT logs today.\n\nMTC can be very robust. Robust enough to not even need generations.\n \n> > I think the biggest issue here is that MTC is poor match to the TAI model. Cosigner negotiation without constraints looks fairly easy problem (even if one throws in some complications). But in TAI model, it looks crazy hard.\n> \n> Oh? What is your easy proposal? What do you think is a poor match? This sounds like we're talking about our mental versions of various unwritten ideas. It'd certainly be a lot less confusing for me to talk about more concrete things. \ud83d\ude06\n\nIn the simplest version: List of cosigners to filter. And one can throw various stuff on top. And it is poor match, since TAI is essentially single-axis, but MTC has two (logs and cosigners).",
+          "createdAt": "2026-04-12T18:43:54Z",
+          "updatedAt": "2026-04-12T18:43:54Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> In the simplest version: List of cosigners to filter. And one can throw various stuff on top. And it is poor match, since TAI is essentially single-axis, but MTC has two (logs and cosigners).\n\nAh sure. That doesn't capture things like, maybe I only needed two of the three matches. But that might be a good enough for an upper bound.\n\nThe other (half-baked) direction I'd been musing on was to give names for policies, tell the AP \"this policy is satisfied by this set, this by this set, etc\", and if you don't have a match, eh we just send them all, or fall back to some other upper bound like what you described above.",
+          "createdAt": "2026-04-13T07:12:04Z",
+          "updatedAt": "2026-04-13T07:12:04Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "\"various stuff on top\" includes things like partitioning the set plus required partition count. One could represent 2 primary cosigners plus 2 out of 11 independent sets of secondaries in 8 bytes.",
+          "createdAt": "2026-04-13T18:03:05Z",
+          "updatedAt": "2026-04-13T18:03:05Z"
         }
       ]
     },
@@ -3092,6 +3176,44 @@
           "body": "> Whichever the status code, do you think it warrants a different header in that case? (I see ACME also has this error system. I've no idea if that's appropriate here.)\n\nAh interesting. ACME actually already uses Retry-After on 200 responses, so that bridge has already been crossed:\n\n>  \"processing\": The certificate is being issued.  Send a POST-as-GET request after the time given in the Retry-After header field of the response, if any.",
           "createdAt": "2026-04-09T04:48:56Z",
           "updatedAt": "2026-04-09T04:48:56Z"
+        }
+      ]
+    },
+    {
+      "number": 206,
+      "id": "I_kwDOJIBkVc79PetD",
+      "title": "Is the \"alternate\" link relation correct for parallel certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/206",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@ilaril in https://github.com/ietf-plants-wg/merkle-tree-certs/pull/203#discussion_r3067963799 thinks the existing ACME \"alternate\" link relation is not a good fit for when the CA wants to hand you two certificates to dispatch between. It seems we're not reading the ACME text in the same way. Moving this to a separate issue to discuss as this is orthogonal to what that PR is addressing.\n\n(CC @aarongable)",
+      "createdAt": "2026-04-12T15:49:32Z",
+      "updatedAt": "2026-04-13T18:05:25Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Yes, it is. The situation between multiple alternate MTC certs is exactly analogous to the relationship between multiple alternate classical certs: they assert the exact same set of validated data, but are trusted by relying parties with different trust stores.\n\nRFC 8555 says that the ACME client should inspect all of the alternates and determine \"which is optimal\". It does not say that the optimality decision must be universal, or under what circumstances the optimality decision must be made. It is perfectly appropriate for a client to store all of the certificates and determine which to use on a handshake-by-handshake basis, selecting the optimal alternative in each case.",
+          "createdAt": "2026-04-13T16:52:07Z",
+          "updatedAt": "2026-04-13T16:52:07Z"
+        },
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "I do not think it is analogous. Any alternative X.509 certificate is installed the same way. That might not be true for stand-alone MTCs and landmark-relative MTCs.\n",
+          "createdAt": "2026-04-13T17:53:46Z",
+          "updatedAt": "2026-04-13T17:53:46Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "If an ACME client / webserver does not understand what standalone and landmark-relative certs are, its heuristic should say \"No idea what that is or when to use it!\" and ignore the alternate. It will use the default (i.e. standalone) certificate for all connections, which is the desired result.\n\nIf an ACME client / webserver _does_ understand what they are, then it will install them side-by-side tagged with their respective Trust Anchor IDs. This is the exact same thing that an updated ACME client / webserver (i.e. one that understands Trust Anchor IDs) would do when offered classical alternates that chain to different roots.\n\nI don't understand how a standalone or landmark-relative cert would be installed in a \"different way\" from each other.",
+          "createdAt": "2026-04-13T18:04:54Z",
+          "updatedAt": "2026-04-13T18:05:25Z"
         }
       ]
     }
@@ -12165,7 +12287,7 @@
       "labels": [],
       "body": "Instead of messing with the URL, this other idea proposes to update the ACME order object, using a very similar flow as the ACME \"processing\" state.\r\n\r\nFixes #202\r\n\r\n@aarongable WDYT?",
       "createdAt": "2026-04-10T02:16:37Z",
-      "updatedAt": "2026-04-12T02:50:47Z",
+      "updatedAt": "2026-04-13T19:44:15Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
@@ -12176,7 +12298,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "body": "Thanks for proposing this. I've written up a third way to do it: https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207. Please let me know what you think!",
+          "createdAt": "2026-04-13T19:44:15Z",
+          "updatedAt": "2026-04-13T19:44:15Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc7zs5vX",
@@ -12635,6 +12765,246 @@
               "updatedAt": "2026-04-12T02:52:27Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70EPr5",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T07:25:58Z",
+          "updatedAt": "2026-04-12T07:25:58Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "> I read this to mean that the client fetches both alternates and then uses \"heuristics\" to decide which to use in any given TLS connection. (And then TAI aims to fix these heuristics into something well-defined.)\r\n\r\n(ACME) clients are (usually :-) ) not TLS servers.\r\n\r\n> If I understand you right, you read this to mean that the client fetches both alternates and uses \"heuristics\" to decide which to install and which to throw away, never to be used at all.\r\n\r\nYes. Besides the text, installing multiple requires specialized TLS server support and has edge cases where it is not clear what is sensible behavior.\r\n \r\n> I agree that, by your read, this feature is inappropriate to use for any kind of multi-certificate story and we'd need something else. However, it seems that to me that the second version makes for a pretty useless feature!\r\n\r\nIt is useful for choosing the root certificate, and Let's Encrypt has used (and I think is currently using) it for that purpose.\r\n\r\n> > Additionally, web linking RFC recommends that relations with highly application-specific meaning should be named accordingly. I think this relation has very application-specific meaning.\r\n> \r\n> I do not think this needs to be that application-specific, or rather not MTC-specific. \r\n\r\nACME clients need to handle MTC landmark-relative certificates differently from stand-alone certificates (MTC or X.509). For example, replacing standalone certificates but not landmark-relative ones.\r\n\r\n>     * ACME server gives you enough information, in some well-defined format, that you can toss it into your TLS server and dispatch the right cert to the right RP (CertificatePropertyList)\r\n\r\nIf order can give multiple used certificates and certificates can be replaced, there is also the question of which exact certificate should be replaced.",
+              "createdAt": "2026-04-12T07:25:58Z",
+              "updatedAt": "2026-04-12T07:25:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70EYDD",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T07:53:44Z",
+          "updatedAt": "2026-04-12T07:53:44Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "> This mechanism also allows things like the ACME server updating the CertificatePropertyList for a certificate once it has more information on bulk-ID inclusions, etc. That is another case where we need replacement.\r\n\r\nBulk-ID inclusions that change seem to be prone to cause failures (AP thinks bulk-ID means something the RP does not). And even immutable bulk IDs can require AP to have additional information.",
+              "createdAt": "2026-04-12T07:53:44Z",
+              "updatedAt": "2026-04-12T07:53:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70EuWp",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T09:46:15Z",
+          "updatedAt": "2026-04-12T09:46:15Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "> Bulk-ID inclusions that change seem to be prone to cause failures (AP thinks bulk-ID means something the RP does not).\r\n\r\nNot what I'm suggesting. There's goofy ordering thing with bulk IDs across CAs and landmarks, which metadata update can solve. But this is a digression this point and not necessarily a lever we want to actually pull anyway. (We can debate whether to allow for optional bulk IDs at all in the TAI discussion.)\r\n\r\n> And even immutable bulk IDs can require AP to have additional information.\r\n\r\nWhich is why TAI defines CertificatePropertyList to carry this information.\r\n\r\nIt sounds like there are no more issues on this thread that are directly related to this PR. I'll go ahead and mark this resolved.\r\n",
+              "createdAt": "2026-04-12T09:46:15Z",
+              "updatedAt": "2026-04-12T10:01:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70E1tr",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T10:20:46Z",
+          "updatedAt": "2026-04-12T10:20:46Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Will leave the question of whether to use alternate or make a new relation type for parallel certificates to ACME experts. I care about it being suitably generic but I don't care what the spelling is.\r\n\r\nThough it's also orthogonal to this PR so we can resolve that separately if it takes too long to resolve. I can file a bug for that so we don't forget, once I'm at a real keyboard. :-) This PR was mostly about dealing with the HTTP 503 situation.\r\n\r\n> ACME clients need to handle MTC landmark-relative certificates differently from stand-alone certificates (MTC or X.509). For example, replacing standalone certificates but not landmark-relative ones.\r\n\r\nMTC certificates are X.509 certificates. :-p\r\n\r\nThe cross-order replacement thing is a difference but they do not *need* to do that. Nothing *breaks* if they don't. It *is* better if they keep the old one around, but they don't have to differentiate the two if they don't want. Keeping the previous order's standalone certificate is unnecessary, but isn't *harmful* because it'll just be shadowed by the new one. Or...\r\n\r\n* One could just parse the certificate and notice it's a landmark-relative one\r\n* We could define a \"I think you should keep this around\" property if we want it to be generic\r\n* The ACME client can notice that the standalone certificates overlap in TAI metadata while the landmark-relative ones do not\r\n\r\n(If we need a new ACME mechanism we can do another PR after fixing the HTTP 503 issue, but my inclination is that \"don't bother differentiating\" or \"parse the certificate if you care\" are pretty good.)\r\n\r\n> If order can give multiple used certificates and certificates can be replaced, there is also the question of which exact certificate should be replaced.\r\n\r\nThe PR answers this, no? Within the bounds of the order update story, the replacement is for the certificates that came from this order. That seems natural to me.\r\n\r\nThe PR says nothing about cross-order replacement, which I think is correct for stuff relating to one order. See above for whether we need a mechanism or not.",
+              "createdAt": "2026-04-12T10:20:46Z",
+              "updatedAt": "2026-04-12T10:21:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70FFu8",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T11:28:28Z",
+          "updatedAt": "2026-04-12T11:28:28Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Thinking about it, I'm not sure the two interpretations of \"alternate\" are *necessarily* incompatible. ACME already says you have to use a heuristic to decide which chain to use. If you implemented it with a heuristic, in a scheme where you have to commit to only one chain to install, your heuristic presumably should say \"don't use the landmark certificate\" because you're not able to.\r\n\r\nIf you *are* able to install both and evaluate the heuristic by ClientHello, the same mechanism is just as serviceable for a smarter setup.\r\n\r\nAnd if you're able to pick up CertificatePropertyList and TAI for a well-defined selection, you don't need to maintain a heuristic.\r\n\r\nThat all feels like different degrees on how to use what is really the same mechanism: CA has a couple way to prove what you asked for and you have to evaluate the size vs applicability trade-off.\r\n\r\nBut again I don't have a horse in this race. If it's the consensus of ACME folks that there should be two of these, that's cool too.",
+              "createdAt": "2026-04-12T11:28:28Z",
+              "updatedAt": "2026-04-12T11:28:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70FeP0",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T13:23:47Z",
+          "updatedAt": "2026-04-12T13:23:48Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "MTCs are not X.509 certificates. The format might be the same, but the semantics are very different.\r\n\r\nUnfortunately, neither CPL nor TAI replaces heuristics due to compatibility constraints. And those heuristics need to be configured to TLS server (and editing random config files is no-no). Well, MTC might be easy: Flag everything as ignored by heuristics.",
+              "createdAt": "2026-04-12T13:23:48Z",
+              "updatedAt": "2026-04-12T13:23:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70F_zL",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T15:39:59Z",
+          "updatedAt": "2026-04-12T15:39:59Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Let's leave discussion of the negotiation bits to those threads. With all this jumping around between threads and vague references to things that you don't think work, jumping to a different topic each time, it is too hard to follow.\r\n\r\nI really do want to understand and address your concerns. But to do that, we have to be able to dive into each concern individually and figure out where you misunderstand the design (and the text could be clearer) and where we've missed something important. That's not possible with all this jumping around.\r\n\r\nThis PR is about adjusting how ACME models the funny valid-but-processing-like state in the issuance flow. *What* it delivers and plugs into server behavior seems pretty orthogonal. This one PR is not meant to be the one PR that finishes the spec in one go.",
+              "createdAt": "2026-04-12T15:39:59Z",
+              "updatedAt": "2026-04-12T15:51:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70GCB0",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T15:50:03Z",
+          "updatedAt": "2026-04-12T15:50:03Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "(As promised, I've filed https://github.com/ietf-plants-wg/merkle-tree-certs/issues/206 for the link relation.)",
+              "createdAt": "2026-04-12T15:50:03Z",
+              "updatedAt": "2026-04-12T15:50:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70Gw0C",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T17:40:22Z",
+          "updatedAt": "2026-04-12T17:40:22Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Why would ACME client replace existing certificate on update (other than due relative certificate slot limits)?",
+              "createdAt": "2026-04-12T17:40:22Z",
+              "updatedAt": "2026-04-12T17:40:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70G3Sc",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T17:53:26Z",
+          "updatedAt": "2026-04-12T17:53:26Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "The first download contained new-standalone-cert. The second download contains (new-standalone-cert, new-landmark-relative-cert). You should replace the first download rather than having two copies of new-standalone-cert.\r\n\r\nThe second download needs to have both because of this:\r\n\r\n> In normal operation, an ACME client will first observe the order only serving a standalone certificate, and later the updated order serving both certificates. However, if the certificate is issued shortly before a landmark is allocated, the landmark-relative certificate will be available very soon after the standalone certificate. Depending on timing, an ACME client might then only observe the updated order. Such a client depends on the updated order serving a complete set certificates, not just the newly-added ones.\r\n\r\nWhy _wouldn't_ the ACME client replace the existing certificates from _this order_? It seems natural to me that, if the mechanism has the CA update the result of _this order_, the correct semantics are that the previous certificates from _this order_ are correspondingly replaced on the client. (Keep in mind the previous landmark-relative certificate is from a _previous_ order and wouldn't be replaced.)",
+              "createdAt": "2026-04-12T17:53:26Z",
+              "updatedAt": "2026-04-12T17:53:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70HhbC",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T19:22:54Z",
+          "updatedAt": "2026-04-12T19:22:54Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "On the second download, the ACME client already has stand-alone certificate from that order. It sees the landmark-relative one as new, so it adds it (unless slot limits force replacement).",
+              "createdAt": "2026-04-12T19:22:54Z",
+              "updatedAt": "2026-04-12T19:22:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70HkIN",
+          "commit": {
+            "abbreviatedOid": "11723d0"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-12T19:34:49Z",
+          "updatedAt": "2026-04-12T19:34:49Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "Ah sure. I think we're using different words to describe the same outcome?\r\n\r\nWe can't use the same URL (at least as long as we use link headers) because, as you noted, the URLs are immutable. So even changing response headers to add a link header counts as a change.\r\n\r\nThat means the second copy of the standalone certificate needs to be deduped against the first copy somehow. We could say \"look for an identical certificate and replace it\", but then we need to answer stupid questions like \"how much do you need to compare\". ISTM it's cleaner to just say it's a replacement of the old set with the new set. Yes, the old set is a subset of the new set, so we're effectively adding. But saying replace means the ACME client doesn't have to compare the contents of the sets. It also gives us room to play games like:\r\n\r\n- Here's a landmark-relative cert, it's part of these group IDs\r\n- Oh I heard back from this root program, it's also part of this group ID\r\n\r\nThe replacement model then nicely handles this. (Whether we want to do that, I don't know. This is just a convenient bonus that falls out of what seems to be the simpler model anyway?)",
+              "createdAt": "2026-04-12T19:34:49Z",
+              "updatedAt": "2026-04-12T19:34:49Z"
+            }
+          ]
         }
       ]
     },
@@ -12734,6 +13104,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 207,
+      "id": "PR_kwDOJIBkVc7SGI1D",
+      "title": "acme: poll landmarkURL, POST newRelativeCertificate",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/207",
+      "state": "OPEN",
+      "author": "jsha",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "An ACME client polls landmarkURL (which may be shared across many certificates) to determine when a landmark-relative certificate is possible. Once a landmark-relative certificate is possible, the ACME client POSTs to newRelativeCertificate (from the directory).\r\n\r\nAdvantages:\r\n\r\n - No new states in the Order state machine.\r\n - No new polling semantics for certificate download URLs.\r\n - CAs do no extra work for clients that don't want relative certificates (or: clients can defer getting relative certificates until they see that traffic justifies it).\r\n - Order lifetime does not depend on landmarking period.\r\n - All HTTP requests are expected to serve 200 in the happy case.\r\n - The new field in the directory serves as a signal that the ACME server supports Merkle Tree Certificates.\r\n\r\nDisadvantages:\r\n\r\n - ACME clients will tend to rush in and request relative certificates as soon as a landmark is minted. Options:\r\n   - CA returns 503 if load is too high and clients backoff and retry.\r\n   - Some mechanism for clients to decide how long to wait after a landmark is minted before requesting a relative certificate. Perhaps interpolation based on size of landmarks?\r\n\r\nClaude drafted the IANA Considerations section, which I reviewed and reference checked. All other words are mine.",
+      "createdAt": "2026-04-13T19:42:08Z",
+      "updatedAt": "2026-04-13T19:42:08Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
+      "headRepository": "jsha/merkle-tree-certs",
+      "headRefName": "acme-get-relative-certificate",
+      "headRefOid": "d4ddd21f4dfd23238afca8b4ec049a33911a45fd",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
