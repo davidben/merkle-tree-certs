@@ -1374,6 +1374,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.6">
                 <p id="section-toc.1-1.12.2.6.1"><a href="#section-12.6" class="auto internal xref">12.6</a>.  <a href="#name-certificate-malleability" class="internal xref">Certificate Malleability</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.7">
+                <p id="section-toc.1-1.12.2.7.1"><a href="#section-12.7" class="auto internal xref">12.7</a>.  <a href="#name-revocation" class="internal xref">Revocation</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
@@ -4649,6 +4652,7 @@ This line MUST satisfy the following, otherwise it is invalid:<a href="#section-
 <p id="section-7.5-2">When a relying party is first configured to trust a CA, it SHOULD be configured to revoke all entries from zero up to but not including the first available unexpired certificate at the time. This revocation SHOULD be periodically updated as entries expire and logs are pruned (<a href="#log-pruning" class="auto internal xref">Section 5.6.1</a>). In particular, when CAs prune entries, relying parties SHOULD be updated to revoke all newly unavailable entries. This gives assurance that, even if some unavailable entry had not yet expired, the relying party will not trust it. It also allows monitors to start monitoring a log without processing expired entries.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
 <p id="section-7.5-3">A misbehaving CA might correctly construct a globally consistent log, but refuse to make some entries or intermediate nodes available. Consistency proofs between checkpoints and subtrees would pass, but monitors cannot observe the entries themselves. Relying parties whose cosigner policies (<a href="#trusted-cosigners" class="auto internal xref">Section 7.3</a>) do not require durable logging (e.g. via <span>[<a href="#TLOG-MIRROR" class="cite xref">TLOG-MIRROR</a>]</span>) are particularly vulnerable to this. In this case, the indices of the missing entries will still be known, so relying parties can use this mechanism to revoke the unknown entries, possibly as an initial, targeted mitigation before complete CA removal.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
 <p id="section-7.5-4">When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the <span>[<a href="#SCTNotAfter" class="cite xref">SCTNotAfter</a>]</span> mechanism used in some PKIs.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
+<p id="section-7.5-5">The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates use log indices as serial numbers, existing revocation mechanisms like CRLs <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and OCSP <span>[<a href="#RFC6960" class="cite xref">RFC6960</a>]</span> apply unchanged.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5000,6 +5004,14 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <p id="section-12.6-9">The above only ensures the TBSCertificate portion is non-malleable. In Merkle Tree Certificates, similar to an ECDSA X.509 signature, the signature value is malleable. Multiple MTCProof structures may prove a single TBSCertificate structure. Additionally, in all X.509-based protocols, a BER-based parser for the outer, unsigned Certificate structure will admit malleability in those portions of the encoding. Applications that derive a unique identifier from the Certificate MUST instead use the TBSCertificate, or some portion of it, for Merkle Tree Certificates.<a href="#section-12.6-9" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="revocation">
+<section id="section-12.7">
+        <h3 id="name-revocation">
+<a href="#section-12.7" class="section-number selfRef">12.7. </a><a href="#name-revocation" class="section-name selfRef">Revocation</a>
+        </h3>
+<p id="section-12.7-1">This document does not define a new certificate-level revocation mechanism. Existing mechanisms like CRLs and OCSP apply unchanged to Merkle Tree certificates. The sequential serial numbers assigned by issuance logs may enable future improvements to revocation, but such work is out of scope for this document.<a href="#section-12.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
@@ -5126,6 +5138,10 @@ TrustAnchorRange TrustAnchorRangeList&lt;1..2^16-1&gt;;
 <dt id="RFC5912">[RFC5912]</dt>
         <dd>
 <span class="refAuthor">Hoffman, P.</span> and <span class="refAuthor">J. Schaad</span>, <span class="refTitle">"New ASN.1 Modules for the Public Key Infrastructure Using X.509 (PKIX)"</span>, <span class="seriesInfo">RFC 5912</span>, <span class="seriesInfo">DOI 10.17487/RFC5912</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5912">https://www.rfc-editor.org/rfc/rfc5912</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6960">[RFC6960]</dt>
+        <dd>
+<span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Myers, M.</span>, <span class="refAuthor">Ankney, R.</span>, <span class="refAuthor">Malpani, A.</span>, <span class="refAuthor">Galperin, S.</span>, and <span class="refAuthor">C. Adams</span>, <span class="refTitle">"X.509 Internet Public Key Infrastructure Online Certificate Status Protocol - OCSP"</span>, <span class="seriesInfo">RFC 6960</span>, <span class="seriesInfo">DOI 10.17487/RFC6960</span>, <time datetime="2013-06" class="refDate">June 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6960">https://www.rfc-editor.org/rfc/rfc6960</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8032">[RFC8032]</dt>
         <dd>

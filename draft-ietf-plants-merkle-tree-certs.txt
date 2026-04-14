@@ -142,6 +142,7 @@ Table of Contents
      12.4.  Non-Repudiation
      12.5.  New Log Entry Types
      12.6.  Certificate Malleability
+     12.7.  Revocation
    13. IANA Considerations
      13.1.  Module Identifier
      13.2.  Algorithm
@@ -2140,6 +2141,11 @@ Table of Contents
    entries after some index, while leaving existing entries accepted.
    This is analogous to the [SCTNotAfter] mechanism used in some PKIs.
 
+   The revocation mechanism in this section is complementary to
+   certificate-level revocation mechanisms.  Because Merkle Tree
+   certificates use log indices as serial numbers, existing revocation
+   mechanisms like CRLs [RFC5280] and OCSP [RFC6960] apply unchanged.
+
 8.  Use in TLS
 
    Most X.509 fields such as subjectPublicKeyInfo and X.509 extensions
@@ -2847,6 +2853,14 @@ Table of Contents
    MUST instead use the TBSCertificate, or some portion of it, for
    Merkle Tree Certificates.
 
+12.7.  Revocation
+
+   This document does not define a new certificate-level revocation
+   mechanism.  Existing mechanisms like CRLs and OCSP apply unchanged to
+   Merkle Tree certificates.  The sequential serial numbers assigned by
+   issuance logs may enable future improvements to revocation, but such
+   work is out of scope for this document.
+
 13.  IANA Considerations
 
 13.1.  Module Identifier
@@ -2934,6 +2948,12 @@ Table of Contents
               Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
               DOI 10.17487/RFC5912, June 2010,
               <https://www.rfc-editor.org/rfc/rfc5912>.
+
+   [RFC6960]  Santesson, S., Myers, M., Ankney, R., Malpani, A.,
+              Galperin, S., and C. Adams, "X.509 Internet Public Key
+              Infrastructure Online Certificate Status Protocol - OCSP",
+              RFC 6960, DOI 10.17487/RFC6960, June 2013,
+              <https://www.rfc-editor.org/rfc/rfc6960>.
 
    [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
               Signature Algorithm (EdDSA)", RFC 8032,
