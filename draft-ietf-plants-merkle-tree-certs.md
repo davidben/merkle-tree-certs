@@ -961,7 +961,7 @@ The fields of a TBSCertificateLogEntry are defined as follows:
 
 * `version`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` have the same semantics as the corresponding TBSCertificate fields, defined in {{Section 4.1.2 of !RFC5280}}.
 
-*  `issuer` is the issuance log's log ID as a X.500 distinguished name, as described in {{log-ids}}.
+*  `issuer` is the issuance log's log ID as a PKIX distinguished name, as described in {{log-ids}}.
 
 * `subjectPublicKeyAlgorithm` describes the algorithm of the subject's public key. It is constructed identically to the `algorithm` field of a SubjectPublicKeyInfo ({{Section 4.1.2.7 of !RFC5280}}).
 
