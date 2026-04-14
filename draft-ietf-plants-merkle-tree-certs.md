@@ -1386,7 +1386,7 @@ A misbehaving CA might correctly construct a globally consistent log, but refuse
 
 When a CA is found to be untrustworthy, relying parties SHOULD remove trust in that CA. To minimize the compatibility impact of this mitigation, index-based revocation can be used to only distrust entries after some index, while leaving existing entries accepted. This is analogous to the {{SCTNotAfter}} mechanism used in some PKIs.
 
-Index-based revocation is complementary to existing certificate-level revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}}, which apply unchanged to Merkle Tree certificates.
+The revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates use log indices as serial numbers, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.
 
 # Use in TLS
 
