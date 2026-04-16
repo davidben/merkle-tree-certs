@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-14T03:32:14.531529+00:00",
+  "timestamp": "2026-04-16T03:38:09.491121+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -869,13 +869,11 @@
       "state": "OPEN",
       "author": "bwesterb",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [
-        "davidben"
-      ],
+      "assignees": [],
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2026-04-02T15:43:50Z",
+      "updatedAt": "2026-04-16T01:38:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -905,6 +903,13 @@
           "body": "Assigning this to myself. I'll put together a PR for log generations.",
           "createdAt": "2026-04-02T15:43:50Z",
           "updatedAt": "2026-04-02T15:43:50Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "(Actually @nharper is probably going to do it, but I'm not able to assign it to him on GitHub for some reason.)",
+          "createdAt": "2026-04-16T01:38:41Z",
+          "updatedAt": "2026-04-16T01:38:50Z"
         }
       ]
     },
@@ -2103,11 +2108,13 @@
       "state": "OPEN",
       "author": "davidben",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "davidben"
+      ],
       "labels": [],
       "body": "",
       "createdAt": "2024-10-18T18:33:05Z",
-      "updatedAt": "2025-06-21T14:42:45Z",
+      "updatedAt": "2026-04-16T01:37:48Z",
       "closedAt": null,
       "comments": [
         {
@@ -2116,6 +2123,13 @@
           "body": "Post-Photosynthesis triage: still applicable to new formulation",
           "createdAt": "2025-06-21T14:42:45Z",
           "updatedAt": "2025-06-21T14:42:45Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Assigning this to myself. List discussion at https://mailarchive.ietf.org/arch/msg/plants/iDw9faR8lV68Hy8pFuvEziIukm0/\n\nPlan is to pick Option 1 of the two as it's less spicy. I think it's also more in the spirit of X.509. In a better world (see the old BikeshedCertificate notion of \"subject\"), a TLS key and a cosigner key and an X.509 key would all be different animals, with different types, and serializing whatever makes sense for those protocols. That's not how X.509 works, and the cosigner info is basically the equivalent of usage information so, well, extension it is.",
+          "createdAt": "2026-04-16T01:37:48Z",
+          "updatedAt": "2026-04-16T01:37:48Z"
         }
       ]
     },
@@ -2983,7 +2997,7 @@
       "labels": [],
       "body": "Our charter says we're going to have two documents. At a glance, the existing text that probably can go in an architecture doc include:\n\n* Much of the introduction\n* Most of Overview section\n* Introduction bits of the Issuance Log\n* Discussion of what cosigners are and the CA's cosigner\n* The guidance on how to pick relying party cosigner policies\n* Text describing how this stuff fits into a broader transparency ecosystem, maybe with (non-normative) pointers to tlog and stuff. Then sections like \"Publishing Logs\" can probably be removed from the protocol draft, which is really focused on how certificates work and such\n* Probably all of Deployment Considerations\n* Other stuff?",
       "createdAt": "2026-03-01T23:29:28Z",
-      "updatedAt": "2026-03-17T16:08:41Z",
+      "updatedAt": "2026-04-15T19:25:32Z",
       "closedAt": null,
       "comments": [
         {
@@ -2992,6 +3006,13 @@
           "body": "Another thing to perhaps touch on in the architecture doc is the interaction of MTCs with offline trust anchors.\n\nMTC CAs are similar to intermediate issuing CAs, with online keys. However, many CA operators keep their root keys offline in air-gapped environments. How does that interact with MTCs? Do we do away with offline keys altogether since the issuing keys become de-facto trust anchors anyway?\n\nI suppose you could have an offline key sign the software update that the ships the online trust anchors to relying parties. Not sure if others have thought deeply about this yet.\n\n(Notably, MTC's built-in batch signing is great for slow-but-online HSMs.)",
           "createdAt": "2026-03-17T16:08:41Z",
           "updatedAt": "2026-03-17T16:08:41Z"
+        },
+        {
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The sections listed above look right, I can open a PR with a skeleton document. It'll let us start moving content over.",
+          "createdAt": "2026-04-15T19:25:32Z",
+          "updatedAt": "2026-04-15T19:25:32Z"
         }
       ]
     },
@@ -3216,6 +3237,22 @@
           "updatedAt": "2026-04-13T18:05:25Z"
         }
       ]
+    },
+    {
+      "number": 208,
+      "id": "I_kwDOJIBkVc7-HwmC",
+      "title": "Explicitly state that CRL and OCSP are unmodified",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/208",
+      "state": "CLOSED",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "MTC doesn't touch OCSP or CRL. If you were using CRLs before, you can continue to use CRLs as before. If you weren't using CRLs before, you can continue to not use CRLs as before.\n\nWe should say this explicitly so it's clear. (There might be interesting things to do in this space, but I think we can say this is orthogonal.)",
+      "createdAt": "2026-04-14T16:28:05Z",
+      "updatedAt": "2026-04-14T22:49:31Z",
+      "closedAt": "2026-04-14T22:49:31Z",
+      "comments": []
     }
   ],
   "pulls": [
@@ -13013,28 +13050,30 @@
       "id": "PR_kwDOJIBkVc7RgpOD",
       "title": "Clarify issuer field in TBSCertificateLogEntry",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/204",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "CBonnell",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "- Removed `issuer` from \"as-is\" list of fields\r\n- Fixed formatting of `issuer` description. Also changed PKIX to X.500 to align with RFC 5280.",
       "createdAt": "2026-04-10T16:32:41Z",
-      "updatedAt": "2026-04-11T00:39:28Z",
+      "updatedAt": "2026-04-14T22:29:42Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "906f3a2ed9d1515c53f1f006dc0f7b646211c497",
       "headRepository": "CBonnell/merkle-tree-certs",
       "headRefName": "patch-1",
-      "headRefOid": "49943ef1da31c4a47fd05ca49f348cf1f66f1b5d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "4e53ebeb3a49b76dd10a0719b283c9f4579fef3b",
+      "closedAt": "2026-04-14T22:29:42Z",
+      "mergedAt": "2026-04-14T22:29:42Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "586c9e13daa7f6e2b63ec81ea366d13a20c0a3db"
+      },
       "comments": [
         {
           "author": "CBonnell",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "I can add X.500 as an informative reference, or can do that as another PR. Thoughts?",
           "createdAt": "2026-04-10T16:36:30Z",
           "updatedAt": "2026-04-10T16:36:30Z"
@@ -13058,6 +13097,26 @@
               "body": "[There was feedback](https://mailarchive.ietf.org/arch/msg/plants/rQPkX4tEQySSvMzsH1bciLkSL8o/) on the list to call this a \"PKIX distinguished name\" instead of \"X.50[09] distinguished name\". I have no horse in this race, but I guess we like to say PKIX instead? I've no idea.",
               "createdAt": "2026-04-11T00:38:52Z",
               "updatedAt": "2026-04-11T00:39:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc70uDi7",
+          "commit": {
+            "abbreviatedOid": "49943ef"
+          },
+          "author": "CBonnell",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-14T12:05:25Z",
+          "updatedAt": "2026-04-14T12:05:25Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "Thanks for the pointer. Yeah, I don't know why that suggestion was made, because the DN as defined in 5280 is the X.500 DN. Nonetheless, this is a minor detail we can all discuss later, so I'll change it back to PKIX for now.",
+              "createdAt": "2026-04-14T12:05:25Z",
+              "updatedAt": "2026-04-14T12:05:25Z"
             }
           ]
         }
@@ -13130,6 +13189,217 @@
       "mergeCommit": null,
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 209,
+      "id": "PR_kwDOJIBkVc7SdETZ",
+      "title": "Clarify that CRL and OCSP apply unchanged to Merkle Tree certificates",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/209",
+      "state": "MERGED",
+      "author": "sgmenda",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #208",
+      "createdAt": "2026-04-14T22:17:33Z",
+      "updatedAt": "2026-04-14T22:55:51Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "237155cac9d839fc85bb90c6e4b385fe9d830bcf",
+      "headRepository": "sgmenda/merkle-tree-certs",
+      "headRefName": "crl-ocsp-unmodified",
+      "headRefOid": "c97b4ce56d72744e6337a638b327c97543f13341",
+      "closedAt": "2026-04-14T22:49:30Z",
+      "mergedAt": "2026-04-14T22:49:30Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "3ba5fb8103993a2b35e5f8bb4c5250d92d7b84ad"
+      },
+      "comments": [
+        {
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@davidben On cosigner key separation, the closest I can find in the spec is this line: https://github.com/ietf-plants-wg/merkle-tree-certs/blob/586c9e13daa7f6e2b63ec81ea366d13a20c0a3db/draft-ietf-plants-merkle-tree-certs.md?plain=1#L1048\r\n\r\nAgree that we should be explicit, would you like me to open a PR for it?",
+          "createdAt": "2026-04-14T22:49:35Z",
+          "updatedAt": "2026-04-14T22:49:35Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah yeah, that might be worth clarifying. PR sounds good! Thanks!",
+          "createdAt": "2026-04-14T22:51:23Z",
+          "updatedAt": "2026-04-14T22:51:23Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "BTW, I've pushed https://github.com/ietf-plants-wg/merkle-tree-certs/commit/6b34c98dfd33493ead59a004bf9b7e0fade519f7 to list you and this contribution.",
+          "createdAt": "2026-04-14T22:55:42Z",
+          "updatedAt": "2026-04-14T22:55:51Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc708vQi",
+          "commit": {
+            "abbreviatedOid": "2698d42"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks!\n\nI tried to find whether we said anything like \"don't use a cosigner key with another protocol\" but neither I nor the word salad machine could find it, so I think that's okay by the text. In terms of domain separation, our label doesn't start with SEQUENCE (0x20) so we're good there too.",
+          "createdAt": "2026-04-14T22:23:53Z",
+          "updatedAt": "2026-04-14T22:28:34Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Confusingly, those actually are, themselves, index-based revocation because we have cleverly stuck the indices into the serial number. Though, hmm, it's true that we phrased it as \"the relying party maintains a list of revoked ranges of indices\", which is a different animal from CRLs and OCSP.\n\nNot sure how best to capture that subtlety in here.",
+              "createdAt": "2026-04-14T22:23:53Z",
+              "updatedAt": "2026-04-14T22:28:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc7086SR",
+          "commit": {
+            "abbreviatedOid": "2698d42"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-14T22:34:10Z",
+          "updatedAt": "2026-04-14T22:34:10Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "(\"This text is fine, no need to complicate it\" is also a fine answer.)",
+              "createdAt": "2026-04-14T22:34:10Z",
+              "updatedAt": "2026-04-14T22:34:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc709EdK",
+          "commit": {
+            "abbreviatedOid": "2698d42"
+          },
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-14T22:42:04Z",
+          "updatedAt": "2026-04-14T22:42:04Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "ah, astute. how about:\r\n\r\n```suggestion\r\nThe revocation mechanism in this section is complementary to certificate-level revocation mechanisms. Because Merkle Tree certificates use log indices as serial numbers, existing revocation mechanisms like CRLs {{!RFC5280}} and OCSP {{!RFC6960}} apply unchanged.\r\n```\r\n\r\n",
+              "createdAt": "2026-04-14T22:42:04Z",
+              "updatedAt": "2026-04-14T22:42:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc709M5k",
+          "commit": {
+            "abbreviatedOid": "2698d42"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-14T22:48:26Z",
+          "updatedAt": "2026-04-14T22:48:27Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "LGTM!",
+              "createdAt": "2026-04-14T22:48:26Z",
+              "updatedAt": "2026-04-14T22:48:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc709NuH",
+          "commit": {
+            "abbreviatedOid": "c97b4ce"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-04-14T22:49:01Z",
+          "updatedAt": "2026-04-14T22:49:01Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 210,
+      "id": "PR_kwDOJIBkVc7SvrhC",
+      "title": "Recommend against reusing cosigner keys for other purposes",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/210",
+      "state": "OPEN",
+      "author": "sgmenda",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See #208 discussion.",
+      "createdAt": "2026-04-15T19:07:03Z",
+      "updatedAt": "2026-04-16T00:48:19Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
+      "headRepository": "sgmenda/merkle-tree-certs",
+      "headRefName": "cosigner-key-separation",
+      "headRefOid": "a28d18e11297df68a5440f4cf3429efb8f1580a5",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc71V-oS",
+          "commit": {
+            "abbreviatedOid": "a28d18e"
+          },
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-15T19:09:33Z",
+          "updatedAt": "2026-04-15T19:09:33Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "I tried using a DOI, but rendered bib entry was too noisy:\n\n> Patton, C. and T. Shrimpton, \"Security in the Presence of Key Reuse: Context-Separable Interfaces and Their Applications\", Springer International Publishing, Lecture Notes in Computer Science pp. 738-768, DOI 10.1007/978-3-030-26948-7_26, ISBN [\"9783030269470\", \"9783030269487\"], 2019, <https://doi.org/10.1007/978-3-030-26948-7_26>. \n\nSo I switched to this instead.",
+              "createdAt": "2026-04-15T19:09:33Z",
+              "updatedAt": "2026-04-15T19:09:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc71bxXm",
+          "commit": {
+            "abbreviatedOid": "a28d18e"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks!",
+          "createdAt": "2026-04-16T00:47:19Z",
+          "updatedAt": "2026-04-16T00:48:19Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "One can probably read this to ban OCSP and CRLs. We assert in security considerations that they apply unchanged, but I'm not sure if we've officially said they're allowed. Maybe \"Certification Authority Cosigners\" should do that.\n\nI do wonder if we should add something just to leave open the door for similar allowed reuses where they've been judged OK? In the old MTC, before the massive tlog/X.509 rewrite, we wrote:\n\n> Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.\n\n\"MUST use a different label string\" is probably not right because OCSP and CRLs don't have a label string, but perhaps we can say something like the other uses MUST NOT overlap with the `label` prefix in {{signature-format}} or something? I dunno.\n\n(Would \"Extensions of this protocol and specific cosigner roles\" make more sense here?)",
+              "createdAt": "2026-04-16T00:47:20Z",
+              "updatedAt": "2026-04-16T00:48:19Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
