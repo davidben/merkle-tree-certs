@@ -296,6 +296,12 @@ Standalone certificate:
 Landmark-relative certificate:
 : An optimized certificate containing an inclusion proof to a landmark subtree, and no signatures.
 
+Successor:
+: A Merkle Tree of size N is the successor of all Merkle Trees of size < N with which it is consistent.
+
+Predecessor:
+: A Merkle Tree of size N is the predecessor of all Merkle Trees of size > N with which it is consistent.
+
 # Overview
 
 In Certificate Transparency, a CA first certifies information by signing it, then submits the resulting certificate (or precertificate) to logs for logging. Merkle Tree Certificates invert this process: the CA certifies information by logging it, then submits the log to cosigners to verify log operation. A certificate is assembled from the result and proves the information is in the CA's log.
@@ -407,30 +413,44 @@ Landmark-relative certificates are constructed and used as follows. {{fig-landma
 
 # Subtrees
 
-This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. A subtree is an interior node of a Merkle Tree, which can be efficiently shown consistent with the original Merkle Tree and any Merkle Tree with additional elements appended. This specification uses subtrees to reduce the size of inclusion proofs.
+This section extends the Merkle Tree definition in {{Section 2.1 of !RFC9162}} by defining a *subtree* of a Merkle Tree. Using subtrees allows the use of smaller inclusion proofs.
 
-## Definition of a Subtree
+A Merkle Tree is defined by an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`. A subtree of a Merkle Tree consists of an interior node and all of its children. A subtree can be identified by the inputs `D_n` plus a half-open interval `[A, B)` that *exactly* identifies the entries below a single node.
 
-Given an ordered list of `n` inputs, `D_n = {d[0], d[1], ..., d[n-1]}`, {{Section 2.1.1 of !RFC9162}} defines the Merkle Tree via the Merkle Tree Hash `MTH(D_n)`.
-
-A *subtree* of this Merkle Tree is itself a Merkle Tree, defined by `MTH(D[start:end])`. `start` and `end` are integers such that:
+Not all intervals identify a subtree. For instance, in a Merkle Tree of size 4, `[2, 4)` identifies a node, one level above the leaves, covering entries 2 and 3. In that same tree, `[1, 3)` does not identify any node, because there is no node whose descendants are *exactly* 1 and 2. Formally, an interval identifies a subtree in a Merkle Tree of size `n` if and only if:
 
 *  `0 <= start < end <= n`
 * `start` is a multiple of `BIT_CEIL(end - start)`
 
 Note that, if `start` is zero, the second condition is always true.
 
-In the context of a single Merkle Tree, the subtree defined by `start` and `end` is denoted by half-open interval `[start, end)`. It contains the entries whose indices are in that half-open interval.
+## Full Subtrees
 
-The *size* of the subtree is `end - start`. If the subtree's size is a power of two, it is said to be *full*, otherwise it is said to be *partial*.
+Any subtree with power-of-two size is *full*, otherwise it is *partial*. Any full subtree of a given Merkle Tree is also contained in all successors to that Merkle Tree, with all hash values unchanged.
 
-If a subtree is full, then it is directly contained in the tree of hash operations in `MTH(D_n)` for `n >= end`.
+## Right Subtrees
 
-If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end`.
+A Right Subtree contains all the children of one of the nodes on the right-hand edge of a Merkle Tree of a specific size.  In a Merkle Tree of size `n`, all subtrees identified by `[A, n)` are Right Subtrees, and all Right subtrees are identified by `[A, n)` for some `A`.
+
+## Partial Subtrees
+
+Partial Subtrees only occur along the right-hand edge of a Merkle Tree. In other words, all Partial Subtrees are also Right Subtrees.
+
+In a Merkle Tree of a size that's not a power of two, all Right Subtrees are partial. At large tree sizes, that will be true most of the time, so most Right Subtrees we encounter will happen to be partial.
+
+A partial subtree of a given Merkle Tree will not be contained in any successors of that tree, because the successor will have different values at some of its interior nodes. However, it can efficiently be proved consistent with successors.
+
+## Covering Arbitrary Ranges Parsimoniously
+
+For specific Merkle Tree `M` of size `N`, and an arbitrary range of entries `[start, end)` within that tree, the smallest subtree that contains that range may be quite large, even when `end - start` is small. In some cases only the whole tree contains that range!
+
+We can instead construct a *pair* of subtrees that contain that range: a Full Subtree plus a Right Subtree. First, we consider `M`'s predecessor tree `P` with size equal to `end`. Then we choose an index `mid` in the range `[start, end)` (see below for the method). The Full Subtree is identified by the lowest common ancestor of `[start, mid)`. In most cases it will happen to include some entries before `start`, which is fine. The Right Subtree is defined by `[mid, end)`.
+
+Together the Full Subtree and Right Subtree include all the entries in `[start, end)`, while having heights that grow logarithmically with `end - start`, not with the size of the whole tree.
 
 ## Example Subtrees
 
-{{fig-subtree-example}} shows the subtrees `[4, 8)` and `[8, 13)`:
+{{fig-subtree-example}} shows a Full Subtree `[4, 8)` and a Right Subtree `[8, 13)`:
 
 ~~~aasvg
    +--------+
@@ -461,9 +481,9 @@ If a subtree is partial, it is directly contained in `MTH(D_n)` only if `n = end
 |8| |9| |10| |11| |12|
 +-+ +-+ +--+ +--+ +--+
 ~~~
-{: #fig-subtree-example title="Two example subtrees, one full and one partial"}
+{: #fig-subtree-example title="Two example subtrees, one Full and one Right"}
 
-Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained (marked with double lines) because, although `n` (13) is not `end` (8), the subtree is full. `[8, 13)` is contained (marked with wavy lines) because `n` (13) is `end` (13).
+Both subtrees are contained in a Merkle Tree of size 13, depicted in {{fig-subtree-containment-example}}. `[4, 8)` is contained (marked with double lines) because the subtree is full. `[8, 13)` (marked with wavy lines) is a Right Subtree because its root node is on the rightmost edge of the tree, or equivalently: its last entry is also the last entry in the containing Merkle Tree.
 
 ~~~aasvg
                 +-----------------------------+
@@ -488,7 +508,7 @@ Both subtrees are directly contained in a Merkle Tree of size 13, depicted in {{
 ~~~
 {: #fig-subtree-containment-example title="A Merkle Tree of size 13"}
 
-In contrast, `[8, 13)` is not directly contained in a Merkle Tree of size 14, depicted in {{fig-subtree-containment-example-2}}. However, the subtree is still computed over consistent elements.
+In contrast, `[8, 13)` is not a subtree of a Merkle Tree of size 14, depicted in {{fig-subtree-containment-example-2}}. However, we can efficiently prove consistency between the Merkle Tree of size 14 and Right Subtree `[8, 13)` of its predecessor.
 
 ~~~aasvg
                 +-----------------------------+
