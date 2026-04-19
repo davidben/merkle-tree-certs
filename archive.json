@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-16T03:38:09.491121+00:00",
+  "timestamp": "2026-04-19T03:41:02.306339+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -873,7 +873,7 @@
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2026-04-16T01:38:50Z",
+      "updatedAt": "2026-04-16T04:27:17Z",
       "closedAt": null,
       "comments": [
         {
@@ -910,6 +910,13 @@
           "body": "(Actually @nharper is probably going to do it, but I'm not able to assign it to him on GitHub for some reason.)",
           "createdAt": "2026-04-16T01:38:41Z",
           "updatedAt": "2026-04-16T01:38:50Z"
+        },
+        {
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "body": "(I'm not able to assign it to myself, but I'm going to write up log generations aka \"the Issuer identifies an entity that can run multiple logs and there's a log number in the upper bits of the serial\".)",
+          "createdAt": "2026-04-16T04:27:17Z",
+          "updatedAt": "2026-04-16T04:27:17Z"
         }
       ]
     },
@@ -13346,7 +13353,7 @@
       "labels": [],
       "body": "See #208 discussion.",
       "createdAt": "2026-04-15T19:07:03Z",
-      "updatedAt": "2026-04-16T00:48:19Z",
+      "updatedAt": "2026-04-16T13:44:54Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13396,6 +13403,73 @@
               "body": "One can probably read this to ban OCSP and CRLs. We assert in security considerations that they apply unchanged, but I'm not sure if we've officially said they're allowed. Maybe \"Certification Authority Cosigners\" should do that.\n\nI do wonder if we should add something just to leave open the door for similar allowed reuses where they've been judged OK? In the old MTC, before the massive tlog/X.509 rewrite, we wrote:\n\n> Extensions of this protocol MAY be defined which reuse the keys, but any that do MUST use a different label string and analyze the security of the two uses concurrently.\n\n\"MUST use a different label string\" is probably not right because OCSP and CRLs don't have a label string, but perhaps we can say something like the other uses MUST NOT overlap with the `label` prefix in {{signature-format}} or something? I dunno.\n\n(Would \"Extensions of this protocol and specific cosigner roles\" make more sense here?)",
               "createdAt": "2026-04-16T00:47:20Z",
               "updatedAt": "2026-04-16T00:48:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc71prtq",
+          "commit": {
+            "abbreviatedOid": "a28d18e"
+          },
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-16T13:44:54Z",
+          "updatedAt": "2026-04-16T13:44:54Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "Good point, lemme think on it. \ud83e\udd14 ",
+              "createdAt": "2026-04-16T13:44:54Z",
+              "updatedAt": "2026-04-16T13:44:54Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 211,
+      "id": "PR_kwDOJIBkVc7TJQ1e",
+      "title": "subtree: define Full, Partial, and Right Subtree",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/211",
+      "state": "OPEN",
+      "author": "jsha",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The previous language said a subtree \"is\" an interior node. It seemed clearer to say that it is an interior node plus all of its children.\r\n\r\nI wound up defining three named kinds of subtrees, which I think are helpful in conceptualizing what's going on: Full Subtree, Right Subtree, and Partial Subtree. Then we can say early on that we'll be using a Full Subtree combined with a Right Subtree to cover arbitrary ranges.\r\n\r\nAlso, I defined a Right Subtree `[start, n)` to only be contained in the Merkle Tree of size `n`. In the tree of size `n+1`, at least one of the nodes has a different hash, so the Right Subtree `[start, n)` isn't really contained in it. This allows us to remove some language around \"directly contained,\" which I found confusing. Note: I haven't yet updated the consistency proof section, since I wanted to first see if folks found this tweak compelling.",
+      "createdAt": "2026-04-17T00:12:46Z",
+      "updatedAt": "2026-04-17T07:09:14Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
+      "headRepository": "jsha/merkle-tree-certs",
+      "headRefName": "subtree-definition",
+      "headRefOid": "b79fb63353667db9a26b5d1959fc967083d08be0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc71-bnq",
+          "commit": {
+            "abbreviatedOid": "b79fb63"
+          },
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-17T07:09:14Z",
+          "updatedAt": "2026-04-17T07:09:14Z",
+          "comments": [
+            {
+              "originalPosition": 47,
+              "body": "All Right Subtrees of non-power-of-two-sized Merkle Tree being partial does not seem to hold. E.g., consider Subtree [4,6) in Merkle Tree of size 6.\n\n- 6 is not a power of two.\n- 0 <= 4 < 6 <= 6 and BIT_CEIL(6-4) = 2 divides 4, so [4,6) is a Subtree.\n- 6-4=2=2^1, so [4,6) is a Full Subtree.\n- [4,6) is of form [A,n), so [4,6) is Right Subtree.\n\nWhat does hold is that any non-power-of-two-sized Merkle Tree has at least one Partial Right Subtree.",
+              "createdAt": "2026-04-17T07:09:14Z",
+              "updatedAt": "2026-04-17T07:09:14Z"
             }
           ]
         }
