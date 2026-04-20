@@ -1988,7 +1988,7 @@ In the case when `fn` is `sn` in step 5, the condition in step 7.2.1 is always f
 
 ## Subtree Signed Note Format
 
-A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. Trust anchor IDs can be converted into log origins and cosigner names by concatenating the ASCII string `oid/1.3.6.1.4.1.` and the ASCII representation of the trust anchor ID. For example, the checkpoint origin for a log named `32473.1` would be `oid/1.3.6.1.4.1.32473.1`.
+A subtree, with signatures, can be represented as a signed note {{SIGNED-NOTE}}. A log origin can be constructed from the log's CA issuer ID and log number ({{log-ids}}) in the following manner: The log origin is the concatenation of the ASCII string `oid/1.3.6.1.4.1.`, the CA issuer ID as its trust anchor ID's ASCII representation, the byte `0x2f` (ASCII character "/"), and the log number as an ASCII string in decimal with no leading zeroes.
 
 The note body is a sequence of the following lines, each terminated by a newline character (U+000A):
 
