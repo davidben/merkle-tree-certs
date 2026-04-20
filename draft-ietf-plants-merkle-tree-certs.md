@@ -259,7 +259,7 @@ Monitor:
 : Parties who watch logs for certificates of interest, analogous to the role in {{Section 8.2 of ?RFC9162}}.
 
 Issuance log:
-: A log, maintained by the CA, of things issued by that CA. A CA operates some number of issuance logs, which together contain everything issued by that CA.
+: A log, maintained by the CA, containing certification statements issued by that CA. A CA operates some number of issuance logs, which together contain all statements issued by that CA.
 
 Cosigner:
 : A service that signs views of an issuance log, to assert correct operation and other properties about the entries.
@@ -915,7 +915,7 @@ Throughout this document, the hash algorithm in use is referred to as HASH, and 
 
 ## Identifying Issuance Logs {#log-ids}
 
-A CA can operate one or more issuance logs. Each log that the CA operates is assigned a log number, which is a positive 64-bit integer. Log numbers must be unique per CA.
+A CA can operate one or more issuance logs. Each log that the CA operates is assigned a log number, which is a positive 64-bit integer, greater than zero. Log numbers must be unique per CA.
 
 The combination of the CA issuer ID and the log number uniquely identify an issuance log.
 
@@ -942,7 +942,7 @@ struct {
 } MerkleTreeCertEntry;
 ~~~
 
-When `type` is `null_entry`, the entry does not represent any information. The entry at index zero of every issuance log MUST be of type `null_entry`. This avoids zero serial numbers in the certificate format ({{certificate-format}}). Other entries MAY have type `null_entry`.
+When `type` is `null_entry`, the entry does not represent any information. Entries at any index in the log MAY have type `null_entry`.
 
 When `type` is `tbs_cert_entry`, `N` is the number of bytes needed to consume the rest of the input. A MerkleTreeCertEntry is expected to be decoded in contexts where the total length of the entry is known.
 
@@ -1003,7 +1003,6 @@ opaque TrustAnchorID<1..2^8-1>;
 
 struct {
     TrustAnchorID ca_id;
-    /* TODO: Are we ok with capping log numbers at 2^64-1? */
     uint64 log_number;
     uint64 start;
     uint64 end;
@@ -1159,9 +1158,9 @@ For any given TBSCertificateLogEntry, there are multiple possible certificates t
 
 The information is encoded in an X.509 Certificate {{!RFC5280}} as follows:
 
-The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's log ID as a PKIX distinguished name, as described in {{ca-ids}}.
+The TBSCertificate's `version`, `issuer`, `validity`, `subject`, `issuerUniqueID`, `subjectUniqueID`, and `extensions` MUST be equal to the corresponding fields of the TBSCertificateLogEntry. If any of `issuerUniqueID`, `subjectUniqueID`, or `extensions` is absent in the TBSCertificateLogEntry, the corresponding field MUST be absent in the TBSCertificate. Per {{log-entries}}, this means `issuer` MUST be the issuance log's CA issuer ID as a PKIX distinguished name, as described in {{ca-ids}}.
 
-The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the logNumber in the TBSCertificateLogEntry. The `serialNumber` MUST be equal to `(logNumber << 64) | index`, i.e. the logNumber from the TBSCertificateLogEntry bit-shifted left 64 bits and bitwise ORed with the zero-based index of the log entry.
+The TBSCertificate's `serialNumber` is constructed from the zero-based index of the TBSCertificateLogEntry in the log and the logNumber in the TBSCertificateLogEntry. The `serialNumber` MUST be equal to `(logNumber << 64) | index`.
 
 TODO: {{log-entries}} reserves entry zero with a `null_entry` type so the index will be positive. This was done because {{Section 4.1.2.2 of !RFC5280}} forbids zero as a serial number. However, with the inclusion of a positive `logNumber` in the `serialNumber`, the serial number will always be positive regardless of the index, and the `null_entry` type could be removed.
 
@@ -1475,7 +1474,7 @@ In applications that use additional trust anchor ranges, relying parties MAY sen
 
 ## Using Trust Anchor IDs
 
-A standalone certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a standalone certificate has a trust anchor ID of the corresponding log ID ({{ca-ids}}). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether the standalone certificate would be acceptable.
+A standalone certificate will generally be accepted by relying parties that trust the issuing CA. To determine this, a standalone certificate has a trust anchor ID of the corresponding CA issuer ID ({{ca-ids}}). The authenticating party can obtain this information either by parsing the certificate's issuer field or via out-of-band information as described in {{Section 3.2 of !I-D.ietf-tls-trust-anchor-ids}}. Authenticating and relying parties SHOULD use the `trust_anchors` extension to determine whether the standalone certificate would be acceptable.
 
 [[TODO: Ideally we would negotiate cosigners. https://github.com/tlswg/tls-trust-anchor-ids/issues/54 has a sketch of how one might do this, though other designs are possible. Negotiating cosigners allows the ecosystem to manage cosigners efficiently, without needing to collect every possible cosignature and send them all at once. This is wasteful, particularly with post-quantum algorithms.]]
 
