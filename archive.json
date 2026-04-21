@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-19T03:41:02.306339+00:00",
+  "timestamp": "2026-04-21T03:35:17.221911+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -864,7 +864,7 @@
     {
       "number": 26,
       "id": "I_kwDOJIBkVc5ljPhu",
-      "title": "Bitflips",
+      "title": "Support multiple logs from a single issuer for incident management",
       "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/26",
       "state": "OPEN",
       "author": "bwesterb",
@@ -873,7 +873,7 @@
       "labels": [],
       "body": "We should spend a few words on what to do with bit flips.",
       "createdAt": "2023-05-10T11:44:26Z",
-      "updatedAt": "2026-04-16T04:27:17Z",
+      "updatedAt": "2026-04-20T18:17:33Z",
       "closedAt": null,
       "comments": [
         {
@@ -3259,6 +3259,22 @@
       "createdAt": "2026-04-14T16:28:05Z",
       "updatedAt": "2026-04-14T22:49:31Z",
       "closedAt": "2026-04-14T22:49:31Z",
+      "comments": []
+    },
+    {
+      "number": 212,
+      "id": "I_kwDOJIBkVc8AAAABACtHGg",
+      "title": "Identify standalone certificates by cosigner ID",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/212",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It's not full cosigner negotiation (#199), but initially I think we can get by with:\n\n* An analog of the CT enforcement shut-off for transparency cosigners\n* Negotiating the CA cosigner as if it were a trust anchor\n\nMore specifically, suppose you have some CA whose issuance log (or group of issuance logs post #26) named L and has CA cosigners C1, C2, C3, etc., each of which sign L. A RP that specifically wants cosigner C2 would advertise a trust anchor ID C2 (or a trust anchor group containing C2). That would tell the AP that should send a certificate from L with cosigner C2 and that it can skip cosignatures C1 and C2. The RP _may_ yet require other witness/mirror cosigners (say, one of W1, W2, W3, W4, ...), so you should still send those. The negotiation scheme says nothing (yet) about that.\n\nAnd then if either the RP or AP is incapable of negotiation and you decide that this is the fallback certificate, you send a jumbo certificate with every cosigner you've got, because you've got nothing better you can do.",
+      "createdAt": "2026-04-20T18:23:53Z",
+      "updatedAt": "2026-04-20T18:23:53Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -13470,6 +13486,235 @@
               "body": "All Right Subtrees of non-power-of-two-sized Merkle Tree being partial does not seem to hold. E.g., consider Subtree [4,6) in Merkle Tree of size 6.\n\n- 6 is not a power of two.\n- 0 <= 4 < 6 <= 6 and BIT_CEIL(6-4) = 2 divides 4, so [4,6) is a Subtree.\n- 6-4=2=2^1, so [4,6) is a Full Subtree.\n- [4,6) is of form [A,n), so [4,6) is Right Subtree.\n\nWhat does hold is that any non-power-of-two-sized Merkle Tree has at least one Partial Right Subtree.",
               "createdAt": "2026-04-17T07:09:14Z",
               "updatedAt": "2026-04-17T07:09:14Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 213,
+      "id": "PR_kwDOJIBkVc7UHGx3",
+      "title": "Add log numbers to certificates and log entries",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/213",
+      "state": "OPEN",
+      "author": "nharper",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses issue #26.",
+      "createdAt": "2026-04-20T21:46:56Z",
+      "updatedAt": "2026-04-20T23:36:48Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
+      "headRepository": "nharper/merkle-tree-certs",
+      "headRefName": "log-numbers",
+      "headRefOid": "0631d5348da4cd6dc2382b7202ebe5028380d6a9",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc72_wfS",
+          "commit": {
+            "abbreviatedOid": "7f63aa6"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks! It's a bit late on the east coast, so I haven't looked over everything yet, but I figure I may as well flush initial comments now.",
+          "createdAt": "2026-04-20T22:31:44Z",
+          "updatedAt": "2026-04-20T23:10:45Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Do we need the log number in the log entries? I _think_ we actually don't. (Really we don't need the issuer in the log entries either. Only reason I put it in there was that X.509 name parsing is a trash fire and it seemed easier to fix it into the entry than to worry about whether we were accidentally admitting some kind of malleability.)",
+              "createdAt": "2026-04-20T22:31:44Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "I am *extremely* OK with capping log numbers hehehe.\n\nThat said, after https://github.com/C2SP/C2SP/pull/237, we'll likely want to say that logs have IDs, constructed by appending the number to the CA ID, and that the number is encoded via `log_id` instead of as a separate field. Though doing it this way works too. (Though given that Appendix C.1 already basically depends on a notion of a \"log ID\" maybe we should just go ahead and get that defined?)",
+              "createdAt": "2026-04-20T22:34:11Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 168,
+              "body": "Nit: This still says log ID, but I think you mean issuer ID now?",
+              "createdAt": "2026-04-20T22:35:19Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 1,
+              "body": "Oh, we should remove the requirement that index zero is `null_entry` if we're going to force it positive by way of log number. And maybe replace it with some other justification for null entries. Perhaps \"Null entries MAY optionally be used as part of periodic health checks, but otherwise do not certify any information.\"\r\n\r\nI don't feel strongly about which way we force it. When I'd thought about it, I'd leaned towards allowing log number zero, but I don't think I came up with a clear reason either way. Some (very very weak) points I can think of:\r\n\r\n* Forcing it by log number _does_ make your very first log's certificates ever-so-slightly shorter, but as soon as you have to rotate it once, that'll change, so this is probably not worth optimizing for.\r\n\r\n* We have to answer dumb questions like \"if we get a certificate whose log number part is zero, must we reject the signature\"? Although we have the corresponding dumb question for the indices too, we just (currently) get to punt it to the serial number situation.\r\n\r\n* A zero log number also feels like a more natural \"no-op\" version of log generations, if your application would like to have nothing to do with this stuff.\r\n\r\n* Using `null_entry` means we burn entry zero of _every_ log, unless we decide to special case log zero, which seems kinda odd.\r\n\r\n* Using the log number means we don't need to define `null_entry` at all. But it seems vaguely useful for health checks and to exercise the entry type out the gate, so maybe we want that anyway.\r\n\r\n\ud83e\udd37  I think I'm happy with whichever.",
+              "createdAt": "2026-04-20T22:37:58Z",
+              "updatedAt": "2026-04-20T23:11:17Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "Nit: \"Things\" is a bit vague. :-) It's arguably an existing issue (\"everything\") but \"things\" somehow feels more egregious to me.\n\nWhat about...\n\n```suggestion\n: A log, maintained by the CA, containing information certified by that CA. A CA operates some number of issuance logs, which together contain all information issued by that CA.\n```\n(I toyed around with \"containing some of the CA's issuance events\", but then we have to define an \"issuance event\" and that seemed a pain.)",
+              "createdAt": "2026-04-20T22:39:29Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 24,
+              "body": "Nit: It seems in prose you call this an \"issuer ID\" but the section is called a CA ID.\n\nWe do want to avoid confusing with \"CA cosigner ID\", so long as a CA can have multiple cosigners, so I think I like sticking _some_ word like \"issuer\" in there somehow. Though \"CA issuer\" is also a little awkward because it might mean the issuer _of_ the CA, rather than the CA _as_ an issuer.\n\nI'm not sure what would be good names. I'm not super satisfied with any of them, but I don't have a great suggestion...\n\nSpitballing, I haven't thought about the implications: what if the \"issuance log\"  was all the log numbers together and made up of a bunch of trees. And then each log number was actually a \"log instance number\" which referred to one \"log instance\" within the \"log\". Or perhaps a \"tree number\" and referred to a specific \"issuance tree\" within the \"issuance log\".",
+              "createdAt": "2026-04-20T22:41:42Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 50,
+              "body": "Super nitpicky nitpick: it may be worth saying \"positive 64-bit integer, greater than zero\", just to make sure people realize it is indeed non-zero. I think \"positive integer\" pretty consistently means non-zero, but \"natural number\" is a trainwreck.",
+              "createdAt": "2026-04-20T22:49:15Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            },
+            {
+              "originalPosition": 106,
+              "body": "Nit: We already define `<<` and `|`  in the notation section. Realistically, I think anyone who knows what \"bit-shifted left\" and \"bitwise ORed\" means will also know what those symbols mean. It's just very wordy. If we want to clarify it, perhaps, `i.e. logNumber * 2<sup>64</sup> + index` or something.",
+              "createdAt": "2026-04-20T22:58:03Z",
+              "updatedAt": "2026-04-20T23:10:46Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73Am_8",
+          "commit": {
+            "abbreviatedOid": "7f63aa6"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:13Z",
+          "updatedAt": "2026-04-20T23:36:13Z",
+          "comments": [
+            {
+              "originalPosition": 106,
+              "body": "Didn't realize those are already in the notation section. Removed the prose.",
+              "createdAt": "2026-04-20T23:36:13Z",
+              "updatedAt": "2026-04-20T23:36:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnDT",
+          "commit": {
+            "abbreviatedOid": "7f63aa6"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:18Z",
+          "updatedAt": "2026-04-20T23:36:18Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "Clarified \"greater than zero\".",
+              "createdAt": "2026-04-20T23:36:18Z",
+              "updatedAt": "2026-04-20T23:36:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnIy",
+          "commit": {
+            "abbreviatedOid": "73234d8"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:26Z",
+          "updatedAt": "2026-04-20T23:36:27Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Reworded. I wanted to `s/things/certificates/`, but they're not certificates, so I went with \"certification statements\".",
+              "createdAt": "2026-04-20T23:36:26Z",
+              "updatedAt": "2026-04-20T23:36:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnN-",
+          "commit": {
+            "abbreviatedOid": "73234d8"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:33Z",
+          "updatedAt": "2026-04-20T23:36:33Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "I removed the requirement, but kept `null_entry` around, because it seems useful, especially to exercise the entry type. (Perhaps log operators might find it useful to pad out trees to a certain size when generating checkpoints or landmarks.) I don't think we should special case log zero (I don't think log zero should exist).",
+              "createdAt": "2026-04-20T23:36:33Z",
+              "updatedAt": "2026-04-20T23:36:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnQi",
+          "commit": {
+            "abbreviatedOid": "73234d8"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:37Z",
+          "updatedAt": "2026-04-20T23:36:37Z",
+          "comments": [
+            {
+              "originalPosition": 168,
+              "body": "I think so too, changed that.",
+              "createdAt": "2026-04-20T23:36:37Z",
+              "updatedAt": "2026-04-20T23:36:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnXS",
+          "commit": {
+            "abbreviatedOid": "73234d8"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:44Z",
+          "updatedAt": "2026-04-20T23:36:44Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "Removed the TODO. I have a bit of a preference for having this draft not be opinionated on OID structure, which means that we shouldn't be constructing OIDs in it. Even if we keep the log number separate from the OID, defining a \"log ID\" that combines the two (and has whatever serialization formats we need) is probably useful. I'll follow up with that.",
+              "createdAt": "2026-04-20T23:36:44Z",
+              "updatedAt": "2026-04-20T23:36:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc73AnaG",
+          "commit": {
+            "abbreviatedOid": "73234d8"
+          },
+          "author": "nharper",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-20T23:36:48Z",
+          "updatedAt": "2026-04-20T23:36:48Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "For the same reason that we probably don't need the issuer, we probably don't need the log number either. I haven't thought through whether removing it could cause issues down the line. I'm going to leave this comment thread open for now and I'll probably remove it later.",
+              "createdAt": "2026-04-20T23:36:48Z",
+              "updatedAt": "2026-04-20T23:36:48Z"
             }
           ]
         }
