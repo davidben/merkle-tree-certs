@@ -1279,7 +1279,8 @@ Table of Contents
 
    This signature format is designed to be compatible with the ML-DSA-44
    signature construction in [TLOG-COSIGNATURE], but it supports
-   signature algorithms other than ML-DSA-44.
+   signature algorithms other than ML-DSA-44 and tree hashes other than
+   SHA-256.
 
    label is a fixed prefix for domain separation.  Its value MUST be the
    string subtree/v1, followed by a newline (U+000A), followed by a zero
