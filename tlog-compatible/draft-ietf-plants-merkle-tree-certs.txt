@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 24 October 2026                                      Apple Inc.
+Expires: 25 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           22 April 2026
+                                                           23 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 October 2026.
+   This Internet-Draft will expire on 25 October 2026.
 
 Copyright Notice
 
@@ -3534,8 +3534,8 @@ C.1.  Subtree Signed Note Format
 
    key ID = SHA-256(key name || 0x0A || 0xFF || "mtc-subtree/v1")[:4]
 
-   [[TODO: This makes more sense on the C2SP side, at which point C2SP
-   can allocate a more idiomatic key ID construction.]]
+   [[TODO: When all this to C2SP, allocate a codepoint for a more
+   idiomatic key ID construction.]]
 
 C.2.  Requesting Subtree Signatures
 
