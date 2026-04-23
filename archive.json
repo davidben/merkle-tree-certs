@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-21T03:35:17.221911+00:00",
+  "timestamp": "2026-04-23T03:36:45.449239+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3276,6 +3276,44 @@
       "updatedAt": "2026-04-20T18:23:53Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 214,
+      "id": "I_kwDOJIBkVc8AAAABAPtseA",
+      "title": "Make sure OCSP and CRLs can *actually* be applied as-is",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/issues/214",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See Ilari's comments here: https://mailarchive.ietf.org/arch/msg/plants/DkZDqqE2r7qokdwd7bHg8Fg7NBY/",
+      "createdAt": "2026-04-22T19:42:29Z",
+      "updatedAt": "2026-04-22T20:02:33Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Specifically reevaluate this after #96 is closed and we have an X.509 encoding for a CA.",
+          "createdAt": "2026-04-22T19:44:25Z",
+          "updatedAt": "2026-04-22T19:44:25Z"
+        },
+        {
+          "author": "sgmenda",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "see also https://github.com/ietf-plants-wg/merkle-tree-certs/pull/210#discussion_r3090176510 which I am still noodling on. ",
+          "createdAt": "2026-04-22T19:56:42Z",
+          "updatedAt": "2026-04-22T19:56:42Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh forgot that hadn't been merged. Yeah, we might need more text there. Also need to give mutiple CA cosigners a think.",
+          "createdAt": "2026-04-22T20:02:33Z",
+          "updatedAt": "2026-04-22T20:02:33Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -11036,13 +11074,13 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-01-17T02:08:14Z",
+      "updatedAt": "2026-04-22T20:44:54Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
-      "baseRefOid": "192a68b8eb5a4f68c640b0cd8d91ba1e519c76eb",
+      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
       "headRepository": "Bren2010/merkle-tree-certs",
       "headRefName": "brendan/accumulated",
-      "headRefOid": "473bfa2731435fb34af9b7388b09cccb4f49c2b2",
+      "headRefOid": "1e5968a97065a390281eff18ea72c7203c20a4e5",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -13503,7 +13541,7 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-04-20T23:36:48Z",
+      "updatedAt": "2026-04-23T02:31:59Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13514,7 +13552,29 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "We had a decent discussion about this on the list, but to restate my objections to this approach:\r\n\r\n- If the cosigners in an MTC deployment are **witnesses**, then there's no strong incentive to keep all witnesses fully up-to-date all the time since updating them is cheap. This could lead to a situation where one witness is far behind the others and then is suddenly updated with a large number of certificates. If that push is corrupted in some way, it can create a fork far back in the log. Revoking by index in this scenario would likely cause an unacceptable amount of collateral damage. That leaves you with a fork full of certificates that are signed, unrevoked, and not visible to monitors, which is a bad outcome.\r\n\r\n- If the cosigners in an MTC deployment are **mirrors**, then it's less likely that one mirror would be allowed to fall substantially behind the others and you have the additional benefit that each mirror can see all the certificates on both sides of the fork. Because of that, it's simpler to just ask a mirror that falls onto a fork to \"jump\" back to the correct fork (where part of \"jumping\" involves verifying that no certificates were removed, just potentially reordered). I say that's simpler because:\r\n  - It requires no protocol change.\r\n  - It allows monitors to know that they've observed all issued certificates if they have a quorum of cosigners on whichever fork they're on. (To contrast that with this approach: this approach says that if a mirror is forked, it remains forked forever. Which means, to observe all certificates in all forks, we need to sync with *all* mirrors.)",
+          "createdAt": "2026-04-22T22:43:48Z",
+          "updatedAt": "2026-04-22T22:43:48Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Happy to consider alternate approaches that meet both the operational and security requirements of running a real-world PKI. This one does and I've yet to see any others that do.\r\n\r\n> If the cosigners in an MTC deployment are witnesses, then there's no strong incentive to keep all witnesses fully up-to-date all the time since updating them is cheap. This could lead to a situation where one witness is far behind the others and then is suddenly updated with a large number of certificates. If that push is corrupted in some way, it can create a fork far back in the log. Revoking by index in this scenario would likely cause an unacceptable amount of collateral damage. That leaves you with a fork full of certificates that are signed, unrevoked, and not visible to monitors, which is a bad outcome.\r\n\r\nSo, your argument is saying witness-based transparency systems do not work, and so we don't need to consider them. That is quite a bold claim! This claim does not seem to track. At most we might want to refine the revocation setup for transparent PKIs a bit.\r\n\r\nFirst, the assertion that there's no incentive to keep witnesses up-to-date does not make sense. _Any_ party in the ecosystem is capable of computing the values needed to catch some witness up. Indeed, in so far as this doomsday revocation situation is a real concern, that in itself provides incentives for the ecosystem to keep them up-to-date. Remember it only takes *one* party to care and the witnesses will catch up.\r\n\r\nNow, for this scenario to happen, the monitoring ecosystem must have been fine with a lagging witness, i.e. because it managed to get an all-quorums-intersecting view of the log from all the other witnesses. And because it has been quite some time, all the certificates in that view were clearly visible to the monitors, or they would have sounded a different alarm.\r\n\r\nThat means, in the scenario you describe, it is clear that this one witness's view is the one to be revoked. We probably should say something about being able to close off entries at a (witness, log) basis rather than log-wide, but that's a pretty minor change.\r\n\r\nBut also this scenario just won't happen. Again, the premise that no one has an incentive for up-to-date witnesses is simply false. If a PKI such that a single weeks-behind witness is a risk of a weeks-long revocation event, that PKI should actively try to get that witness caught up, and raise the alarm when it cannot.\r\n\r\n> If the cosigners in an MTC deployment are mirrors, then it's less likely that one mirror would be allowed to fall substantially behind the others and you have the additional benefit that each mirror can see all the certificates on both sides of the fork. Because of that, it's simpler to just ask a mirror that falls onto a fork to \"jump\" back to the correct fork (where part of \"jumping\" involves verifying that no certificates were removed, just potentially reordered). I say that's simpler because:\r\n\r\nSo, first off, it doesn't really matter whether we can save mirrors from this fate if we also want to support witness-based PKIs. I expect the Web PKI to use mirrors (it's much easier to reason about), but I think it's valuable for MTC to work for other applications.\r\n\r\nAnyway, all this presumes a mirror design that cannot get wedged by missing preimages. However, the [current mirror protocol](https://c2sp.org/tlog-mirror) meets its scalability and consistency requirements by operating an internal witness to pre-commit to entries before they are uploaded. Once you have that, all the failure modes of a witness carry over.\r\n\r\nIs that the right mirror design? I don't know. Feedback on that one would be great. But, whatever the design is, we need something that can operate at the scale needed for the Web PKI. That design was written to fit into the current CT log architecture, which has been proven to work.\r\n\r\nGiven the operational risks here and PQ transition timelines, I think deviating from the CT ecosystem's existing operational experience is a very, _very_ tall order. Log numbers reduce our operational risk and switching logs matches existing CT playbooks, while still providing all the tools needed to meet transparency goals. If N years later, we figure out how to not need them, great. RPs start enforcing a maximum log number of 1 and we all move on. But, in a vacuum, the bar is pretty high to argue \"oh these failure modes are impossible\" or \"oh no this extra synchronizing operation will scale\".\r\n\r\n(But if you think you have a different mirror design that can scalably support all these operations, *including your proposed reconciliation operation*, great! I'd encourage you to work with the CT log operator community on this. That doesn't remove the need for this change.)",
+          "createdAt": "2026-04-23T00:22:18Z",
+          "updatedAt": "2026-04-23T00:22:18Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> First, the assertion that there's no incentive to keep witnesses up-to-date does not make sense. Any party in the ecosystem is capable of computing the values needed to catch some witness up.\r\n\r\nThe document doesn't specify the protocol between the witness and the CA, but it does say \"A cosigner MAY expose a private interface for the CA, to reduce denial-of-service risk\" and also mentions the idea of there being witnesses that the CA doesn't communicate with at all. I understand your point as being that it's possible to avoid this happening, but my point is that it's a very big footgun that's non-obvious and seems to be consistent with the text of the document.\r\n\r\n> Anyway, all this presumes a mirror design that cannot get wedged by missing preimages. However, the [current mirror protocol](https://c2sp.org/tlog-mirror) meets its scalability and consistency requirements by operating an internal witness to pre-commit to entries before they are uploaded. Once you have that, all the failure modes of a witness carry over.\r\n\r\nMy understanding is that the tlog-mirror doesn't produce a signature over a portion of the log until it has durably persisted all of the log entries. That's the only guarantee that we need for this to work. Support for a reconciliation operation can be added to tlog-mirror in a backwards-compatible way, and without affecting anything about how MTC works.\r\n\r\n> If N years later, we figure out how to not need them, great. RPs start enforcing a maximum log number of 1 and we all move on. But, in a vacuum, the bar is pretty high to argue \"oh these failure modes are impossible\" or \"oh no this extra synchronizing operation will scale\".\r\n\r\nThe idea that this can be removed later is only true from the perspective of an individual browser. Monitors need to care about what a long tail of browsers might accept. So once this is added and some swath of versions of browsers support it, monitors will need to support it for as long as any of those browser-versions have non-negligible usage. If you don't add this feature now, you won't have to slowly phase it out of the ecosystem later.",
+          "createdAt": "2026-04-23T02:31:59Z",
+          "updatedAt": "2026-04-23T02:31:59Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOJIBkVc72_wfS",
