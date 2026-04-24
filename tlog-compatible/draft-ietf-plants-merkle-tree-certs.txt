@@ -5,13 +5,13 @@
 PKI, Logs, And Tree Signatures                               D. Benjamin
 Internet-Draft                                                Google LLC
 Intended status: Standards Track                              D. O'Brien
-Expires: 25 October 2026                                      Apple Inc.
+Expires: 26 October 2026                                      Apple Inc.
                                                         B. E. Westerbaan
                                                               L. Valenta
                                                               Cloudflare
                                                              F. Valsorda
                                                                   Geomys
-                                                           23 April 2026
+                                                           24 April 2026
 
 
                         Merkle Tree Certificates
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 October 2026.
+   This Internet-Draft will expire on 26 October 2026.
 
 Copyright Notice
 
@@ -1250,10 +1250,10 @@ Table of Contents
    Each cosigner has a public key and a _cosigner ID_, which uniquely
    identifies the cosigner.  The cosigner ID is a trust anchor ID
    [I-D.ietf-tls-trust-anchor-ids].  By identifying the cosigner, the
-   cosigner ID specifies both the public key and the additional
-   statements made by the cosigner's signatures.  If a single operator
-   performs multiple cosigner roles in an ecosystem, each role MUST use
-   a distinct cosigner ID and SHOULD use a distinct key.
+   cosigner ID specifies the public key, signature algorithm, and any
+   additional statements made by the cosigner's signatures.  If a single
+   operator performs multiple cosigner roles in an ecosystem, each role
+   MUST use a distinct cosigner ID and SHOULD use a distinct key.
 
    A single cosigner, with a single cosigner ID and public key, MAY
    generate cosignatures for multiple logs.  In this case, signed
@@ -1261,9 +1261,9 @@ Table of Contents
 
 5.4.1.  Signature Format
 
-   A cosigner computes a cosignature for a subtree in a log by signing a
-   CosignedMessage, defined below using the TLS presentation language
-   (Section 3 of [RFC8446]):
+   A cosigner computes a _subtree signature_ for a subtree in a log by
+   signing a CosignedMessage, defined below using the TLS presentation
+   language (Section 3 of [RFC8446]):
 
    opaque HashValue[HASH_SIZE];
 
@@ -1306,19 +1306,16 @@ Table of Contents
 
    start and end MUST define a valid subtree of the log, and
    subtree_hash MUST be the subtree's hash value in the cosigner's view
-   of the log.
+   of the log.  If start is non-zero, then timestamp MUST be zero.
 
-   timestamp, if non-zero, indicates both that the signature was
-   produced at the time, and that end is the size of largest consistent
-   tree the cosigner has observed for the log.  If timestamp is zero, no
-   statement is made about signing time or the largest such tree.  If
-   start is non-zero, timestamp MUST be zero.
+   If timestamp is non-zero, it MUST be the time that the signature was
+   produced, represented as seconds since the Epoch as defined in
+   Section 4.19 of Volume 1 of [POSIX].  Additionally end MUST be the
+   size of the largest consistent tree that the cosigner has observed
+   for the log.
 
-   The resulting signature is known as a _subtree signature_. When start
-   is zero, the resulting signature describes the checkpoint with tree
-   size end and is also known as a _checkpoint signature_. All subtree
-   signatures used in this document's certificate construction
-   (Section 6.1) have a timestamp of zero.
+   If timestamp is zero, no statement is made about the signing time or
+   largest observed tree.
 
    Before signing a subtree of some log, the cosigner MUST ensure that
    subtree_hash is consistent with its view of the log.  Different
@@ -1344,6 +1341,14 @@ Table of Contents
    its additional statements on all entries in the inconsistent subtree,
    even if some other signed subtree exists that asserts different
    entries.
+
+   Subtree signatures can be used to sign timestamped log checkpoints by
+   setting start to zero and a non-zero timestamp.  These signatures are
+   not directly used in Merkle Tree Certificates (Section 6.1), but
+   cosigners MAY generate them, subject to the rules above, as part of
+   other functions in a PKI.  This may include log serving or
+   integrating an issuance log into a transparency ecosystem.  For
+   example, [TLOG-TILES] and [TLOG-WITNESS] use such signatures.
 
 5.4.2.  Signature Algorithms
 
@@ -1695,23 +1700,6 @@ Table of Contents
    request signatures from a redundant set of cosigners and select the
    ones that complete first.
 
-   This document does not prescribe the specific cosigner roles, or a
-   particular protocol for requesting cosignatures.  Protocols for
-   cosigners MAY vary depending on the needs for that cosigner.  A
-   consistency-only cosigner, such as [TLOG-WITNESS], might only require
-   a checkpoint signature and consistency proof, while a mirroring
-   cosigner, such as [TLOG-MIRROR] might require the full log contents.
-
-   A cosigner MAY expose a private interface for the CA, to reduce
-   denial-of-service risk, or a cosigner MAY expose a public interface
-   for other parties to request additional cosignatures.  The latter may
-   be useful if a relying party requires a cosigner that the CA does not
-   communicate with.  In this case, an authenticating party MAY request
-   cosignatures and add them to the certificate.  However, it is
-   RECOMMENDED that the CA collect cosignatures for the authenticating
-   party.  This simplifies deployment, as relying party policies change
-   over time.
-
    This document does not place any requirements on how frequently this
    job runs.  More frequent runs results in lower issuance delay, but
    higher signing overhead.  It is RECOMMENDED that CAs run at most one
@@ -1722,6 +1710,14 @@ Table of Contents
    that wish to directly audit signatures, as described in Section 5.2
    of [AuditingRevisited], though this document does not define such a
    system.
+
+   This document does not prescribe the specific cosigner roles, or a
+   particular protocol for requesting cosignatures.  Protocols for
+   cosigners can vary depending on the needs of that cosigner.  Some
+   example protocols are described in [TLOG-WITNESS] and [TLOG-MIRROR].
+   It is RECOMMENDED that the CA collect cosignatures for the
+   authenticating party, but the authenticating party MAY collect
+   additional cosignatures and add them to the certificate.
 
 6.3.  Landmark-Relative Certificates
 
@@ -2726,22 +2722,22 @@ Table of Contents
 
    When a monitor finds an unauthorized certificate issuance in a log or
    mirror, it must be possible to prove the CA indeed certified the
-   information in the entry.  However, only the latest checkpoint
-   signature is retained by the transparency ecosystem, so it may not be
+   information in the entry.  However, only the latest signed checkpoint
+   may be retained by the transparency ecosystem, so it may not be
    possible to reconstruct the exact certificate seen by relying
    parties.
 
-   However, per Section 5.5, any checkpoint signature is a binding
-   assertion by the CA that it has certified every entry in the
-   checkpoint.  Thus, given _any_ signed checkpoint that contains the
-   unauthorized entry, a Merkle inclusion proof (Section 2.1.3 of
-   [RFC9162]) is sufficient to prove the CA issued the entry.  This is
-   analogous to how, in Section 3.2.1 of [RFC9162], CAs are held
-   accountable for signed CT precertificates.
+   However, per Section 5.5, any subtree signature is a binding
+   assertion by the CA that it has certified every entry in the subtree.
+   Thus, given _any_ signed checkpoint that contains the unauthorized
+   entry, a Merkle inclusion proof (Section 2.1.3 of [RFC9162]) is
+   sufficient to prove the CA issued the entry.  This is analogous to
+   how, in Section 3.2.1 of [RFC9162], CAs are held accountable for
+   signed CT precertificates.
 
    The transparency ecosystem does not retain unhashed public keys, so
    it also may not be possible to construct a complete certificate from
-   the checkpoint signature and inclusion proof.  However, if the log
+   the signed checkpoint and inclusion proof.  However, if the log
    entry's subjectPublicKeyInfoHash does not correspond to an authorized
    key for the subject of the certificate, the entry is still
    unauthorized.  A Merkle Tree CA is held responsible for all log
@@ -2947,6 +2943,13 @@ Table of Contents
               Draft, draft-ietf-tls-trust-anchor-ids-03, 19 March 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
               trust-anchor-ids-03>.
+
+   [POSIX]    "IEEE/Open Group Standard for Information Technology--
+              Portable Operating System Interface (POSIX™) Base
+              Specifications, Issue 8", IEEE,
+              DOI 10.1109/ieeestd.2024.10555529, ISBN ["9798855707939"],
+              June 2024,
+              <https://doi.org/10.1109/ieeestd.2024.10555529>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
