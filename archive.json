@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-23T03:36:45.449239+00:00",
+  "timestamp": "2026-04-26T03:47:52.529640+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -3273,9 +3273,17 @@
       "labels": [],
       "body": "It's not full cosigner negotiation (#199), but initially I think we can get by with:\n\n* An analog of the CT enforcement shut-off for transparency cosigners\n* Negotiating the CA cosigner as if it were a trust anchor\n\nMore specifically, suppose you have some CA whose issuance log (or group of issuance logs post #26) named L and has CA cosigners C1, C2, C3, etc., each of which sign L. A RP that specifically wants cosigner C2 would advertise a trust anchor ID C2 (or a trust anchor group containing C2). That would tell the AP that should send a certificate from L with cosigner C2 and that it can skip cosignatures C1 and C2. The RP _may_ yet require other witness/mirror cosigners (say, one of W1, W2, W3, W4, ...), so you should still send those. The negotiation scheme says nothing (yet) about that.\n\nAnd then if either the RP or AP is incapable of negotiation and you decide that this is the fallback certificate, you send a jumbo certificate with every cosigner you've got, because you've got nothing better you can do.",
       "createdAt": "2026-04-20T18:23:53Z",
-      "updatedAt": "2026-04-20T18:23:53Z",
+      "updatedAt": "2026-04-23T17:12:53Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ilaril",
+          "authorAssociation": "NONE",
+          "body": "How does AP know to skip C1 and C3 but still send W1, W2, W3 and W4 (or some subset thereof)? Other than there being separate negotiation for transparency cosigners?\n\nAnd as for fallback certificate, that is going to be X.509 for a long time (without negotiation one can not assume RP supports MTC at all).",
+          "createdAt": "2026-04-23T17:12:53Z",
+          "updatedAt": "2026-04-23T17:12:53Z"
+        }
+      ]
     },
     {
       "number": 214,
@@ -11074,7 +11082,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-01-11T18:41:04Z",
-      "updatedAt": "2026-04-22T20:44:54Z",
+      "updatedAt": "2026-04-23T20:50:18Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -11141,6 +11149,41 @@
           "body": "I think this is only true from a client perspective, servers just use whatever gets pushed down from ACME. So a server wouldn't necessarily trust all the CAs that it uses / have trustworthy sources of information about them. A server generally also wouldn't have a list of \"all\" CAs.\r\n\r\nIt's not relevant to this PR but building on the above point, I see monitoring working by either having all CAs aggregated into individual vindexes, or there being some kind of verifiable discovery step for all the CAs trusted by a particular client. You wouldn't want it to be the case that the server has to have it's own view of what CAs it thinks Samsung TV accepts, where an inaccurate/out-of-date view causes monitoring misses.",
           "createdAt": "2026-01-17T02:08:14Z",
           "updatedAt": "2026-01-17T02:08:14Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> A natural place to commit to verifiable index tree heads is in the landmark checkpoint. And for consistency we could add an entry type for them.\r\n\r\nGoing back to this idea, why doesn't this work? Landmarks are allocated on a strict cadence (one per landmark interval, Section 6.3.2). Every time it allocates a landmark, the CA could insert a landmark log entry (say, just before generating the checkpoint) that commits to vindex tree heads and anything else it likes.\r\n\r\nFor a server doing monitoring, it can either fetch the landmark sequence from the CA (which requires trusting a third party, as you mention) or it can get the location of a relatively fresh landmark (and corresponding landmark log entry) by inspecting any landmark-relative certificates it holds [^1]. Then the server can use the gossip mechanism you described to bootstrap trust in the landmark log entries from RPs by presenting the landmark-relative certs in a TLS handshake.\r\n\r\nOn the negative-results question: the landmark sequence is append-only and monotonically increasing, and any landmark-relative cert the server holds gives a lower bound on landmark freshness (the cert is unexpired, so the landmark it's relative to is within max_cert_lifetime). For vindex monitoring, that's sufficient \u2014 the server doesn't need to prove \"there is no newer landmark,\" only that the entry it's looking at is recent enough. A CA that stopped issuing landmark entries or rolled back its landmark sequence would be detectable the same way any other log misbehavior is: by monitors observing the log structure against cosigned checkpoints.\r\n\r\n[^1]: This would require a format change in MTCProof: instead of encoding the start and end indices of a landmark subtree, we'd need to encode the start and end landmark tree sizes (and from those and the leaf index it's easy to go back to the corresponding landmark subtree with `find_subtrees`, Section 4.5).",
+          "createdAt": "2026-04-23T17:36:09Z",
+          "updatedAt": "2026-04-23T17:36:57Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "There are a few immediate reservations I'd have about that approach:\r\n\r\n- With this PR, if you're able to connect to your website *at all*, and you're confident for whatever reason that there's no MitM, then you get the bootstrap property. With what you're describing, the connection needs to specifically be authenticated by a landmark-relative cert, which isn't guaranteed. It's a lot more ergonomic to care about \"the website is online\" vs \"the website is serving this specific sub-type of certificate\".\r\n\r\n- The security of that approach would seem to come from third-party auditors verifying that a landmark log entry is present at every point where a landmark head is issued. But it's not clear to me that auditors have visibility into which landmark heads have been issued. My understanding so far has been that landmarks are (for the most part) just arbitrary subtrees that browser vendors choose to push down.\r\n\r\n- Like you say, it limits monitoring frequency to be no greater than issuance frequency. But realistically speaking, you would want to know about mis-issuance much faster than you would want to re-issue a valid certificate.",
+          "createdAt": "2026-04-23T18:39:22Z",
+          "updatedAt": "2026-04-23T18:39:22Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> With what you're describing, the connection needs to specifically be authenticated by a landmark-relative cert, which isn't guaranteed.\r\n\r\nOops, yes, I forgot to mention that point. Not sure how serious that limitation would be but good to note. (As a more heavyweight approach, you could insert a \"checkpoint log entry\" every time the log issues a checkpoint if you want this to work for standalone certs. I'm not advocating for this but just mentioning it as another possible tradeoff.)\r\n\r\nOne correction on my original post: The server doesn't really need to trust the CA to use a CA-served landmark sequence as an index into the log. If the landmark sequence points to valid landmark log entries, great! Otherwise, the server has to do more work to find a recent landmark log entry.\r\n\r\n> But it's not clear to me that auditors have visibility into which landmark heads have been issued. My understanding so far has been that landmarks are (for the most part) just arbitrary subtrees that browser vendors choose to push down.\r\n\r\nBoth those issuing landmark-relative certs and RPs need to agree on the landmark tree sizes. (See [section 6.3.1](https://www.ietf.org/archive/id/draft-ietf-plants-merkle-tree-certs-03.html#name-landmark-tree-sizes): \"Landmarks are agreed-upon tree sizes across the ecosystem for optimizing certificates.\") To issue landmark-relative certificates, the CA has to get cosignatures on the landmark subtrees (via /sign-subtree, currently described in Appendix C.2). That would be a fine place to plug in the vindex validation, I think, assuming the log cosigners are the ones doing the vindex auditing.\r\n\r\n> But realistically speaking, you would want to know about mis-issuance much faster than you would want to re-issue a valid certificate.\r\n\r\nIsn't this PR doing the same thing? The server only learns about fresh `accumulated_count`s (and corresponding vindexes) when it gets a fresh certificate?",
+          "createdAt": "2026-04-23T19:19:06Z",
+          "updatedAt": "2026-04-23T19:19:06Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> If the landmark sequence points to valid landmark log entries, great! Otherwise, the server has to do more work to find a recent landmark log entry.\r\n\r\nIf by \"the server has to do more work\", you mean that the server has to process a linear number of certificates, that's not really ideal. The CA is an untrusted party here, it shouldn't be able to force the server to do a prohibitive amount of work to remain secure.\r\n\r\n> To issue landmark-relative certificates, the CA has to get cosignatures on the landmark subtrees (via /sign-subtree, currently described in Appendix C.2). \r\n\r\nIn 7.4 the document says \"It is not necessary that the cosigners have generated signatures over the specific subtrees, only that they are consistent.\" So that would need to change to require 1.) cosignatures that indicate an intent to make a landmark, over the specific subtrees, and 2.) have cosigners verify existence of a landmark log entry before signing. And you'd still have the other downsides we've discussed, so this wouldn't be my preference.\r\n\r\n> Isn't this PR doing the same thing? The server only learns about fresh accumulated_counts (and corresponding vindexes) when it gets a fresh certificate?\r\n\r\nNo, the server is able to go to the CA (or a mirror) at any time and find a newer accumulated log entry (if one exists). The server uses its certificate to gossip the tree head with browsers, so gossip here is limited to issuance frequency. But if the server is stateful, then any fork will be detected eventually. So while the landmark log entry idea is best-case as fast as re-issuance, the accumulated log entry idea is worst-case (= your chosen CA is malicious) as fast as re-issuance and best-case as fast as your CA will allow (allowing you to detect mis-issuances by other CAs sooner).",
+          "createdAt": "2026-04-23T20:37:53Z",
+          "updatedAt": "2026-04-23T20:37:53Z"
+        },
+        {
+          "author": "lukevalenta",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Quick note: section 7.4 refers to pushing landmark subtrees down to RPs, in\r\nwhich case consistency proofs to a signed checkpoint are sufficient. See\r\nsection 6.2 for the construction of certificates which _does_\r\nrequire cosignatures on the exact subtree. (This was also a point of\r\nconfusion in [1], so we should probably clarify the text.)\r\n\r\n[1]\r\nhttps://mailarchive.ietf.org/arch/msg/plants/qFo9aC8WxZBBD936aVYKMhEfqjM/\r\n\r\nOn Thu, Apr 23, 2026 at 4:38\u202fPM Brendan McMillion ***@***.***>\r\nwrote:\r\n\r\n> *Bren2010* left a comment (ietf-plants-wg/merkle-tree-certs#172)\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>\r\n>\r\n> If the landmark sequence points to valid landmark log entries, great!\r\n> Otherwise, the server has to do more work to find a recent landmark log\r\n> entry.\r\n>\r\n> If by \"the server has to do more work\", you mean that the server has to\r\n> process a linear number of certificates, that's not really ideal. The CA is\r\n> an untrusted party here, it shouldn't be able to force the server to do a\r\n> prohibitive amount of work to remain secure.\r\n>\r\n> To issue landmark-relative certificates, the CA has to get cosignatures on\r\n> the landmark subtrees (via /sign-subtree, currently described in Appendix\r\n> C.2).\r\n>\r\n> In 7.4 the document says \"It is not necessary that the cosigners have\r\n> generated signatures over the specific subtrees, only that they are\r\n> consistent.\" So that would need to change to require 1.) cosignatures that\r\n> indicate an intent to make a landmark, over the specific subtrees, and 2.)\r\n> have cosigners verify existence of a landmark log entry before signing. And\r\n> you'd still have the other downsides we've discussed, so this wouldn't be\r\n> my preference.\r\n>\r\n> Isn't this PR doing the same thing? The server only learns about fresh\r\n> accumulated_counts (and corresponding vindexes) when it gets a fresh\r\n> certificate?\r\n>\r\n> No, the server is able to go to the CA (or a mirror) at any time and find\r\n> a newer accumulated log entry (if one exists). The server uses its\r\n> certificate to gossip the tree head with browsers, so gossip here is\r\n> limited to issuance frequency. But if the server is stateful, then any fork\r\n> will be detected eventually. So while the landmark log entry idea is\r\n> best-case as fast as re-issuance, the accumulated log entry idea is\r\n> worst-case (= your chosen CA is malicious) as fast as re-issuance and\r\n> best-case as fast as your CA will allow (allowing you to detect\r\n> mis-issuances by other CAs sooner).\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/ietf-plants-wg/merkle-tree-certs/pull/172?email_source=notifications&email_token=ABAARLFMOORNLRA5IIUYXRL4XJ5LRA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIMZQG44DKMZWG432M4TFMFZW63VHMNXW23LFNZ2KKZLWMVXHJNLQOJPWG33NNVSW45C7N5YGK3S7MNWGSY3L#issuecomment-4307853677>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/ABAARLFVFO7CNO76T5DVAXL4XJ5LRAVCNFSM6AAAAACRLDRLCKVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHM2DGMBXHA2TGNRXG4>\r\n> .\r\n> You are receiving this because you commented.Message ID:\r\n> ***@***.***>\r\n>\r\n\r\n\r\n-- \r\nLuke Valenta\r\nSystems Engineer - Research\r\n",
+          "createdAt": "2026-04-23T20:50:17Z",
+          "updatedAt": "2026-04-23T20:50:17Z"
         }
       ],
       "reviews": []
@@ -13541,7 +13584,7 @@
       "labels": [],
       "body": "Addresses issue #26.",
       "createdAt": "2026-04-20T21:46:56Z",
-      "updatedAt": "2026-04-23T02:31:59Z",
+      "updatedAt": "2026-04-25T16:16:44Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
@@ -13573,6 +13616,20 @@
           "body": "> First, the assertion that there's no incentive to keep witnesses up-to-date does not make sense. Any party in the ecosystem is capable of computing the values needed to catch some witness up.\r\n\r\nThe document doesn't specify the protocol between the witness and the CA, but it does say \"A cosigner MAY expose a private interface for the CA, to reduce denial-of-service risk\" and also mentions the idea of there being witnesses that the CA doesn't communicate with at all. I understand your point as being that it's possible to avoid this happening, but my point is that it's a very big footgun that's non-obvious and seems to be consistent with the text of the document.\r\n\r\n> Anyway, all this presumes a mirror design that cannot get wedged by missing preimages. However, the [current mirror protocol](https://c2sp.org/tlog-mirror) meets its scalability and consistency requirements by operating an internal witness to pre-commit to entries before they are uploaded. Once you have that, all the failure modes of a witness carry over.\r\n\r\nMy understanding is that the tlog-mirror doesn't produce a signature over a portion of the log until it has durably persisted all of the log entries. That's the only guarantee that we need for this to work. Support for a reconciliation operation can be added to tlog-mirror in a backwards-compatible way, and without affecting anything about how MTC works.\r\n\r\n> If N years later, we figure out how to not need them, great. RPs start enforcing a maximum log number of 1 and we all move on. But, in a vacuum, the bar is pretty high to argue \"oh these failure modes are impossible\" or \"oh no this extra synchronizing operation will scale\".\r\n\r\nThe idea that this can be removed later is only true from the perspective of an individual browser. Monitors need to care about what a long tail of browsers might accept. So once this is added and some swath of versions of browsers support it, monitors will need to support it for as long as any of those browser-versions have non-negligible usage. If you don't add this feature now, you won't have to slowly phase it out of the ecosystem later.",
           "createdAt": "2026-04-23T02:31:59Z",
           "updatedAt": "2026-04-23T02:31:59Z"
+        },
+        {
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> The document doesn't specify the protocol between the witness and the CA, but it does say \"A cosigner MAY expose a private interface for the CA, to reduce denial-of-service risk\" and also mentions the idea of there being witnesses that the CA doesn't communicate with at all. I understand your point as being that it's possible to avoid this happening, but my point is that it's a very big footgun that's non-obvious and seems to be consistent with the text of the document.\r\n\r\nEven if the cosigner is private to the CA, if you believe this massive-collateral-damage situation is real, you have to also believe that the CA wouldn't want this to happen. In that world, it is absolutely the case that the CA would be interested in pushing the witness forward.\r\n\r\nThis document also doesn't specify the protocol because it's a general mechanism, not \"here is everything you need to know about this one PKI I'm interested in\". Anything using the tlog ecosystem (including the Web PKI) will presumably use the tlog protocols. Those _are_ specified: https://c2sp.org/tlog-witness https://c2sp.org/tlog-mirror\r\n\r\n(As it turns out, what that paragraph was actually talking about was the subtree signer oracle, as that doesn't have the forward-progress-always property that witnesses have. So this is really all a distraction. Maybe we should just delete that whole paragraph.)\r\n\r\nBut, regardless, this all seems to be unrelated to the topic at hand. Your overall claim seems to be that we should disregard witness-based PKIs, which is a bold claim that cuts out a large number of applications. (E.g. the interest from folks in the WG for applying some of this to private PKIs.) The argument for this claim is that there is a theoretical situation that might result in a massive collateral damage. However, that theoretical situation is, in itself, only plausible if everyone acts against their incentives to reduce risk. Moreover, even if that all went wrong, there is a clear technical mechanism to avoid the collateral damage: only close off that one witness's view of the broken log.\r\n\r\n> My understanding is that the tlog-mirror doesn't produce a signature over a portion of the log until it has durably persisted all of the log entries. That's the only guarantee that we need for this to work. Support for a reconciliation operation can be added to tlog-mirror in a backwards-compatible way, and without affecting anything about how MTC works.\r\n\r\nYes, when tlog-mirror gets stuck, it has not _cryptographically_ committed to anything what would prevent it from resetting the pending checkpoint. That does not mean resetting state solves the problem. Unless it can be integrated into the design in a safe, automatic, and scaleable way, we're talking about a manual intervention, across multiple parties in the ecosystem. That will take a ton of coordination across the ecosystem, during which time there is a PKI outage. That's not operationally acceptable.\r\n\r\nBy contrast, the log generations approach maintains availability (the next few generations would be active already) while the ecosystem reacts to the incident. This matches how we handle PKIs today.\r\n\r\nNow, I say all this, and I actually _do_ think making these protocols more robust, where possible, is a good idea. If we can make mirrors hard to wedge, awesome. If it takes a manual but still fairly safe \"drop temporary state and kill all pending update requests\" button somewhere, maybe that's still useful. But that is unchartered territory and added risk. The right place to start is aligned with what we have experience with.\r\n\r\n> The idea that this can be removed later is only true from the perspective of an individual browser. Monitors need to care about what a long tail of browsers might accept. So once this is added and some swath of versions of browsers support it, monitors will need to support it for as long as any of those browser-versions have non-negligible usage. If you don't add this feature now, you won't have to slowly phase it out of the ecosystem later.\r\n\r\n\"Later\" is much easier than you think. Today, every CT-enforcing client has an enforcement shut-off after 10 weeks. This is an operational necessity because we do not have a story today for clients with arbitrarily old log lists to continue to function.\r\n\r\nI really dislike this mechanism, and am excited because MTCs finally gives a plausible path to not needing it. (See all my vague muttering about cosigner agility and negotiation. Also compare CT's need for year-sharded logs and an MTC cosigner's identity being stable.)\r\n\r\nHowever, it is totally implausible, with the timelines we're working with, that we'll remove it in day 1 of MTCs. I expect the initial MTC story will be:\r\n* Clients that do not require transparency cosigners at all (analog of today's non-CT-enforcing clients)\r\n* Clients that require transparency cosigners, but disable this after being stale (analog of today's CT-enforcing clients)\r\n\r\nThat means later here is at most 10 weeks. Even as things improve here, think about the rest of the picture. The reason monitors care about monitoring all this stuff is that we want to find bad certs. But finding a bad cert doesn't automatically make it better. It's an alerting mechanism. The security enforcement comes later, with actions like...\r\n* Maybe the cert is revoked and the revocation is pushed to clients\r\n* Maybe a CA is found untrustworthy and a removal is pushed to clients\r\n\r\nTransparency and monitoring cannot help stale clients. So we're already not talking about the long-tail on the time axis.",
+          "createdAt": "2026-04-24T20:45:05Z",
+          "updatedAt": "2026-04-24T20:46:33Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> But, regardless, this all seems to be unrelated to the topic at hand. Your overall claim seems to be that we should disregard witness-based PKIs, which is a bold claim that cuts out a large number of applications.\r\n\r\nI don't believe I claimed that. I'm pointing out a problem and proposing a solution. There are multiple solutions to the same problem though, and we can compare them.\r\n\r\nYou could add text to the document saying that all cosigners should always be kept relatively up to date. You could specify cosigner-based or subtree-based revocation. These are both direct, reasonable solutions to parts of what I stated. However, you'd want to do at least one of these regardless of whether you implement log generations or reconciliation, so these aren't points of differentiation.\r\n\r\nThe benefits of reconciliation over log generations are:\r\n- Reconciliation requires no protocol mechanism in MTC and is easier to evolve over time.\r\n- With log generations, monitoring any combination of (CA, log generation, mirror) could result in observing different certificates. With reconciliation, there are no log generations and it doesn't long-term matter which mirror you use, so it's much simpler to observe all certificates issued by a CA.\r\n\r\nThe downside of reconciliation over log generations is:\r\n- It doesn't work for witnesses. However, I'd say that fits into a larger pattern of significant downsides that come from using witnesses. Another one being: the ability of a CA to cosign some certificate and then refuse to publish it. That's a much weaker transparency property than CT provides today. If witnesses are only meant for less robust, private PKI-type deployments, maybe it's fine that reconciliation isn't an option for them?\r\n\r\n> Unless it can be integrated into the design in a safe, automatic, and scaleable way, we're talking about a manual intervention, across multiple parties in the ecosystem.\r\n\r\nThe reconciliation operation is essentially: \"given list A and list B, verify that B is a superset of A.\" That can obviously be automated in a lot of ways, and generally with time complexity O(n log n) and space O(n). That's the same time and space complexity that running a mirror already takes, so I would generally expect this to be as scalable as the rest of the mirror operations. If you think it has a realistic chance of getting merged, I'm happy to write a proposal to c2sp.",
+          "createdAt": "2026-04-25T16:16:44Z",
+          "updatedAt": "2026-04-25T16:16:44Z"
         }
       ],
       "reviews": [
@@ -13775,6 +13832,169 @@
               "body": "For the same reason that we probably don't need the issuer, we probably don't need the log number either. I haven't thought through whether removing it could cause issues down the line. I'm going to leave this comment thread open for now and I'll probably remove it later.",
               "createdAt": "2026-04-20T23:36:48Z",
               "updatedAt": "2026-04-20T23:36:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74u9hv",
+          "commit": {
+            "abbreviatedOid": "0631d53"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-24T19:57:38Z",
+          "updatedAt": "2026-04-24T20:12:09Z",
+          "comments": [
+            {
+              "originalPosition": 63,
+              "body": "Well, the considerations around the issuer are mostly malleability of the TBSCertificate, whether it's possible that a different issuer byte string might result in the same TBSCertificateLogEntry. They can't if the parser\n\nI don't think that directly applies to the logNumber because we're already having to decode and reencode a different value when we go from TBSCertificate to TBSCertificateLogEntry. If we put the whole serial number in, that could help, but that makes the log API very complex because you need to synchronize generating the log entry bytes. So, for serial number, [security considerations](https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-certificate-malleability) talk about needing to be strict in processing that.\n\nWe *could* have done the same with the issuer field, but since X.509 names are tied up with canonicalization, I opted to just copy it in and not think too hard about it.\n\nBut since none of that applies to `logNumber`, I think that points to omitting it.",
+              "createdAt": "2026-04-24T19:57:38Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/215 is uploaded now and requires a log ID.\r\n\r\nIf there is a log ID, we need to be *at least* opinionated enough to be able to deterministically construct the signature payload. The point of this scheme is that your one config blob will get you all the log numbers at once\r\n\r\nWe *could* potentially be unopinionated about things like cosigner IDs or landmark IDs (but I think it is better to be opinionated). That's because, in the unopinionated model, those would be a couple of extra fields in your config.\r\n\r\n(The landmark IDs are themselves already constructed OIDs because they take up a whole OID arc. That is fine and the reason we used OIDs.)",
+              "createdAt": "2026-04-24T20:01:36Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 116,
+              "body": "Out-of-date TODO?",
+              "createdAt": "2026-04-24T20:03:10Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "Out-of-date TODO?",
+              "createdAt": "2026-04-24T20:03:25Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 142,
+              "body": "Instead of \"lowest\", \"least significant\"? Although that gets into silly questions like:\n* Is the type of the least significant bits list<bit> or integer?\n* What happens if the serial number is negative, since 5280 says \"Certificate users SHOULD be prepared to gracefully handle such certificates\" and most stacks tolerate it.\n\nWhat about:\n\n```suggestion\n1. Let `serial` be the certificate's serial number. If `serial` is negative, abort this process and fail verification.\n1. Let `index` be `serial` modulo 2<sup>64</sup>, and let `log_number` be `serial >> 64`.\n```\n\nShould we reject `log_number` zero?",
+              "createdAt": "2026-04-24T20:06:57Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 156,
+              "body": "It does feel odd to not say anything anywhere about what RPs and CAs are expected to do with this. We don't actually expect the RP to have subtrees configured for every one of the range of logs that exist. (Maybe we can leave that in a TODO where this is all set up? I dunno.)",
+              "createdAt": "2026-04-24T20:10:04Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            },
+            {
+              "originalPosition": 185,
+              "body": "While we _have_ gotten rid of the ASCII-to-binary conversion now, I think it is still better to just append the number as a dot. The spec as it exists right now does not technically admit a path component after the OID.\nhttps://github.com/C2SP/C2SP/blob/main/tlog-cosignature.md#:~:text=For%20ecosystems%20that%20use%20OIDs%20for%20identification%2C%20the%20key%20name%20MAY%20be%20the%20string%20oid/%20followed%20by%20an%20OID%20in%20dotted%20decimal%20form.\n\n(Also just seems unnecessary to invent a second kind of combiner because we _already_ have a way to append integers.)",
+              "createdAt": "2026-04-24T20:12:01Z",
+              "updatedAt": "2026-04-24T20:12:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74vqvT",
+          "commit": {
+            "abbreviatedOid": "0631d53"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-24T20:32:47Z",
+          "updatedAt": "2026-04-24T20:32:47Z",
+          "comments": [
+            {
+              "originalPosition": 142,
+              "body": "Oh we also are missing a story for whether the client accepts that log number. The client is going to need a minimum log number (to close out the bad generations) and probably an optional maximum one.",
+              "createdAt": "2026-04-24T20:32:47Z",
+              "updatedAt": "2026-04-24T20:32:47Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 215,
+      "id": "PR_kwDOJIBkVc7VBa1l",
+      "title": "Align signature scheme with tlog-cosignature",
+      "url": "https://github.com/ietf-plants-wg/merkle-tree-certs/pull/215",
+      "state": "OPEN",
+      "author": "davidben",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This makes minor changes to the signature scheme to make it compatible with https://c2sp.org/tlog-cosignature, with the aim that MTCs can be more easily deployed by using unmodified tlog-based software.\r\n\r\nThis does not add a normative dependency on tlog, though we do non-normatively cite a tlog document so readers know the signature construction was chosen to be compatible. It also remains unnecessary to use tlog to implement MTCs. This is just defining the format for the signature input.\r\n\r\nWhile I'm here, some of the discussion about cosignatures was... very confusing. We were talking about keeping a current checkpoint and everything, without defining cosigner roles. Let's leave exact state to the cosigner roles and instead, here, we can just abstractly define what you need to guarantee.\r\n\r\n\"Cosigners SHOULD publish their current checkpoint, along with the checkpoint signature\" was particularly weird since it doesn't say how to publish it. While it is true for basically all cosigners in CT-like deployments, it should be for the individual cosigner roles to define.",
+      "createdAt": "2026-04-23T14:58:32Z",
+      "updatedAt": "2026-04-24T22:37:54Z",
+      "baseRepository": "ietf-plants-wg/merkle-tree-certs",
+      "baseRefName": "main",
+      "baseRefOid": "6b34c98dfd33493ead59a004bf9b7e0fade519f7",
+      "headRepository": "ietf-plants-wg/merkle-tree-certs",
+      "headRefName": "tlog-compatible",
+      "headRefOid": "5943ecf62cdea1c8d72f0c93448dcab04408df6f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOJIBkVc74vOFQ",
+          "commit": {
+            "abbreviatedOid": "43c26ca"
+          },
+          "author": "aarongable",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-24T20:10:05Z",
+          "updatedAt": "2026-04-24T20:10:27Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "These two paragraphs make it clear that `start` and `timestamp` are mutually exclusive, but it's (to me) very unclear _why_ that is the case. This is especially confusing because the second paragraph assigns a name (\"checkpoint signature\") to one of these kinds of certs (where `start` is zero), and then says that this document only uses the _other_ kind of signature (where `timestamp` is zero), which doesn't have a name. Why assign a name to one thing, and then say that we're using the other thing?",
+              "createdAt": "2026-04-24T20:10:05Z",
+              "updatedAt": "2026-04-24T20:10:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74wwCt",
+          "commit": {
+            "abbreviatedOid": "43c26ca"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-24T21:33:00Z",
+          "updatedAt": "2026-04-24T21:33:00Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "> These two paragraphs make it clear that start and timestamp are mutually exclusive, but it's (to me) very unclear why that is the case.\n\nI mean the narrow answer for \"why that is the case\" is \"because the proposed spec text defines it that way\", but that is unhelpful. \ud83d\ude43\n\nThe answer for \"why is this defined that way\" is that there are two incompatible definitions for what the timestamp could mean:\n\n1. I generated this signature at time T, so my view of the tree was *at least as big as* [start, end) at the time T.\n2. I generated this signature at time T over *my entire view of the tree*. Not only was the tree *at least as big* as [start, end) at time T, but *end is the size of the tree as of T*.\n\ntlog-witness uses the second semantics for checkpoint signatures. (There are no subtree signatures in tlog yet, we need to go back and add them.) This is useful for monitoring because you know that you've received a fresh status from the witness, rather than a replay of an old one.\n\nHowever, the second semantics are kinda incompatible with subtree signatures embedded in certificates for a couple reasons:\n\nFirst, say you go from tree size 1023 to tree size 1100 in a batch of certs. You ideally construct that cert by signing [1023, 1100), but that range is not a subtree. If you were to build a Merkle Tree over it, you could not efficiently prove it consistent with [0, 1100). So we have this construction where it's split into a [pair of subtrees](https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-arbitrary-intervals), specifically [1023, 1024) and [1024, 1100). But that first subtree is necessarily behind the witness position, so it cannot possibly meet condition 2. I would needed to have gone back in time to find when my view of the tree was at 1024.\n\nEven without this two-subtrees construction, getting certificate-embedded signatures to meet condition 2 seems very tricky. Witnesses only move forward. Say you're trying to mint certificates anchored on [1023, 1100), so you catch the witnesses up to size 1100. If some witness was _already_ past 1100, you cannot rewind it. It will never again be willing to claim end = 1100 under condition 2.\n\nNow, if \"you\" are the CA, okay, presumably you didn't add anything past 1100, so the witness cannot possibly be past 1100. But this assumes that signature collection happens in lockstep with appending to the tree. Maybe your issuing thread has gone ahead and moved the log forward. Or maybe \"you\" isn't the CA at all and this is a site operator trying to collect an extra cosignature that the CA missed.\n\nIt seems operationally a lot simpler to say:\n\n* First you catch the witness up to *anywhere* past the subtree. If it was already caught up, or somehow got ahead, that's cool. It just needs to be contained in it.\n\n* The witness exposes some [sign subtree](https://ietf-plants-wg.github.io/merkle-tree-certs/draft-ietf-plants-merkle-tree-certs.html#name-requesting-subtree-signatur) endpoint to request subtree signatures for anything contained in the current position.\n\nThose signatures cannot meet condition (2), so they must be distinguishable from checkpoint signatures. They _could_ in theory meet condition (1), but there didn't seem to be a clear use case for condition (1), so the signature scheme just says \"your options are to assert condition (2) or to make no assertion\". \ud83e\udd37 \n\n>  This is especially confusing because the second paragraph assigns a name (\"checkpoint signature\") to one of these kinds of certs (where start is zero), and then says that this document only uses the other kind of signature (where timestamp is zero), which doesn't have a name. Why assign a name to one thing, and then say that we're using the other thing?\n\nIt's an awkward artifact of the scoping. This document defines certificates, which only use subtree signatures. But we expect it will often (certainly in the Web PKI) be used as part of a broader system (log mirroring and witnessing) that _does_ generate checkpoint signatures.\n\nIf we just say \"timestamp is zero\" and move on, then it's a little unclear what it means if someone signs something where timestamp is non-zero. Does it mean:\n\n* This is an illegal use of the CA's key and therefore misissuance? That would be bad. We _want_ the CA to generate checkpoint signatures.\n* This is out of scope for definition of the CA and therefore we don't care what the signature contains? That would be bad. If the CA signs a checkpoint containing misissued stuff, that stuff still in scope for misissuance.\n\nGiven that, and the desire to avoid a normative reference to tlog-cosignature, I figured I'd just redefine it here. Though the wording is awkward so I'll take another pass at it.",
+              "createdAt": "2026-04-24T21:33:00Z",
+              "updatedAt": "2026-04-24T21:33:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOJIBkVc74xv3L",
+          "commit": {
+            "abbreviatedOid": "43c26ca"
+          },
+          "author": "davidben",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-24T22:37:54Z",
+          "updatedAt": "2026-04-24T22:37:54Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "Took another pass at it. WDYT?",
+              "createdAt": "2026-04-24T22:37:54Z",
+              "updatedAt": "2026-04-24T22:37:54Z"
             }
           ]
         }
