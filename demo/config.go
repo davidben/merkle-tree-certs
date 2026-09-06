@@ -45,15 +45,11 @@ func (v DraftVersion) String() string {
 	panic(fmt.Sprintf("unknown version %d", v))
 }
 
-func (v *DraftVersion) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
+func (v *DraftVersion) UnmarshalText(text []byte) error {
 	var ok bool
-	*v, ok = DraftVersionFromString(s)
+	*v, ok = DraftVersionFromString(string(text))
 	if !ok {
-		return fmt.Errorf("unknown version %q", s)
+		return fmt.Errorf("unknown version %q", text)
 	}
 	return nil
 }
@@ -127,15 +123,11 @@ func (s SignatureAlgorithm) String() string {
 	}
 }
 
-func (s *SignatureAlgorithm) UnmarshalJSON(data []byte) error {
-	var v string
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
+func (s *SignatureAlgorithm) UnmarshalText(text []byte) error {
 	var ok bool
-	*s, ok = SignatureAlgorithmFromString(v)
+	*s, ok = SignatureAlgorithmFromString(string(text))
 	if !ok {
-		return fmt.Errorf("invalid signature algorithm: %q", v)
+		return fmt.Errorf("invalid signature algorithm: %q", text)
 	}
 	return nil
 }
@@ -304,15 +296,11 @@ func (t TrustAnchorID) String() string {
 	return s.String()
 }
 
-func (t *TrustAnchorID) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
+func (t *TrustAnchorID) UnmarshalText(text []byte) error {
 	var ok bool
-	*t, ok = TrustAnchorIDFromString(s)
+	*t, ok = TrustAnchorIDFromString(string(text))
 	if !ok {
-		return fmt.Errorf("invalid trust anchor ID: %q", s)
+		return fmt.Errorf("invalid trust anchor ID: %q", text)
 	}
 	return nil
 }
@@ -355,25 +343,21 @@ func (k *KeyUsageConfig) UnmarshalJSON(data []byte) error {
 
 type ExtKeyUsageConfig asn1.ObjectIdentifier
 
-func (e *ExtKeyUsageConfig) UnmarshalJSON(data []byte) error {
-	var value string
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
+func (e *ExtKeyUsageConfig) UnmarshalText(text []byte) error {
 	var oid asn1.ObjectIdentifier
-	switch value {
+	switch s := string(text); s {
 	case "ServerAuth":
 		oid = oidServerAuth
 	default:
-		for _, part := range strings.Split(value, ".") {
+		for _, part := range strings.Split(s, ".") {
 			v, err := strconv.Atoi(part)
 			if err != nil || v < 0 {
-				return fmt.Errorf("invalid extended key usage: %q", value)
+				return fmt.Errorf("invalid extended key usage: %q", s)
 			}
 			oid = append(oid, v)
 		}
 		if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) {
-			return fmt.Errorf("invalid extended key usage: %q", value)
+			return fmt.Errorf("invalid extended key usage: %q", s)
 		}
 	}
 	*e = ExtKeyUsageConfig(oid)
