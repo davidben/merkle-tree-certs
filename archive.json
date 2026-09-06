@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-03T04:08:37.231553+00:00",
+  "timestamp": "2026-09-06T04:20:20.583682+00:00",
   "repo": "ietf-plants-wg/merkle-tree-certs",
   "labels": [
     {
@@ -21193,9 +21193,9 @@
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
-      "body": "## Summary\n- Adds a regenerable end-to-end certificate encoding test vector in the demo tool (`demo/e2e_test.go`, `demo/e2e_certificate.{txt,json}`), covering intermediates from `TBSCertificateLogEntry` through leaf hash, inclusion proof, CosignedMessage, `MTCProof`, and Certificate.\n- Uses a small plants-05 example (two-entry log, Ed25519 CA cosigner for deterministic signatures) and round-trips through `VerifyMTCProof`.\n- Adds a short draft appendix under Test Vectors with the worked intermediate values and an informative reference to the demo files.\n\nFixes #291\n\n## Test plan\n- [ ] `cd demo && go test ./...`\n- [ ] `cd demo && go test -run TestE2ECertificateVector -update` regenerates goldens that match the committed files\n- [ ] Spot-check draft appendix hex against `demo/e2e_certificate.txt`\n\n\nMade with [Cursor](https://cursor.com)",
+      "body": "## Summary\r\n- Adds a regenerable end-to-end certificate encoding test vector in the demo tool (`demo/e2e_test.go`, `demo/e2e_certificate.{txt,json}`), covering intermediates from `TBSCertificateLogEntry` through leaf hash, inclusion proof, CosignedMessage, `MTCProof`, and Certificate.\r\n- Uses a small plants-05 example (two-entry log, Ed25519 CA cosigner for deterministic signatures) and round-trips through `VerifyMTCProof`.\r\n- Adds a short draft appendix under Test Vectors with the worked intermediate values and an informative reference to the demo files.\r\n\r\nFixes #291\r\n\r\n## Test plan\r\n- [ ] `cd demo && go test ./...`\r\n- [ ] `cd demo && go test -run TestE2ECertificateVector -update` regenerates goldens that match the committed files\r\n- [ ] Spot-check draft appendix hex against `demo/e2e_certificate.txt`",
       "createdAt": "2026-08-31T21:53:57Z",
-      "updatedAt": "2026-08-31T21:53:57Z",
+      "updatedAt": "2026-09-04T12:41:52Z",
       "baseRepository": "ietf-plants-wg/merkle-tree-certs",
       "baseRefName": "main",
       "baseRefOid": "1bf9277eacbc45ab0e6d0b943f0550304cbe4c4c",
